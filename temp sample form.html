@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Custom Form with Summary</title>
+    <style>
+      .summary {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Form Questions</h1>
+
+    <!-- Section 1: Questions -->
+    <div id="questions-section">
+      <label for="dropdown">Select an option:</label>
+      <select id="dropdown">
+        <option value="Option 1">Option 1</option>
+        <option value="Option 2">Option 2</option>
+        <option value="Option 3">Option 3</option>
+      </select><br>
+
+      <label for="checkbox">Select your preferences:</label><br>
+      <input type="checkbox" id="checkbox1" value="Preference 1"> Preference 1<br>
+      <input type="checkbox" id="checkbox2" value="Preference 2"> Preference 2<br>
+      <input type="checkbox" id="checkbox3" value="Preference 3"> Preference 3<br>
+
+      <label for="text">Enter your text:</label><br>
+      <input type="text" id="text"><br>
+
+      <label for="date">Pick a date:</label>
+      <input type="date" id="date"><br>
+
+      <button onclick="showSummary()">Next</button>
+    </div>
+
+    <!-- Section 2: Summary -->
+    <div id="summary-section" class="summary">
+      <h2>Summary of Your Answers</h2>
+      <p><strong>Dropdown selection:</strong> <span id="dropdown-summary"></span></p>
+      <p><strong>Checkbox selections:</strong> <span id="checkbox-summary"></span></p>
+      <p><strong>Text input:</strong> <span id="text-summary"></span></p>
+      <p><strong>Date selected:</strong> <span id="date-summary"></span></p>
+
+      <button onclick="submitForm()">Submit</button>
+    </div>
+
+    <script>
+      function showSummary() {
+        // Gather answers
+        var dropdown = document.getElementById("dropdown").value;
+        var checkboxes = [];
+        if (document.getElementById("checkbox1").checked) checkboxes.push("Preference 1");
+        if (document.getElementById("checkbox2").checked) checkboxes.push("Preference 2");
+        if (document.getElementById("checkbox3").checked) checkboxes.push("Preference 3");
+        var text = document.getElementById("text").value;
+        var date = document.getElementById("date").value;
+
+        // Show the summary
+        document.getElementById("dropdown-summary").textContent = dropdown;
+        document.getElementById("checkbox-summary").textContent = checkboxes.join(", ");
+        document.getElementById("text-summary").textContent = text;
+        document.getElementById("date-summary").textContent = date;
+
+        // Hide the questions section and show the summary section
+        document.getElementById("questions-section").style.display = "none";
+        document.getElementById("summary-section").style.display = "block";
+      }
+
+      function submitForm() {
+        // Here you can send the data to a Google Sheet, for example
+        alert("Form Submitted! (You can send data to Google Sheets or other backends)");
+      }
+    </script>
+  </body>
+</html>
