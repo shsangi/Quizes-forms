@@ -98,14 +98,8 @@
       flex-direction: column;
       gap: 1.5rem;
       margin: 0.5rem 0 1.5rem;
-      max-height: 550px;
-      overflow-y: auto;
-      padding-right: 0.5rem;
-      scroll-behavior: smooth;
+      /* No max-height or overflow — uses page scroll */
     }
-    /* Hide scrollbar but keep functionality */
-    .all-questions-container::-webkit-scrollbar { width: 0; background: transparent; }
-    .all-questions-container { scrollbar-width: none; -ms-overflow-style: none; }
 
     .all-q-item {
       background: #fafcfe;
@@ -113,7 +107,7 @@
       border-radius: 1.2rem;
       padding: 1rem 1.2rem;
       transition: 0.1s;
-      scroll-margin-top: 10px;
+      scroll-margin-top: 80px;
     }
     .all-q-item.correct-item { border-color: #1f8b4c; background: #f0faf4; }
     .all-q-item.wrong-item { border-color: #b33c3c; background: #fdf2f2; }
@@ -309,10 +303,6 @@
       overflow-y: auto;
       padding-right: 0.5rem;
     }
-    .result-details::-webkit-scrollbar { width: 6px; }
-    .result-details::-webkit-scrollbar-track { background: #e6edf5; border-radius: 10px; }
-    .result-details::-webkit-scrollbar-thumb { background: #8aacbf; border-radius: 10px; }
-
     .result-details .detail-item {
       background: #fafcfe;
       border: 1px solid #e2eaf2;
@@ -359,7 +349,6 @@
       .result-details { max-height: 300px; }
       .action-bar { flex-direction: column; }
       .btn-primary, .btn-success { width: 100%; justify-content: center; }
-      .all-questions-container { max-height: 400px; }
     }
   </style>
 </head>
@@ -641,9 +630,13 @@
     function scrollToQuestion(index) {
       const items = allQuestionsContainer.querySelectorAll('.all-q-item');
       if (items[index]) {
-        items[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        items[index].classList.remove('highlight');
-        setTimeout(() => items[index].classList.add('highlight'), 50);
+        const element = items[index];
+        const yOffset = -80;
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+        
+        element.classList.remove('highlight');
+        setTimeout(() => element.classList.add('highlight'), 50);
         renderDots(index);
       }
     }
