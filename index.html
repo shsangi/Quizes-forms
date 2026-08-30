@@ -255,6 +255,13 @@
       flex: 1;
     }
 
+    .feedback-msg .no-answer {
+      font-size: 0.75rem;
+      color: #999;
+      margin-left: 0.5rem;
+      font-weight: 400;
+    }
+
     .nav-group {
       display: flex;
       gap: 0.7rem;
@@ -343,6 +350,7 @@
     .legend-dot.done { background: #1f8b4c; }
     .legend-dot.active { background: #2f7b9e; }
     .legend-dot.pending { background: #dce6ef; }
+    .legend-dot.no-answer-dot { background: #999; }
 
     .grid-dots {
       display: flex;
@@ -379,6 +387,11 @@
 
     .grid-dot.wrong-dot {
       background: #b33c3c;
+      color: white;
+    }
+
+    .grid-dot.no-answer-dot {
+      background: #999;
       color: white;
     }
 
@@ -481,6 +494,7 @@
             <span class="legend-item"><span class="legend-dot done"></span> Done</span>
             <span class="legend-item"><span class="legend-dot active"></span> Active</span>
             <span class="legend-item"><span class="legend-dot pending"></span> Pending</span>
+            <span class="legend-item"><span class="legend-dot no-answer-dot"></span> No Answer</span>
           </div>
         </div>
         <div class="grid-dots" id="dotGrid"></div>
@@ -561,79 +575,46 @@
       const lines = text.split('\n').filter(line => line.trim() !== '');
       if (lines.length < 2) return [];
 
-      // Parse header to find column indexes
-      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
-      const qIdx = header.findIndex(h => h.includes('question'));
-      const optIdx = [];
-      const correctIdx = header.findIndex(h => h.includes('correct') || h.includes('answer'));
-
-      // Find option columns (A, B, C, D or option1, option2, etc.)
-      for (let i = 0; i < header.length; i++) {
-        const h = header[i];
-        if (h.includes('option') || h.includes('choice') || h.match(/^[a-d]$/)) {
-          optIdx.push(i);
-        }
-      }
-
-      // If no option columns found, try to find A, B, C, D columns
-      if (optIdx.length === 0) {
-        for (let i = 0; i < header.length; i++) {
-          const h = header[i].toUpperCase();
-          if (h === 'A' || h === 'B' || h === 'C' || h === 'D') {
-            optIdx.push(i);
-          }
-        }
-      }
-
-      // If still no options, assume columns 1-4 are options (after question)
-      if (optIdx.length === 0 && qIdx !== -1) {
-        for (let i = qIdx + 1; i < Math.min(qIdx + 5, header.length); i++) {
-          optIdx.push(i);
-        }
-      }
-
       const result = [];
+
       for (let i = 1; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
-        if (cols.length === 0) continue;
+        if (cols.length < 6) continue; // Need at least E, F, G, H, I, J
 
-        const question = qIdx !== -1 && qIdx < cols.length ? cols[qIdx].trim() : '';
+        // Column E (index 4) = Question
+        const question = cols[4] ? cols[4].trim() : '';
         if (!question) continue;
 
-        const options = optIdx
-          .filter(idx => idx < cols.length)
-          .map(idx => cols[idx].trim())
-          .filter(opt => opt !== '');
+        // Columns F, G, H, I (indices 5, 6, 7, 8) = Choices
+        const options = [
+          cols[5] ? cols[5].trim() : '',
+          cols[6] ? cols[6].trim() : '',
+          cols[7] ? cols[7].trim() : '',
+          cols[8] ? cols[8].trim() : ''
+        ];
 
-        // If we have fewer than 4 options, pad with empty strings
-        while (options.length < 4) {
-          options.push('(Option missing)');
-        }
+        // Column J (index 9) = Correct Answer (exact match)
+        const correctAnswer = cols[9] ? cols[9].trim() : '';
 
-        let correct = 0;
-        if (correctIdx !== -1 && correctIdx < cols.length) {
-          const val = cols[correctIdx].trim();
-          // Try to parse as number (0-indexed or 1-indexed)
-          const num = parseInt(val);
-          if (!isNaN(num)) {
-            correct = num >= 1 ? num - 1 : num;
-          } else {
-            // Try to match letter A, B, C, D
-            const letter = val.toUpperCase();
-            if (letter === 'A') correct = 0;
-            else if (letter === 'B') correct = 1;
-            else if (letter === 'C') correct = 2;
-            else if (letter === 'D') correct = 3;
+        // Find the index of the correct answer in options
+        let correctIndex = -1;
+        if (correctAnswer) {
+          for (let j = 0; j < options.length; j++) {
+            if (options[j] === correctAnswer) {
+              correctIndex = j;
+              break;
+            }
           }
         }
 
-        // Ensure correct is within bounds
-        if (correct < 0 || correct >= options.length) correct = 0;
+        // If no match found, correctIndex remains -1
+        // We'll handle this in the quiz logic
 
         result.push({
           question: question,
-          options: options.slice(0, 4),
-          correct: correct
+          options: options,
+          correct: correctIndex, // -1 means "No answer in db"
+          correctText: correctAnswer || 'No answer in db'
         });
       }
 
@@ -706,14 +687,25 @@
       q.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
-        btn.innerHTML = `<span class="letter">${letters[idx]}</span> ${opt}`;
+        btn.innerHTML = `<span class="letter">${letters[idx]}</span> ${opt || '(Empty)'}`;
         btn.dataset.index = idx;
         btn.addEventListener('click', () => handleOptionClick(idx));
+        if (!opt) {
+          btn.style.opacity = '0.5';
+          btn.style.cursor = 'not-allowed';
+        }
         optionsContainer.appendChild(btn);
       });
 
-      feedbackMessage.textContent = '✨ Select an answer';
-      feedbackMessage.style.background = '#f0f4f9';
+      // Show if there's no answer in DB
+      if (q.correct === -1) {
+        feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(Column J doesn't match any choice)</span>`;
+        feedbackMessage.style.background = '#fff3cd';
+      } else {
+        feedbackMessage.textContent = '✨ Select an answer';
+        feedbackMessage.style.background = '#f0f4f9';
+      }
+
       isAnswered = false;
       nextBtn.disabled = true;
 
@@ -732,6 +724,14 @@
     function handleOptionClick(selectedIdx) {
       if (isAnswered) return;
       const q = questions[currentIndex];
+      
+      // If no answer in DB, just show message and don't allow answering
+      if (q.correct === -1) {
+        feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(This question has no matching answer in Column J)</span>`;
+        feedbackMessage.style.background = '#fff3cd';
+        return;
+      }
+
       const isCorrect = (selectedIdx === q.correct);
       const allOptions = document.querySelectorAll('.option-btn');
 
@@ -751,7 +751,7 @@
         feedbackMessage.style.background = '#d4edda';
         answerStatus[currentIndex] = true;
       } else {
-        feedbackMessage.textContent = `❌ The correct answer was ${String.fromCharCode(65 + q.correct)}.`;
+        feedbackMessage.textContent = `❌ The correct answer was "${q.options[q.correct]}"`;
         feedbackMessage.style.background = '#f5dddd';
         answerStatus[currentIndex] = false;
       }
@@ -804,7 +804,11 @@
         if (i === currentIndex && !quizCompleted) {
           dot.classList.add('active');
         }
-        if (answerStatus[i] === true) {
+        
+        // Check if this question has no answer in DB
+        if (questions[i] && questions[i].correct === -1) {
+          dot.classList.add('no-answer-dot');
+        } else if (answerStatus[i] === true) {
           dot.classList.add('answered');
         } else if (answerStatus[i] === false) {
           dot.classList.add('wrong-dot');
