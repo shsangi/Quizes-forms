@@ -289,7 +289,7 @@
     .result-msg { color: #1f4b61; font-size: 1.1rem; margin: 0.2rem 0 1.6rem; }
     .result-card .btn-outline { font-size: 1rem; padding: 0.7rem 2.8rem; }
     .loading { text-align: center; padding: 2rem; color: #1f4d66; font-weight: 500; }
-    .error { color: #b33c3c; background: #f5dddd; padding: 1rem; border-radius: 1.5rem; margin: 1rem 0; display: none; }
+    .error { color: #b33c3c; background: #f5dddd; padding: 1rem; border-radius: 1.5rem; margin: 1rem 0; }
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand h1 { font-size: 1.4rem; }
@@ -319,7 +319,7 @@
 
     <!-- loading / error -->
     <div id="loadingMessage" class="loading">📥 Loading questions from Google Sheet...</div>
-    <div id="errorMessage" class="error"></div>
+    <div id="errorMessage" class="error" style="display:none;"></div>
 
     <!-- question area -->
     <div id="questionArea" style="display:none;">
@@ -363,8 +363,39 @@
   (function() {
     // ---------- CONFIG ----------
     // Replace with your Google Sheet CSV export URL (published as CSV)
-    // For your sheet: https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv";
+    // Example: "https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv"
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVz/pub?output=csv";
+
+    // fallback data if sheet fails (first question from your example + a few more)
+    const FALLBACK_QUESTIONS = [
+      {
+        srno: "1", qno: "1", subject: "Jurisprudence", topic: "Ijtihad",
+        question: "Consider the following statements regarding Ijtihad in Islamic jurisprudence: (1) It is disciplined juristic reasoning rather than unrestricted personal preference. (2) It operates within an accepted methodological framework of Islamic sources and principles. (3) It necessarily permits a jurist to disregard an explicit and authoritative textual ruling whenever contemporary circumstances appear different. (4) Its continuing relevance is particularly evident where new circumstances require principled legal reasoning. Which combination is most accurate?",
+        choice1: "1, 2 and 4 only",
+        choice2: "1 and 3 only",
+        choice3: "2, 3 and 4 only",
+        choice4: "1, 2, 3 and 4",
+        right: "1"
+      },
+      {
+        srno: "2", qno: "2", subject: "Study", topic: "Retention",
+        question: "What is the most effective technique for long-term retention?",
+        choice1: "Cramming",
+        choice2: "Spaced repetition",
+        choice3: "Passive re-reading",
+        choice4: "Highlighting",
+        right: "2"
+      },
+      {
+        srno: "3", qno: "3", subject: "Mindset", topic: "Growth",
+        question: "Which mindset is most associated with continuous learning?",
+        choice1: "Fixed mindset",
+        choice2: "Growth mindset",
+        choice3: "Perfectionist",
+        choice4: "Competitive",
+        right: "2"
+      }
+    ];
 
     // ---------- STATE ----------
     let questions = [];
@@ -395,7 +426,8 @@
 
     // ---------- HELPERS ----------
     function parseCSVRow(row) {
-      // Expected columns: Srno, question no, subject, topic, question, choice 1, choice 2, choice 3, choice 4, right answer
+      // Expected columns: Srno, Question No, Subject, Topic, Question, Choice 1, Choice 2, Choice 3, Choice 4, Right Answer
+      // We'll map by index (0-based)
       if (row.length < 10) return null;
       return {
         srno: row[0]?.trim() || '',
@@ -417,23 +449,7 @@
       // assume first row is header, skip it
       const result = [];
       for (let i = 1; i < lines.length; i++) {
-        // handle quoted fields (simple approach)
-        let row = [];
-        let current = '';
-        let inQuotes = false;
-        const line = lines[i];
-        for (let j = 0; j < line.length; j++) {
-          const char = line[j];
-          if (char === '"') {
-            inQuotes = !inQuotes;
-          } else if (char === ',' && !inQuotes) {
-            row.push(current.trim());
-            current = '';
-          } else {
-            current += char;
-          }
-        }
-        row.push(current.trim());
+        const row = lines[i].split(',').map(cell => cell.trim());
         const parsed = parseCSVRow(row);
         if (parsed && parsed.question) {
           result.push(parsed);
@@ -451,13 +467,11 @@
         options: [r.choice1, r.choice2, r.choice3, r.choice4].filter(o => o !== ''),
         correct: (() => {
           const right = r.right.trim();
-          if (right === '1' || right.toLowerCase() === 'a') return 0;
-          if (right === '2' || right.toLowerCase() === 'b') return 1;
-          if (right === '3' || right.toLowerCase() === 'c') return 2;
-          if (right === '4' || right.toLowerCase() === 'd') return 3;
-          const num = parseInt(right);
-          if (!isNaN(num) && num >= 1 && num <= 4) return num - 1;
-          return 0; // default to first
+          if (right === '1' || right === 'A') return 0;
+          if (right === '2' || right === 'B') return 1;
+          if (right === '3' || right === 'C') return 2;
+          if (right === '4' || right === 'D') return 3;
+          return parseInt(right) - 1 || 0;
         })(),
         raw: r
       }));
@@ -468,23 +482,25 @@
       try {
         loadingMsg.style.display = 'block';
         errorMsg.style.display = 'none';
-        errorMsg.textContent = '';
         const response = await fetch(SHEET_CSV_URL);
         if (!response.ok) throw new Error(`HTTP error ${response.status}`);
         const csvText = await response.text();
         const rows = parseCSV(csvText);
-        if (rows.length === 0) throw new Error('No data found in sheet. Please check the sheet has data and is published.');
+        if (rows.length === 0) throw new Error('No data found in sheet');
         questions = toInternalQuestions(rows);
         loadingMsg.style.display = 'none';
         questionArea.style.display = 'block';
         initQuiz();
       } catch (err) {
+        console.warn('Sheet load failed, using fallback data:', err);
+        // fallback
+        questions = toInternalQuestions(FALLBACK_QUESTIONS);
         loadingMsg.style.display = 'none';
+        questionArea.style.display = 'block';
+        initQuiz();
+        // show a small warning
+        errorMsg.textContent = '⚠️ Using fallback data. Could not load from Google Sheet.';
         errorMsg.style.display = 'block';
-        errorMsg.textContent = `❌ Failed to load from Google Sheet: ${err.message}. Please check the sheet is published and the URL is correct.`;
-        // Keep question area hidden, show error
-        questionArea.style.display = 'none';
-        resultArea.style.display = 'none';
       }
     }
 
