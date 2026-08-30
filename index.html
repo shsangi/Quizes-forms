@@ -90,15 +90,38 @@
     .timer-line .timer.danger { color: #b33c3c; animation: pulse 1s infinite; }
     @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
 
-    .progress-block { background: #e6edf5; height: 6px; border-radius: 20px; margin: 0.6rem 0 1.4rem 0; overflow: hidden; }
-    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #2f7b9e, #4ba3c7); border-radius: 20px; transition: width 0.35s ease; }
+    .progress-block {
+      background: #e6edf5;
+      height: 8px;
+      border-radius: 20px;
+      margin: 0.6rem 0 0.3rem 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2f7b9e, #4ba3c7);
+      border-radius: 20px;
+      transition: width 0.35s ease;
+    }
+    .progress-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1f4d66;
+      margin-bottom: 0.8rem;
+    }
+    .progress-label .attempted {
+      color: #0b2a3b;
+      font-weight: 700;
+    }
 
     .all-questions-container {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
       margin: 0.5rem 0 1.5rem;
-      /* No max-height or overflow — uses page scroll */
     }
 
     .all-q-item {
@@ -369,7 +392,10 @@
   <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
 
   <div id="quizContent">
-    <div class="progress-block"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+    <div class="progress-block">
+      <div class="progress-fill" id="progressFill" style="width:0%;"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">Attempted: <span class="attempted" id="attemptedCount">0</span> / <span id="totalCount">0</span></div>
 
     <!-- All questions view -->
     <div id="allAtOnceView">
@@ -427,6 +453,9 @@
     let selectedAllAnswers = [];
 
     const progressFill = document.getElementById('progressFill');
+    const progressLabel = document.getElementById('progressLabel');
+    const attemptedCount = document.getElementById('attemptedCount');
+    const totalCount = document.getElementById('totalCount');
     const timerDisplay = document.getElementById('timerDisplay');
     const quizTitle = document.getElementById('quizTitle');
     const quizSubtitle = document.getElementById('quizSubtitle');
@@ -616,15 +645,22 @@
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
       submittedBanner.style.display = 'none';
+      totalCount.textContent = totalQuestions;
       renderAllQuestions();
+      updateProgress();
       renderDots();
       updateOverview();
-      const answered = selectedAllAnswers.filter(a => a !== null).length;
-      progressFill.style.width = `${(answered / totalQuestions) * 100}%`;
       if (!quizCompleted && !isSubmitted) {
         startTimer();
       }
       saveState();
+    }
+
+    function updateProgress() {
+      const answered = selectedAllAnswers.filter(a => a !== null).length;
+      attemptedCount.textContent = answered;
+      const pct = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
+      progressFill.style.width = `${pct}%`;
     }
 
     function scrollToQuestion(index) {
@@ -685,8 +721,7 @@
               btns.forEach(b => b.classList.remove('selected-opt'));
               this.classList.add('selected-opt');
               selectedAllAnswers[idx] = optIdx;
-              const answered = selectedAllAnswers.filter(a => a !== null).length;
-              progressFill.style.width = `${(answered / totalQuestions) * 100}%`;
+              updateProgress();
               renderDots();
               updateOverview();
               saveState();
@@ -786,6 +821,7 @@
       const total = questions.length;
       finalScore.textContent = `${score} / ${total}`;
       progressFill.style.width = '100%';
+      attemptedCount.textContent = total;
       let msg = quizTimedOut ? '⏰ Time ran out! ' + getScoreMsg(score,total) : getScoreMsg(score,total);
       resultMessage.textContent = msg;
 
