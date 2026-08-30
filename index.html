@@ -57,6 +57,7 @@
       background: #f0f4f9;
       padding: 4px;
       flex-shrink: 0;
+      display: block !important;
     }
 
     .brand-title {
@@ -492,8 +493,11 @@
   <!-- header -->
   <div class="top-bar">
     <div class="brand">
-      <!-- Logo from Google Drive -->
-      <img class="brand-logo" id="brandLogo" src="" alt="Logo" onerror="this.style.display='none'">
+      <!-- Logo from Google Drive - now with inline styles to prevent disappearing -->
+      <img class="brand-logo" id="brandLogo" 
+           src="https://drive.google.com/uc?export=view&id=1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL" 
+           alt="Self Learners Logo"
+           style="display:block !important; width:48px; height:48px; border-radius:12px; object-fit:contain; background:#f0f4f9; padding:4px; flex-shrink:0;">
       <div class="brand-title">
         <h1 id="quizTitle">Loading...</h1>
         <span class="subtitle" id="quizSubtitle">Self Learners</span>
@@ -557,9 +561,6 @@
   (function() {
     // ----- CONFIGURATION -----
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
-    
-    // Your logo from Google Drive (direct download link)
-    const LOGO_URL = 'https://drive.google.com/uc?export=view&id=1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
 
     // ----- STATE -----
     let questions = [];
@@ -598,9 +599,10 @@
     const noAnswerCount = document.getElementById('noAnswerCount');
     const brandLogo = document.getElementById('brandLogo');
 
-    // Set logo
-    brandLogo.src = LOGO_URL;
-    brandLogo.alt = 'Self Learners Logo';
+    // Ensure logo stays visible
+    if (brandLogo) {
+      brandLogo.style.display = 'block !important';
+    }
 
     // ----- FETCH & PARSE CSV -----
     function fetchQuestions() {
