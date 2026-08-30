@@ -208,6 +208,22 @@
     .btn-secondary:hover:not(:disabled) { background: #5a7a8e; transform: scale(1.02); }
     .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
+    .btn-success {
+      background: #1f8b4c;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.7rem 2.2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(31,139,76,0.25);
+      transition: 0.15s;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .btn-success:hover:not(:disabled) { background: #167a3e; transform: scale(1.02); }
+    .btn-success:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
     .overview-section {
       margin-top: 1.2rem;
       border-top: 1px solid #e2eaf2;
@@ -237,6 +253,8 @@
     .legend-dot { width: 14px; height: 14px; border-radius: 30px; display: inline-block; flex-shrink: 0; }
     .legend-dot.done-dot { background: #2f7b9e; }
     .legend-dot.pending-dot { background: #dce6ef; }
+    .legend-dot.correct-dot { background: #1f8b4c; }
+    .legend-dot.wrong-dot { background: #b33c3c; }
 
     .grid-dots {
       display: flex;
@@ -320,6 +338,16 @@
     .status-badge.submitted { background: #d8eddf; color: #1f8b4c; }
     .status-badge.ended { background: #e2eaf2; color: #1f4d66; }
 
+    .submitted-header {
+      text-align: center;
+      padding: 0.5rem;
+      background: #d8eddf;
+      border-radius: 60px;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #1f8b4c;
+    }
+
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
@@ -332,7 +360,7 @@
       .timer-line { font-size: 0.8rem; }
       .result-details { max-height: 300px; }
       .action-bar { flex-direction: column; }
-      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+      .btn-primary, .btn-secondary, .btn-success { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -357,10 +385,13 @@
 
     <!-- All questions view -->
     <div id="allAtOnceView">
+      <div id="submittedBanner" style="display:none;" class="submitted-header">
+        ✅ Submitted — You can review your answers below. Click "End Quiz" to see your final score.
+      </div>
       <div id="allQuestionsContainer" class="all-questions-container"></div>
       <div class="action-bar">
         <button class="btn-primary" id="submitBtn">✅ Submit</button>
-        <button class="btn-secondary" id="endQuizBtn">🏁 End Quiz</button>
+        <button class="btn-success" id="endQuizBtn">🏁 End Quiz</button>
       </div>
     </div>
 
@@ -371,12 +402,14 @@
         <div class="legend" id="legendContainer">
           <span class="legend-item"><span class="legend-dot done-dot"></span> Done <span class="count" id="doneCount">0</span></span>
           <span class="legend-item"><span class="legend-dot pending-dot"></span> Pending <span class="count" id="pendingCount">0</span></span>
+          <span class="legend-item" id="correctLegend" style="display:none;"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
+          <span class="legend-item" id="wrongLegend" style="display:none;"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
         </div>
       </div>
       <div class="grid-dots" id="dotGrid"></div>
     </div>
 
-    <!-- Result card with details -->
+    <!-- Result card -->
     <div class="result-card" id="resultArea">
       <h2>🏁 Quiz Complete</h2>
       <div class="result-score" id="finalScore">0 / 0</div>
@@ -420,8 +453,13 @@
     const restartFromResult = document.getElementById('restartFromResult');
     const doneCount = document.getElementById('doneCount');
     const pendingCount = document.getElementById('pendingCount');
+    const correctCount = document.getElementById('correctCount');
+    const wrongCount = document.getElementById('wrongCount');
+    const correctLegend = document.getElementById('correctLegend');
+    const wrongLegend = document.getElementById('wrongLegend');
     const brandLogo = document.getElementById('brandLogo');
     const allAtOnceView = document.getElementById('allAtOnceView');
+    const submittedBanner = document.getElementById('submittedBanner');
 
     function loadLogo() {
       const img = new Image();
@@ -467,7 +505,6 @@
     // --- fetch ---
     function fetchQuestions() {
       quizTitle.textContent = 'Loading...';
-      // Check for saved state first
       const saved = loadState();
       if (saved && saved.questions && saved.questions.length > 0) {
         questions = saved.questions;
@@ -481,7 +518,6 @@
         score = saved.score || 0;
         timeRemaining = saved.timeRemaining || (totalQuestions * 60);
         if (quizCompleted) {
-          // If already completed, show result
           showResult();
           return;
         }
@@ -489,7 +525,6 @@
         return;
       }
 
-      // Otherwise fetch from CSV
       fetch(CSV_URL)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(csvText => {
@@ -580,11 +615,10 @@
     function handleTimeout() {
       quizTimedOut = true;
       quizCompleted = true;
-      isSubmitted = true; // lock editing
+      isSubmitted = true;
       document.querySelectorAll('.all-q-options .option-btn').forEach(b => b.disabled = true);
       submitBtn.disabled = true;
       endQuizBtn.disabled = true;
-      // Auto-submit with current selections
       gradeQuiz();
       saveState();
       setTimeout(() => showResult(), 600);
@@ -597,12 +631,13 @@
       quizSubtitle.textContent = 'Self Learners';
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
+      submittedBanner.style.display = 'none';
       renderAllQuestions();
       renderDots();
       updateOverview();
       const answered = selectedAllAnswers.filter(a => a !== null).length;
       progressFill.style.width = `${(answered / totalQuestions) * 100}%`;
-      if (!quizCompleted) {
+      if (!quizCompleted && !isSubmitted) {
         startTimer();
       }
       saveState();
@@ -629,12 +664,10 @@
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
           
-          // Restore selected state
           if (selectedAllAnswers[idx] === optIdx) {
             btn.classList.add('selected-opt');
           }
           
-          // If already submitted or quiz completed, show correct/wrong and disable
           if (isSubmitted || quizCompleted) {
             btn.disabled = true;
             if (q.correct !== -1) {
@@ -669,9 +702,23 @@
       
       submitBtn.disabled = isSubmitted || quizCompleted;
       endQuizBtn.disabled = isSubmitted || quizCompleted;
+      
+      if (isSubmitted && !quizCompleted) {
+        submittedBanner.style.display = 'block';
+        submitBtn.textContent = '✅ Submitted';
+        submitBtn.disabled = true;
+        endQuizBtn.disabled = false;
+        endQuizBtn.textContent = '🏁 End Quiz';
+      } else if (!isSubmitted && !quizCompleted) {
+        submittedBanner.style.display = 'none';
+        submitBtn.textContent = '✅ Submit';
+        submitBtn.disabled = false;
+        endQuizBtn.textContent = '🏁 End Quiz';
+        endQuizBtn.disabled = false;
+      }
     }
 
-    // --- grade quiz (used by Submit and timeout) ---
+    // --- grade quiz ---
     function gradeQuiz() {
       let correctCountLocal = 0;
       for (let i = 0; i < questions.length; i++) {
@@ -683,7 +730,7 @@
         else { answerStatus[i] = false; }
       }
       score = correctCountLocal;
-      // Update UI to show correct/wrong
+      
       questions.forEach((q, idx) => {
         const item = allQuestionsContainer.children[idx];
         if (!item) return;
@@ -703,9 +750,14 @@
           else if (answerStatus[idx] === false) item.classList.add('wrong-item');
         }
       });
+      
       isSubmitted = true;
       submitBtn.disabled = true;
-      endQuizBtn.disabled = true;
+      submitBtn.textContent = '✅ Submitted';
+      endQuizBtn.disabled = false;
+      endQuizBtn.textContent = '🏁 End Quiz';
+      submittedBanner.style.display = 'block';
+      
       renderDots();
       updateOverview();
       saveState();
@@ -715,17 +767,23 @@
     function handleSubmit() {
       if (isSubmitted || quizCompleted) return;
       gradeQuiz();
-      // Show result after brief delay
-      setTimeout(() => showResult(), 600);
+      // Stop timer since submitted
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     }
 
     // --- End Quiz button ---
     function handleEndQuiz() {
-      if (isSubmitted || quizCompleted) return;
-      // End quiz: go to score screen with current selections (no grading shown, but we grade for score)
-      // Grade silently and show result
-      gradeQuiz();
-      setTimeout(() => showResult(), 400);
+      if (quizCompleted) return;
+      // If not submitted yet, grade it first
+      if (!isSubmitted) {
+        gradeQuiz();
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      }
+      // Now show result
+      quizCompleted = true;
+      endQuizBtn.disabled = true;
+      submitBtn.disabled = true;
+      showResult();
     }
 
     // --- show result ---
@@ -806,14 +864,28 @@
     }
 
     function updateOverview() {
-      let done = 0, pending = 0;
+      let done = 0, pending = 0, correct = 0, wrong = 0;
       const total = questions.length;
       for (let i = 0; i < total; i++) {
         if (selectedAllAnswers[i] !== null) done++;
         else pending++;
+        if (isSubmitted || quizCompleted) {
+          if (answerStatus[i] === true) correct++;
+          else if (answerStatus[i] === false) wrong++;
+        }
       }
       doneCount.textContent = done;
       pendingCount.textContent = pending;
+      
+      if (isSubmitted || quizCompleted) {
+        correctLegend.style.display = 'inline-flex';
+        wrongLegend.style.display = 'inline-flex';
+        correctCount.textContent = correct;
+        wrongCount.textContent = wrong;
+      } else {
+        correctLegend.style.display = 'none';
+        wrongLegend.style.display = 'none';
+      }
     }
 
     function restartQuiz() {
@@ -828,6 +900,11 @@
       timeRemaining = totalQuestions * 60;
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
+      submittedBanner.style.display = 'none';
+      submitBtn.textContent = '✅ Submit';
+      endQuizBtn.textContent = '🏁 End Quiz';
+      correctLegend.style.display = 'none';
+      wrongLegend.style.display = 'none';
       startQuiz();
     }
 
