@@ -451,6 +451,7 @@
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
+    let isInitialLoad = true;
 
     const progressFill = document.getElementById('progressFill');
     const progressLabel = document.getElementById('progressLabel');
@@ -532,7 +533,16 @@
         quizTimedOut = saved.quizTimedOut || false;
         score = saved.score || 0;
         timeRemaining = saved.timeRemaining || (totalQuestions * 60);
+        
+        // Restore UI state
+        quizTitle.textContent = quizTitleText;
+        totalCount.textContent = totalQuestions;
+        
         if (quizCompleted) {
+          renderAllQuestions();
+          updateProgress();
+          renderDots();
+          updateOverview();
           showResult();
           return;
         }
@@ -555,11 +565,14 @@
           quizTimedOut = false;
           score = 0;
           clearState();
+          quizTitle.textContent = quizTitleText;
+          totalCount.textContent = totalQuestions;
           startQuiz();
         })
         .catch(err => {
           console.error(err);
           allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Check CSV link or reload.</div>`;
+          quizTitle.textContent = 'Error';
         });
     }
 
@@ -640,8 +653,6 @@
 
     function startQuiz() {
       if (questions.length === 0) { allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">⚠️ No questions found.</div>'; return; }
-      quizTitle.textContent = quizTitleText;
-      quizSubtitle.textContent = 'Self Learners';
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
       submittedBanner.style.display = 'none';
@@ -685,6 +696,15 @@
         div.className = 'all-q-item';
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
+        
+        // Restore correct/wrong styling if already graded
+        if (isSubmitted || quizCompleted) {
+          if (q.correct !== -1) {
+            if (answerStatus[idx] === true) div.classList.add('correct-item');
+            else if (answerStatus[idx] === false) div.classList.add('wrong-item');
+          }
+        }
+        
         const qText = document.createElement('div');
         qText.className = 'all-q-text';
         qText.textContent = `${idx+1}. ${q.question}`;
@@ -734,7 +754,6 @@
       });
       
       submitBtn.disabled = isSubmitted || quizCompleted;
-      endQuizBtn.disabled = isSubmitted || quizCompleted;
       
       if (isSubmitted && !quizCompleted) {
         submittedBanner.style.display = 'block';
@@ -748,6 +767,9 @@
         submitBtn.disabled = false;
         endQuizBtn.textContent = '🏁 End Quiz';
         endQuizBtn.disabled = false;
+      } else if (quizCompleted) {
+        endQuizBtn.disabled = true;
+        submitBtn.disabled = true;
       }
     }
 
@@ -938,7 +960,9 @@
       allAtOnceView.style.display = 'block';
       submittedBanner.style.display = 'none';
       submitBtn.textContent = '✅ Submit';
+      submitBtn.disabled = false;
       endQuizBtn.textContent = '🏁 End Quiz';
+      endQuizBtn.disabled = false;
       correctLegend.style.display = 'none';
       wrongLegend.style.display = 'none';
       startQuiz();
