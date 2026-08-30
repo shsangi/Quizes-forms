@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Self Learners · GSheet Quiz</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self Learners · Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background: #f2f6fc;
@@ -18,14 +23,18 @@
       justify-content: center;
       padding: 1.2rem;
     }
+
     .quiz-wrapper {
       max-width: 880px;
       width: 100%;
       background: white;
       border-radius: 2rem;
       padding: 2rem 2rem 1.8rem;
-      box-shadow: 0 25px 50px -10px rgba(0,20,30,0.15), 0 8px 20px -8px rgba(0,0,0,0.04);
+      box-shadow: 0 25px 50px -10px rgba(0, 20, 30, 0.15), 0 8px 20px -8px rgba(0,0,0,0.04);
+      transition: all 0.2s;
     }
+
+    /* header */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -34,6 +43,13 @@
       gap: 0.8rem 1.2rem;
       margin-bottom: 1.2rem;
     }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     .brand h1 {
       font-size: 1.8rem;
       font-weight: 700;
@@ -41,10 +57,9 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
+      letter-spacing: -0.02em;
     }
+
     .brand small {
       background: #dceaf3;
       font-size: 0.75rem;
@@ -53,13 +68,16 @@
       padding: 0.15rem 0.9rem;
       border-radius: 40px;
       text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
+
     .time-score {
       display: flex;
       align-items: center;
       gap: 1.2rem;
       flex-wrap: wrap;
     }
+
     .timer {
       font-weight: 600;
       font-size: 1.1rem;
@@ -67,7 +85,9 @@
       background: #eef4f9;
       padding: 0.3rem 1.2rem;
       border-radius: 60px;
+      letter-spacing: 0.3px;
     }
+
     .score-pill {
       background: #0b2a3b;
       color: white;
@@ -76,7 +96,9 @@
       border-radius: 60px;
       font-size: 0.95rem;
       border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 4px 8px rgba(0,20,30,0.06);
     }
+
     .score-pill span {
       background: #f0c27f;
       color: #0b2a3b;
@@ -84,6 +106,8 @@
       border-radius: 30px;
       margin-left: 0.4rem;
     }
+
+    /* progress */
     .progress-block {
       background: #e6edf5;
       height: 6px;
@@ -91,6 +115,7 @@
       margin: 0.6rem 0 1.4rem 0;
       overflow: hidden;
     }
+
     .progress-fill {
       height: 100%;
       width: 0%;
@@ -98,6 +123,8 @@
       border-radius: 20px;
       transition: width 0.35s ease;
     }
+
+    /* question meta */
     .q-meta {
       display: flex;
       justify-content: space-between;
@@ -106,6 +133,7 @@
       gap: 0.4rem 1rem;
       margin-bottom: 0.4rem;
     }
+
     .q-label {
       font-weight: 600;
       font-size: 0.9rem;
@@ -114,15 +142,17 @@
       padding: 0.2rem 1.2rem;
       border-radius: 40px;
     }
+
     .q-category {
       font-size: 0.8rem;
       font-weight: 500;
       color: #1f5672;
-      background: rgba(26,90,122,0.06);
+      background: rgba(26, 90, 122, 0.06);
       padding: 0.15rem 1.2rem;
       border-radius: 30px;
-      border: 1px solid rgba(26,90,122,0.08);
+      border: 1px solid rgba(26, 90, 122, 0.08);
     }
+
     .question-text {
       font-size: 1.35rem;
       font-weight: 600;
@@ -131,12 +161,15 @@
       margin: 0.6rem 0 1.6rem 0;
       min-height: 4rem;
     }
+
+    /* options */
     .options-grid {
       display: flex;
       flex-direction: column;
       gap: 0.7rem;
       margin-bottom: 1.6rem;
     }
+
     .option-btn {
       background: white;
       border: 1.5px solid #dce6ef;
@@ -151,12 +184,15 @@
       display: flex;
       align-items: center;
       gap: 0.9rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.01);
     }
+
     .option-btn:hover:not(:disabled) {
       background: #f5faff;
       border-color: #6fa6c7;
       transform: scale(1.01);
     }
+
     .option-btn .letter {
       background: #e7f0f7;
       color: #1a5a7a;
@@ -169,20 +205,40 @@
       justify-content: center;
       flex-shrink: 0;
     }
+
     .option-btn.correct {
       background: #d8eddf;
       border-color: #1f8b4c;
-      box-shadow: 0 0 0 2px rgba(31,139,76,0.15);
+      box-shadow: 0 0 0 2px rgba(31, 139, 76, 0.15);
     }
-    .option-btn.correct .letter { background: #1f8b4c; color: white; }
+
+    .option-btn.correct .letter {
+      background: #1f8b4c;
+      color: white;
+    }
+
     .option-btn.wrong {
       background: #f5dddd;
       border-color: #b33c3c;
-      box-shadow: 0 0 0 2px rgba(179,60,60,0.12);
+      box-shadow: 0 0 0 2px rgba(179, 60, 60, 0.12);
     }
-    .option-btn.wrong .letter { background: #b33c3c; color: white; }
-    .option-btn:disabled { cursor: default; opacity: 0.7; }
-    .option-btn:disabled:hover { transform: none; }
+
+    .option-btn.wrong .letter {
+      background: #b33c3c;
+      color: white;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    .option-btn:disabled:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* feedback + nav */
     .action-bar {
       display: flex;
       flex-wrap: wrap;
@@ -191,6 +247,7 @@
       gap: 1rem;
       margin: 0.4rem 0 1.2rem 0;
     }
+
     .feedback-msg {
       font-weight: 500;
       font-size: 0.9rem;
@@ -202,12 +259,14 @@
       align-items: center;
       flex: 1;
     }
+
     .nav-group {
       display: flex;
       gap: 0.7rem;
       align-items: center;
       flex-wrap: wrap;
     }
+
     .btn-outline {
       background: transparent;
       border: 1.5px solid #0b2a3b;
@@ -219,7 +278,12 @@
       cursor: pointer;
       transition: 0.15s;
     }
-    .btn-outline:hover { background: #0b2a3b; color: white; }
+
+    .btn-outline:hover {
+      background: #0b2a3b;
+      color: white;
+    }
+
     .btn-primary {
       background: #0b2a3b;
       border: none;
@@ -229,16 +293,30 @@
       padding: 0.6rem 2.4rem;
       border-radius: 60px;
       cursor: pointer;
-      box-shadow: 0 6px 14px rgba(11,42,59,0.16);
+      box-shadow: 0 6px 14px rgba(11, 42, 59, 0.16);
       transition: 0.15s;
+      border: 1px solid rgba(255,255,255,0.06);
     }
-    .btn-primary:hover:not(:disabled) { background: #1a4b62; transform: scale(1.02); }
-    .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #1a4b62;
+      transform: scale(1.02);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* overview grid */
     .overview-section {
       margin-top: 1.2rem;
       border-top: 1px solid #e2eaf2;
       padding-top: 1rem;
     }
+
     .overview-header {
       display: flex;
       justify-content: space-between;
@@ -247,7 +325,13 @@
       flex-wrap: wrap;
       gap: 0.4rem;
     }
-    .overview-header span { font-weight: 600; font-size: 0.9rem; color: #1f4d66; }
+
+    .overview-header span {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1f4d66;
+    }
+
     .legend {
       display: flex;
       gap: 1rem;
@@ -255,11 +339,24 @@
       font-weight: 500;
       color: #2d5a72;
     }
-    .legend-item { display: flex; align-items: center; gap: 0.3rem; }
-    .legend-dot { width: 16px; height: 16px; border-radius: 30px; display: inline-block; }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .legend-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 30px;
+      display: inline-block;
+    }
+
     .legend-dot.done { background: #1f8b4c; }
     .legend-dot.active { background: #2f7b9e; }
     .legend-dot.pending { background: #dce6ef; }
+
     .grid-dots {
       display: flex;
       flex-wrap: wrap;
@@ -267,6 +364,7 @@
       justify-content: center;
       margin-top: 0.2rem;
     }
+
     .grid-dot {
       width: 36px;
       height: 36px;
@@ -280,16 +378,57 @@
       color: #1d4b61;
       transition: 0.1s;
     }
-    .grid-dot.active { background: #2f7b9e; color: white; box-shadow: 0 0 0 3px rgba(47,123,158,0.25); }
-    .grid-dot.answered { background: #1f8b4c; color: white; }
-    .grid-dot.wrong-dot { background: #b33c3c; color: white; }
-    .result-card { text-align: center; padding: 1rem 0.5rem 0.5rem; display: none; }
-    .result-card h2 { font-size: 2.2rem; font-weight: 700; color: #0b2a3b; }
-    .result-score { font-size: 3.6rem; font-weight: 800; background: linear-gradient(135deg, #1a5a7a, #48a0c7); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 0.3rem 0 0.2rem; }
-    .result-msg { color: #1f4b61; font-size: 1.1rem; margin: 0.2rem 0 1.6rem; }
-    .result-card .btn-outline { font-size: 1rem; padding: 0.7rem 2.8rem; }
-    .loading { text-align: center; padding: 2rem; color: #1f4d66; font-weight: 500; }
-    .error { color: #b33c3c; background: #f5dddd; padding: 1rem; border-radius: 1.5rem; margin: 1rem 0; }
+
+    .grid-dot.active {
+      background: #2f7b9e;
+      color: white;
+      box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.25);
+    }
+
+    .grid-dot.answered {
+      background: #1f8b4c;
+      color: white;
+    }
+
+    .grid-dot.wrong-dot {
+      background: #b33c3c;
+      color: white;
+    }
+
+    /* result */
+    .result-card {
+      text-align: center;
+      padding: 1rem 0.5rem 0.5rem;
+      display: none;
+    }
+
+    .result-card h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #0b2a3b;
+    }
+
+    .result-score {
+      font-size: 3.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1a5a7a, #48a0c7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 0.3rem 0 0.2rem;
+    }
+
+    .result-msg {
+      color: #1f4b61;
+      font-size: 1.1rem;
+      margin: 0.2rem 0 1.6rem;
+    }
+
+    .result-card .btn-outline {
+      font-size: 1rem;
+      padding: 0.7rem 2.8rem;
+    }
+
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand h1 { font-size: 1.4rem; }
@@ -306,8 +445,11 @@
 <body>
 
 <div class="quiz-wrapper" id="quizApp">
+  <!-- header -->
   <div class="top-bar">
-    <div class="brand"><h1>📘 Self <small>Learners</small></h1></div>
+    <div class="brand">
+      <h1>📘 Self <small>Learners</small></h1>
+    </div>
     <div class="time-score">
       <div class="timer" id="timerDisplay">⏱️ 174:22</div>
       <div class="score-pill">🎯 <span id="scoreNumber">0</span></div>
@@ -315,20 +457,21 @@
   </div>
 
   <div id="quizContent">
-    <div class="progress-block"><div class="progress-fill" id="progressFill"></div></div>
-
-    <!-- loading / error -->
-    <div id="loadingMessage" class="loading">📥 Loading questions from Google Sheet...</div>
-    <div id="errorMessage" class="error" style="display:none;"></div>
+    <!-- progress -->
+    <div class="progress-block">
+      <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+    </div>
 
     <!-- question area -->
-    <div id="questionArea" style="display:none;">
+    <div id="questionArea">
       <div class="q-meta">
-        <span class="q-label" id="qNumber">QUESTION 1 OF 0</span>
-        <span class="q-category" id="qCategory">📚</span>
+        <span class="q-label" id="qNumber">QUESTION 1 OF 200</span>
+        <span class="q-category" id="qCategory">⚖️ Jurisprudence</span>
       </div>
-      <div class="question-text" id="questionText"></div>
+      <div class="question-text" id="questionText">Loading question...</div>
+
       <div class="options-grid" id="optionsContainer"></div>
+
       <div class="action-bar">
         <div class="feedback-msg" id="feedbackMessage">✨ Select an answer</div>
         <div class="nav-group">
@@ -336,6 +479,8 @@
           <button class="btn-primary" id="nextBtn" disabled>Next →</button>
         </div>
       </div>
+
+      <!-- overview -->
       <div class="overview-section">
         <div class="overview-header">
           <span>OVERVIEW</span>
@@ -352,7 +497,7 @@
     <!-- result -->
     <div class="result-card" id="resultArea">
       <h2>🏁 Quiz Complete</h2>
-      <div class="result-score" id="finalScore">0 / 0</div>
+      <div class="result-score" id="finalScore">0 / 200</div>
       <p class="result-msg" id="resultMessage">Keep learning, Self Learner!</p>
       <button class="btn-outline" id="restartFromResult">⟳ Try again</button>
     </div>
@@ -361,49 +506,59 @@
 
 <script>
   (function() {
-    // ---------- CONFIG ----------
-    // Replace with your Google Sheet CSV export URL (published as CSV)
-    // Example: "https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv"
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVzVz/pub?output=csv";
-
-    // fallback data if sheet fails (first question from your example + a few more)
-    const FALLBACK_QUESTIONS = [
-      {
-        srno: "1", qno: "1", subject: "Jurisprudence", topic: "Ijtihad",
+    // ---------- 200 QUESTIONS (simulated) ----------
+    const TOTAL = 200;
+    // generate 200 questions: first one is the exact Ijtihad question, rest are varied
+    function buildQuestions() {
+      const qs = [];
+      // 1. exact question from screenshot
+      qs.push({
+        category: "⚖️ Jurisprudence",
         question: "Consider the following statements regarding Ijtihad in Islamic jurisprudence: (1) It is disciplined juristic reasoning rather than unrestricted personal preference. (2) It operates within an accepted methodological framework of Islamic sources and principles. (3) It necessarily permits a jurist to disregard an explicit and authoritative textual ruling whenever contemporary circumstances appear different. (4) Its continuing relevance is particularly evident where new circumstances require principled legal reasoning. Which combination is most accurate?",
-        choice1: "1, 2 and 4 only",
-        choice2: "1 and 3 only",
-        choice3: "2, 3 and 4 only",
-        choice4: "1, 2, 3 and 4",
-        right: "1"
-      },
-      {
-        srno: "2", qno: "2", subject: "Study", topic: "Retention",
-        question: "What is the most effective technique for long-term retention?",
-        choice1: "Cramming",
-        choice2: "Spaced repetition",
-        choice3: "Passive re-reading",
-        choice4: "Highlighting",
-        right: "2"
-      },
-      {
-        srno: "3", qno: "3", subject: "Mindset", topic: "Growth",
-        question: "Which mindset is most associated with continuous learning?",
-        choice1: "Fixed mindset",
-        choice2: "Growth mindset",
-        choice3: "Perfectionist",
-        choice4: "Competitive",
-        right: "2"
+        options: [
+          "1, 2 and 4 only",
+          "1 and 3 only",
+          "2, 3 and 4 only",
+          "1, 2, 3 and 4"
+        ],
+        correct: 0
+      });
+
+      // fill remaining 199 with varied questions
+      const categories = ["📚 Study", "🧠 Mindset", "⏳ Productivity", "💡 Wisdom", "🌱 Growth", "🔬 Science"];
+      const questionBank = [
+        { q: "What is the most effective technique for long-term retention?", opts: ["Cramming", "Spaced repetition", "Passive re-reading", "Highlighting"], correct: 1 },
+        { q: "Which mindset is most associated with continuous learning?", opts: ["Fixed mindset", "Growth mindset", "Perfectionist", "Competitive"], correct: 1 },
+        { q: "What does the Pomodoro Technique recommend?", opts: ["25 min work / 5 min break", "50 min study / 10 min walk", "2 hours deep work", "No breaks"], correct: 0 },
+        { q: "Which habit best supports self-learning?", opts: ["Waiting for motivation", "Consistent daily practice", "Learning only from school", "Avoiding mistakes"], correct: 1 },
+        { q: "What is the primary benefit of active recall?", opts: ["Faster reading", "Stronger memory", "Less study time", "Better handwriting"], correct: 1 },
+        { q: "Which of these is a key component of critical thinking?", opts: ["Accepting all facts", "Questioning assumptions", "Memorizing data", "Following trends"], correct: 1 },
+        { q: "What is the 'Feynman technique'?", opts: ["Teaching to learn", "Reading fast", "Writing essays", "Group study"], correct: 0 },
+        { q: "How does sleep affect learning?", opts: ["No effect", "Consolidates memory", "Worsens focus", "Only affects mood"], correct: 1 }
+      ];
+
+      while (qs.length < TOTAL) {
+        const idx = Math.floor(Math.random() * questionBank.length);
+        const item = questionBank[idx];
+        const cat = categories[Math.floor(Math.random() * categories.length)];
+        qs.push({
+          category: cat,
+          question: item.q,
+          options: item.opts.slice(),
+          correct: item.correct
+        });
       }
-    ];
+      return qs;
+    }
+
+    const questions = buildQuestions();
 
     // ---------- STATE ----------
-    let questions = [];
     let currentIndex = 0;
     let score = 0;
     let isAnswered = false;
     let quizCompleted = false;
-    let answerStatus = []; // true=correct, false=wrong, null=pending
+    let answerStatus = new Array(questions.length).fill(null); // true=correct, false=wrong, null=pending
 
     // DOM refs
     const progressFill = document.getElementById('progressFill');
@@ -421,107 +576,12 @@
     const finalScore = document.getElementById('finalScore');
     const resultMessage = document.getElementById('resultMessage');
     const dotGrid = document.getElementById('dotGrid');
-    const loadingMsg = document.getElementById('loadingMessage');
-    const errorMsg = document.getElementById('errorMessage');
+    const timerDisplay = document.getElementById('timerDisplay');
 
-    // ---------- HELPERS ----------
-    function parseCSVRow(row) {
-      // Expected columns: Srno, Question No, Subject, Topic, Question, Choice 1, Choice 2, Choice 3, Choice 4, Right Answer
-      // We'll map by index (0-based)
-      if (row.length < 10) return null;
-      return {
-        srno: row[0]?.trim() || '',
-        qno: row[1]?.trim() || '',
-        subject: row[2]?.trim() || '',
-        topic: row[3]?.trim() || '',
-        question: row[4]?.trim() || '',
-        choice1: row[5]?.trim() || '',
-        choice2: row[6]?.trim() || '',
-        choice3: row[7]?.trim() || '',
-        choice4: row[8]?.trim() || '',
-        right: row[9]?.trim() || ''
-      };
-    }
+    // ---------- TIMER (static demo) ----------
+    // just display 174:22 as in screenshot, we keep it static for demo
 
-    function parseCSV(text) {
-      const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
-      if (lines.length === 0) return [];
-      // assume first row is header, skip it
-      const result = [];
-      for (let i = 1; i < lines.length; i++) {
-        const row = lines[i].split(',').map(cell => cell.trim());
-        const parsed = parseCSVRow(row);
-        if (parsed && parsed.question) {
-          result.push(parsed);
-        }
-      }
-      return result;
-    }
-
-    // convert parsed rows to internal question format
-    function toInternalQuestions(rows) {
-      return rows.map((r, idx) => ({
-        id: idx,
-        category: r.subject || r.topic || 'General',
-        question: r.question || 'No question',
-        options: [r.choice1, r.choice2, r.choice3, r.choice4].filter(o => o !== ''),
-        correct: (() => {
-          const right = r.right.trim();
-          if (right === '1' || right === 'A') return 0;
-          if (right === '2' || right === 'B') return 1;
-          if (right === '3' || right === 'C') return 2;
-          if (right === '4' || right === 'D') return 3;
-          return parseInt(right) - 1 || 0;
-        })(),
-        raw: r
-      }));
-    }
-
-    // ---------- FETCH FROM SHEET ----------
-    async function loadQuestions() {
-      try {
-        loadingMsg.style.display = 'block';
-        errorMsg.style.display = 'none';
-        const response = await fetch(SHEET_CSV_URL);
-        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-        const csvText = await response.text();
-        const rows = parseCSV(csvText);
-        if (rows.length === 0) throw new Error('No data found in sheet');
-        questions = toInternalQuestions(rows);
-        loadingMsg.style.display = 'none';
-        questionArea.style.display = 'block';
-        initQuiz();
-      } catch (err) {
-        console.warn('Sheet load failed, using fallback data:', err);
-        // fallback
-        questions = toInternalQuestions(FALLBACK_QUESTIONS);
-        loadingMsg.style.display = 'none';
-        questionArea.style.display = 'block';
-        initQuiz();
-        // show a small warning
-        errorMsg.textContent = '⚠️ Using fallback data. Could not load from Google Sheet.';
-        errorMsg.style.display = 'block';
-      }
-    }
-
-    // ---------- QUIZ ENGINE ----------
-    function initQuiz() {
-      currentIndex = 0;
-      score = 0;
-      isAnswered = false;
-      quizCompleted = false;
-      answerStatus = new Array(questions.length).fill(null);
-      scoreNumber.textContent = '0';
-      resultArea.style.display = 'none';
-      questionArea.style.display = 'block';
-      renderQuestion(0);
-      nextBtn.disabled = true;
-      progressFill.style.width = '0%';
-      feedbackMessage.textContent = '✨ Select an answer';
-      feedbackMessage.style.background = '#f0f4f9';
-      renderDots();
-    }
-
+    // ---------- RENDER DOTS ----------
     function renderDots() {
       dotGrid.innerHTML = '';
       const total = questions.length;
@@ -529,20 +589,30 @@
         const dot = document.createElement('div');
         dot.className = 'grid-dot';
         dot.textContent = i + 1;
-        if (i === currentIndex && !quizCompleted) dot.classList.add('active');
-        if (answerStatus[i] === true) dot.classList.add('answered');
-        else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
+
+        if (i === currentIndex && !quizCompleted) {
+          dot.classList.add('active');
+        }
+        if (answerStatus[i] === true) {
+          dot.classList.add('answered');
+        } else if (answerStatus[i] === false) {
+          dot.classList.add('wrong-dot');
+        }
         dotGrid.appendChild(dot);
       }
     }
 
+    // ---------- RENDER QUESTION ----------
     function renderQuestion(index) {
       const q = questions[index];
       if (!q) return;
+
       const total = questions.length;
-      progressFill.style.width = `${((index) / total) * 100}%`;
+      const progressPercent = ((index) / total) * 100;
+      progressFill.style.width = `${progressPercent}%`;
+
       qNumber.textContent = `QUESTION ${index+1} OF ${total}`;
-      qCategory.textContent = q.category || 'General';
+      qCategory.textContent = q.category;
       questionText.textContent = q.question;
 
       const letters = ['A', 'B', 'C', 'D'];
@@ -560,26 +630,36 @@
       feedbackMessage.style.background = '#f0f4f9';
       isAnswered = false;
       nextBtn.disabled = true;
+
       document.querySelectorAll('.option-btn').forEach(btn => {
         btn.disabled = false;
         btn.classList.remove('correct', 'wrong');
       });
+
       resultArea.style.display = 'none';
       questionArea.style.display = 'block';
       quizCompleted = false;
+
       renderDots();
     }
 
+    // ---------- HANDLE ANSWER ----------
     function handleOptionClick(selectedIdx) {
       if (isAnswered) return;
       const q = questions[currentIndex];
       const isCorrect = (selectedIdx === q.correct);
       const allOptions = document.querySelectorAll('.option-btn');
+
       allOptions.forEach(btn => btn.disabled = true);
+
       allOptions.forEach((btn, idx) => {
-        if (idx === q.correct) btn.classList.add('correct');
-        else if (idx === selectedIdx && !isCorrect) btn.classList.add('wrong');
+        if (idx === q.correct) {
+          btn.classList.add('correct');
+        } else if (idx === selectedIdx && !isCorrect) {
+          btn.classList.add('wrong');
+        }
       });
+
       if (isCorrect) {
         score += 1;
         feedbackMessage.textContent = '✅ Correct! +1 point';
@@ -590,12 +670,14 @@
         feedbackMessage.style.background = '#f5dddd';
         answerStatus[currentIndex] = false;
       }
+
       scoreNumber.textContent = score;
       isAnswered = true;
       nextBtn.disabled = false;
       renderDots();
     }
 
+    // ---------- NEXT / FINISH ----------
     function goToNext() {
       if (!isAnswered) return;
       if (currentIndex + 1 < questions.length) {
@@ -610,20 +692,24 @@
       quizCompleted = true;
       questionArea.style.display = 'none';
       resultArea.style.display = 'block';
+
       const total = questions.length;
       finalScore.textContent = `${score} / ${total}`;
       progressFill.style.width = '100%';
+
       let msg = '';
       if (score === total) msg = '🌟 Perfect! You are a true Self Learner.';
       else if (score >= total * 0.7) msg = '👏 Great job! Keep growing every day.';
       else if (score >= total * 0.4) msg = '📖 Good effort! Review and try again.';
       else msg = '💪 Learning is a journey. Restart and improve!';
       resultMessage.textContent = msg;
+
       scoreNumber.textContent = score;
       nextBtn.disabled = true;
       renderDots();
     }
 
+    // ---------- RESTART ----------
     function restartQuiz() {
       currentIndex = 0;
       score = 0;
@@ -646,8 +732,9 @@
     restartBtn.addEventListener('click', restartQuiz);
     restartFromResult.addEventListener('click', restartQuiz);
 
-    // ---------- START ----------
-    loadQuestions();
+    // ---------- INIT ----------
+    renderQuestion(0);
+    renderDots();
   })();
 </script>
 </body>
