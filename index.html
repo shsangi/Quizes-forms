@@ -436,9 +436,26 @@
 
 <script>
   (function() {
+    // ============================================================
+    // CONFIGURATION — Edit this URL to point to your Google Sheet CSV
+    // ============================================================
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
     const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
     const STORAGE_KEY = 'selfLearnersQuizData';
+
+    // ============================================================
+    // Your Google Sheet should have the following columns:
+    // Column A: (optional) ID or timestamp
+    // Column B: (optional) Category
+    // Column C: Quiz Title (will be used as the quiz name)
+    // Column D: (optional) unused
+    // Column E: Question text
+    // Column F: Option A
+    // Column G: Option B
+    // Column H: Option C
+    // Column I: Option D
+    // Column J: Correct answer (must exactly match one of the options)
+    // ============================================================
 
     let questions = [];
     let score = 0;
@@ -521,6 +538,9 @@
       localStorage.removeItem(STORAGE_KEY);
     }
 
+    // ============================================================
+    // FETCH QUESTIONS FROM GOOGLE SHEETS CSV
+    // ============================================================
     function fetchQuestions() {
       quizTitle.textContent = 'Loading...';
       const saved = loadState();
@@ -553,11 +573,15 @@
         return;
       }
 
+      // Fetch from Google Sheets CSV
       fetch(CSV_URL)
-        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+        .then(r => { 
+          if (!r.ok) throw new Error(`HTTP ${r.status}`); 
+          return r.text(); 
+        })
         .then(csvText => {
           const parsed = parseCSV(csvText);
-          if (parsed.questions.length === 0) throw new Error('No data');
+          if (parsed.questions.length === 0) throw new Error('No data found in CSV');
           questions = parsed.questions;
           quizTitleText = parsed.title || 'Quiz';
           totalQuestions = questions.length;
@@ -574,55 +598,110 @@
           startQuiz();
         })
         .catch(err => {
-          console.error(err);
-          allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Check CSV link or reload.</div>`;
-          quizTitle.textContent = 'Error';
+          console.error('Error loading questions:', err);
+          allQuestionsContainer.innerHTML = `
+            <div style="padding:2rem;text-align:center;color:#b33c3c;">
+              ❌ Failed to load questions from Google Sheets.<br>
+              <span style="font-size:0.85rem;color:#666;margin-top:0.5rem;display:block;">
+                Make sure your sheet is published and the URL is correct.
+              </span>
+              <button onclick="location.reload()" style="margin-top:1rem;padding:0.5rem 1.5rem;border-radius:60px;border:none;background:#0b2a3b;color:white;cursor:pointer;font-weight:600;">
+                🔄 Retry
+              </button>
+            </div>
+          `;
+          quizTitle.textContent = 'Error Loading Quiz';
         });
     }
 
+    // ============================================================
+    // PARSE CSV FROM GOOGLE SHEETS
+    // ============================================================
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim() !== '');
       if (lines.length < 2) return { questions: [], title: 'Quiz' };
+      
       let title = 'Quiz';
+      // Try to read title from Row 1, Column C (index 2)
       if (lines.length > 0) {
         const firstRow = parseCSVLine(lines[0]);
         if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'Quiz';
       }
+
       const result = [];
+      // Start from row 2 (index 1) for actual questions
       const startRow = Math.min(1, lines.length - 1);
+      
       for (let i = startRow; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 6) continue;
-        const q = cols[4]?.trim() || '';
-        if (!q) continue;
-        const opts = [ cols[5]?.trim() || '', cols[6]?.trim() || '', cols[7]?.trim() || '', cols[8]?.trim() || '' ];
-        const correctAns = cols[9]?.trim() || '';
-        let correctIdx = -1;
-        if (correctAns) { for (let j=0; j<opts.length; j++) { if (opts[j] === correctAns) { correctIdx = j; break; } } }
-        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns });
+
+        const question = cols[4] ? cols[4].trim() : '';
+        if (!question) continue;
+
+        const options = [
+          cols[5] ? cols[5].trim() : '',
+          cols[6] ? cols[6].trim() : '',
+          cols[7] ? cols[7].trim() : '',
+          cols[8] ? cols[8].trim() : ''
+        ];
+
+        const correctAnswer = cols[9] ? cols[9].trim() : '';
+
+        let correctIndex = -1;
+        if (correctAnswer) {
+          for (let j = 0; j < options.length; j++) {
+            if (options[j] === correctAnswer) {
+              correctIndex = j;
+              break;
+            }
+          }
+        }
+
+        result.push({
+          question: question,
+          options: options,
+          correct: correctIndex,
+          correctText: correctAnswer || 'No answer in db'
+        });
       }
-      return { questions: result, title };
+
+      return { questions: result, title: title };
     }
 
     function parseCSVLine(line) {
-      const res = [];
-      let cur = '', inQuotes = false;
-      for (let i=0; i<line.length; i++) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
         const ch = line[i];
         if (inQuotes) {
-          if (ch === '"' && (i+1 < line.length && line[i+1] === '"')) { cur += '"'; i++; }
-          else if (ch === '"') inQuotes = false;
-          else cur += ch;
+          if (ch === '"' && (i + 1 < line.length && line[i + 1] === '"')) {
+            current += '"';
+            i++;
+          } else if (ch === '"') {
+            inQuotes = false;
+          } else {
+            current += ch;
+          }
         } else {
-          if (ch === '"') inQuotes = true;
-          else if (ch === ',') { res.push(cur.trim()); cur = ''; }
-          else cur += ch;
+          if (ch === '"') {
+            inQuotes = true;
+          } else if (ch === ',') {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += ch;
+          }
         }
       }
-      res.push(cur.trim());
-      return res;
+      result.push(current.trim());
+      return result;
     }
 
+    // ============================================================
+    // TIMER
+    // ============================================================
     function startTimer() {
       if (timeRemaining <= 0) timeRemaining = totalQuestions * 60;
       updateTimerDisplay();
@@ -655,8 +734,14 @@
       setTimeout(() => showResult(), 600);
     }
 
+    // ============================================================
+    // QUIZ CORE
+    // ============================================================
     function startQuiz() {
-      if (questions.length === 0) { allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">⚠️ No questions found.</div>'; return; }
+      if (questions.length === 0) { 
+        allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">⚠️ No questions found.</div>'; 
+        return; 
+      }
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
       submittedBanner.style.display = 'none';
@@ -669,8 +754,6 @@
         startTimer();
       }
       saveState();
-      
-      // Scroll to top when quiz starts
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -975,20 +1058,16 @@
       correctLegend.style.display = 'none';
       wrongLegend.style.display = 'none';
       
-      // Render everything first
       totalCount.textContent = totalQuestions;
       renderAllQuestions();
       updateProgress();
       renderDots();
       updateOverview();
       
-      // Start timer fresh
       if (!quizCompleted && !isSubmitted) {
         startTimer();
       }
       saveState();
-      
-      // Scroll to top smoothly
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
