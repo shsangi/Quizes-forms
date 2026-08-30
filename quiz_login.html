@@ -786,8 +786,20 @@
       // 2. TOAST SYSTEM
       // --------------------------------------------------------------
       const toastContainer = document.getElementById('toastContainer');
+      let toastTimeout = null;
 
       function showToast(message, type = 'info', duration = 4000) {
+        // Clear any pending toast removal
+        if (toastTimeout) {
+          clearTimeout(toastTimeout);
+          toastTimeout = null;
+        }
+
+        // Remove existing toasts to prevent stacking
+        while (toastContainer.firstChild) {
+          toastContainer.removeChild(toastContainer.firstChild);
+        }
+
         const icons = {
           success: '✅',
           error: '❌',
@@ -807,8 +819,9 @@
           removeToast(toast);
         });
 
-        setTimeout(() => {
+        toastTimeout = setTimeout(() => {
           removeToast(toast);
+          toastTimeout = null;
         }, duration);
 
         return toast;
@@ -893,6 +906,7 @@
       const SESSION_KEY = 'quiz_session_data';
 
       function saveSession() {
+        if (!loggedInUser || quizCompleted) return;
         const sessionData = {
           user: loggedInUser,
           questions: questions,
@@ -918,7 +932,6 @@
           const raw = sessionStorage.getItem(SESSION_KEY);
           if (!raw) return null;
           const data = JSON.parse(raw);
-          // Check if session is less than 24 hours old
           const age = Date.now() - new Date(data.timestamp).getTime();
           if (age > 24 * 60 * 60 * 1000) {
             sessionStorage.removeItem(SESSION_KEY);
@@ -932,6 +945,7 @@
 
       function clearSession() {
         sessionStorage.removeItem(SESSION_KEY);
+        sessionBadge.textContent = '';
       }
 
       // --------------------------------------------------------------
@@ -940,12 +954,11 @@
       let users = [];
       let isLoadingUsers = true;
       let loggedInUser = null;
+      let sessionRestored = false;
 
       function fetchUsers() {
         loginStatus.textContent = '⏳ Loading user data...';
         loginBtn.disabled = true;
-
-        showToast('Loading user credentials...', 'info', 2000);
 
         fetch(LOGIN_CSV_URL)
           .then(response => {
@@ -957,16 +970,15 @@
             isLoadingUsers = false;
             loginStatus.textContent = `✅ ${users.length} users loaded`;
             loginBtn.disabled = false;
-            showToast(`✅ ${users.length} users loaded. Please sign in.`, 'success', 3000);
 
-            // Check for saved session after users loaded
-            checkForSession();
+            // Check for saved session AFTER users are loaded
+            checkAndRestoreSession();
           })
           .catch(err => {
             console.error('Login load error:', err);
             loginStatus.textContent = '⚠️ Failed to load user data';
             loginBtn.disabled = true;
-            showToast('⚠️ Failed to load user data. Please refresh or check the CSV link.', 'error', 5000);
+            showToast('⚠️ Failed to load user data. Please refresh.', 'error', 4000);
           });
       }
 
@@ -1004,7 +1016,6 @@
 
         if (matched) {
           loggedInUser = matched;
-          // Clear any old session
           clearSession();
           showToast(`✅ Welcome, ${matched.email}!`, 'success', 2500);
           initQuizForUser(matched);
@@ -1015,13 +1026,13 @@
       }
 
       // --------------------------------------------------------------
-      // 9. SESSION RESTORE CHECK
+      // 9. SESSION RESTORE
       // --------------------------------------------------------------
-      function checkForSession() {
+      function checkAndRestoreSession() {
         const session = loadSession();
         if (!session || !session.user) return;
 
-        // Verify user still exists in the loaded users list
+        // Verify user exists
         const userExists = users.some(u => 
           u.email.toLowerCase() === session.user.email.toLowerCase()
         );
@@ -1030,7 +1041,7 @@
           return;
         }
 
-        // Restore session
+        // Restore session silently without toasts
         loggedInUser = session.user;
         questions = session.questions || [];
         currentIndex = session.currentIndex || 0;
@@ -1041,53 +1052,31 @@
         timeRemaining = session.timeRemaining || 0;
         totalQuestions = session.totalQuestions || 0;
         quizTitleText = session.quizTitleText || 'Quiz';
+        sessionRestored = true;
 
-        // If quiz was already completed, show result
+        // Switch to quiz screen immediately
+        loginScreen.style.display = 'none';
+        quizScreen.style.display = 'block';
+        updateUserBadge(loggedInUser);
+        sessionBadge.textContent = '↻ Restored';
+
         if (quizCompleted) {
-          showToast(`🔄 Restoring completed quiz for ${loggedInUser.email}`, 'info', 3000);
-          loginScreen.style.display = 'none';
-          quizScreen.style.display = 'block';
-          updateUserBadge(loggedInUser);
-          sessionBadge.textContent = '↻ Restored';
+          // Show result if quiz was already completed
           showResult();
+          showToast(`📊 Quiz completed: ${score}/${totalQuestions}`, 'info', 3000);
           return;
         }
 
-        // If questions exist, restore the quiz state
-        if (questions.length > 0) {
-          showToast(`🔄 Welcome back, ${loggedInUser.email}! Resuming quiz...`, 'success', 3000);
-          loginScreen.style.display = 'none';
-          quizScreen.style.display = 'block';
-          updateUserBadge(loggedInUser);
-          sessionBadge.textContent = '↻ Restored';
+        if (questions.length > 0 && totalQuestions > 0) {
+          // Restore the quiz state
           restoreQuiz();
-          return;
-        }
-
-        // If no questions, but user logged in, fetch fresh
-        if (loggedInUser) {
-          loginScreen.style.display = 'none';
-          quizScreen.style.display = 'block';
-          updateUserBadge(loggedInUser);
-          sessionBadge.textContent = '↻ Restored';
+          // Single toast notification
+          showToast(`↻ Resumed: Question ${currentIndex + 1} of ${totalQuestions}`, 'info', 2500);
+        } else {
+          // Need to fetch questions
           fetchQuizQuestions();
         }
       }
-
-      // --------------------------------------------------------------
-      // 10. QUIZ SYSTEM
-      // --------------------------------------------------------------
-      let questions = [];
-      let currentIndex = 0;
-      let score = 0;
-      let isAnswered = false;
-      let quizCompleted = false;
-      let quizTimedOut = false;
-      let answerStatus = [];
-      let timerInterval = null;
-      let timeRemaining = 0;
-      let totalQuestions = 0;
-      let quizTitleText = 'Quiz';
 
       function initQuizForUser(user) {
         loginScreen.style.display = 'none';
@@ -1104,7 +1093,6 @@
       }
 
       function restoreQuiz() {
-        // Set UI state
         quizTitle.textContent = quizTitleText;
         quizSubtitle.textContent = 'Self Learners';
         
@@ -1127,9 +1115,6 @@
         
         renderDots();
         updateLegendCounts();
-        
-        // Show restore notification
-        showToast(`✅ Quiz restored. Question ${currentIndex + 1} of ${totalQuestions}`, 'info', 2500);
       }
 
       function startTimerFrom(seconds) {
@@ -1139,8 +1124,7 @@
         timerInterval = setInterval(() => {
           timeRemaining--;
           updateTimerDisplay();
-          // Save session periodically (every 5 seconds)
-          if (timeRemaining % 5 === 0) saveSession();
+          if (timeRemaining % 10 === 0) saveSession();
           if (timeRemaining <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
@@ -1149,10 +1133,24 @@
         }, 1000);
       }
 
+      // --------------------------------------------------------------
+      // 10. QUIZ SYSTEM
+      // --------------------------------------------------------------
+      let questions = [];
+      let currentIndex = 0;
+      let score = 0;
+      let isAnswered = false;
+      let quizCompleted = false;
+      let quizTimedOut = false;
+      let answerStatus = [];
+      let timerInterval = null;
+      let timeRemaining = 0;
+      let totalQuestions = 0;
+      let quizTitleText = 'Quiz';
+
       function fetchQuizQuestions() {
         questionText.textContent = '📥 Fetching questions...';
         feedbackMessage.innerHTML = '<span>⏳</span> Loading...';
-        showToast('📥 Loading quiz questions...', 'info', 2000);
 
         fetch(QUIZ_CSV_URL)
           .then(response => {
@@ -1165,19 +1163,30 @@
             questions = parsed.questions;
             quizTitleText = parsed.title || 'Quiz';
             totalQuestions = questions.length;
-            answerStatus = new Array(totalQuestions).fill(null);
-            currentIndex = 0;
-            score = 0;
-            quizCompleted = false;
-            quizTimedOut = false;
-            showToast(`✅ ${totalQuestions} questions loaded!`, 'success', 2500);
+            
+            // Only reset if not restoring a session
+            if (!sessionRestored) {
+              answerStatus = new Array(totalQuestions).fill(null);
+              currentIndex = 0;
+              score = 0;
+              quizCompleted = false;
+              quizTimedOut = false;
+            } else {
+              // Ensure answerStatus matches questions length
+              while (answerStatus.length < totalQuestions) {
+                answerStatus.push(null);
+              }
+            }
+            
+            sessionRestored = false;
+            showToast(`✅ ${totalQuestions} questions loaded!`, 'success', 2000);
             startQuiz();
           })
           .catch(err => {
             console.error('Quiz load error:', err);
-            questionText.textContent = '❌ Failed to load questions. Please check the CSV link.';
+            questionText.textContent = '❌ Failed to load questions.';
             feedbackMessage.innerHTML = '<span>❌</span> Error loading questions';
-            showToast('❌ Failed to load quiz questions. Please check the CSV link.', 'error', 5000);
+            showToast('❌ Failed to load quiz questions.', 'error', 4000);
           });
       }
 
@@ -1261,8 +1270,7 @@
         timerInterval = setInterval(() => {
           timeRemaining--;
           updateTimerDisplay();
-          // Save session every 5 seconds
-          if (timeRemaining % 5 === 0) saveSession();
+          if (timeRemaining % 10 === 0) saveSession();
           if (timeRemaining <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
@@ -1284,7 +1292,7 @@
         quizTimedOut = true;
         quizCompleted = true;
         document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-        feedbackMessage.innerHTML = '<span>⏰</span> Time is up! Quiz automatically submitted.';
+        feedbackMessage.innerHTML = '<span>⏰</span> Time is up! Quiz submitted.';
         feedbackMessage.style.background = '#fff3cd';
         nextBtn.disabled = true;
         showToast('⏰ Time is up! Quiz submitted.', 'warning', 3000);
@@ -1301,19 +1309,26 @@
         quizTitle.textContent = quizTitleText;
         quizSubtitle.textContent = 'Self Learners';
 
-        currentIndex = 0;
-        score = 0;
-        isAnswered = false;
-        quizCompleted = false;
-        quizTimedOut = false;
-        answerStatus = new Array(questions.length).fill(null);
+        // If session was restored, don't reset everything
+        if (!sessionRestored) {
+          currentIndex = 0;
+          score = 0;
+          isAnswered = false;
+          quizCompleted = false;
+          quizTimedOut = false;
+          answerStatus = new Array(questions.length).fill(null);
+        }
+
         resultArea.style.display = 'none';
         questionArea.style.display = 'block';
 
-        renderQuestion(0);
+        renderQuestion(currentIndex);
         renderDots();
         updateLegendCounts();
-        startTimer();
+        
+        if (!sessionRestored) {
+          startTimer();
+        }
         saveSession();
       }
 
@@ -1354,9 +1369,8 @@
                 nextBtn.disabled = false;
                 renderDots();
                 updateLegendCounts();
-                feedbackMessage.innerHTML = `⏭️ Skipped (no answer in db) <span class="no-answer">Moving to next question</span>`;
+                feedbackMessage.innerHTML = `⏭️ Skipped (no answer) <span class="no-answer">Moving to next</span>`;
                 feedbackMessage.style.background = '#e9ecef';
-                showToast('⏭️ No answer in database. Skipping.', 'warning', 2000);
                 saveSession();
               }
             }, 800);
@@ -1387,7 +1401,7 @@
         if (isAnswered || quizTimedOut || quizCompleted) return;
         const q = questions[currentIndex];
         if (q.correct === -1) {
-          feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(This question has no matching answer in Column J)</span>`;
+          feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(No match in Column J)</span>`;
           feedbackMessage.style.background = '#fff3cd';
           return;
         }
@@ -1406,12 +1420,10 @@
           feedbackMessage.innerHTML = '<span>✅</span> Correct! +1 point';
           feedbackMessage.style.background = '#d4edda';
           answerStatus[currentIndex] = true;
-          showToast('✅ Correct!', 'success', 1500);
         } else {
           feedbackMessage.innerHTML = `❌ The correct answer was "${q.options[q.correct]}"`;
           feedbackMessage.style.background = '#f8d7da';
           answerStatus[currentIndex] = false;
-          showToast(`❌ Incorrect. The answer was "${q.options[q.correct]}"`, 'error', 2500);
         }
 
         isAnswered = true;
@@ -1462,8 +1474,11 @@
         nextBtn.disabled = true;
         renderDots();
         updateLegendCounts();
-        clearSession(); // Clear session when quiz is complete
-        showToast(`🏁 Quiz complete! Score: ${score}/${total} (${percentage}%)`, 'info', 4000);
+        clearSession();
+        
+        if (!sessionRestored) {
+          showToast(`🏁 Quiz complete! Score: ${score}/${total} (${percentage}%)`, 'info', 4000);
+        }
       }
 
       function getScoreMessage(score, total) {
@@ -1527,6 +1542,7 @@
           timerInterval = null;
         }
         clearSession();
+        sessionRestored = false;
         if (questions.length === 0) {
           fetchQuizQuestions();
           return;
