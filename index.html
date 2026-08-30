@@ -182,7 +182,7 @@
       color: white;
       font-weight: 600;
       font-size: 1rem;
-      padding: 0.7rem 2.8rem;
+      padding: 0.7rem 2.2rem;
       border-radius: 60px;
       cursor: pointer;
       box-shadow: 0 6px 14px rgba(11,42,59,0.16);
@@ -191,6 +191,20 @@
     }
     .btn-primary:hover:not(:disabled) { background: #1a4b62; transform: scale(1.02); }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary {
+      background: #eaf1f8;
+      border: none;
+      color: #1f4d66;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.7rem 2.2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.15s;
+      border: 1.5px solid #dce6ef;
+    }
+    .btn-secondary:hover:not(:disabled) { background: #dce6ef; transform: scale(1.02); }
+    .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     .overview-section {
       margin-top: 1.2rem;
@@ -306,6 +320,7 @@
       .legend-dot { width: 12px; height: 12px; }
       .timer-line { font-size: 0.8rem; }
       .result-details { max-height: 300px; }
+      .btn-primary, .btn-secondary { padding: 0.6rem 1.4rem; font-size: 0.9rem; }
     }
   </style>
 </head>
@@ -332,9 +347,9 @@
     <div id="allAtOnceView">
       <div id="allQuestionsContainer" class="all-questions-container"></div>
       <div class="action-bar">
-        <button class="btn-primary" id="submitAllBtn">✅ Submit All & Show Score</button>
+        <button class="btn-secondary" id="showScoreBtn">📊 Show Score</button>
+        <button class="btn-primary" id="submitAllBtn">✅ Submit All</button>
       </div>
-      <!-- feedback label removed -->
     </div>
 
     <!-- overview -->
@@ -364,6 +379,7 @@
   (function() {
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
     const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
+    const STORAGE_KEY = 'self_learners_quiz_data';
 
     let questions = [];
     let score = 0;
@@ -374,9 +390,8 @@
     let timeRemaining = 0;
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
-
-    // selected answers per question (index -> selected option index)
     let selectedAllAnswers = [];
+    let isSubmitted = false; // track if answers have been submitted
 
     const progressFill = document.getElementById('progressFill');
     const timerDisplay = document.getElementById('timerDisplay');
@@ -384,6 +399,7 @@
     const quizSubtitle = document.getElementById('quizSubtitle');
     const allQuestionsContainer = document.getElementById('allQuestionsContainer');
     const submitAllBtn = document.getElementById('submitAllBtn');
+    const showScoreBtn = document.getElementById('showScoreBtn');
     const dotGrid = document.getElementById('dotGrid');
     const resultArea = document.getElementById('resultArea');
     const finalScore = document.getElementById('finalScore');
@@ -403,9 +419,60 @@
     }
     loadLogo();
 
+    // --- Save/Load state ---
+    function saveState() {
+      try {
+        const state = {
+          selectedAllAnswers: selectedAllAnswers,
+          answerStatus: answerStatus,
+          isSubmitted: isSubmitted,
+          quizCompleted: quizCompleted,
+          score: score,
+          timeRemaining: timeRemaining,
+          questions: questions, // save questions too for offline
+          quizTitleText: quizTitleText
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) { console.warn('Save error', e); }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const state = JSON.parse(raw);
+        if (state.questions && state.questions.length > 0) {
+          return state;
+        }
+        return null;
+      } catch (e) { return null; }
+    }
+
+    function clearState() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    }
+
     // --- fetch ---
     function fetchQuestions() {
       quizTitle.textContent = 'Loading...';
+      
+      // Check for saved state first
+      const saved = loadState();
+      if (saved && saved.questions && saved.questions.length > 0) {
+        questions = saved.questions;
+        quizTitleText = saved.quizTitleText || 'Quiz';
+        totalQuestions = questions.length;
+        selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
+        answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
+        isSubmitted = saved.isSubmitted || false;
+        quizCompleted = saved.quizCompleted || false;
+        score = saved.score || 0;
+        timeRemaining = saved.timeRemaining || totalQuestions * 60;
+        startQuiz(true);
+        return;
+      }
+
+      // Fetch fresh
       fetch(CSV_URL)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(csvText => {
@@ -416,7 +483,12 @@
           totalQuestions = questions.length;
           answerStatus = new Array(questions.length).fill(null);
           selectedAllAnswers = new Array(questions.length).fill(null);
-          startQuiz();
+          isSubmitted = false;
+          quizCompleted = false;
+          score = 0;
+          timeRemaining = totalQuestions * 60;
+          clearState();
+          startQuiz(false);
         })
         .catch(err => {
           console.error(err);
@@ -469,12 +541,12 @@
 
     // --- timer ---
     function startTimer() {
-      timeRemaining = totalQuestions * 60;
-      updateTimerDisplay();
+      if (quizCompleted || isSubmitted) return;
       timerInterval = setInterval(() => {
         timeRemaining--;
         updateTimerDisplay();
         if (timeRemaining <= 0) { clearInterval(timerInterval); timerInterval = null; handleTimeout(); }
+        saveState();
       }, 1000);
     }
 
@@ -491,27 +563,69 @@
       quizCompleted = true;
       document.querySelectorAll('.all-q-options .option-btn').forEach(b => b.disabled = true);
       submitAllBtn.disabled = true;
+      showScoreBtn.disabled = true;
       // auto-submit with current selections
       submitAll();
     }
 
     // --- start ---
-    function startQuiz() {
+    function startQuiz(restored) {
       if (questions.length === 0) { allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">⚠️ No questions found.</div>'; return; }
       quizTitle.textContent = quizTitleText;
       quizSubtitle.textContent = 'Self Learners';
-      score = 0;
-      quizCompleted = false;
-      quizTimedOut = false;
-      answerStatus = new Array(questions.length).fill(null);
-      selectedAllAnswers = new Array(questions.length).fill(null);
+      
+      if (!restored) {
+        score = 0;
+        quizCompleted = false;
+        quizTimedOut = false;
+        answerStatus = new Array(questions.length).fill(null);
+        selectedAllAnswers = new Array(questions.length).fill(null);
+        isSubmitted = false;
+        timeRemaining = totalQuestions * 60;
+        clearState();
+      }
+      
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
       renderAllQuestions();
       renderDots();
       updateOverview();
       progressFill.style.width = '0%';
+      
+      // Restore selected answers
+      if (restored && selectedAllAnswers) {
+        selectedAllAnswers.forEach((selected, idx) => {
+          if (selected !== null && selected !== undefined) {
+            const item = allQuestionsContainer.children[idx];
+            if (item) {
+              const btns = item.querySelectorAll('.option-btn');
+              btns.forEach((b, optIdx) => {
+                if (optIdx === selected) {
+                  b.classList.add('selected-opt');
+                }
+              });
+            }
+          }
+        });
+        // If already submitted, show results
+        if (isSubmitted) {
+          showResultScreen();
+          return;
+        }
+      }
+      
+      // If quiz was completed (e.g., from timeout), show result
+      if (quizCompleted) {
+        showResultScreen();
+        return;
+      }
+      
+      submitAllBtn.disabled = false;
+      showScoreBtn.disabled = false;
+      
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       startTimer();
+      saveState();
     }
 
     // --- render all questions ---
@@ -535,7 +649,7 @@
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
           btn.addEventListener('click', function(e) {
-            if (quizCompleted || quizTimedOut) return;
+            if (quizCompleted || quizTimedOut || isSubmitted) return;
             const parent = this.closest('.all-q-item');
             const btns = parent.querySelectorAll('.option-btn');
             btns.forEach(b => b.classList.remove('selected-opt'));
@@ -543,21 +657,49 @@
             selectedAllAnswers[idx] = optIdx;
             renderDots();
             updateOverview();
+            saveState();
           });
           optsDiv.appendChild(btn);
         });
         div.appendChild(optsDiv);
         allQuestionsContainer.appendChild(div);
       });
-      submitAllBtn.disabled = false;
+      
+      // If already submitted, show correct/wrong
+      if (isSubmitted || quizCompleted) {
+        displayResultsOnQuestions();
+      }
+    }
+
+    function displayResultsOnQuestions() {
+      const letters = ['A','B','C','D'];
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const item = allQuestionsContainer.children[i];
+        if (!item) continue;
+        const btns = item.querySelectorAll('.option-btn');
+        btns.forEach((b, idx) => {
+          b.disabled = true;
+          if (q.correct !== -1) {
+            if (idx === q.correct) b.classList.add('correct');
+            if (idx === selectedAllAnswers[i] && idx !== q.correct) b.classList.add('wrong');
+          }
+          b.classList.remove('selected-opt');
+        });
+        if (q.correct !== -1 && answerStatus[i] !== null) {
+          if (answerStatus[i] === true) item.classList.add('correct-item');
+          else if (answerStatus[i] === false) item.classList.add('wrong-item');
+        }
+      }
+      submitAllBtn.disabled = true;
+      showScoreBtn.disabled = false;
     }
 
     // --- submit all ---
     function submitAll() {
-      if (quizCompleted && !quizTimedOut) return;
+      if (isSubmitted && !quizTimedOut) return;
       // grade all
       let correctCountLocal = 0;
-      const letters = ['A','B','C','D'];
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         const selected = selectedAllAnswers[i];
@@ -565,33 +707,34 @@
         if (q.correct === -1) { answerStatus[i] = null; continue; }
         if (isCorrect) { correctCountLocal++; answerStatus[i] = true; }
         else { answerStatus[i] = false; }
-        // show correct/wrong on options
-        const item = allQuestionsContainer.children[i];
-        if (item) {
-          const btns = item.querySelectorAll('.option-btn');
-          btns.forEach((b, idx) => {
-            b.disabled = true;
-            if (idx === q.correct) b.classList.add('correct');
-            else if (idx === selected && !isCorrect) b.classList.add('wrong');
-            b.classList.remove('selected-opt');
-          });
-          if (q.correct !== -1) {
-            if (isCorrect) item.classList.add('correct-item');
-            else item.classList.add('wrong-item');
-          }
-        }
       }
       score = correctCountLocal;
-      submitAllBtn.disabled = true;
+      isSubmitted = true;
       quizCompleted = true;
+      
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      
+      displayResultsOnQuestions();
       renderDots();
       updateOverview();
-      setTimeout(() => showResult(), 600);
+      saveState();
+      
+      // Show score screen automatically
+      showResultScreen();
+    }
+
+    // --- show score (without re-submitting) ---
+    function showScore() {
+      if (!isSubmitted && !quizCompleted) {
+        // If not submitted, submit first
+        submitAll();
+        return;
+      }
+      showResultScreen();
     }
 
     // --- show result with details ---
-    function showResult() {
+    function showResultScreen() {
       allAtOnceView.style.display = 'none';
       resultArea.style.display = 'block';
       const total = questions.length;
@@ -601,7 +744,6 @@
       resultMessage.textContent = msg;
 
       resultDetails.innerHTML = '';
-      const letters = ['A','B','C','D'];
       questions.forEach((q, idx) => {
         const div = document.createElement('div');
         div.className = 'detail-item';
@@ -646,7 +788,7 @@
       else return '💪 Learning is a journey. Keep practicing!';
     }
 
-    // --- dots and overview (Done / Pending only) ---
+    // --- dots and overview ---
     function renderDots() {
       dotGrid.innerHTML = '';
       const total = questions.length;
@@ -656,16 +798,13 @@
         dot.textContent = i + 1;
         const q = questions[i];
         const hasAnswer = selectedAllAnswers[i] !== null;
-        // after submission, show correct/wrong
-        if (quizCompleted) {
+        if (isSubmitted || quizCompleted) {
           if (q && q.correct === -1) dot.classList.add('no-answer-dot');
           else if (answerStatus[i] === true) dot.classList.add('correct-dot');
           else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
           else if (q && q.correct !== -1) dot.classList.add('timeout');
         } else {
-          // before submission: done if selected, else pending
           if (hasAnswer) dot.classList.add('done-dot');
-          // else default pending (light gray)
         }
         dotGrid.appendChild(dot);
       }
@@ -684,14 +823,24 @@
 
     function restartQuiz() {
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      clearState();
       if (questions.length === 0) { fetchQuestions(); return; }
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
-      startQuiz();
+      // Reset state
+      selectedAllAnswers = new Array(questions.length).fill(null);
+      answerStatus = new Array(questions.length).fill(null);
+      isSubmitted = false;
+      quizCompleted = false;
+      quizTimedOut = false;
+      score = 0;
+      timeRemaining = totalQuestions * 60;
+      startQuiz(false);
     }
 
     // --- event listeners ---
     submitAllBtn.addEventListener('click', submitAll);
+    showScoreBtn.addEventListener('click', showScore);
     restartFromResult.addEventListener('click', restartQuiz);
 
     // --- init ---
