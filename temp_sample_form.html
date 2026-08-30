@@ -78,21 +78,43 @@
       color: #1f4d66;
       margin-bottom: 0.2rem;
     }
-    .login-wrapper input {
+    .login-wrapper .input-group {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+    .login-wrapper .input-group input {
       width: 100%;
       padding: 0.8rem 1.2rem;
+      padding-right: 3rem;
       border: 1.5px solid #dce6ef;
       border-radius: 60px;
       font-size: 1rem;
       font-family: 'Inter', sans-serif;
-      margin-bottom: 1.2rem;
       transition: border 0.2s;
       background: #fafcfe;
     }
-    .login-wrapper input:focus {
+    .login-wrapper .input-group input:focus {
       outline: none;
       border-color: #2f7b9e;
       box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.15);
+    }
+    .login-wrapper .toggle-password {
+      position: absolute;
+      right: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #6c8a9e;
+      padding: 0.2rem;
+      border-radius: 30px;
+      transition: 0.2s;
+    }
+    .login-wrapper .toggle-password:hover {
+      color: #0b2a3b;
+      background: #f0f4f9;
     }
     .login-wrapper .btn-primary {
       width: 100%;
@@ -510,7 +532,12 @@
     <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username" />
 
     <label for="passwordInput">Password</label>
-    <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password" />
+    <div class="input-group">
+      <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password" />
+      <button class="toggle-password" id="togglePasswordBtn" type="button" aria-label="Toggle password visibility">
+        👁️
+      </button>
+    </div>
 
     <button class="btn-primary" id="loginBtn">Sign In</button>
     <div class="loading-text" id="loginStatus">Loading user data...</div>
@@ -592,13 +619,13 @@
   <script>
     (function() {
       // --------------------------------------------------------------
-      // 1. CONFIGURATION – REPLACE WITH YOUR PUBLISHED CSV LINKS
+      // 1. CONFIGURATION – CSV EXPORT URLs
       // --------------------------------------------------------------
-      // After publishing your sheets as CSV, paste the links here:
-      const LOGIN_CSV_URL = 'YOUR_PUBLISHED_LOGIN_CSV_URL';   // e.g. https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
-      const QUIZ_CSV_URL  = 'YOUR_PUBLISHED_QUIZ_CSV_URL';    // e.g. https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
+      // These URLs directly export your sheets as CSV using the gid (sheet ID)
+      const LOGIN_CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=2051134983';
+      const QUIZ_CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
 
-      // Optional: your logo from Google Drive
+      // Optional: your logo from Google Drive (if you have one)
       const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
 
       // --------------------------------------------------------------
@@ -608,6 +635,7 @@
       const quizScreen = document.getElementById('quizScreen');
       const emailInput = document.getElementById('emailInput');
       const passwordInput = document.getElementById('passwordInput');
+      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
       const loginBtn = document.getElementById('loginBtn');
       const loginError = document.getElementById('loginError');
       const loginStatus = document.getElementById('loginStatus');
@@ -639,7 +667,18 @@
       const quizLogo = document.getElementById('quizLogo');
 
       // --------------------------------------------------------------
-      // 4. LOAD LOGO (if available)
+      // 4. PASSWORD VISIBILITY TOGGLE
+      // --------------------------------------------------------------
+      let passwordVisible = false;
+      togglePasswordBtn.addEventListener('click', function() {
+        passwordVisible = !passwordVisible;
+        passwordInput.type = passwordVisible ? 'text' : 'password';
+        togglePasswordBtn.textContent = passwordVisible ? '🙈' : '👁️';
+        togglePasswordBtn.setAttribute('aria-label', passwordVisible ? 'Hide password' : 'Show password');
+      });
+
+      // --------------------------------------------------------------
+      // 5. LOAD LOGO (if available)
       // --------------------------------------------------------------
       function loadLogo(imgElement) {
         if (!LOGO_URL) return;
@@ -652,7 +691,7 @@
       loadLogo(quizLogo);
 
       // --------------------------------------------------------------
-      // 5. LOGIN SYSTEM
+      // 6. LOGIN SYSTEM
       // --------------------------------------------------------------
       let users = [];
       let isLoadingUsers = true;
@@ -683,7 +722,9 @@
         const lines = text.split('\n').filter(line => line.trim() !== '');
         if (lines.length < 2) return [];
         const result = [];
-        for (let i = 1; i < lines.length; i++) {
+        // Start from row 2 (index 1) if row 1 has headers
+        const startRow = 1;
+        for (let i = startRow; i < lines.length; i++) {
           const cols = parseCSVLine(lines[i]);
           if (cols.length < 2) continue;
           const email = cols[0] ? cols[0].trim() : '';
@@ -732,7 +773,7 @@
       }
 
       // --------------------------------------------------------------
-      // 6. QUIZ SYSTEM
+      // 7. QUIZ SYSTEM
       // --------------------------------------------------------------
       let questions = [];
       let currentIndex = 0;
@@ -1107,9 +1148,11 @@
       }
 
       // --------------------------------------------------------------
-      // 7. EVENT LISTENERS
+      // 8. EVENT LISTENERS
       // --------------------------------------------------------------
       loginBtn.addEventListener('click', handleLogin);
+
+      // Enter key on login
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !loginBtn.disabled) {
           const active = document.activeElement;
@@ -1119,16 +1162,17 @@
         }
       });
 
+      // Quiz navigation
       nextBtn.addEventListener('click', goToNext);
       restartFromResult.addEventListener('click', restartQuiz);
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !nextBtn.disabled) {
+        if (e.key === 'Enter' && !nextBtn.disabled && quizScreen.style.display !== 'none') {
           goToNext();
         }
       });
 
       // --------------------------------------------------------------
-      // 8. INIT – Load users first
+      // 9. INIT – Load users first
       // --------------------------------------------------------------
       fetchUsers();
     })();
