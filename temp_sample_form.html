@@ -1,76 +1,1137 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Custom Form with Summary</title>
-    <style>
-      .summary {
-        display: none;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Form Questions</h1>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Self Learners · Login & Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <style>
+    /* ---------- RESET & BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f2f6fc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+    }
 
-    <!-- Section 1: Questions -->
-    <div id="questions-section">
-      <label for="dropdown">Select an option:</label>
-      <select id="dropdown">
-        <option value="Option 1">Option 1</option>
-        <option value="Option 2">Option 2</option>
-        <option value="Option 3">Option 3</option>
-      </select><br>
+    /* ---------- LOGIN SCREEN ---------- */
+    .login-wrapper {
+      max-width: 400px;
+      width: 100%;
+      background: white;
+      border-radius: 2rem;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 25px 50px -10px rgba(0, 20, 30, 0.15);
+      text-align: center;
+    }
+    .login-wrapper .logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      object-fit: contain;
+      background: #f0f4f9;
+      padding: 8px;
+      margin: 0 auto 0.8rem;
+      display: block;
+    }
+    .login-wrapper h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.2rem;
+    }
+    .login-wrapper .sub {
+      color: #6c8a9e;
+      font-size: 0.85rem;
+      margin-bottom: 1.8rem;
+    }
+    .login-wrapper .error-msg {
+      background: #f5dddd;
+      color: #b33c3c;
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+      display: none;
+    }
+    .login-wrapper .error-msg.visible {
+      display: block;
+    }
+    .login-wrapper label {
+      display: block;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #1f4d66;
+      margin-bottom: 0.2rem;
+    }
+    .login-wrapper input {
+      width: 100%;
+      padding: 0.8rem 1.2rem;
+      border: 1.5px solid #dce6ef;
+      border-radius: 60px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 1.2rem;
+      transition: border 0.2s;
+      background: #fafcfe;
+    }
+    .login-wrapper input:focus {
+      outline: none;
+      border-color: #2f7b9e;
+      box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.15);
+    }
+    .login-wrapper .btn-primary {
+      width: 100%;
+      background: #0b2a3b;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.8rem;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(11, 42, 59, 0.16);
+      transition: 0.15s;
+      margin-top: 0.4rem;
+    }
+    .login-wrapper .btn-primary:hover:not(:disabled) {
+      background: #1a4b62;
+      transform: scale(1.01);
+    }
+    .login-wrapper .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .login-wrapper .loading-text {
+      font-size: 0.85rem;
+      color: #6c8a9e;
+      margin-top: 0.8rem;
+    }
 
-      <label for="checkbox">Select your preferences:</label><br>
-      <input type="checkbox" id="checkbox1" value="Preference 1"> Preference 1<br>
-      <input type="checkbox" id="checkbox2" value="Preference 2"> Preference 2<br>
-      <input type="checkbox" id="checkbox3" value="Preference 3"> Preference 3<br>
+    /* ---------- QUIZ SCREEN ---------- */
+    .quiz-wrapper {
+      max-width: 880px;
+      width: 100%;
+      background: white;
+      border-radius: 2rem;
+      padding: 2rem 2rem 1.8rem;
+      box-shadow: 0 25px 50px -10px rgba(0, 20, 30, 0.15);
+      display: none;
+    }
+    .quiz-wrapper .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .quiz-wrapper .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .quiz-wrapper .brand-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: #f0f4f9;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .quiz-wrapper .brand-title h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.2;
+    }
+    .quiz-wrapper .brand-title .subtitle {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #6c8a9e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .quiz-wrapper .timer-line {
+      text-align: center;
+      padding: 0.2rem 0 0.8rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #1f4d66;
+      letter-spacing: 0.3px;
+      font-variant-numeric: tabular-nums;
+    }
+    .quiz-wrapper .timer-line .timer {
+      font-weight: 600;
+      color: #0b2a3b;
+    }
+    .quiz-wrapper .timer-line .timer.warning {
+      color: #856404;
+    }
+    .quiz-wrapper .timer-line .timer.danger {
+      color: #b33c3c;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .quiz-wrapper .progress-block {
+      background: #e6edf5;
+      height: 6px;
+      border-radius: 20px;
+      margin: 0.6rem 0 1.4rem;
+      overflow: hidden;
+    }
+    .quiz-wrapper .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2f7b9e, #4ba3c7);
+      border-radius: 20px;
+      transition: width 0.35s ease;
+    }
+    .quiz-wrapper .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      margin-bottom: 0.4rem;
+    }
+    .quiz-wrapper .q-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1f4d66;
+      background: #eaf1f8;
+      padding: 0.2rem 1.2rem;
+      border-radius: 40px;
+    }
+    .quiz-wrapper .q-category {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #1f5672;
+      background: rgba(26, 90, 122, 0.06);
+      padding: 0.15rem 1.2rem;
+      border-radius: 30px;
+      border: 1px solid rgba(26, 90, 122, 0.08);
+    }
+    .quiz-wrapper .question-text {
+      font-size: 1.35rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #0a212b;
+      margin: 0.6rem 0 1.6rem;
+      min-height: 4rem;
+    }
+    .quiz-wrapper .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin-bottom: 1.6rem;
+    }
+    .quiz-wrapper .option-btn {
+      background: white;
+      border: 1.5px solid #dce6ef;
+      border-radius: 60px;
+      padding: 0.8rem 1.8rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #1d3847;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.12s;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+    .quiz-wrapper .option-btn:hover:not(:disabled) {
+      background: #f5faff;
+      border-color: #6fa6c7;
+      transform: scale(1.01);
+    }
+    .quiz-wrapper .option-btn .letter {
+      background: #e7f0f7;
+      color: #1a5a7a;
+      font-weight: 700;
+      width: 30px;
+      height: 30px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .quiz-wrapper .option-btn.correct {
+      background: #d8eddf;
+      border-color: #1f8b4c;
+      box-shadow: 0 0 0 2px rgba(31, 139, 76, 0.15);
+    }
+    .quiz-wrapper .option-btn.correct .letter {
+      background: #1f8b4c;
+      color: white;
+    }
+    .quiz-wrapper .option-btn.wrong {
+      background: #f5dddd;
+      border-color: #b33c3c;
+      box-shadow: 0 0 0 2px rgba(179, 60, 60, 0.12);
+    }
+    .quiz-wrapper .option-btn.wrong .letter {
+      background: #b33c3c;
+      color: white;
+    }
+    .quiz-wrapper .option-btn:disabled {
+      cursor: default;
+      opacity: 0.7;
+    }
+    .quiz-wrapper .option-btn:disabled:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    .quiz-wrapper .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 0.4rem 0 1.2rem;
+    }
+    .quiz-wrapper .feedback-msg {
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.3rem 1.2rem;
+      border-radius: 40px;
+      background: #f0f4f9;
+      min-height: 2.6rem;
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+    .quiz-wrapper .feedback-msg .no-answer {
+      font-size: 0.75rem;
+      color: #999;
+      margin-left: 0.5rem;
+      font-weight: 400;
+    }
+    .quiz-wrapper .nav-group {
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .quiz-wrapper .btn-primary {
+      background: #0b2a3b;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.6rem 2.4rem;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(11, 42, 59, 0.16);
+      transition: 0.15s;
+    }
+    .quiz-wrapper .btn-primary:hover:not(:disabled) {
+      background: #1a4b62;
+      transform: scale(1.02);
+    }
+    .quiz-wrapper .btn-primary:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .quiz-wrapper .overview-section {
+      margin-top: 1.2rem;
+      border-top: 1px solid #e2eaf2;
+      padding-top: 1rem;
+    }
+    .quiz-wrapper .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .quiz-wrapper .overview-header span {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1f4d66;
+    }
+    .quiz-wrapper .legend {
+      display: flex;
+      gap: 0.8rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #2d5a72;
+      flex-wrap: wrap;
+    }
+    .quiz-wrapper .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .quiz-wrapper .legend-item .count {
+      font-weight: 700;
+      font-size: 0.8rem;
+      min-width: 1.2rem;
+      text-align: center;
+    }
+    .quiz-wrapper .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 30px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .quiz-wrapper .legend-dot.correct-dot { background: #1f8b4c; }
+    .quiz-wrapper .legend-dot.wrong-dot { background: #b33c3c; }
+    .quiz-wrapper .legend-dot.active { background: #2f7b9e; }
+    .quiz-wrapper .legend-dot.pending { background: #dce6ef; }
+    .quiz-wrapper .grid-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+      margin-top: 0.2rem;
+    }
+    .quiz-wrapper .grid-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 30px;
+      background: #dce6ef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.7rem;
+      color: #1d4b61;
+      cursor: default;
+    }
+    .quiz-wrapper .grid-dot.active {
+      background: #2f7b9e;
+      color: white;
+      box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.25);
+    }
+    .quiz-wrapper .grid-dot.correct-dot {
+      background: #1f8b4c;
+      color: white;
+    }
+    .quiz-wrapper .grid-dot.wrong-dot {
+      background: #b33c3c;
+      color: white;
+    }
+    .quiz-wrapper .grid-dot.no-answer-dot {
+      background: #999;
+      color: white;
+    }
+    .quiz-wrapper .grid-dot.timeout {
+      background: #6c757d;
+      color: white;
+      opacity: 0.5;
+    }
+    .quiz-wrapper .result-card {
+      text-align: center;
+      padding: 1rem 0.5rem 0.5rem;
+      display: none;
+    }
+    .quiz-wrapper .result-card h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #0b2a3b;
+    }
+    .quiz-wrapper .result-score {
+      font-size: 3.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1a5a7a, #48a0c7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 0.3rem 0 0.2rem;
+    }
+    .quiz-wrapper .result-msg {
+      color: #1f4b61;
+      font-size: 1.1rem;
+      margin: 0.2rem 0 1.6rem;
+    }
 
-      <label for="text">Enter your text:</label><br>
-      <input type="text" id="text"><br>
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 550px) {
+      .login-wrapper { padding: 2rem 1.2rem; }
+      .login-wrapper h1 { font-size: 1.4rem; }
+      .quiz-wrapper { padding: 1.4rem 0.8rem; }
+      .quiz-wrapper .brand-logo { width: 36px; height: 36px; }
+      .quiz-wrapper .brand-title h1 { font-size: 1.2rem; }
+      .quiz-wrapper .question-text { font-size: 1.1rem; min-height: 3.2rem; }
+      .quiz-wrapper .option-btn { padding: 0.6rem 1rem; font-size: 0.9rem; }
+      .quiz-wrapper .action-bar { flex-direction: column; align-items: stretch; }
+      .quiz-wrapper .btn-primary { width: 100%; justify-content: center; }
+      .quiz-wrapper .nav-group { width: 100%; }
+      .quiz-wrapper .grid-dot { width: 28px; height: 28px; font-size: 0.65rem; }
+      .quiz-wrapper .legend { font-size: 0.6rem; gap: 0.4rem; }
+      .quiz-wrapper .legend-dot { width: 12px; height: 12px; }
+      .quiz-wrapper .timer-line { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
 
-      <label for="date">Pick a date:</label>
-      <input type="date" id="date"><br>
+  <!-- ============================================================ -->
+  <!-- LOGIN SCREEN -->
+  <!-- ============================================================ -->
+  <div class="login-wrapper" id="loginScreen">
+    <img class="logo" id="loginLogo"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Crect width='72' height='72' rx='16' fill='%230b2a3b'/%3E%3Ctext x='36' y='48' text-anchor='middle' font-family='Inter, sans-serif' font-size='36' font-weight='700' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
+         alt="Logo" />
+    <h1>Self Learners</h1>
+    <p class="sub">Sign in to continue your quiz</p>
 
-      <button onclick="showSummary()">Next</button>
+    <div class="error-msg" id="loginError">Invalid email or password. Please try again.</div>
+
+    <label for="emailInput">Email / Username</label>
+    <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username" />
+
+    <label for="passwordInput">Password</label>
+    <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password" />
+
+    <button class="btn-primary" id="loginBtn">Sign In</button>
+    <div class="loading-text" id="loginStatus">Loading user data...</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- QUIZ SCREEN (hidden until login) -->
+  <!-- ============================================================ -->
+  <div class="quiz-wrapper" id="quizScreen">
+    <!-- header -->
+    <div class="top-bar">
+      <div class="brand">
+        <img class="brand-logo" id="quizLogo"
+             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
+             alt="Logo" />
+        <div class="brand-title">
+          <h1 id="quizTitle">Loading...</h1>
+          <span class="subtitle" id="quizSubtitle">Self Learners</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Section 2: Summary -->
-    <div id="summary-section" class="summary">
-      <h2>Summary of Your Answers</h2>
-      <p><strong>Dropdown selection:</strong> <span id="dropdown-summary"></span></p>
-      <p><strong>Checkbox selections:</strong> <span id="checkbox-summary"></span></p>
-      <p><strong>Text input:</strong> <span id="text-summary"></span></p>
-      <p><strong>Date selected:</strong> <span id="date-summary"></span></p>
-
-      <button onclick="submitForm()">Submit</button>
+    <!-- timer -->
+    <div class="timer-line">
+      ⏱️ <span class="timer" id="timerDisplay">00:00</span>
     </div>
 
-    <script>
-      function showSummary() {
-        // Gather answers
-        var dropdown = document.getElementById("dropdown").value;
-        var checkboxes = [];
-        if (document.getElementById("checkbox1").checked) checkboxes.push("Preference 1");
-        if (document.getElementById("checkbox2").checked) checkboxes.push("Preference 2");
-        if (document.getElementById("checkbox3").checked) checkboxes.push("Preference 3");
-        var text = document.getElementById("text").value;
-        var date = document.getElementById("date").value;
+    <div id="quizContent">
+      <!-- progress -->
+      <div class="progress-block">
+        <div class="progress-fill" id="progressFill" style="width:0%;"></div>
+      </div>
 
-        // Show the summary
-        document.getElementById("dropdown-summary").textContent = dropdown;
-        document.getElementById("checkbox-summary").textContent = checkboxes.join(", ");
-        document.getElementById("text-summary").textContent = text;
-        document.getElementById("date-summary").textContent = date;
+      <!-- question area -->
+      <div id="questionArea">
+        <div class="q-meta">
+          <span class="q-label" id="qNumber">QUESTION 1 OF 0</span>
+          <span class="q-category" id="qCategory">📚 Loading...</span>
+        </div>
+        <div class="question-text" id="questionText">Loading questions from spreadsheet...</div>
 
-        // Hide the questions section and show the summary section
-        document.getElementById("questions-section").style.display = "none";
-        document.getElementById("summary-section").style.display = "block";
+        <div class="options-grid" id="optionsContainer"></div>
+
+        <div class="action-bar">
+          <div class="feedback-msg" id="feedbackMessage">✨ Select an answer</div>
+          <div class="nav-group">
+            <button class="btn-primary" id="nextBtn" disabled>Next →</button>
+          </div>
+        </div>
+
+        <!-- overview -->
+        <div class="overview-section">
+          <div class="overview-header">
+            <span>OVERVIEW</span>
+            <div class="legend" id="legendContainer">
+              <span class="legend-item"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
+              <span class="legend-item"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
+              <span class="legend-item"><span class="legend-dot active"></span> Active <span class="count" id="activeCount">0</span></span>
+              <span class="legend-item"><span class="legend-dot pending"></span> Pending <span class="count" id="pendingCount">0</span></span>
+            </div>
+          </div>
+          <div class="grid-dots" id="dotGrid"></div>
+        </div>
+      </div>
+
+      <!-- result -->
+      <div class="result-card" id="resultArea">
+        <h2>🏁 Quiz Complete</h2>
+        <div class="result-score" id="finalScore">0 / 0</div>
+        <p class="result-msg" id="resultMessage">Keep learning, Self Learner!</p>
+        <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT – LOGIN + QUIZ -->
+  <!-- ============================================================ -->
+  <script>
+    (function() {
+      // --------------------------------------------------------------
+      // 1. CONFIGURATION – REPLACE WITH YOUR PUBLISHED CSV LINKS
+      // --------------------------------------------------------------
+      // After publishing your sheets as CSV, paste the links here:
+      const LOGIN_CSV_URL = 'YOUR_PUBLISHED_LOGIN_CSV_URL';   // e.g. https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
+      const QUIZ_CSV_URL  = 'YOUR_PUBLISHED_QUIZ_CSV_URL';    // e.g. https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
+
+      // Optional: your logo from Google Drive
+      const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
+
+      // --------------------------------------------------------------
+      // 2. DOM REFS – LOGIN
+      // --------------------------------------------------------------
+      const loginScreen = document.getElementById('loginScreen');
+      const quizScreen = document.getElementById('quizScreen');
+      const emailInput = document.getElementById('emailInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const loginBtn = document.getElementById('loginBtn');
+      const loginError = document.getElementById('loginError');
+      const loginStatus = document.getElementById('loginStatus');
+      const loginLogo = document.getElementById('loginLogo');
+
+      // --------------------------------------------------------------
+      // 3. DOM REFS – QUIZ
+      // --------------------------------------------------------------
+      const progressFill = document.getElementById('progressFill');
+      const qNumber = document.getElementById('qNumber');
+      const qCategory = document.getElementById('qCategory');
+      const questionText = document.getElementById('questionText');
+      const optionsContainer = document.getElementById('optionsContainer');
+      const feedbackMessage = document.getElementById('feedbackMessage');
+      const nextBtn = document.getElementById('nextBtn');
+      const restartFromResult = document.getElementById('restartFromResult');
+      const questionArea = document.getElementById('questionArea');
+      const resultArea = document.getElementById('resultArea');
+      const finalScore = document.getElementById('finalScore');
+      const resultMessage = document.getElementById('resultMessage');
+      const dotGrid = document.getElementById('dotGrid');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const quizTitle = document.getElementById('quizTitle');
+      const quizSubtitle = document.getElementById('quizSubtitle');
+      const correctCount = document.getElementById('correctCount');
+      const wrongCount = document.getElementById('wrongCount');
+      const activeCount = document.getElementById('activeCount');
+      const pendingCount = document.getElementById('pendingCount');
+      const quizLogo = document.getElementById('quizLogo');
+
+      // --------------------------------------------------------------
+      // 4. LOAD LOGO (if available)
+      // --------------------------------------------------------------
+      function loadLogo(imgElement) {
+        if (!LOGO_URL) return;
+        const img = new Image();
+        img.onload = function() { imgElement.src = LOGO_URL; };
+        img.onerror = function() { /* keep fallback */ };
+        img.src = LOGO_URL;
+      }
+      loadLogo(loginLogo);
+      loadLogo(quizLogo);
+
+      // --------------------------------------------------------------
+      // 5. LOGIN SYSTEM
+      // --------------------------------------------------------------
+      let users = [];
+      let isLoadingUsers = true;
+
+      function fetchUsers() {
+        loginStatus.textContent = 'Loading user data...';
+        loginBtn.disabled = true;
+
+        fetch(LOGIN_CSV_URL)
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.text();
+          })
+          .then(csvText => {
+            users = parseLoginCSV(csvText);
+            isLoadingUsers = false;
+            loginStatus.textContent = `✅ ${users.length} users loaded. Please sign in.`;
+            loginBtn.disabled = false;
+          })
+          .catch(err => {
+            console.error('Login load error:', err);
+            loginStatus.textContent = '⚠️ Failed to load user data. Please refresh or check the CSV link.';
+            loginBtn.disabled = true;
+          });
       }
 
-      function submitForm() {
-        // Here you can send the data to a Google Sheet, for example
-        alert("Form Submitted! (You can send data to Google Sheets or other backends)");
+      function parseLoginCSV(text) {
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) return [];
+        const result = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCSVLine(lines[i]);
+          if (cols.length < 2) continue;
+          const email = cols[0] ? cols[0].trim() : '';
+          const password = cols[1] ? cols[1].trim() : '';
+          if (email && password) result.push({ email, password });
+        }
+        return result;
       }
-    </script>
-  </body>
+
+      function handleLogin() {
+        loginError.classList.remove('visible');
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!email || !password) {
+          loginError.textContent = 'Please enter both email and password.';
+          loginError.classList.add('visible');
+          return;
+        }
+        if (isLoadingUsers) {
+          loginError.textContent = 'User data is still loading. Please wait.';
+          loginError.classList.add('visible');
+          return;
+        }
+
+        const matched = users.find(u =>
+          u.email.toLowerCase() === email.toLowerCase() &&
+          u.password === password
+        );
+
+        if (matched) {
+          // Login success – store user and show quiz
+          sessionStorage.setItem('loggedInUser', JSON.stringify({
+            email: matched.email,
+            loginTime: new Date().toISOString()
+          }));
+          loginScreen.style.display = 'none';
+          quizScreen.style.display = 'block';
+          // Start the quiz
+          fetchQuizQuestions();
+        } else {
+          loginError.textContent = 'Invalid email or password. Please try again.';
+          loginError.classList.add('visible');
+          loginStatus.textContent = '❌ Login failed. Please check your credentials.';
+        }
+      }
+
+      // --------------------------------------------------------------
+      // 6. QUIZ SYSTEM
+      // --------------------------------------------------------------
+      let questions = [];
+      let currentIndex = 0;
+      let score = 0;
+      let isAnswered = false;
+      let quizCompleted = false;
+      let quizTimedOut = false;
+      let answerStatus = [];
+      let timerInterval = null;
+      let timeRemaining = 0;
+      let totalQuestions = 0;
+      let quizTitleText = 'Quiz';
+
+      function fetchQuizQuestions() {
+        questionText.textContent = '📥 Fetching questions from spreadsheet...';
+        feedbackMessage.textContent = '⏳ Loading...';
+
+        fetch(QUIZ_CSV_URL)
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.text();
+          })
+          .then(csvText => {
+            const parsed = parseQuizCSV(csvText);
+            if (parsed.questions.length === 0) throw new Error('No questions found');
+            questions = parsed.questions;
+            quizTitleText = parsed.title || 'Quiz';
+            totalQuestions = questions.length;
+            answerStatus = new Array(totalQuestions).fill(null);
+            startQuiz();
+          })
+          .catch(err => {
+            console.error('Quiz load error:', err);
+            questionText.textContent = '❌ Failed to load questions. Please check the CSV link.';
+            feedbackMessage.textContent = '⚠️ Error: ' + err.message;
+            feedbackMessage.style.background = '#f5dddd';
+          });
+      }
+
+      function parseQuizCSV(text) {
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) return { questions: [], title: 'Quiz' };
+
+        let title = 'Quiz';
+        const result = [];
+
+        // Read title from C1 (row 1, col C = index 2)
+        if (lines.length > 0) {
+          const firstRow = parseCSVLine(lines[0]);
+          if (firstRow.length > 2 && firstRow[2]) {
+            title = firstRow[2].trim() || 'Quiz';
+          }
+        }
+
+        // Questions start from row 2 (index 1)
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCSVLine(lines[i]);
+          if (cols.length < 6) continue;
+          const question = cols[4] ? cols[4].trim() : '';
+          if (!question) continue;
+          const options = [
+            cols[5] ? cols[5].trim() : '',
+            cols[6] ? cols[6].trim() : '',
+            cols[7] ? cols[7].trim() : '',
+            cols[8] ? cols[8].trim() : ''
+          ];
+          const correctAnswer = cols[9] ? cols[9].trim() : '';
+          let correctIndex = -1;
+          if (correctAnswer) {
+            for (let j = 0; j < options.length; j++) {
+              if (options[j] === correctAnswer) { correctIndex = j; break; }
+            }
+          }
+          result.push({
+            question,
+            options,
+            correct: correctIndex,
+            correctText: correctAnswer || 'No answer in db'
+          });
+        }
+        return { questions: result, title };
+      }
+
+      // ----- CSV line parser (handles quoted fields) -----
+      function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (inQuotes) {
+            if (ch === '"' && (i + 1 < line.length && line[i + 1] === '"')) {
+              current += '"';
+              i++;
+            } else if (ch === '"') {
+              inQuotes = false;
+            } else {
+              current += ch;
+            }
+          } else {
+            if (ch === '"') {
+              inQuotes = true;
+            } else if (ch === ',') {
+              result.push(current.trim());
+              current = '';
+            } else {
+              current += ch;
+            }
+          }
+        }
+        result.push(current.trim());
+        return result;
+      }
+
+      // ----- Timer -----
+      function startTimer() {
+        timeRemaining = totalQuestions * 60;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+          timeRemaining--;
+          updateTimerDisplay();
+          if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            handleTimeout();
+          }
+        }, 1000);
+      }
+
+      function updateTimerDisplay() {
+        const mins = Math.floor(timeRemaining / 60);
+        const secs = timeRemaining % 60;
+        timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        timerDisplay.classList.remove('warning', 'danger');
+        if (timeRemaining < 60) timerDisplay.classList.add('danger');
+        else if (timeRemaining < 300) timerDisplay.classList.add('warning');
+      }
+
+      function handleTimeout() {
+        quizTimedOut = true;
+        quizCompleted = true;
+        document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+        feedbackMessage.textContent = '⏰ Time is up! Quiz automatically submitted.';
+        feedbackMessage.style.background = '#fff3cd';
+        nextBtn.disabled = true;
+        setTimeout(showResult, 1500);
+      }
+
+      // ----- Quiz Flow -----
+      function startQuiz() {
+        if (questions.length === 0) {
+          questionText.textContent = '⚠️ No questions found.';
+          return;
+        }
+        quizTitle.textContent = quizTitleText;
+        quizSubtitle.textContent = 'Self Learners';
+
+        currentIndex = 0;
+        score = 0;
+        isAnswered = false;
+        quizCompleted = false;
+        quizTimedOut = false;
+        answerStatus = new Array(questions.length).fill(null);
+        resultArea.style.display = 'none';
+        questionArea.style.display = 'block';
+
+        renderQuestion(0);
+        renderDots();
+        updateLegendCounts();
+        startTimer();
+      }
+
+      function renderQuestion(index) {
+        const q = questions[index];
+        if (!q) return;
+
+        const total = questions.length;
+        progressFill.style.width = ((index) / total * 100) + '%';
+
+        qNumber.textContent = `QUESTION ${index+1} OF ${total}`;
+        qCategory.textContent = `📚 Question ${index+1}`;
+        questionText.textContent = q.question;
+
+        const letters = ['A', 'B', 'C', 'D'];
+        optionsContainer.innerHTML = '';
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerHTML = `<span class="letter">${letters[idx]}</span> ${opt || '(Empty)'}`;
+          btn.dataset.index = idx;
+          btn.addEventListener('click', () => handleOptionClick(idx));
+          if (!opt || quizTimedOut) {
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+          }
+          optionsContainer.appendChild(btn);
+        });
+
+        if (q.correct === -1) {
+          feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(Column J doesn't match any choice)</span>`;
+          feedbackMessage.style.background = '#fff3cd';
+          if (!quizTimedOut && !quizCompleted) {
+            setTimeout(() => {
+              if (!isAnswered && !quizCompleted) {
+                answerStatus[currentIndex] = null;
+                isAnswered = true;
+                nextBtn.disabled = false;
+                renderDots();
+                updateLegendCounts();
+                feedbackMessage.innerHTML = `⏭️ Skipped (no answer in db) <span class="no-answer">Moving to next question</span>`;
+                feedbackMessage.style.background = '#e9ecef';
+              }
+            }, 800);
+          }
+        } else {
+          if (!quizTimedOut && !quizCompleted) {
+            feedbackMessage.textContent = '✨ Select an answer';
+            feedbackMessage.style.background = '#f0f4f9';
+          }
+        }
+
+        isAnswered = false;
+        nextBtn.disabled = true;
+
+        document.querySelectorAll('.option-btn').forEach(btn => {
+          btn.disabled = quizTimedOut || quizCompleted;
+          btn.classList.remove('correct', 'wrong');
+        });
+
+        resultArea.style.display = 'none';
+        questionArea.style.display = 'block';
+        renderDots();
+        updateLegendCounts();
+      }
+
+      function handleOptionClick(selectedIdx) {
+        if (isAnswered || quizTimedOut || quizCompleted) return;
+        const q = questions[currentIndex];
+        if (q.correct === -1) {
+          feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(This question has no matching answer in Column J)</span>`;
+          feedbackMessage.style.background = '#fff3cd';
+          return;
+        }
+
+        const isCorrect = (selectedIdx === q.correct);
+        const allOptions = document.querySelectorAll('.option-btn');
+
+        allOptions.forEach(btn => btn.disabled = true);
+        allOptions.forEach((btn, idx) => {
+          if (idx === q.correct) btn.classList.add('correct');
+          else if (idx === selectedIdx && !isCorrect) btn.classList.add('wrong');
+        });
+
+        if (isCorrect) {
+          score += 1;
+          feedbackMessage.textContent = '✅ Correct! +1 point';
+          feedbackMessage.style.background = '#d4edda';
+          answerStatus[currentIndex] = true;
+        } else {
+          feedbackMessage.textContent = `❌ The correct answer was "${q.options[q.correct]}"`;
+          feedbackMessage.style.background = '#f5dddd';
+          answerStatus[currentIndex] = false;
+        }
+
+        isAnswered = true;
+        nextBtn.disabled = false;
+        renderDots();
+        updateLegendCounts();
+      }
+
+      function goToNext() {
+        if (!isAnswered || quizCompleted) return;
+        if (currentIndex + 1 < questions.length) {
+          currentIndex++;
+          renderQuestion(currentIndex);
+        } else {
+          if (!quizTimedOut) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+          showResult();
+        }
+      }
+
+      function showResult() {
+        quizCompleted = true;
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+
+        questionArea.style.display = 'none';
+        resultArea.style.display = 'block';
+
+        const total = questions.length;
+        finalScore.textContent = `${score} / ${total}`;
+        progressFill.style.width = '100%';
+
+        let msg = quizTimedOut ? '⏰ Time ran out! ' : '';
+        msg += getScoreMessage(score, total);
+        resultMessage.textContent = msg;
+
+        nextBtn.disabled = true;
+        renderDots();
+        updateLegendCounts();
+      }
+
+      function getScoreMessage(score, total) {
+        if (score === total) return '🌟 Perfect! You are a true Self Learner.';
+        else if (score >= total * 0.7) return '👏 Great job! Keep growing every day.';
+        else if (score >= total * 0.4) return '📖 Good effort! Review and try again.';
+        else return '💪 Learning is a journey. Keep practicing!';
+      }
+
+      function renderDots() {
+        dotGrid.innerHTML = '';
+        const total = questions.length;
+        for (let i = 0; i < total; i++) {
+          const dot = document.createElement('div');
+          dot.className = 'grid-dot';
+          dot.textContent = i + 1;
+
+          if (i === currentIndex && !quizCompleted && !quizTimedOut) {
+            dot.classList.add('active');
+          }
+          if (questions[i] && questions[i].correct === -1) {
+            dot.classList.add('no-answer-dot');
+          } else if (answerStatus[i] === true) {
+            dot.classList.add('correct-dot');
+          } else if (answerStatus[i] === false) {
+            dot.classList.add('wrong-dot');
+          }
+          if (quizTimedOut && answerStatus[i] === null && questions[i] && questions[i].correct !== -1) {
+            dot.classList.add('timeout');
+          }
+          dotGrid.appendChild(dot);
+        }
+      }
+
+      function updateLegendCounts() {
+        let correct = 0, wrong = 0, active = 0, pending = 0;
+        const total = questions.length;
+        for (let i = 0; i < total; i++) {
+          if (questions[i] && questions[i].correct === -1) {
+            pending++;
+          } else if (answerStatus[i] === true) {
+            correct++;
+          } else if (answerStatus[i] === false) {
+            wrong++;
+          } else if (i === currentIndex && !quizCompleted && !quizTimedOut) {
+            active++;
+          } else {
+            pending++;
+          }
+        }
+        correctCount.textContent = correct;
+        wrongCount.textContent = wrong;
+        activeCount.textContent = active;
+        pendingCount.textContent = pending;
+      }
+
+      function restartQuiz() {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        if (questions.length === 0) {
+          fetchQuizQuestions();
+          return;
+        }
+        startQuiz();
+      }
+
+      // --------------------------------------------------------------
+      // 7. EVENT LISTENERS
+      // --------------------------------------------------------------
+      loginBtn.addEventListener('click', handleLogin);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !loginBtn.disabled) {
+          const active = document.activeElement;
+          if (active === emailInput || active === passwordInput) {
+            handleLogin();
+          }
+        }
+      });
+
+      nextBtn.addEventListener('click', goToNext);
+      restartFromResult.addEventListener('click', restartQuiz);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !nextBtn.disabled) {
+          goToNext();
+        }
+      });
+
+      // --------------------------------------------------------------
+      // 8. INIT – Load users first
+      // --------------------------------------------------------------
+      fetchUsers();
+    })();
+  </script>
+</body>
 </html>
