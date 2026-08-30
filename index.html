@@ -191,19 +191,21 @@
     }
     .btn-primary:hover:not(:disabled) { background: #1a4b62; transform: scale(1.02); }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
     .btn-secondary {
-      background: #eaf1f8;
+      background: #6c8a9e;
       border: none;
-      color: #1f4d66;
+      color: white;
       font-weight: 600;
       font-size: 1rem;
       padding: 0.7rem 2.2rem;
       border-radius: 60px;
       cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
       transition: 0.15s;
-      border: 1.5px solid #dce6ef;
+      border: 1px solid rgba(255,255,255,0.06);
     }
-    .btn-secondary:hover:not(:disabled) { background: #dce6ef; transform: scale(1.02); }
+    .btn-secondary:hover:not(:disabled) { background: #5a7a8e; transform: scale(1.02); }
     .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     .overview-section {
@@ -308,6 +310,15 @@
     .result-details .detail-answer .user-ans { font-weight: 500; }
 
     .hidden { display: none !important; }
+    .status-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.8rem;
+      border-radius: 30px;
+      margin-left: 0.5rem;
+    }
+    .status-badge.submitted { background: #d8eddf; color: #1f8b4c; }
+    .status-badge.ended { background: #e2eaf2; color: #1f4d66; }
 
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
@@ -320,7 +331,8 @@
       .legend-dot { width: 12px; height: 12px; }
       .timer-line { font-size: 0.8rem; }
       .result-details { max-height: 300px; }
-      .btn-primary, .btn-secondary { padding: 0.6rem 1.4rem; font-size: 0.9rem; }
+      .action-bar { flex-direction: column; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -347,8 +359,8 @@
     <div id="allAtOnceView">
       <div id="allQuestionsContainer" class="all-questions-container"></div>
       <div class="action-bar">
-        <button class="btn-secondary" id="showScoreBtn">📊 Show Score</button>
-        <button class="btn-primary" id="submitAllBtn">✅ Submit All</button>
+        <button class="btn-primary" id="submitBtn">✅ Submit</button>
+        <button class="btn-secondary" id="endQuizBtn">🏁 End Quiz</button>
       </div>
     </div>
 
@@ -379,27 +391,27 @@
   (function() {
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
     const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
-    const STORAGE_KEY = 'self_learners_quiz_data';
+    const STORAGE_KEY = 'selfLearnersQuizData';
 
     let questions = [];
     let score = 0;
     let quizCompleted = false;
     let quizTimedOut = false;
+    let isSubmitted = false; // true when Submit clicked (shows correct/wrong, disables edits)
     let answerStatus = [];
     let timerInterval = null;
     let timeRemaining = 0;
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
-    let isSubmitted = false; // track if answers have been submitted
 
     const progressFill = document.getElementById('progressFill');
     const timerDisplay = document.getElementById('timerDisplay');
     const quizTitle = document.getElementById('quizTitle');
     const quizSubtitle = document.getElementById('quizSubtitle');
     const allQuestionsContainer = document.getElementById('allQuestionsContainer');
-    const submitAllBtn = document.getElementById('submitAllBtn');
-    const showScoreBtn = document.getElementById('showScoreBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const endQuizBtn = document.getElementById('endQuizBtn');
     const dotGrid = document.getElementById('dotGrid');
     const resultArea = document.getElementById('resultArea');
     const finalScore = document.getElementById('finalScore');
@@ -423,17 +435,19 @@
     function saveState() {
       try {
         const state = {
+          questions: questions,
           selectedAllAnswers: selectedAllAnswers,
           answerStatus: answerStatus,
           isSubmitted: isSubmitted,
           quizCompleted: quizCompleted,
+          quizTimedOut: quizTimedOut,
           score: score,
           timeRemaining: timeRemaining,
-          questions: questions, // save questions too for offline
-          quizTitleText: quizTitleText
+          quizTitleText: quizTitleText,
+          totalQuestions: totalQuestions
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (e) { console.warn('Save error', e); }
+      } catch (e) { console.warn('Save failed', e); }
     }
 
     function loadState() {
@@ -441,38 +455,41 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return null;
         const state = JSON.parse(raw);
-        if (state.questions && state.questions.length > 0) {
-          return state;
-        }
-        return null;
+        if (!state.questions || state.questions.length === 0) return null;
+        return state;
       } catch (e) { return null; }
     }
 
     function clearState() {
-      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      localStorage.removeItem(STORAGE_KEY);
     }
 
     // --- fetch ---
     function fetchQuestions() {
       quizTitle.textContent = 'Loading...';
-      
       // Check for saved state first
       const saved = loadState();
       if (saved && saved.questions && saved.questions.length > 0) {
         questions = saved.questions;
         quizTitleText = saved.quizTitleText || 'Quiz';
-        totalQuestions = questions.length;
+        totalQuestions = saved.totalQuestions || questions.length;
         selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
         answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
         isSubmitted = saved.isSubmitted || false;
         quizCompleted = saved.quizCompleted || false;
+        quizTimedOut = saved.quizTimedOut || false;
         score = saved.score || 0;
-        timeRemaining = saved.timeRemaining || totalQuestions * 60;
-        startQuiz(true);
+        timeRemaining = saved.timeRemaining || (totalQuestions * 60);
+        if (quizCompleted) {
+          // If already completed, show result
+          showResult();
+          return;
+        }
+        startQuiz();
         return;
       }
 
-      // Fetch fresh
+      // Otherwise fetch from CSV
       fetch(CSV_URL)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(csvText => {
@@ -485,14 +502,14 @@
           selectedAllAnswers = new Array(questions.length).fill(null);
           isSubmitted = false;
           quizCompleted = false;
+          quizTimedOut = false;
           score = 0;
-          timeRemaining = totalQuestions * 60;
           clearState();
-          startQuiz(false);
+          startQuiz();
         })
         .catch(err => {
           console.error(err);
-          allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Check CSV link.</div>`;
+          allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Check CSV link or reload.</div>`;
         });
     }
 
@@ -541,7 +558,9 @@
 
     // --- timer ---
     function startTimer() {
-      if (quizCompleted || isSubmitted) return;
+      if (timeRemaining <= 0) timeRemaining = totalQuestions * 60;
+      updateTimerDisplay();
+      if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timeRemaining--;
         updateTimerDisplay();
@@ -561,70 +580,31 @@
     function handleTimeout() {
       quizTimedOut = true;
       quizCompleted = true;
+      isSubmitted = true; // lock editing
       document.querySelectorAll('.all-q-options .option-btn').forEach(b => b.disabled = true);
-      submitAllBtn.disabled = true;
-      showScoreBtn.disabled = true;
-      // auto-submit with current selections
-      submitAll();
+      submitBtn.disabled = true;
+      endQuizBtn.disabled = true;
+      // Auto-submit with current selections
+      gradeQuiz();
+      saveState();
+      setTimeout(() => showResult(), 600);
     }
 
     // --- start ---
-    function startQuiz(restored) {
+    function startQuiz() {
       if (questions.length === 0) { allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">⚠️ No questions found.</div>'; return; }
       quizTitle.textContent = quizTitleText;
       quizSubtitle.textContent = 'Self Learners';
-      
-      if (!restored) {
-        score = 0;
-        quizCompleted = false;
-        quizTimedOut = false;
-        answerStatus = new Array(questions.length).fill(null);
-        selectedAllAnswers = new Array(questions.length).fill(null);
-        isSubmitted = false;
-        timeRemaining = totalQuestions * 60;
-        clearState();
-      }
-      
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
       renderAllQuestions();
       renderDots();
       updateOverview();
-      progressFill.style.width = '0%';
-      
-      // Restore selected answers
-      if (restored && selectedAllAnswers) {
-        selectedAllAnswers.forEach((selected, idx) => {
-          if (selected !== null && selected !== undefined) {
-            const item = allQuestionsContainer.children[idx];
-            if (item) {
-              const btns = item.querySelectorAll('.option-btn');
-              btns.forEach((b, optIdx) => {
-                if (optIdx === selected) {
-                  b.classList.add('selected-opt');
-                }
-              });
-            }
-          }
-        });
-        // If already submitted, show results
-        if (isSubmitted) {
-          showResultScreen();
-          return;
-        }
+      const answered = selectedAllAnswers.filter(a => a !== null).length;
+      progressFill.style.width = `${(answered / totalQuestions) * 100}%`;
+      if (!quizCompleted) {
+        startTimer();
       }
-      
-      // If quiz was completed (e.g., from timeout), show result
-      if (quizCompleted) {
-        showResultScreen();
-        return;
-      }
-      
-      submitAllBtn.disabled = false;
-      showScoreBtn.disabled = false;
-      
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      startTimer();
       saveState();
     }
 
@@ -648,57 +628,51 @@
           btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt || '(Empty)'}`;
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
-          btn.addEventListener('click', function(e) {
-            if (quizCompleted || quizTimedOut || isSubmitted) return;
-            const parent = this.closest('.all-q-item');
-            const btns = parent.querySelectorAll('.option-btn');
-            btns.forEach(b => b.classList.remove('selected-opt'));
-            this.classList.add('selected-opt');
-            selectedAllAnswers[idx] = optIdx;
-            renderDots();
-            updateOverview();
-            saveState();
-          });
+          
+          // Restore selected state
+          if (selectedAllAnswers[idx] === optIdx) {
+            btn.classList.add('selected-opt');
+          }
+          
+          // If already submitted or quiz completed, show correct/wrong and disable
+          if (isSubmitted || quizCompleted) {
+            btn.disabled = true;
+            if (q.correct !== -1) {
+              if (optIdx === q.correct) btn.classList.add('correct');
+              else if (optIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
+                btn.classList.add('wrong');
+              }
+            }
+            if (q.correct === -1 && optIdx === selectedAllAnswers[idx]) {
+              btn.classList.add('no-answer-dot');
+            }
+          } else {
+            btn.addEventListener('click', function(e) {
+              if (isSubmitted || quizCompleted) return;
+              const parent = this.closest('.all-q-item');
+              const btns = parent.querySelectorAll('.option-btn');
+              btns.forEach(b => b.classList.remove('selected-opt'));
+              this.classList.add('selected-opt');
+              selectedAllAnswers[idx] = optIdx;
+              const answered = selectedAllAnswers.filter(a => a !== null).length;
+              progressFill.style.width = `${(answered / totalQuestions) * 100}%`;
+              renderDots();
+              updateOverview();
+              saveState();
+            });
+          }
           optsDiv.appendChild(btn);
         });
         div.appendChild(optsDiv);
         allQuestionsContainer.appendChild(div);
       });
       
-      // If already submitted, show correct/wrong
-      if (isSubmitted || quizCompleted) {
-        displayResultsOnQuestions();
-      }
+      submitBtn.disabled = isSubmitted || quizCompleted;
+      endQuizBtn.disabled = isSubmitted || quizCompleted;
     }
 
-    function displayResultsOnQuestions() {
-      const letters = ['A','B','C','D'];
-      for (let i = 0; i < questions.length; i++) {
-        const q = questions[i];
-        const item = allQuestionsContainer.children[i];
-        if (!item) continue;
-        const btns = item.querySelectorAll('.option-btn');
-        btns.forEach((b, idx) => {
-          b.disabled = true;
-          if (q.correct !== -1) {
-            if (idx === q.correct) b.classList.add('correct');
-            if (idx === selectedAllAnswers[i] && idx !== q.correct) b.classList.add('wrong');
-          }
-          b.classList.remove('selected-opt');
-        });
-        if (q.correct !== -1 && answerStatus[i] !== null) {
-          if (answerStatus[i] === true) item.classList.add('correct-item');
-          else if (answerStatus[i] === false) item.classList.add('wrong-item');
-        }
-      }
-      submitAllBtn.disabled = true;
-      showScoreBtn.disabled = false;
-    }
-
-    // --- submit all ---
-    function submitAll() {
-      if (isSubmitted && !quizTimedOut) return;
-      // grade all
+    // --- grade quiz (used by Submit and timeout) ---
+    function gradeQuiz() {
       let correctCountLocal = 0;
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
@@ -709,32 +683,55 @@
         else { answerStatus[i] = false; }
       }
       score = correctCountLocal;
+      // Update UI to show correct/wrong
+      questions.forEach((q, idx) => {
+        const item = allQuestionsContainer.children[idx];
+        if (!item) return;
+        const btns = item.querySelectorAll('.option-btn');
+        btns.forEach((b, optIdx) => {
+          b.disabled = true;
+          b.classList.remove('selected-opt');
+          if (q.correct !== -1) {
+            if (optIdx === q.correct) b.classList.add('correct');
+            else if (optIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
+              b.classList.add('wrong');
+            }
+          }
+        });
+        if (q.correct !== -1) {
+          if (answerStatus[idx] === true) item.classList.add('correct-item');
+          else if (answerStatus[idx] === false) item.classList.add('wrong-item');
+        }
+      });
       isSubmitted = true;
-      quizCompleted = true;
-      
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      
-      displayResultsOnQuestions();
+      submitBtn.disabled = true;
+      endQuizBtn.disabled = true;
       renderDots();
       updateOverview();
       saveState();
-      
-      // Show score screen automatically
-      showResultScreen();
     }
 
-    // --- show score (without re-submitting) ---
-    function showScore() {
-      if (!isSubmitted && !quizCompleted) {
-        // If not submitted, submit first
-        submitAll();
-        return;
-      }
-      showResultScreen();
+    // --- Submit button ---
+    function handleSubmit() {
+      if (isSubmitted || quizCompleted) return;
+      gradeQuiz();
+      // Show result after brief delay
+      setTimeout(() => showResult(), 600);
     }
 
-    // --- show result with details ---
-    function showResultScreen() {
+    // --- End Quiz button ---
+    function handleEndQuiz() {
+      if (isSubmitted || quizCompleted) return;
+      // End quiz: go to score screen with current selections (no grading shown, but we grade for score)
+      // Grade silently and show result
+      gradeQuiz();
+      setTimeout(() => showResult(), 400);
+    }
+
+    // --- show result ---
+    function showResult() {
+      quizCompleted = true;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       allAtOnceView.style.display = 'none';
       resultArea.style.display = 'block';
       const total = questions.length;
@@ -776,9 +773,7 @@
         div.appendChild(ansDiv);
         resultDetails.appendChild(div);
       });
-
-      renderDots();
-      updateOverview();
+      saveState();
     }
 
     function getScoreMsg(score,total) {
@@ -824,10 +819,6 @@
     function restartQuiz() {
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       clearState();
-      if (questions.length === 0) { fetchQuestions(); return; }
-      resultArea.style.display = 'none';
-      allAtOnceView.style.display = 'block';
-      // Reset state
       selectedAllAnswers = new Array(questions.length).fill(null);
       answerStatus = new Array(questions.length).fill(null);
       isSubmitted = false;
@@ -835,12 +826,14 @@
       quizTimedOut = false;
       score = 0;
       timeRemaining = totalQuestions * 60;
-      startQuiz(false);
+      resultArea.style.display = 'none';
+      allAtOnceView.style.display = 'block';
+      startQuiz();
     }
 
     // --- event listeners ---
-    submitAllBtn.addEventListener('click', submitAll);
-    showScoreBtn.addEventListener('click', showScore);
+    submitBtn.addEventListener('click', handleSubmit);
+    endQuizBtn.addEventListener('click', handleEndQuiz);
     restartFromResult.addEventListener('click', restartQuiz);
 
     // --- init ---
