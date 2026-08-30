@@ -210,11 +210,6 @@
       color: #8aa3b5;
       margin-top: 1.2rem;
     }
-    .login-wrapper .login-footer a {
-      color: #1b5a7a;
-      text-decoration: none;
-      font-weight: 600;
-    }
 
     /* ---------- QUIZ SCREEN ---------- */
     .quiz-wrapper {
@@ -292,6 +287,14 @@
       justify-content: center;
       font-weight: 700;
       font-size: 0.8rem;
+    }
+    .quiz-wrapper .session-restore {
+      font-size: 0.7rem;
+      color: #6c8a9e;
+      background: #eef3f8;
+      padding: 0.15rem 0.8rem;
+      border-radius: 30px;
+      margin-left: 0.5rem;
     }
 
     .quiz-wrapper .timer-line {
@@ -448,7 +451,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 1rem;
       margin: 0.2rem 0 1.2rem;
     }
@@ -496,21 +499,6 @@
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
-    }
-    .quiz-wrapper .btn-secondary {
-      background: transparent;
-      border: 2px solid #dce6ef;
-      color: #1f4d66;
-      font-weight: 600;
-      font-size: 0.9rem;
-      padding: 0.5rem 1.6rem;
-      border-radius: 60px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .quiz-wrapper .btn-secondary:hover {
-      background: #f0f4f9;
-      border-color: #b0c8d8;
     }
 
     .quiz-wrapper .overview-section {
@@ -658,6 +646,7 @@
       .quiz-wrapper .user-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem 0.2rem 0.5rem; }
       .quiz-wrapper .user-badge .avatar { width: 24px; height: 24px; font-size: 0.6rem; }
       .toast-container { top: 0.8rem; right: 0.8rem; max-width: calc(100% - 1.6rem); }
+      .quiz-wrapper .session-restore { display: none; }
     }
 
     /* ---------- SCROLLBAR ---------- */
@@ -721,6 +710,7 @@
       <div class="user-badge" id="userBadge">
         <span class="avatar" id="userAvatar">U</span>
         <span id="userNameDisplay">User</span>
+        <span class="session-restore" id="sessionBadge"></span>
       </div>
     </div>
 
@@ -750,7 +740,6 @@
             <span>✨</span> Select an answer
           </div>
           <div class="nav-group">
-            <button class="btn-secondary" id="restartBtn">⟳ Restart</button>
             <button class="btn-primary" id="nextBtn" disabled>Next →</button>
           </div>
         </div>
@@ -814,12 +803,10 @@
         `;
         toastContainer.appendChild(toast);
 
-        // Close button
         toast.querySelector('.toast-close').addEventListener('click', () => {
           removeToast(toast);
         });
 
-        // Auto-remove
         setTimeout(() => {
           removeToast(toast);
         }, duration);
@@ -857,7 +844,6 @@
       const optionsContainer = document.getElementById('optionsContainer');
       const feedbackMessage = document.getElementById('feedbackMessage');
       const nextBtn = document.getElementById('nextBtn');
-      const restartBtn = document.getElementById('restartBtn');
       const restartFromResult = document.getElementById('restartFromResult');
       const questionArea = document.getElementById('questionArea');
       const resultArea = document.getElementById('resultArea');
@@ -876,6 +862,7 @@
       const userBadge = document.getElementById('userBadge');
       const userAvatar = document.getElementById('userAvatar');
       const userNameDisplay = document.getElementById('userNameDisplay');
+      const sessionBadge = document.getElementById('sessionBadge');
 
       // --------------------------------------------------------------
       // 5. LOAD LOGO
@@ -901,7 +888,54 @@
       });
 
       // --------------------------------------------------------------
-      // 7. LOGIN SYSTEM
+      // 7. SESSION MANAGEMENT
+      // --------------------------------------------------------------
+      const SESSION_KEY = 'quiz_session_data';
+
+      function saveSession() {
+        const sessionData = {
+          user: loggedInUser,
+          questions: questions,
+          currentIndex: currentIndex,
+          score: score,
+          answerStatus: answerStatus,
+          quizCompleted: quizCompleted,
+          quizTimedOut: quizTimedOut,
+          timeRemaining: timeRemaining,
+          totalQuestions: totalQuestions,
+          quizTitleText: quizTitleText,
+          timestamp: new Date().toISOString()
+        };
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+        } catch (e) {
+          console.warn('Could not save session:', e);
+        }
+      }
+
+      function loadSession() {
+        try {
+          const raw = sessionStorage.getItem(SESSION_KEY);
+          if (!raw) return null;
+          const data = JSON.parse(raw);
+          // Check if session is less than 24 hours old
+          const age = Date.now() - new Date(data.timestamp).getTime();
+          if (age > 24 * 60 * 60 * 1000) {
+            sessionStorage.removeItem(SESSION_KEY);
+            return null;
+          }
+          return data;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function clearSession() {
+        sessionStorage.removeItem(SESSION_KEY);
+      }
+
+      // --------------------------------------------------------------
+      // 8. LOGIN SYSTEM
       // --------------------------------------------------------------
       let users = [];
       let isLoadingUsers = true;
@@ -924,6 +958,9 @@
             loginStatus.textContent = `✅ ${users.length} users loaded`;
             loginBtn.disabled = false;
             showToast(`✅ ${users.length} users loaded. Please sign in.`, 'success', 3000);
+
+            // Check for saved session after users loaded
+            checkForSession();
           })
           .catch(err => {
             console.error('Login load error:', err);
@@ -967,21 +1004,10 @@
 
         if (matched) {
           loggedInUser = matched;
-          sessionStorage.setItem('loggedInUser', JSON.stringify({
-            email: matched.email,
-            loginTime: new Date().toISOString()
-          }));
-
+          // Clear any old session
+          clearSession();
           showToast(`✅ Welcome, ${matched.email}!`, 'success', 2500);
-
-          // Update user badge
-          const initial = matched.email.charAt(0).toUpperCase();
-          userAvatar.textContent = initial;
-          userNameDisplay.textContent = matched.email;
-
-          loginScreen.style.display = 'none';
-          quizScreen.style.display = 'block';
-          fetchQuizQuestions();
+          initQuizForUser(matched);
         } else {
           showToast('❌ Invalid email or password. Please try again.', 'error', 3000);
           loginStatus.textContent = '❌ Login failed';
@@ -989,7 +1015,67 @@
       }
 
       // --------------------------------------------------------------
-      // 8. QUIZ SYSTEM
+      // 9. SESSION RESTORE CHECK
+      // --------------------------------------------------------------
+      function checkForSession() {
+        const session = loadSession();
+        if (!session || !session.user) return;
+
+        // Verify user still exists in the loaded users list
+        const userExists = users.some(u => 
+          u.email.toLowerCase() === session.user.email.toLowerCase()
+        );
+        if (!userExists) {
+          clearSession();
+          return;
+        }
+
+        // Restore session
+        loggedInUser = session.user;
+        questions = session.questions || [];
+        currentIndex = session.currentIndex || 0;
+        score = session.score || 0;
+        answerStatus = session.answerStatus || [];
+        quizCompleted = session.quizCompleted || false;
+        quizTimedOut = session.quizTimedOut || false;
+        timeRemaining = session.timeRemaining || 0;
+        totalQuestions = session.totalQuestions || 0;
+        quizTitleText = session.quizTitleText || 'Quiz';
+
+        // If quiz was already completed, show result
+        if (quizCompleted) {
+          showToast(`🔄 Restoring completed quiz for ${loggedInUser.email}`, 'info', 3000);
+          loginScreen.style.display = 'none';
+          quizScreen.style.display = 'block';
+          updateUserBadge(loggedInUser);
+          sessionBadge.textContent = '↻ Restored';
+          showResult();
+          return;
+        }
+
+        // If questions exist, restore the quiz state
+        if (questions.length > 0) {
+          showToast(`🔄 Welcome back, ${loggedInUser.email}! Resuming quiz...`, 'success', 3000);
+          loginScreen.style.display = 'none';
+          quizScreen.style.display = 'block';
+          updateUserBadge(loggedInUser);
+          sessionBadge.textContent = '↻ Restored';
+          restoreQuiz();
+          return;
+        }
+
+        // If no questions, but user logged in, fetch fresh
+        if (loggedInUser) {
+          loginScreen.style.display = 'none';
+          quizScreen.style.display = 'block';
+          updateUserBadge(loggedInUser);
+          sessionBadge.textContent = '↻ Restored';
+          fetchQuizQuestions();
+        }
+      }
+
+      // --------------------------------------------------------------
+      // 10. QUIZ SYSTEM
       // --------------------------------------------------------------
       let questions = [];
       let currentIndex = 0;
@@ -1002,6 +1088,66 @@
       let timeRemaining = 0;
       let totalQuestions = 0;
       let quizTitleText = 'Quiz';
+
+      function initQuizForUser(user) {
+        loginScreen.style.display = 'none';
+        quizScreen.style.display = 'block';
+        updateUserBadge(user);
+        sessionBadge.textContent = '';
+        fetchQuizQuestions();
+      }
+
+      function updateUserBadge(user) {
+        const initial = user.email.charAt(0).toUpperCase();
+        userAvatar.textContent = initial;
+        userNameDisplay.textContent = user.email;
+      }
+
+      function restoreQuiz() {
+        // Set UI state
+        quizTitle.textContent = quizTitleText;
+        quizSubtitle.textContent = 'Self Learners';
+        
+        // Restore timer
+        if (timeRemaining > 0 && !quizCompleted) {
+          updateTimerDisplay();
+          startTimerFrom(timeRemaining);
+        }
+
+        // Restore progress
+        const progressPercent = totalQuestions > 0 ? (currentIndex / totalQuestions) * 100 : 0;
+        progressFill.style.width = progressPercent + '%';
+
+        // Render the current question
+        if (currentIndex < questions.length) {
+          renderQuestion(currentIndex);
+        } else {
+          showResult();
+        }
+        
+        renderDots();
+        updateLegendCounts();
+        
+        // Show restore notification
+        showToast(`✅ Quiz restored. Question ${currentIndex + 1} of ${totalQuestions}`, 'info', 2500);
+      }
+
+      function startTimerFrom(seconds) {
+        timeRemaining = seconds;
+        updateTimerDisplay();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          timeRemaining--;
+          updateTimerDisplay();
+          // Save session periodically (every 5 seconds)
+          if (timeRemaining % 5 === 0) saveSession();
+          if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            handleTimeout();
+          }
+        }, 1000);
+      }
 
       function fetchQuizQuestions() {
         questionText.textContent = '📥 Fetching questions...';
@@ -1020,6 +1166,10 @@
             quizTitleText = parsed.title || 'Quiz';
             totalQuestions = questions.length;
             answerStatus = new Array(totalQuestions).fill(null);
+            currentIndex = 0;
+            score = 0;
+            quizCompleted = false;
+            quizTimedOut = false;
             showToast(`✅ ${totalQuestions} questions loaded!`, 'success', 2500);
             startQuiz();
           })
@@ -1107,9 +1257,12 @@
       function startTimer() {
         timeRemaining = totalQuestions * 60;
         updateTimerDisplay();
+        if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
           timeRemaining--;
           updateTimerDisplay();
+          // Save session every 5 seconds
+          if (timeRemaining % 5 === 0) saveSession();
           if (timeRemaining <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
@@ -1135,6 +1288,7 @@
         feedbackMessage.style.background = '#fff3cd';
         nextBtn.disabled = true;
         showToast('⏰ Time is up! Quiz submitted.', 'warning', 3000);
+        saveSession();
         setTimeout(showResult, 1500);
       }
 
@@ -1160,6 +1314,7 @@
         renderDots();
         updateLegendCounts();
         startTimer();
+        saveSession();
       }
 
       function renderQuestion(index) {
@@ -1202,6 +1357,7 @@
                 feedbackMessage.innerHTML = `⏭️ Skipped (no answer in db) <span class="no-answer">Moving to next question</span>`;
                 feedbackMessage.style.background = '#e9ecef';
                 showToast('⏭️ No answer in database. Skipping.', 'warning', 2000);
+                saveSession();
               }
             }, 800);
           }
@@ -1224,6 +1380,7 @@
         questionArea.style.display = 'block';
         renderDots();
         updateLegendCounts();
+        saveSession();
       }
 
       function handleOptionClick(selectedIdx) {
@@ -1261,6 +1418,7 @@
         nextBtn.disabled = false;
         renderDots();
         updateLegendCounts();
+        saveSession();
       }
 
       function goToNext() {
@@ -1288,7 +1446,7 @@
         resultArea.style.display = 'block';
 
         const total = questions.length;
-        const percentage = Math.round((score / total) * 100);
+        const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
         finalScore.textContent = `${score} / ${total}`;
         progressFill.style.width = '100%';
 
@@ -1296,7 +1454,6 @@
         msg += getScoreMessage(score, total);
         resultMessage.textContent = msg;
 
-        // Set icon based on performance
         if (percentage === 100) resultIcon.textContent = '🌟';
         else if (percentage >= 70) resultIcon.textContent = '🎉';
         else if (percentage >= 40) resultIcon.textContent = '📖';
@@ -1305,12 +1462,12 @@
         nextBtn.disabled = true;
         renderDots();
         updateLegendCounts();
-
+        clearSession(); // Clear session when quiz is complete
         showToast(`🏁 Quiz complete! Score: ${score}/${total} (${percentage}%)`, 'info', 4000);
       }
 
       function getScoreMessage(score, total) {
-        const pct = Math.round((score / total) * 100);
+        const pct = total > 0 ? Math.round((score / total) * 100) : 0;
         if (pct === 100) return '🌟 Perfect! You are a true Self Learner!';
         else if (pct >= 70) return '👏 Great job! Keep growing every day!';
         else if (pct >= 40) return '📖 Good effort! Review and try again.';
@@ -1369,16 +1526,29 @@
           clearInterval(timerInterval);
           timerInterval = null;
         }
+        clearSession();
         if (questions.length === 0) {
           fetchQuizQuestions();
           return;
         }
         showToast('🔄 Restarting quiz...', 'info', 1500);
-        startQuiz();
+        currentIndex = 0;
+        score = 0;
+        isAnswered = false;
+        quizCompleted = false;
+        quizTimedOut = false;
+        answerStatus = new Array(questions.length).fill(null);
+        resultArea.style.display = 'none';
+        questionArea.style.display = 'block';
+        renderQuestion(0);
+        renderDots();
+        updateLegendCounts();
+        startTimer();
+        saveSession();
       }
 
       // --------------------------------------------------------------
-      // 9. EVENT LISTENERS
+      // 11. EVENT LISTENERS
       // --------------------------------------------------------------
       loginBtn.addEventListener('click', handleLogin);
 
@@ -1392,7 +1562,6 @@
       });
 
       nextBtn.addEventListener('click', goToNext);
-      restartBtn.addEventListener('click', restartQuiz);
       restartFromResult.addEventListener('click', restartQuiz);
 
       document.addEventListener('keydown', (e) => {
@@ -1401,20 +1570,17 @@
         }
       });
 
+      // Save session before page unload
+      window.addEventListener('beforeunload', function() {
+        if (loggedInUser && !quizCompleted) {
+          saveSession();
+        }
+      });
+
       // --------------------------------------------------------------
-      // 10. INIT
+      // 12. INIT
       // --------------------------------------------------------------
       fetchUsers();
-
-      // Check if user was already logged in
-      const savedUser = sessionStorage.getItem('loggedInUser');
-      if (savedUser) {
-        try {
-          const userData = JSON.parse(savedUser);
-          // Optionally auto-login or show welcome back
-          console.log('Welcome back,', userData.email);
-        } catch (e) {}
-      }
     })();
   </script>
 </body>
