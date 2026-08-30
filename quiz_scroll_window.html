@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self Learners · Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f2f6fc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+    }
+
+    .quiz-wrapper {
+      max-width: 880px;
+      width: 100%;
+      background: white;
+      border-radius: 2rem;
+      padding: 2rem 2rem 1.8rem;
+      box-shadow: 0 25px 50px -10px rgba(0, 20, 30, 0.15), 0 8px 20px -8px rgba(0,0,0,0.04);
+      transition: all 0.2s;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: #f0f4f9;
+      padding: 4px;
+      flex-shrink: 0;
+      display: block !important;
+    }
+
+    .brand-title h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-title .subtitle {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #6c8a9e;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .timer-line {
+      text-align: center;
+      padding: 0.2rem 0 0.8rem 0;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #1f4d66;
+      letter-spacing: 0.3px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-line .timer { font-weight: 600; color: #0b2a3b; }
+    .timer-line .timer.warning { color: #856404; }
+    .timer-line .timer.danger { color: #b33c3c; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
+    .progress-block { background: #e6edf5; height: 6px; border-radius: 20px; margin: 0.6rem 0 1.4rem 0; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #2f7b9e, #4ba3c7); border-radius: 20px; transition: width 0.35s ease; }
+
+    .all-questions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin: 0.5rem 0 1.5rem;
+      max-height: 550px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      scroll-behavior: smooth;
+    }
+    .all-questions-container::-webkit-scrollbar { width: 6px; }
+    .all-questions-container::-webkit-scrollbar-track { background: #e6edf5; border-radius: 10px; }
+    .all-questions-container::-webkit-scrollbar-thumb { background: #8aacbf; border-radius: 10px; }
+
+    .all-q-item {
+      background: #fafcfe;
+      border: 1px solid #e2eaf2;
+      border-radius: 1.2rem;
+      padding: 1rem 1.2rem;
+      transition: 0.1s;
+      scroll-margin-top: 10px;
+    }
+    .all-q-item.correct-item { border-color: #1f8b4c; background: #f0faf4; }
+    .all-q-item.wrong-item { border-color: #b33c3c; background: #fdf2f2; }
+    .all-q-item.highlight {
+      animation: highlightPulse 0.8s ease;
+    }
+    @keyframes highlightPulse {
+      0% { box-shadow: 0 0 0 0 rgba(47, 123, 158, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(47, 123, 158, 0.15); }
+      100% { box-shadow: 0 0 0 0 rgba(47, 123, 158, 0); }
+    }
+    .all-q-text {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 0.6rem;
+      color: #0a212b;
+    }
+    .all-q-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .all-q-options .option-btn {
+      background: white;
+      border: 1.5px solid #dce6ef;
+      border-radius: 60px;
+      padding: 0.5rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #1d3847;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.12s;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+    }
+    .all-q-options .option-btn:hover:not(:disabled) { background: #f5faff; border-color: #6fa6c7; }
+    .all-q-options .option-btn .letter {
+      background: #e7f0f7;
+      color: #1a5a7a;
+      font-weight: 700;
+      width: 28px;
+      height: 28px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .all-q-options .option-btn.correct {
+      background: #d8eddf;
+      border-color: #1f8b4c;
+      box-shadow: 0 0 0 2px rgba(31,139,76,0.15);
+    }
+    .all-q-options .option-btn.correct .letter { background: #1f8b4c; color: white; }
+    .all-q-options .option-btn.wrong {
+      background: #f5dddd;
+      border-color: #b33c3c;
+      box-shadow: 0 0 0 2px rgba(179,60,60,0.12);
+    }
+    .all-q-options .option-btn.wrong .letter { background: #b33c3c; color: white; }
+    .all-q-options .option-btn.selected-opt {
+      border-color: #2f7b9e;
+      background: #e6f0f7;
+    }
+    .all-q-options .option-btn:disabled { cursor: default; opacity: 0.8; }
+    .all-q-options .option-btn:disabled:hover { transform: none; }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 0.4rem 0 0.2rem 0;
+    }
+
+    .btn-primary {
+      background: #0b2a3b;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.7rem 2.2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(11,42,59,0.16);
+      transition: 0.15s;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .btn-primary:hover:not(:disabled) { background: #1a4b62; transform: scale(1.02); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-secondary {
+      background: #6c8a9e;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.7rem 2.2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: 0.15s;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .btn-secondary:hover:not(:disabled) { background: #5a7a8e; transform: scale(1.02); }
+    .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-success {
+      background: #1f8b4c;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.7rem 2.2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(31,139,76,0.25);
+      transition: 0.15s;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .btn-success:hover:not(:disabled) { background: #167a3e; transform: scale(1.02); }
+    .btn-success:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .overview-section {
+      margin-top: 1.2rem;
+      border-top: 1px solid #e2eaf2;
+      padding-top: 1rem;
+    }
+
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .overview-header span { font-weight: 600; font-size: 0.9rem; color: #1f4d66; }
+
+    .legend {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #2d5a72;
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+    .legend-item .count { font-weight: 700; font-size: 0.9rem; min-width: 1.2rem; text-align: center; }
+    .legend-dot { width: 14px; height: 14px; border-radius: 30px; display: inline-block; flex-shrink: 0; }
+    .legend-dot.done-dot { background: #2f7b9e; }
+    .legend-dot.pending-dot { background: #dce6ef; }
+    .legend-dot.correct-dot { background: #1f8b4c; }
+    .legend-dot.wrong-dot { background: #b33c3c; }
+
+    .grid-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+      margin-top: 0.2rem;
+    }
+
+    .grid-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 30px;
+      background: #dce6ef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.7rem;
+      color: #1d4b61;
+      transition: 0.1s;
+      cursor: pointer;
+      border: 2px solid transparent;
+      font-family: inherit;
+    }
+    .grid-dot:hover { transform: scale(1.08); filter: brightness(0.92); }
+    .grid-dot.done-dot { background: #2f7b9e; color: white; }
+    .grid-dot.correct-dot { background: #1f8b4c; color: white; }
+    .grid-dot.wrong-dot { background: #b33c3c; color: white; }
+    .grid-dot.no-answer-dot { background: #999; color: white; }
+    .grid-dot.timeout { background: #6c757d; color: white; opacity: 0.5; }
+    .grid-dot.active-dot { border-color: #0b2a3b; transform: scale(1.1); }
+
+    .result-card {
+      text-align: center;
+      padding: 0.5rem 0.5rem 0.5rem;
+      display: none;
+    }
+    .result-card h2 { font-size: 2.2rem; font-weight: 700; color: #0b2a3b; }
+    .result-score { font-size: 3.6rem; font-weight: 800; background: linear-gradient(135deg, #1a5a7a, #48a0c7); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 0.3rem 0 0.2rem; }
+    .result-msg { color: #1f4b61; font-size: 1.1rem; margin: 0.2rem 0 1.6rem; }
+    .result-card .btn-primary { font-size: 1rem; padding: 0.7rem 2.8rem; }
+
+    .result-details {
+      text-align: left;
+      margin: 1.5rem 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+    .result-details .detail-item {
+      background: #fafcfe;
+      border: 1px solid #e2eaf2;
+      border-radius: 1rem;
+      padding: 0.8rem 1rem;
+    }
+    .result-details .detail-item.correct-detail { border-left: 6px solid #1f8b4c; }
+    .result-details .detail-item.wrong-detail { border-left: 6px solid #b33c3c; }
+    .result-details .detail-q {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #0a212b;
+      margin-bottom: 0.2rem;
+    }
+    .result-details .detail-answer {
+      font-size: 0.9rem;
+      color: #1f4d66;
+    }
+    .result-details .detail-answer .correct-ans { color: #1f8b4c; font-weight: 600; }
+    .result-details .detail-answer .wrong-ans { color: #b33c3c; font-weight: 600; }
+    .result-details .detail-answer .user-ans { font-weight: 500; }
+
+    .hidden { display: none !important; }
+    .submitted-header {
+      text-align: center;
+      padding: 0.5rem;
+      background: #d8eddf;
+      border-radius: 60px;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #1f8b4c;
+    }
+
+    @media (max-width: 550px) {
+      .quiz-wrapper { padding: 1.4rem 0.8rem; }
+      .brand-logo { width: 36px; height: 36px; }
+      .brand-title h1 { font-size: 1.2rem; }
+      .all-q-text { font-size: 0.95rem; }
+      .all-q-options .option-btn { padding: 0.4rem 1rem; font-size: 0.85rem; }
+      .grid-dot { width: 28px; height: 28px; font-size: 0.65rem; }
+      .legend { font-size: 0.7rem; gap: 0.6rem; }
+      .legend-dot { width: 12px; height: 12px; }
+      .timer-line { font-size: 0.8rem; }
+      .result-details { max-height: 300px; }
+      .action-bar { flex-direction: column; }
+      .btn-primary, .btn-secondary, .btn-success { width: 100%; justify-content: center; }
+      .all-questions-container { max-height: 400px; }
+    }
+  </style>
+</head>
+<body>
+<div class="quiz-wrapper" id="quizApp">
+  <div class="top-bar">
+    <div class="brand">
+      <img class="brand-logo" id="brandLogo" 
+           src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
+           alt="Self Learners Logo" style="display:block !important; width:48px; height:48px; border-radius:12px; object-fit:contain; background:#f0f4f9; padding:4px; flex-shrink:0;">
+      <div class="brand-title">
+        <h1 id="quizTitle">Loading...</h1>
+        <span class="subtitle" id="quizSubtitle">Self Learners</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
+
+  <div id="quizContent">
+    <div class="progress-block"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+
+    <!-- All questions view -->
+    <div id="allAtOnceView">
+      <div id="submittedBanner" style="display:none;" class="submitted-header">
+        ✅ Submitted — You can review your answers below. Click "End Quiz" to see your final score.
+      </div>
+      <div id="allQuestionsContainer" class="all-questions-container"></div>
+      <div class="action-bar">
+        <button class="btn-primary" id="submitBtn">✅ Submit</button>
+        <button class="btn-success" id="endQuizBtn">🏁 End Quiz</button>
+      </div>
+    </div>
+
+    <!-- overview -->
+    <div class="overview-section">
+      <div class="overview-header">
+        <span>OVERVIEW</span>
+        <div class="legend" id="legendContainer">
+          <span class="legend-item"><span class="legend-dot done-dot"></span> Done <span class="count" id="doneCount">0</span></span>
+          <span class="legend-item"><span class="legend-dot pending-dot"></span> Pending <span class="count" id="pendingCount">0</span></span>
+          <span class="legend-item" id="correctLegend" style="display:none;"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
+          <span class="legend-item" id="wrongLegend" style="display:none;"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
+        </div>
+      </div>
+      <div class="grid-dots" id="dotGrid"></div>
+    </div>
+
+    <!-- Result card -->
+    <div class="result-card" id="resultArea">
+      <h2>🏁 Quiz Complete</h2>
+      <div class="result-score" id="finalScore">0 / 0</div>
+      <p class="result-msg" id="resultMessage">Keep learning!</p>
+      <div class="result-details" id="resultDetails"></div>
+      <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
+    const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
+    const STORAGE_KEY = 'selfLearnersQuizData';
+
+    let questions = [];
+    let score = 0;
+    let quizCompleted = false;
+    let quizTimedOut = false;
+    let isSubmitted = false;
+    let answerStatus = [];
+    let timerInterval = null;
+    let timeRemaining = 0;
+    let totalQuestions = 0;
+    let quizTitleText = 'Quiz';
+    let selectedAllAnswers = [];
+
+    const progressFill = document.getElementById('progressFill');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const quizTitle = document.getElementById('quizTitle');
+    const quizSubtitle = document.getElementById('quizSubtitle');
+    const allQuestionsContainer = document.getElementById('allQuestionsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const endQuizBtn = document.getElementById('endQuizBtn');
+    const dotGrid = document.getElementById('dotGrid');
+    const resultArea = document.getElementById('resultArea');
+    const finalScore = document.getElementById('finalScore');
+    const resultMessage = document.getElementById('resultMessage');
+    const resultDetails = document.getElementById('resultDetails');
+    const restartFromResult = document.getElementById('restartFromResult');
+    const doneCount = document.getElementById('doneCount');
+    const pendingCount = document.getElementById('pendingCount');
+    const correctCount = document.getElementById('correctCount');
+    const wrongCount = document.getElementById('wrongCount');
+    const correctLegend = document.getElementById('correctLegend');
+    const wrongLegend = document.getElementById('wrongLegend');
+    const brandLogo = document.getElementById('brandLogo');
+    const allAtOnceView = document.getElementById('allAtOnceView');
+    const submittedBanner = document.getElementById('submittedBanner');
+
+    function loadLogo() {
+      const img = new Image();
+      img.onload = function() { brandLogo.src = LOGO_URL; };
+      img.onerror = function() { console.log('fallback logo'); };
+      img.src = LOGO_URL;
+    }
+    loadLogo();
+
+    function saveState() {
+      try {
+        const state = {
+          questions: questions,
+          selectedAllAnswers: selectedAllAnswers,
+          answerStatus: answerStatus,
+          isSubmitted: isSubmitted,
+          quizCompleted: quizCompleted,
+          quizTimedOut: quizTimedOut,
+          score: score,
+          timeRemaining: timeRemaining,
+          quizTitleText: quizTitleText,
+          totalQuestions: totalQuestions
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) { console.warn('Save failed', e); }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const state = JSON.parse(raw);
+        if (!state.questions || state.questions.length === 0) return null;
+        return state;
+      } catch (e) { return null; }
+    }
+
+    function clearState() {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function fetchQuestions() {
+      quizTitle.textContent = 'Loading...';
+      const saved = loadState();
+      if (saved && saved.questions && saved.questions.length > 0) {
+        questions = saved.questions;
+        quizTitleText = saved.quizTitleText || 'Quiz';
+        totalQuestions = saved.totalQuestions || questions.length;
+        selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
+        answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
+        isSubmitted = saved.isSubmitted || false;
+        quizCompleted = saved.quizCompleted || false;
+        quizTimedOut = saved.quizTimedOut || false;
+        score = saved.score || 0;
+        timeRemaining = saved.timeRemaining || (totalQuestions * 60);
+        if (quizCompleted) {
+          showResult();
+          return;
+        }
+        startQuiz();
+        return;
+      }
+
+      fetch(CSV_URL)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+        .then(csvText => {
+          const parsed = parseCSV(csvText);
+          if (parsed.questions.length === 0) throw new Error('No data');
+          questions = parsed.questions;
+          quizTitleText = parsed.title || 'Quiz';
+          totalQuestions = questions.length;
+          answerStatus = new Array(questions.length).fill(null);
+          selectedAllAnswers = new Array(questions.length).fill(null);
+          isSubmitted = false;
+          quizCompleted = false;
+          quizTimedOut = false;
+          score = 0;
+          clearState();
+          startQuiz();
+        })
+        .catch(err => {
+          console.error(err);
+          allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Check CSV link or reload.</div>`;
+        });
+    }
+
+    function parseCSV(text) {
+      const lines = text.split('\n').filter(l => l.trim() !== '');
+      if (lines.length < 2) return { questions: [], title: 'Quiz' };
+      let title = 'Quiz';
+      if (lines.length > 0) {
+        const firstRow = parseCSVLine(lines[0]);
+        if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'Quiz';
+      }
+      const result = [];
+      const startRow = Math.min(1, lines.length - 1);
+      for (let i = startRow; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (cols.length < 6) continue;
+        const q = cols[4]?.trim() || '';
+        if (!q) continue;
+        const opts = [ cols[5]?.trim() || '', cols[6]?.trim() || '', cols[7]?.trim() || '', cols[8]?.trim() || '' ];
+        const correctAns = cols[9]?.trim() || '';
+        let correctIdx = -1;
+        if (correctAns) { for (let j=0; j<opts.length; j++) { if (opts[j] === correctAns) { correctIdx = j; break; } } }
+        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns });
+      }
+      return { questions: result, title };
+    }
+
+    function parseCSVLine(line) {
+      const res = [];
+      let cur = '', inQuotes = false;
+      for (let i=0; i<line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"' && (i+1 < line.length && line[i+1] === '"')) { cur += '"'; i++; }
+          else if (ch === '"') inQuotes = false;
+          else cur += ch;
+        } else {
+          if (ch === '"') inQuotes = true;
+          else if (ch === ',') { res.push(cur.trim()); cur = ''; }
+          else cur += ch;
+        }
+      }
+      res.push(cur.trim());
+      return res;
+    }
+
+    function startTimer() {
+      if (timeRemaining <= 0) timeRemaining = totalQuestions * 60;
+      updateTimerDisplay();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) { clearInterval(timerInterval); timerInterval = null; handleTimeout(); }
+        saveState();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timeRemaining / 60), secs = timeRemaining % 60;
+      timerDisplay.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      timerDisplay.classList.remove('warning','danger');
+      if (timeRemaining < 60) timerDisplay.classList.add('danger');
+      else if (timeRemaining < 300) timerDisplay.classList.add('warning');
+    }
+
+    function handleTimeout() {
+      quizTimedOut = true;
+      quizCompleted = true;
+      isSubmitted = true;
+      document.querySelectorAll('.all-q-options .option-btn').forEach(b => b.disabled = true);
+      submitBtn.disabled = true;
+      endQuizBtn.disabled = true;
+      gradeQuiz();
+      saveState();
+      setTimeout(() => showResult(), 600);
+    }
+
+    function startQuiz() {
+      if (questions.length === 0) { allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">⚠️ No questions found.</div>'; return; }
+      quizTitle.textContent = quizTitleText;
+      quizSubtitle.textContent = 'Self Learners';
+      resultArea.style.display = 'none';
+      allAtOnceView.style.display = 'block';
+      submittedBanner.style.display = 'none';
+      renderAllQuestions();
+      renderDots();
+      updateOverview();
+      const answered = selectedAllAnswers.filter(a => a !== null).length;
+      progressFill.style.width = `${(answered / totalQuestions) * 100}%`;
+      if (!quizCompleted && !isSubmitted) {
+        startTimer();
+      }
+      saveState();
+    }
+
+    function scrollToQuestion(index) {
+      const items = allQuestionsContainer.querySelectorAll('.all-q-item');
+      if (items[index]) {
+        items[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Highlight effect
+        items[index].classList.remove('highlight');
+        setTimeout(() => items[index].classList.add('highlight'), 50);
+        // Update active dot
+        renderDots(index);
+      }
+    }
+
+    function renderAllQuestions() {
+      allQuestionsContainer.innerHTML = '';
+      const letters = ['A','B','C','D'];
+      questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'all-q-item';
+        div.dataset.qIdx = idx;
+        div.id = `question-${idx}`;
+        const qText = document.createElement('div');
+        qText.className = 'all-q-text';
+        qText.textContent = `${idx+1}. ${q.question}`;
+        div.appendChild(qText);
+        const optsDiv = document.createElement('div');
+        optsDiv.className = 'all-q-options';
+        q.options.forEach((opt, optIdx) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt || '(Empty)'}`;
+          btn.dataset.qIdx = idx;
+          btn.dataset.optIdx = optIdx;
+          
+          if (selectedAllAnswers[idx] === optIdx) {
+            btn.classList.add('selected-opt');
+          }
+          
+          if (isSubmitted || quizCompleted) {
+            btn.disabled = true;
+            if (q.correct !== -1) {
+              if (optIdx === q.correct) btn.classList.add('correct');
+              else if (optIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
+                btn.classList.add('wrong');
+              }
+            }
+            if (q.correct === -1 && optIdx === selectedAllAnswers[idx]) {
+              btn.classList.add('no-answer-dot');
+            }
+          } else {
+            btn.addEventListener('click', function(e) {
+              if (isSubmitted || quizCompleted) return;
+              const parent = this.closest('.all-q-item');
+              const btns = parent.querySelectorAll('.option-btn');
+              btns.forEach(b => b.classList.remove('selected-opt'));
+              this.classList.add('selected-opt');
+              selectedAllAnswers[idx] = optIdx;
+              const answered = selectedAllAnswers.filter(a => a !== null).length;
+              progressFill.style.width = `${(answered / totalQuestions) * 100}%`;
+              renderDots();
+              updateOverview();
+              saveState();
+            });
+          }
+          optsDiv.appendChild(btn);
+        });
+        div.appendChild(optsDiv);
+        allQuestionsContainer.appendChild(div);
+      });
+      
+      submitBtn.disabled = isSubmitted || quizCompleted;
+      endQuizBtn.disabled = isSubmitted || quizCompleted;
+      
+      if (isSubmitted && !quizCompleted) {
+        submittedBanner.style.display = 'block';
+        submitBtn.textContent = '✅ Submitted';
+        submitBtn.disabled = true;
+        endQuizBtn.disabled = false;
+        endQuizBtn.textContent = '🏁 End Quiz';
+      } else if (!isSubmitted && !quizCompleted) {
+        submittedBanner.style.display = 'none';
+        submitBtn.textContent = '✅ Submit';
+        submitBtn.disabled = false;
+        endQuizBtn.textContent = '🏁 End Quiz';
+        endQuizBtn.disabled = false;
+      }
+    }
+
+    function gradeQuiz() {
+      let correctCountLocal = 0;
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const selected = selectedAllAnswers[i];
+        const isCorrect = (selected !== null && selected === q.correct);
+        if (q.correct === -1) { answerStatus[i] = null; continue; }
+        if (isCorrect) { correctCountLocal++; answerStatus[i] = true; }
+        else { answerStatus[i] = false; }
+      }
+      score = correctCountLocal;
+      
+      questions.forEach((q, idx) => {
+        const item = allQuestionsContainer.children[idx];
+        if (!item) return;
+        const btns = item.querySelectorAll('.option-btn');
+        btns.forEach((b, optIdx) => {
+          b.disabled = true;
+          b.classList.remove('selected-opt');
+          if (q.correct !== -1) {
+            if (optIdx === q.correct) b.classList.add('correct');
+            else if (optIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
+              b.classList.add('wrong');
+            }
+          }
+        });
+        if (q.correct !== -1) {
+          if (answerStatus[idx] === true) item.classList.add('correct-item');
+          else if (answerStatus[idx] === false) item.classList.add('wrong-item');
+        }
+      });
+      
+      isSubmitted = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '✅ Submitted';
+      endQuizBtn.disabled = false;
+      endQuizBtn.textContent = '🏁 End Quiz';
+      submittedBanner.style.display = 'block';
+      
+      renderDots();
+      updateOverview();
+      saveState();
+    }
+
+    function handleSubmit() {
+      if (isSubmitted || quizCompleted) return;
+      gradeQuiz();
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    function handleEndQuiz() {
+      if (quizCompleted) return;
+      if (!isSubmitted) {
+        gradeQuiz();
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      }
+      quizCompleted = true;
+      endQuizBtn.disabled = true;
+      submitBtn.disabled = true;
+      showResult();
+    }
+
+    function showResult() {
+      quizCompleted = true;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      allAtOnceView.style.display = 'none';
+      resultArea.style.display = 'block';
+      const total = questions.length;
+      finalScore.textContent = `${score} / ${total}`;
+      progressFill.style.width = '100%';
+      let msg = quizTimedOut ? '⏰ Time ran out! ' + getScoreMsg(score,total) : getScoreMsg(score,total);
+      resultMessage.textContent = msg;
+
+      resultDetails.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'detail-item';
+        const isCorrect = answerStatus[idx] === true;
+        const isWrong = answerStatus[idx] === false;
+        if (isCorrect) div.classList.add('correct-detail');
+        else if (isWrong) div.classList.add('wrong-detail');
+        else div.style.borderLeft = '6px solid #999';
+
+        const qText = document.createElement('div');
+        qText.className = 'detail-q';
+        qText.textContent = `${idx+1}. ${q.question}`;
+        div.appendChild(qText);
+
+        const ansDiv = document.createElement('div');
+        ansDiv.className = 'detail-answer';
+        const userSelected = selectedAllAnswers[idx];
+        const userAnswer = (userSelected !== null && q.options[userSelected]) ? q.options[userSelected] : 'Not answered';
+        const correctAnswer = (q.correct !== -1 && q.options[q.correct]) ? q.options[q.correct] : 'Not available';
+
+        if (q.correct === -1) {
+          ansDiv.innerHTML = `<span style="color:#999;">⚠️ No correct answer in database.</span>`;
+        } else if (isCorrect) {
+          ansDiv.innerHTML = `✅ Your answer: <span class="user-ans" style="color:#1f8b4c;">${userAnswer}</span> (Correct)`;
+        } else if (isWrong) {
+          ansDiv.innerHTML = `❌ Your answer: <span class="user-ans" style="color:#b33c3c;">${userAnswer}</span> &nbsp; Correct: <span class="correct-ans">${correctAnswer}</span>`;
+        } else {
+          ansDiv.innerHTML = `⏭️ Skipped &nbsp; Correct: <span class="correct-ans">${correctAnswer}</span>`;
+        }
+        div.appendChild(ansDiv);
+        resultDetails.appendChild(div);
+      });
+      saveState();
+    }
+
+    function getScoreMsg(score,total) {
+      if (score === total) return '🌟 Perfect! You are a true Self Learner.';
+      else if (score >= total * 0.7) return '👏 Great job! Keep growing every day.';
+      else if (score >= total * 0.4) return '📖 Good effort! Review and try again.';
+      else return '💪 Learning is a journey. Keep practicing!';
+    }
+
+    function renderDots(activeIndex) {
+      dotGrid.innerHTML = '';
+      const total = questions.length;
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'grid-dot';
+        dot.textContent = i + 1;
+        const q = questions[i];
+        const hasAnswer = selectedAllAnswers[i] !== null;
+        
+        if (isSubmitted || quizCompleted) {
+          if (q && q.correct === -1) dot.classList.add('no-answer-dot');
+          else if (answerStatus[i] === true) dot.classList.add('correct-dot');
+          else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
+          else if (q && q.correct !== -1) dot.classList.add('timeout');
+        } else {
+          if (hasAnswer) dot.classList.add('done-dot');
+        }
+        
+        if (activeIndex !== undefined && i === activeIndex) {
+          dot.classList.add('active-dot');
+        }
+        
+        dot.addEventListener('click', function(e) {
+          e.stopPropagation();
+          scrollToQuestion(i);
+        });
+        dotGrid.appendChild(dot);
+      }
+    }
+
+    function updateOverview() {
+      let done = 0, pending = 0, correct = 0, wrong = 0;
+      const total = questions.length;
+      for (let i = 0; i < total; i++) {
+        if (selectedAllAnswers[i] !== null) done++;
+        else pending++;
+        if (isSubmitted || quizCompleted) {
+          if (answerStatus[i] === true) correct++;
+          else if (answerStatus[i] === false) wrong++;
+        }
+      }
+      doneCount.textContent = done;
+      pendingCount.textContent = pending;
+      
+      if (isSubmitted || quizCompleted) {
+        correctLegend.style.display = 'inline-flex';
+        wrongLegend.style.display = 'inline-flex';
+        correctCount.textContent = correct;
+        wrongCount.textContent = wrong;
+      } else {
+        correctLegend.style.display = 'none';
+        wrongLegend.style.display = 'none';
+      }
+    }
+
+    function restartQuiz() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      clearState();
+      selectedAllAnswers = new Array(questions.length).fill(null);
+      answerStatus = new Array(questions.length).fill(null);
+      isSubmitted = false;
+      quizCompleted = false;
+      quizTimedOut = false;
+      score = 0;
+      timeRemaining = totalQuestions * 60;
+      resultArea.style.display = 'none';
+      allAtOnceView.style.display = 'block';
+      submittedBanner.style.display = 'none';
+      submitBtn.textContent = '✅ Submit';
+      endQuizBtn.textContent = '🏁 End Quiz';
+      correctLegend.style.display = 'none';
+      wrongLegend.style.display = 'none';
+      startQuiz();
+    }
+
+    submitBtn.addEventListener('click', handleSubmit);
+    endQuizBtn.addEventListener('click', handleEndQuiz);
+    restartFromResult.addEventListener('click', restartQuiz);
+
+    fetchQuestions();
+  })();
+</script>
+</body>
+</html>
