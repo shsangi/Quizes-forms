@@ -85,39 +85,40 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .timer-line .timer {
-      font-weight: 600;
-      color: #0b2a3b;
-    }
+    .timer-line .timer { font-weight: 600; color: #0b2a3b; }
     .timer-line .timer.warning { color: #856404; }
     .timer-line .timer.danger { color: #b33c3c; animation: pulse 1s infinite; }
     @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
 
-    .score-pill {
-      background: #0b2a3b;
-      color: white;
-      font-weight: 600;
-      padding: 0.3rem 1.6rem;
-      border-radius: 60px;
-      font-size: 0.95rem;
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 4px 8px rgba(0,20,30,0.06);
-    }
-    .score-pill span { background: #f0c27f; color: #0b2a3b; padding: 0.05rem 0.7rem; border-radius: 30px; margin-left: 0.4rem; }
-
     .progress-block { background: #e6edf5; height: 6px; border-radius: 20px; margin: 0.6rem 0 1.4rem 0; overflow: hidden; }
     .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #2f7b9e, #4ba3c7); border-radius: 20px; transition: width 0.35s ease; }
 
-    .q-meta {
+    .mode-tabs {
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1.2rem;
       flex-wrap: wrap;
-      gap: 0.4rem 1rem;
-      margin-bottom: 0.4rem;
     }
-    .q-label { font-weight: 600; font-size: 0.9rem; color: #1f4d66; background: #eaf1f8; padding: 0.2rem 1.2rem; border-radius: 40px; }
-    .q-category { font-size: 0.8rem; font-weight: 500; color: #1f5672; background: rgba(26,90,122,0.06); padding: 0.15rem 1.2rem; border-radius: 30px; border: 1px solid rgba(26,90,122,0.08); }
+    .mode-tab {
+      background: #eaf1f8;
+      border: none;
+      padding: 0.5rem 1.8rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1f4d66;
+      cursor: pointer;
+      transition: 0.15s;
+      border: 1.5px solid transparent;
+    }
+    .mode-tab.active {
+      background: #0b2a3b;
+      color: white;
+      border-color: #0b2a3b;
+      box-shadow: 0 4px 10px rgba(11,42,59,0.2);
+    }
+    .mode-tab:hover:not(.active) { background: #dce6ef; }
 
     .question-text {
       font-size: 1.35rem;
@@ -162,15 +163,25 @@
       gap: 1rem;
       margin: 0.4rem 0 1.2rem 0;
     }
-    /* feedback label removed – area kept for layout but hidden */
-    .feedback-msg { display: none; }
+
+    .feedback-msg {
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.3rem 1.2rem;
+      border-radius: 40px;
+      background: #f0f4f9;
+      min-height: 2.6rem;
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+    .feedback-msg .no-answer { font-size: 0.75rem; color: #999; margin-left: 0.5rem; font-weight: 400; }
 
     .nav-group {
       display: flex;
       gap: 0.7rem;
       align-items: center;
       flex-wrap: wrap;
-      margin-left: auto;
     }
 
     .btn-primary {
@@ -241,11 +252,8 @@
       font-size: 0.7rem;
       color: #1d4b61;
       transition: 0.1s;
-      cursor: pointer;
-      border: none;
-      font-family: inherit;
+      cursor: default;
     }
-    .grid-dot:hover { filter: brightness(0.92); transform: scale(0.96); }
     .grid-dot.active { background: #2f7b9e; color: white; box-shadow: 0 0 0 3px rgba(47,123,158,0.25); }
     .grid-dot.correct-dot { background: #1f8b4c; color: white; }
     .grid-dot.wrong-dot { background: #b33c3c; color: white; }
@@ -258,7 +266,55 @@
     .result-msg { color: #1f4b61; font-size: 1.1rem; margin: 0.2rem 0 1.6rem; }
     .result-card .btn-primary { font-size: 1rem; padding: 0.7rem 2.8rem; }
 
-    .loading-msg { text-align: center; padding: 3rem 1rem; font-size: 1.2rem; color: #1a5a7a; }
+    .all-questions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      margin: 1rem 0 2rem;
+    }
+    .all-q-item {
+      background: #fafcfe;
+      border: 1px solid #e2eaf2;
+      border-radius: 1.2rem;
+      padding: 1rem 1.2rem;
+    }
+    .all-q-text {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.6rem;
+      color: #0a212b;
+    }
+    .all-q-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .all-q-options .option-btn {
+      padding: 0.4rem 1.2rem;
+      font-size: 0.9rem;
+      border-radius: 40px;
+    }
+    .all-q-options .option-btn.correct { background: #d8eddf; border-color: #1f8b4c; }
+    .all-q-options .option-btn.wrong { background: #f5dddd; border-color: #b33c3c; }
+
+    .submit-all-btn {
+      background: #0b2a3b;
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.8rem 2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(11,42,59,0.16);
+      transition: 0.15s;
+      width: fit-content;
+      margin: 0.5rem auto 0;
+    }
+    .submit-all-btn:hover:not(:disabled) { background: #1a4b62; transform: scale(1.02); }
+    .submit-all-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .hidden { display: none !important; }
 
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
@@ -273,6 +329,7 @@
       .legend { font-size: 0.6rem; gap: 0.4rem; }
       .legend-dot { width: 12px; height: 12px; }
       .timer-line { font-size: 0.8rem; }
+      .mode-tab { padding: 0.4rem 1.2rem; font-size: 0.8rem; }
     }
   </style>
 </head>
@@ -288,49 +345,62 @@
         <span class="subtitle" id="quizSubtitle">Self Learners</span>
       </div>
     </div>
-    <!-- score pill removed as requested -->
   </div>
 
   <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
 
+  <!-- Mode Tabs -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="all" id="modeAll">📋 All at Once</button>
+    <button class="mode-tab" data-mode="one" id="modeOne">➡️ One by One</button>
+  </div>
+
   <div id="quizContent">
     <div class="progress-block"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
 
-    <div id="questionArea">
-      <div class="q-meta">
-        <span class="q-label" id="qNumber">QUESTION 1 OF 0</span>
-        <span class="q-category" id="qCategory">📚 Loading...</span>
-      </div>
-      <div class="question-text" id="questionText">Loading questions from spreadsheet...</div>
-
-      <div class="options-grid" id="optionsContainer"></div>
-
-      <div class="action-bar">
-        <!-- feedback-msg removed: the element exists but hidden -->
-        <div class="feedback-msg" id="feedbackMessage"></div>
-        <div class="nav-group">
-          <button class="btn-primary" id="nextBtn" disabled>Next →</button>
+    <!-- One by one view -->
+    <div id="oneByOneView">
+      <div id="questionArea">
+        <div class="q-meta">
+          <span class="q-label" id="qNumber">QUESTION 1 OF 0</span>
+          <span class="q-category" id="qCategory">📚</span>
         </div>
-      </div>
-
-      <div class="overview-section">
-        <div class="overview-header">
-          <span>OVERVIEW</span>
-          <div class="legend" id="legendContainer">
-            <span class="legend-item"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
-            <span class="legend-item"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
-            <span class="legend-item"><span class="legend-dot active"></span> Active <span class="count" id="activeCount">0</span></span>
-            <span class="legend-item"><span class="legend-dot pending"></span> Pending <span class="count" id="pendingCount">0</span></span>
+        <div class="question-text" id="questionText">Loading...</div>
+        <div class="options-grid" id="optionsContainer"></div>
+        <div class="action-bar">
+          <div class="feedback-msg" id="feedbackMessage">✨ Select an answer</div>
+          <div class="nav-group">
+            <button class="btn-primary" id="nextBtn" disabled>Next →</button>
           </div>
         </div>
-        <div class="grid-dots" id="dotGrid"></div>
       </div>
+    </div>
+
+    <!-- All at once view -->
+    <div id="allAtOnceView" class="hidden">
+      <div id="allQuestionsContainer" class="all-questions-container"></div>
+      <button class="submit-all-btn" id="submitAllBtn">✅ Submit All & Show Score</button>
+      <div id="allFeedback" style="text-align:center;margin-top:0.8rem;font-weight:500;color:#1f4d66;"></div>
+    </div>
+
+    <!-- overview (shared) -->
+    <div class="overview-section">
+      <div class="overview-header">
+        <span>OVERVIEW</span>
+        <div class="legend" id="legendContainer">
+          <span class="legend-item"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
+          <span class="legend-item"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
+          <span class="legend-item"><span class="legend-dot active"></span> Active <span class="count" id="activeCount">0</span></span>
+          <span class="legend-item"><span class="legend-dot pending"></span> Pending <span class="count" id="pendingCount">0</span></span>
+        </div>
+      </div>
+      <div class="grid-dots" id="dotGrid"></div>
     </div>
 
     <div class="result-card" id="resultArea">
       <h2>🏁 Quiz Complete</h2>
       <div class="result-score" id="finalScore">0 / 0</div>
-      <p class="result-msg" id="resultMessage">Keep learning, Self Learner!</p>
+      <p class="result-msg" id="resultMessage">Keep learning!</p>
       <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
     </div>
   </div>
@@ -352,7 +422,9 @@
     let timeRemaining = 0;
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
+    let currentMode = 'all'; // 'all' or 'one'
 
+    // DOM refs
     const progressFill = document.getElementById('progressFill');
     const qNumber = document.getElementById('qNumber');
     const qCategory = document.getElementById('qCategory');
@@ -374,39 +446,46 @@
     const activeCount = document.getElementById('activeCount');
     const pendingCount = document.getElementById('pendingCount');
     const brandLogo = document.getElementById('brandLogo');
+    const oneByOneView = document.getElementById('oneByOneView');
+    const allAtOnceView = document.getElementById('allAtOnceView');
+    const allQuestionsContainer = document.getElementById('allQuestionsContainer');
+    const submitAllBtn = document.getElementById('submitAllBtn');
+    const allFeedback = document.getElementById('allFeedback');
+    const modeAll = document.getElementById('modeAll');
+    const modeOne = document.getElementById('modeOne');
 
     function loadLogo() {
       const img = new Image();
       img.onload = function() { brandLogo.src = LOGO_URL; };
-      img.onerror = function() { console.log('Using fallback logo'); };
+      img.onerror = function() { console.log('fallback logo'); };
       img.src = LOGO_URL;
     }
     loadLogo();
 
-    // ---- fetch & parse ----
+    // --- fetch ---
     function fetchQuestions() {
-      questionText.textContent = '📥 Fetching questions from spreadsheet...';
+      questionText.textContent = '📥 Fetching...';
       fetch(CSV_URL)
-        .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.text(); })
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(csvText => {
           const parsed = parseCSV(csvText);
-          if (parsed.questions.length === 0) throw new Error('No data found');
+          if (parsed.questions.length === 0) throw new Error('No data');
           questions = parsed.questions;
           quizTitleText = parsed.title || 'Quiz';
           totalQuestions = questions.length;
           answerStatus = new Array(questions.length).fill(null);
           startQuiz();
         })
-        .catch(error => {
-          console.error(error);
-          questionText.textContent = '❌ Failed to load questions. Check CSV link.';
+        .catch(err => {
+          console.error(err);
+          questionText.textContent = '❌ Failed to load. Check CSV link.';
           feedbackMessage.textContent = '⚠️ Error';
           feedbackMessage.style.background = '#f5dddd';
         });
     }
 
     function parseCSV(text) {
-      const lines = text.split('\n').filter(line => line.trim() !== '');
+      const lines = text.split('\n').filter(l => l.trim() !== '');
       if (lines.length < 2) return { questions: [], title: 'Quiz' };
       let title = 'Quiz';
       if (lines.length > 0) {
@@ -418,39 +497,37 @@
       for (let i = startRow; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 6) continue;
-        const question = cols[4] ? cols[4].trim() : '';
-        if (!question) continue;
-        const options = [ cols[5]?.trim() || '', cols[6]?.trim() || '', cols[7]?.trim() || '', cols[8]?.trim() || '' ];
-        const correctAnswer = cols[9] ? cols[9].trim() : '';
-        let correctIndex = -1;
-        if (correctAnswer) {
-          for (let j = 0; j < options.length; j++) { if (options[j] === correctAnswer) { correctIndex = j; break; } }
-        }
-        result.push({ question, options, correct: correctIndex, correctText: correctAnswer || 'No answer in db' });
+        const q = cols[4]?.trim() || '';
+        if (!q) continue;
+        const opts = [ cols[5]?.trim() || '', cols[6]?.trim() || '', cols[7]?.trim() || '', cols[8]?.trim() || '' ];
+        const correctAns = cols[9]?.trim() || '';
+        let correctIdx = -1;
+        if (correctAns) { for (let j=0; j<opts.length; j++) { if (opts[j] === correctAns) { correctIdx = j; break; } } }
+        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns });
       }
       return { questions: result, title };
     }
 
     function parseCSVLine(line) {
-      const result = [];
-      let current = '', inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
+      const res = [];
+      let cur = '', inQuotes = false;
+      for (let i=0; i<line.length; i++) {
         const ch = line[i];
         if (inQuotes) {
-          if (ch === '"' && (i + 1 < line.length && line[i + 1] === '"')) { current += '"'; i++; }
+          if (ch === '"' && (i+1 < line.length && line[i+1] === '"')) { cur += '"'; i++; }
           else if (ch === '"') inQuotes = false;
-          else current += ch;
+          else cur += ch;
         } else {
           if (ch === '"') inQuotes = true;
-          else if (ch === ',') { result.push(current.trim()); current = ''; }
-          else current += ch;
+          else if (ch === ',') { res.push(cur.trim()); cur = ''; }
+          else cur += ch;
         }
       }
-      result.push(current.trim());
-      return result;
+      res.push(cur.trim());
+      return res;
     }
 
-    // ---- timer ----
+    // --- timer ---
     function startTimer() {
       timeRemaining = totalQuestions * 60;
       updateTimerDisplay();
@@ -471,33 +548,45 @@
 
     function handleTimeout() {
       quizTimedOut = true; quizCompleted = true;
-      document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-      nextBtn.disabled = true;
+      if (currentMode === 'one') {
+        document.querySelectorAll('#optionsContainer .option-btn').forEach(b => b.disabled = true);
+        nextBtn.disabled = true;
+      } else {
+        document.querySelectorAll('#allQuestionsContainer .option-btn').forEach(b => b.disabled = true);
+        submitAllBtn.disabled = true;
+      }
       setTimeout(() => showResult(), 1500);
     }
 
-    // ---- quiz core ----
+    // --- start ---
     function startQuiz() {
-      if (questions.length === 0) { questionText.textContent = '⚠️ No questions found.'; return; }
+      if (questions.length === 0) { questionText.textContent = '⚠️ No questions.'; return; }
       quizTitle.textContent = quizTitleText;
       quizSubtitle.textContent = 'Self Learners';
       currentIndex = 0; score = 0; isAnswered = false; quizCompleted = false; quizTimedOut = false;
       answerStatus = new Array(questions.length).fill(null);
       resultArea.style.display = 'none';
       questionArea.style.display = 'block';
-      renderQuestion(0);
+      allAtOnceView.classList.add('hidden');
+      oneByOneView.classList.remove('hidden');
+      currentMode = 'all';
+      modeAll.classList.add('active');
+      modeOne.classList.remove('active');
+      renderAllQuestions();
+      renderOneByOne(0);
       renderDots();
       updateLegendCounts();
       startTimer();
     }
 
-    function renderQuestion(index) {
+    // --- one by one ---
+    function renderOneByOne(index) {
       const q = questions[index];
       if (!q) return;
       const total = questions.length;
       progressFill.style.width = `${((index) / total) * 100}%`;
       qNumber.textContent = `QUESTION ${index+1} OF ${total}`;
-      qCategory.textContent = `📚 Question ${index+1}`;
+      qCategory.textContent = `📚 Q${index+1}`;
       questionText.textContent = q.question;
       const letters = ['A','B','C','D'];
       optionsContainer.innerHTML = '';
@@ -506,46 +595,32 @@
         btn.className = 'option-btn';
         btn.innerHTML = `<span class="letter">${letters[idx]}</span> ${opt || '(Empty)'}`;
         btn.dataset.index = idx;
-        btn.addEventListener('click', () => handleOptionClick(idx));
+        btn.addEventListener('click', () => handleOneOptionClick(idx));
         if (!opt || quizTimedOut) { btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
         optionsContainer.appendChild(btn);
       });
-      // feedback hidden; no message
-      if (q.correct === -1) {
-        // no feedback label, but we handle auto-skip
-        if (!quizTimedOut && !quizCompleted) {
-          setTimeout(() => {
-            if (!isAnswered && !quizCompleted) {
-              answerStatus[currentIndex] = null;
-              isAnswered = true;
-              nextBtn.disabled = false;
-              renderDots(); updateLegendCounts();
-            }
-          }, 800);
-        }
-      }
+      feedbackMessage.textContent = '✨ Select an answer';
+      feedbackMessage.style.background = '#f0f4f9';
       isAnswered = false;
       nextBtn.disabled = true;
-      document.querySelectorAll('.option-btn').forEach(btn => {
-        btn.disabled = quizTimedOut || quizCompleted;
-        btn.classList.remove('correct','wrong');
+      document.querySelectorAll('#optionsContainer .option-btn').forEach(b => {
+        b.disabled = quizTimedOut || quizCompleted;
+        b.classList.remove('correct','wrong');
       });
-      resultArea.style.display = 'none';
-      questionArea.style.display = 'block';
       renderDots();
       updateLegendCounts();
     }
 
-    function handleOptionClick(selectedIdx) {
+    function handleOneOptionClick(selectedIdx) {
       if (isAnswered || quizTimedOut || quizCompleted) return;
       const q = questions[currentIndex];
       if (q.correct === -1) return;
       const isCorrect = (selectedIdx === q.correct);
-      const allOptions = document.querySelectorAll('.option-btn');
-      allOptions.forEach(btn => btn.disabled = true);
-      allOptions.forEach((btn, idx) => {
-        if (idx === q.correct) btn.classList.add('correct');
-        else if (idx === selectedIdx && !isCorrect) btn.classList.add('wrong');
+      const allOptions = document.querySelectorAll('#optionsContainer .option-btn');
+      allOptions.forEach(b => b.disabled = true);
+      allOptions.forEach((b, idx) => {
+        if (idx === q.correct) b.classList.add('correct');
+        else if (idx === selectedIdx && !isCorrect) b.classList.add('wrong');
       });
       if (isCorrect) { score += 1; answerStatus[currentIndex] = true; }
       else { answerStatus[currentIndex] = false; }
@@ -557,58 +632,108 @@
 
     function goToNext() {
       if (!isAnswered || quizCompleted) return;
-      if (currentIndex + 1 < questions.length) { currentIndex++; renderQuestion(currentIndex); }
+      if (currentIndex + 1 < questions.length) { currentIndex++; renderOneByOne(currentIndex); }
       else { if (!quizTimedOut) { clearInterval(timerInterval); timerInterval = null; } showResult(); }
     }
 
-    function showResult() {
+    // --- all at once ---
+    function renderAllQuestions() {
+      allQuestionsContainer.innerHTML = '';
+      const letters = ['A','B','C','D'];
+      questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'all-q-item';
+        const qText = document.createElement('div');
+        qText.className = 'all-q-text';
+        qText.textContent = `${idx+1}. ${q.question}`;
+        div.appendChild(qText);
+        const optsDiv = document.createElement('div');
+        optsDiv.className = 'all-q-options';
+        q.options.forEach((opt, optIdx) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt || '(Empty)'}`;
+          btn.dataset.qIdx = idx;
+          btn.dataset.optIdx = optIdx;
+          btn.addEventListener('click', function(e) {
+            if (quizCompleted || quizTimedOut) return;
+            // allow toggle: if already selected, deselect? we just set.
+            const parent = this.closest('.all-q-item');
+            const btns = parent.querySelectorAll('.option-btn');
+            btns.forEach(b => { b.classList.remove('correct','wrong'); });
+            // we don't know if correct yet, just mark selected? we'll show on submit.
+            // but we want to allow selection. we store selected answer per question.
+            selectedAllAnswers[idx] = optIdx;
+            // visual feedback: highlight selected
+            btns.forEach(b => b.classList.remove('selected-opt'));
+            this.classList.add('selected-opt');
+            // update status to 'answered' for that question (but not graded)
+            allAnsweredStatus[idx] = true;
+            updateLegendCounts();
+            renderDots();
+          });
+          optsDiv.appendChild(btn);
+        });
+        div.appendChild(optsDiv);
+        allQuestionsContainer.appendChild(div);
+      });
+      // reset selected
+      window.selectedAllAnswers = new Array(questions.length).fill(null);
+      window.allAnsweredStatus = new Array(questions.length).fill(false);
+      submitAllBtn.disabled = false;
+      allFeedback.textContent = '';
+    }
+
+    function submitAll() {
+      if (quizCompleted || quizTimedOut) return;
+      // grade all
+      let correctCount = 0;
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const selected = window.selectedAllAnswers[i];
+        const isCorrect = (selected !== null && selected === q.correct);
+        if (q.correct === -1) { answerStatus[i] = null; continue; }
+        if (isCorrect) { correctCount++; answerStatus[i] = true; }
+        else { answerStatus[i] = false; }
+        // show correct/wrong on options
+        const item = allQuestionsContainer.children[i];
+        if (item) {
+          const btns = item.querySelectorAll('.option-btn');
+          btns.forEach((b, idx) => {
+            b.disabled = true;
+            if (idx === q.correct) b.classList.add('correct');
+            else if (idx === selected && !isCorrect) b.classList.add('wrong');
+          });
+        }
+      }
+      score = correctCount;
+      submitAllBtn.disabled = true;
+      allFeedback.textContent = `✅ You scored ${score} / ${questions.length}`;
+      allFeedback.style.background = '#d4edda';
+      allFeedback.style.padding = '0.5rem';
+      allFeedback.style.borderRadius = '40px';
+      // complete quiz
       quizCompleted = true;
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      questionArea.style.display = 'none';
-      resultArea.style.display = 'block';
-      const total = questions.length;
-      finalScore.textContent = `${score} / ${total}`;
-      progressFill.style.width = '100%';
-      let msg = quizTimedOut ? '⏰ Time ran out! ' + getScoreMessage(score,total) : getScoreMessage(score,total);
-      resultMessage.textContent = msg;
-      nextBtn.disabled = true;
       renderDots();
       updateLegendCounts();
+      setTimeout(() => showResult(), 800);
     }
 
-    function getScoreMessage(score,total) {
-      if (score === total) return '🌟 Perfect! You are a true Self Learner.';
-      else if (score >= total * 0.7) return '👏 Great job! Keep growing every day.';
-      else if (score >= total * 0.4) return '📖 Good effort! Review and try again.';
-      else return '💪 Learning is a journey. Keep practicing!';
-    }
-
-    // ---- interactive dot grid: click to jump ----
+    // --- shared ---
     function renderDots() {
       dotGrid.innerHTML = '';
       const total = questions.length;
       for (let i = 0; i < total; i++) {
-        const dot = document.createElement('button');
+        const dot = document.createElement('div');
         dot.className = 'grid-dot';
         dot.textContent = i + 1;
-        if (i === currentIndex && !quizCompleted && !quizTimedOut) dot.classList.add('active');
+        const isActive = (i === currentIndex && currentMode === 'one' && !quizCompleted && !quizTimedOut);
+        if (isActive) dot.classList.add('active');
         if (questions[i] && questions[i].correct === -1) dot.classList.add('no-answer-dot');
         else if (answerStatus[i] === true) dot.classList.add('correct-dot');
         else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
         if (quizTimedOut && answerStatus[i] === null && questions[i] && questions[i].correct !== -1) dot.classList.add('timeout');
-        // click handler: jump to question only if not answered and not completed
-        dot.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const targetIndex = i;
-          if (quizCompleted || quizTimedOut) return;
-          if (targetIndex === currentIndex) return;
-          // if current question is not answered, allow jump? we allow jump anytime, but if current is unanswered we keep it unanswered.
-          // we simply switch, but we must not reset the answer for the question we leave.
-          currentIndex = targetIndex;
-          renderQuestion(currentIndex);
-          renderDots();
-          updateLegendCounts();
-        });
         dotGrid.appendChild(dot);
       }
     }
@@ -617,10 +742,11 @@
       let correct = 0, wrong = 0, active = 0, pending = 0;
       const total = questions.length;
       for (let i = 0; i < total; i++) {
-        if (questions[i] && questions[i].correct === -1) pending++;
+        const q = questions[i];
+        if (q && q.correct === -1) pending++;
         else if (answerStatus[i] === true) correct++;
         else if (answerStatus[i] === false) wrong++;
-        else if (i === currentIndex && !quizCompleted && !quizTimedOut) active++;
+        else if (i === currentIndex && currentMode === 'one' && !quizCompleted && !quizTimedOut) active++;
         else pending++;
       }
       correctCount.textContent = correct;
@@ -629,18 +755,73 @@
       pendingCount.textContent = pending;
     }
 
+    function showResult() {
+      quizCompleted = true;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      document.getElementById('questionArea').style.display = 'none';
+      allAtOnceView.classList.add('hidden');
+      oneByOneView.classList.add('hidden');
+      resultArea.style.display = 'block';
+      const total = questions.length;
+      finalScore.textContent = `${score} / ${total}`;
+      progressFill.style.width = '100%';
+      let msg = quizTimedOut ? '⏰ Time ran out! ' + getScoreMsg(score,total) : getScoreMsg(score,total);
+      resultMessage.textContent = msg;
+      renderDots();
+      updateLegendCounts();
+    }
+
+    function getScoreMsg(score,total) {
+      if (score === total) return '🌟 Perfect!';
+      else if (score >= total * 0.7) return '👏 Great job!';
+      else if (score >= total * 0.4) return '📖 Good effort!';
+      else return '💪 Keep practicing!';
+    }
+
     function restartQuiz() {
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       if (questions.length === 0) { fetchQuestions(); return; }
       startQuiz();
     }
 
-    // ---- event listeners ----
+    // --- mode switching ---
+    function switchMode(mode) {
+      if (quizCompleted || quizTimedOut) return;
+      currentMode = mode;
+      if (mode === 'all') {
+        oneByOneView.classList.add('hidden');
+        allAtOnceView.classList.remove('hidden');
+        modeAll.classList.add('active');
+        modeOne.classList.remove('active');
+        // render all questions if not rendered
+        if (allQuestionsContainer.children.length === 0) renderAllQuestions();
+        // update dots
+        renderDots();
+        updateLegendCounts();
+      } else {
+        oneByOneView.classList.remove('hidden');
+        allAtOnceView.classList.add('hidden');
+        modeOne.classList.add('active');
+        modeAll.classList.remove('active');
+        renderOneByOne(currentIndex);
+        renderDots();
+        updateLegendCounts();
+      }
+    }
+
+    // --- event listeners ---
     nextBtn.addEventListener('click', goToNext);
     restartFromResult.addEventListener('click', restartQuiz);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !nextBtn.disabled) goToNext(); });
+    submitAllBtn.addEventListener('click', submitAll);
 
-    // ---- init ----
+    modeAll.addEventListener('click', function() { switchMode('all'); });
+    modeOne.addEventListener('click', function() { switchMode('one'); });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !nextBtn.disabled && currentMode === 'one') goToNext();
+    });
+
+    // --- init ---
     fetchQuestions();
   })();
 </script>
