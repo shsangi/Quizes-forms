@@ -377,10 +377,10 @@
       flex-shrink: 0;
     }
 
-    .legend-dot.done { background: #1f8b4c; }
+    .legend-dot.correct-dot { background: #1f8b4c; }
+    .legend-dot.wrong-dot { background: #b33c3c; }
     .legend-dot.active { background: #2f7b9e; }
     .legend-dot.pending { background: #dce6ef; }
-    .legend-dot.no-answer-dot { background: #999; }
 
     .grid-dots {
       display: flex;
@@ -411,7 +411,7 @@
       box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.25);
     }
 
-    .grid-dot.answered {
+    .grid-dot.correct-dot {
       background: #1f8b4c;
       color: white;
     }
@@ -537,10 +537,10 @@
         <div class="overview-header">
           <span>OVERVIEW</span>
           <div class="legend" id="legendContainer">
-            <span class="legend-item"><span class="legend-dot done"></span> Done <span class="count" id="doneCount">0</span></span>
+            <span class="legend-item"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
+            <span class="legend-item"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
             <span class="legend-item"><span class="legend-dot active"></span> Active <span class="count" id="activeCount">0</span></span>
             <span class="legend-item"><span class="legend-dot pending"></span> Pending <span class="count" id="pendingCount">0</span></span>
-            <span class="legend-item"><span class="legend-dot no-answer-dot"></span> No Ans <span class="count" id="noAnswerCount">0</span></span>
           </div>
         </div>
         <div class="grid-dots" id="dotGrid"></div>
@@ -596,10 +596,10 @@
     const timerDisplay = document.getElementById('timerDisplay');
     const quizTitle = document.getElementById('quizTitle');
     const quizSubtitle = document.getElementById('quizSubtitle');
-    const doneCount = document.getElementById('doneCount');
+    const correctCount = document.getElementById('correctCount');
+    const wrongCount = document.getElementById('wrongCount');
     const activeCount = document.getElementById('activeCount');
     const pendingCount = document.getElementById('pendingCount');
-    const noAnswerCount = document.getElementById('noAnswerCount');
     const brandLogo = document.getElementById('brandLogo');
 
     // Try to load the actual logo
@@ -664,7 +664,7 @@
         }
       }
 
-      // Start from row 2 (index 1) for actual questions (since row 1 is header/title)
+      // Start from row 2 (index 1) for actual questions
       const startRow = Math.min(1, lines.length - 1);
       
       for (let i = startRow; i < lines.length; i++) {
@@ -981,7 +981,7 @@
         if (questions[i] && questions[i].correct === -1) {
           dot.classList.add('no-answer-dot');
         } else if (answerStatus[i] === true) {
-          dot.classList.add('answered');
+          dot.classList.add('correct-dot');
         } else if (answerStatus[i] === false) {
           dot.classList.add('wrong-dot');
         }
@@ -995,14 +995,17 @@
     }
 
     function updateLegendCounts() {
-      let done = 0, active = 0, pending = 0, noAns = 0;
+      let correct = 0, wrong = 0, active = 0, pending = 0;
       const total = questions.length;
       
       for (let i = 0; i < total; i++) {
         if (questions[i] && questions[i].correct === -1) {
-          noAns++;
-        } else if (answerStatus[i] === true || answerStatus[i] === false) {
-          done++;
+          // Skip no-answer questions - they don't count as correct or wrong
+          pending++;
+        } else if (answerStatus[i] === true) {
+          correct++;
+        } else if (answerStatus[i] === false) {
+          wrong++;
         } else if (i === currentIndex && !quizCompleted && !quizTimedOut) {
           active++;
         } else {
@@ -1010,10 +1013,10 @@
         }
       }
       
-      doneCount.textContent = done;
+      correctCount.textContent = correct;
+      wrongCount.textContent = wrong;
       activeCount.textContent = active;
       pendingCount.textContent = pending;
-      noAnswerCount.textContent = noAns;
     }
 
     function restartQuiz() {
