@@ -462,10 +462,13 @@
       border-radius: 60px;
       background: #f0f4f9;
       min-height: 2.8rem;
-      display: flex;
+      display: none;
       align-items: center;
       flex: 1;
       gap: 0.5rem;
+    }
+    .quiz-wrapper .feedback-msg.visible {
+      display: flex;
     }
     .quiz-wrapper .feedback-msg .no-answer {
       font-size: 0.7rem;
@@ -647,6 +650,7 @@
       .quiz-wrapper .user-badge .avatar { width: 24px; height: 24px; font-size: 0.6rem; }
       .toast-container { top: 0.8rem; right: 0.8rem; max-width: calc(100% - 1.6rem); }
       .quiz-wrapper .session-restore { display: none; }
+      .quiz-wrapper .feedback-msg { min-height: auto; padding: 0.3rem 1rem; }
     }
 
     /* ---------- SCROLLBAR ---------- */
@@ -1133,9 +1137,30 @@
       let totalQuestions = 0;
       let quizTitleText = 'Quiz';
 
+      // Helper to show feedback message
+      function showFeedback(message, type = 'info') {
+        feedbackMessage.textContent = message;
+        feedbackMessage.className = 'feedback-msg visible';
+        if (type === 'warning') {
+          feedbackMessage.style.background = '#fff3cd';
+        } else if (type === 'error') {
+          feedbackMessage.style.background = '#f8d7da';
+        } else if (type === 'success') {
+          feedbackMessage.style.background = '#d4edda';
+        } else {
+          feedbackMessage.style.background = '#f0f4f9';
+        }
+      }
+
+      function hideFeedback() {
+        feedbackMessage.className = 'feedback-msg';
+        feedbackMessage.textContent = '';
+        feedbackMessage.style.background = '#f0f4f9';
+      }
+
       function fetchQuizQuestions() {
         questionText.textContent = '📥 Fetching questions...';
-        feedbackMessage.innerHTML = '';
+        hideFeedback();
 
         fetch(QUIZ_CSV_URL)
           .then(response => {
@@ -1168,7 +1193,7 @@
           .catch(err => {
             console.error('Quiz load error:', err);
             questionText.textContent = '❌ Failed to load questions.';
-            feedbackMessage.innerHTML = '';
+            hideFeedback();
             showToast('❌ Failed to load quiz questions.', 'error', 4000);
           });
       }
@@ -1275,8 +1300,7 @@
         quizTimedOut = true;
         quizCompleted = true;
         document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-        feedbackMessage.innerHTML = '⏰ Time is up! Quiz submitted.';
-        feedbackMessage.style.background = '#fff3cd';
+        showFeedback('⏰ Time is up! Quiz submitted.', 'warning');
         nextBtn.disabled = true;
         showToast('⏰ Time is up! Quiz submitted.', 'warning', 3000);
         saveSession();
@@ -1340,9 +1364,10 @@
           optionsContainer.appendChild(btn);
         });
 
+        hideFeedback();
+
         if (q.correct === -1) {
-          feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(Column J doesn't match any choice)</span>`;
-          feedbackMessage.style.background = '#fff3cd';
+          showFeedback(`⚠️ No answer in db (Column J doesn't match any choice)`, 'warning');
           if (!quizTimedOut && !quizCompleted) {
             setTimeout(() => {
               if (!isAnswered && !quizCompleted) {
@@ -1351,16 +1376,10 @@
                 nextBtn.disabled = false;
                 renderDots();
                 updateLegendCounts();
-                feedbackMessage.innerHTML = `⏭️ Skipped (no answer) <span class="no-answer">Moving to next</span>`;
-                feedbackMessage.style.background = '#e9ecef';
+                hideFeedback();
                 saveSession();
               }
             }, 800);
-          }
-        } else {
-          if (!quizTimedOut && !quizCompleted) {
-            feedbackMessage.innerHTML = '';
-            feedbackMessage.style.background = '#f0f4f9';
           }
         }
 
@@ -1383,8 +1402,7 @@
         if (isAnswered || quizTimedOut || quizCompleted) return;
         const q = questions[currentIndex];
         if (q.correct === -1) {
-          feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(No match in Column J)</span>`;
-          feedbackMessage.style.background = '#fff3cd';
+          showFeedback(`⚠️ No answer in db (No match in Column J)`, 'warning');
           return;
         }
 
@@ -1399,14 +1417,13 @@
 
         if (isCorrect) {
           score += 1;
-          feedbackMessage.innerHTML = '';
-          feedbackMessage.style.background = '#f0f4f9';
           answerStatus[currentIndex] = true;
         } else {
-          feedbackMessage.innerHTML = '';
-          feedbackMessage.style.background = '#f0f4f9';
           answerStatus[currentIndex] = false;
         }
+
+        // Hide feedback after answering
+        hideFeedback();
 
         isAnswered = true;
         nextBtn.disabled = false;
@@ -1457,6 +1474,7 @@
         renderDots();
         updateLegendCounts();
         clearSession();
+        hideFeedback();
         
         if (!sessionRestored) {
           showToast(`🏁 Quiz complete! Score: ${score}/${total} (${percentage}%)`, 'info', 4000);
@@ -1538,6 +1556,7 @@
         answerStatus = new Array(questions.length).fill(null);
         resultArea.style.display = 'none';
         questionArea.style.display = 'block';
+        hideFeedback();
         renderQuestion(0);
         renderDots();
         updateLegendCounts();
