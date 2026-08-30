@@ -85,6 +85,23 @@
       padding: 0.3rem 1.2rem;
       border-radius: 60px;
       letter-spacing: 0.3px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer.warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .timer.danger {
+      background: #f5dddd;
+      color: #b33c3c;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
     .score-pill {
@@ -269,23 +286,6 @@
       flex-wrap: wrap;
     }
 
-    .btn-outline {
-      background: transparent;
-      border: 1.5px solid #0b2a3b;
-      color: #0b2a3b;
-      padding: 0.5rem 1.6rem;
-      border-radius: 60px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: 0.15s;
-    }
-
-    .btn-outline:hover {
-      background: #0b2a3b;
-      color: white;
-    }
-
     .btn-primary {
       background: #0b2a3b;
       border: none;
@@ -312,6 +312,14 @@
       box-shadow: none;
     }
 
+    .btn-primary.auto-submit {
+      background: #28a745;
+    }
+
+    .btn-primary.auto-submit:hover:not(:disabled) {
+      background: #218838;
+    }
+
     .overview-section {
       margin-top: 1.2rem;
       border-top: 1px solid #e2eaf2;
@@ -335,16 +343,32 @@
 
     .legend {
       display: flex;
-      gap: 1rem;
-      font-size: 0.75rem;
+      gap: 0.8rem;
+      font-size: 0.7rem;
       font-weight: 500;
       color: #2d5a72;
+      flex-wrap: wrap;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.2rem;
+    }
+
+    .legend-item .count {
+      font-weight: 700;
+      font-size: 0.8rem;
+      min-width: 1.2rem;
+      text-align: center;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 30px;
+      display: inline-block;
+      flex-shrink: 0;
     }
 
     .legend-dot.done { background: #1f8b4c; }
@@ -355,23 +379,24 @@
     .grid-dots {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 0.4rem;
       justify-content: center;
       margin-top: 0.2rem;
     }
 
     .grid-dot {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 30px;
       background: #dce6ef;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       color: #1d4b61;
       transition: 0.1s;
+      cursor: default;
     }
 
     .grid-dot.active {
@@ -393,6 +418,12 @@
     .grid-dot.no-answer-dot {
       background: #999;
       color: white;
+    }
+
+    .grid-dot.timeout {
+      background: #6c757d;
+      color: white;
+      opacity: 0.5;
     }
 
     .result-card {
@@ -423,7 +454,7 @@
       margin: 0.2rem 0 1.6rem;
     }
 
-    .result-card .btn-outline {
+    .result-card .btn-primary {
       font-size: 1rem;
       padding: 0.7rem 2.8rem;
     }
@@ -435,6 +466,16 @@
       color: #1a5a7a;
     }
 
+    .quiz-over-message {
+      text-align: center;
+      padding: 1rem;
+      background: #fff3cd;
+      border-radius: 1rem;
+      color: #856404;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand h1 { font-size: 1.4rem; }
@@ -443,8 +484,9 @@
       .action-bar { flex-direction: column; align-items: stretch; }
       .btn-primary { width: 100%; justify-content: center; }
       .nav-group { width: 100%; }
-      .btn-outline { flex: 1; }
-      .grid-dot { width: 32px; height: 32px; font-size: 0.7rem; }
+      .grid-dot { width: 28px; height: 28px; font-size: 0.65rem; }
+      .legend { font-size: 0.6rem; gap: 0.4rem; }
+      .legend-dot { width: 12px; height: 12px; }
     }
   </style>
 </head>
@@ -454,10 +496,10 @@
   <!-- header -->
   <div class="top-bar">
     <div class="brand">
-      <h1>📘 Self <small>Learners</small></h1>
+      <h1 id="quizTitle">📘 Self <small>Learners</small></h1>
     </div>
     <div class="time-score">
-      <div class="timer" id="timerDisplay">⏱️ 174:22</div>
+      <div class="timer" id="timerDisplay">⏱️ 00:00</div>
       <div class="score-pill">🎯 <span id="scoreNumber">0</span></div>
     </div>
   </div>
@@ -481,7 +523,6 @@
       <div class="action-bar">
         <div class="feedback-msg" id="feedbackMessage">✨ Select an answer</div>
         <div class="nav-group">
-          <button class="btn-outline" id="restartBtn">⟳ Restart</button>
           <button class="btn-primary" id="nextBtn" disabled>Next →</button>
         </div>
       </div>
@@ -490,11 +531,11 @@
       <div class="overview-section">
         <div class="overview-header">
           <span>OVERVIEW</span>
-          <div class="legend">
-            <span class="legend-item"><span class="legend-dot done"></span> Done</span>
-            <span class="legend-item"><span class="legend-dot active"></span> Active</span>
-            <span class="legend-item"><span class="legend-dot pending"></span> Pending</span>
-            <span class="legend-item"><span class="legend-dot no-answer-dot"></span> No Answer</span>
+          <div class="legend" id="legendContainer">
+            <span class="legend-item"><span class="legend-dot done"></span> Done <span class="count" id="doneCount">0</span></span>
+            <span class="legend-item"><span class="legend-dot active"></span> Active <span class="count" id="activeCount">0</span></span>
+            <span class="legend-item"><span class="legend-dot pending"></span> Pending <span class="count" id="pendingCount">0</span></span>
+            <span class="legend-item"><span class="legend-dot no-answer-dot"></span> No Ans <span class="count" id="noAnswerCount">0</span></span>
           </div>
         </div>
         <div class="grid-dots" id="dotGrid"></div>
@@ -506,7 +547,7 @@
       <h2>🏁 Quiz Complete</h2>
       <div class="result-score" id="finalScore">0 / 0</div>
       <p class="result-msg" id="resultMessage">Keep learning, Self Learner!</p>
-      <button class="btn-outline" id="restartFromResult">⟳ Try again</button>
+      <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
     </div>
   </div>
 </div>
@@ -514,7 +555,6 @@
 <script>
   (function() {
     // ----- CONFIGURATION -----
-    // REPLACE THIS URL with your actual published CSV link
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
 
     // ----- STATE -----
@@ -523,7 +563,12 @@
     let score = 0;
     let isAnswered = false;
     let quizCompleted = false;
+    let quizTimedOut = false;
     let answerStatus = [];
+    let timerInterval = null;
+    let timeRemaining = 0;
+    let totalQuestions = 0;
+    let sheetName = 'Quiz';
 
     // DOM refs
     const progressFill = document.getElementById('progressFill');
@@ -533,7 +578,6 @@
     const optionsContainer = document.getElementById('optionsContainer');
     const feedbackMessage = document.getElementById('feedbackMessage');
     const nextBtn = document.getElementById('nextBtn');
-    const restartBtn = document.getElementById('restartBtn');
     const restartFromResult = document.getElementById('restartFromResult');
     const scoreNumber = document.getElementById('scoreNumber');
     const questionArea = document.getElementById('questionArea');
@@ -541,6 +585,12 @@
     const finalScore = document.getElementById('finalScore');
     const resultMessage = document.getElementById('resultMessage');
     const dotGrid = document.getElementById('dotGrid');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const quizTitle = document.getElementById('quizTitle');
+    const doneCount = document.getElementById('doneCount');
+    const activeCount = document.getElementById('activeCount');
+    const pendingCount = document.getElementById('pendingCount');
+    const noAnswerCount = document.getElementById('noAnswerCount');
 
     // ----- FETCH & PARSE CSV -----
     function fetchQuestions() {
@@ -560,6 +610,7 @@
             throw new Error('No data found in CSV');
           }
           questions = parsed;
+          totalQuestions = questions.length;
           answerStatus = new Array(questions.length).fill(null);
           startQuiz();
         })
@@ -575,17 +626,21 @@
       const lines = text.split('\n').filter(line => line.trim() !== '');
       if (lines.length < 2) return [];
 
+      // Try to extract sheet name from first line if it contains sheet info
+      const firstLine = lines[0];
+      if (firstLine.includes('quiz_1') || firstLine.includes('Sheet')) {
+        sheetName = firstLine.replace(/[",]/g, '').trim() || 'Quiz';
+      }
+
       const result = [];
 
       for (let i = 1; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
-        if (cols.length < 6) continue; // Need at least E, F, G, H, I, J
+        if (cols.length < 6) continue;
 
-        // Column E (index 4) = Question
         const question = cols[4] ? cols[4].trim() : '';
         if (!question) continue;
 
-        // Columns F, G, H, I (indices 5, 6, 7, 8) = Choices
         const options = [
           cols[5] ? cols[5].trim() : '',
           cols[6] ? cols[6].trim() : '',
@@ -593,10 +648,8 @@
           cols[8] ? cols[8].trim() : ''
         ];
 
-        // Column J (index 9) = Correct Answer (exact match)
         const correctAnswer = cols[9] ? cols[9].trim() : '';
 
-        // Find the index of the correct answer in options
         let correctIndex = -1;
         if (correctAnswer) {
           for (let j = 0; j < options.length; j++) {
@@ -607,13 +660,10 @@
           }
         }
 
-        // If no match found, correctIndex remains -1
-        // We'll handle this in the quiz logic
-
         result.push({
           question: question,
           options: options,
-          correct: correctIndex, // -1 means "No answer in db"
+          correct: correctIndex,
           correctText: correctAnswer || 'No answer in db'
         });
       }
@@ -621,7 +671,6 @@
       return result;
     }
 
-    // Simple CSV line parser (handles quoted fields)
     function parseCSVLine(line) {
       const result = [];
       let current = '';
@@ -652,22 +701,82 @@
       return result;
     }
 
+    // ----- TIMER -----
+    function startTimer() {
+      // Time allowed = total number of questions (in minutes)
+      timeRemaining = totalQuestions * 60; // convert to seconds
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = timeRemaining % 60;
+      timerDisplay.textContent = `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      // Warning states
+      timerDisplay.classList.remove('warning', 'danger');
+      if (timeRemaining < 60) {
+        timerDisplay.classList.add('danger');
+      } else if (timeRemaining < 300) {
+        timerDisplay.classList.add('warning');
+      }
+    }
+
+    function handleTimeout() {
+      quizTimedOut = true;
+      quizCompleted = true;
+      
+      // Disable all options
+      document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+      
+      // Show timeout message
+      feedbackMessage.textContent = '⏰ Time is up! Quiz automatically submitted.';
+      feedbackMessage.style.background = '#fff3cd';
+      nextBtn.disabled = true;
+
+      // Show result after a short delay
+      setTimeout(() => {
+        showResult();
+      }, 1500);
+    }
+
     // ----- QUIZ FUNCTIONS -----
     function startQuiz() {
       if (questions.length === 0) {
         questionText.textContent = '⚠️ No questions found in the spreadsheet.';
         return;
       }
+
+      // Update title with sheet name
+      quizTitle.innerHTML = `📘 ${sheetName} <small>Self Learners</small>`;
+
       currentIndex = 0;
       score = 0;
       isAnswered = false;
       quizCompleted = false;
+      quizTimedOut = false;
       answerStatus = new Array(questions.length).fill(null);
       scoreNumber.textContent = '0';
       resultArea.style.display = 'none';
       questionArea.style.display = 'block';
+      
       renderQuestion(0);
       renderDots();
+      updateLegendCounts();
+      
+      // Start timer
+      startTimer();
     }
 
     function renderQuestion(index) {
@@ -690,42 +799,61 @@
         btn.innerHTML = `<span class="letter">${letters[idx]}</span> ${opt || '(Empty)'}`;
         btn.dataset.index = idx;
         btn.addEventListener('click', () => handleOptionClick(idx));
-        if (!opt) {
+        if (!opt || quizTimedOut) {
           btn.style.opacity = '0.5';
           btn.style.cursor = 'not-allowed';
         }
         optionsContainer.appendChild(btn);
       });
 
-      // Show if there's no answer in DB
       if (q.correct === -1) {
         feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(Column J doesn't match any choice)</span>`;
         feedbackMessage.style.background = '#fff3cd';
+        // Auto-skip no-answer questions
+        if (!quizTimedOut && !quizCompleted) {
+          setTimeout(() => {
+            if (!isAnswered && !quizCompleted) {
+              // Mark as no-answer and move on
+              answerStatus[currentIndex] = null; // null means no answer
+              isAnswered = true;
+              nextBtn.disabled = false;
+              renderDots();
+              updateLegendCounts();
+              feedbackMessage.innerHTML = `⏭️ Skipped (no answer in db) <span class="no-answer">Moving to next question</span>`;
+              feedbackMessage.style.background = '#e9ecef';
+            }
+          }, 800);
+        }
       } else {
-        feedbackMessage.textContent = '✨ Select an answer';
-        feedbackMessage.style.background = '#f0f4f9';
+        if (!quizTimedOut && !quizCompleted) {
+          feedbackMessage.textContent = '✨ Select an answer';
+          feedbackMessage.style.background = '#f0f4f9';
+        }
       }
 
       isAnswered = false;
-      nextBtn.disabled = true;
+      if (!quizTimedOut && !quizCompleted) {
+        nextBtn.disabled = true;
+      } else {
+        nextBtn.disabled = true;
+      }
 
       document.querySelectorAll('.option-btn').forEach(btn => {
-        btn.disabled = false;
+        btn.disabled = quizTimedOut || quizCompleted;
         btn.classList.remove('correct', 'wrong');
       });
 
       resultArea.style.display = 'none';
       questionArea.style.display = 'block';
-      quizCompleted = false;
 
       renderDots();
+      updateLegendCounts();
     }
 
     function handleOptionClick(selectedIdx) {
-      if (isAnswered) return;
+      if (isAnswered || quizTimedOut || quizCompleted) return;
       const q = questions[currentIndex];
       
-      // If no answer in DB, just show message and don't allow answering
       if (q.correct === -1) {
         feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(This question has no matching answer in Column J)</span>`;
         feedbackMessage.style.background = '#fff3cd';
@@ -760,20 +888,31 @@
       isAnswered = true;
       nextBtn.disabled = false;
       renderDots();
+      updateLegendCounts();
     }
 
     function goToNext() {
-      if (!isAnswered) return;
+      if (!isAnswered || quizCompleted) return;
       if (currentIndex + 1 < questions.length) {
         currentIndex++;
         renderQuestion(currentIndex);
       } else {
+        // Quiz complete - all questions answered
+        if (!quizTimedOut) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
         showResult();
       }
     }
 
     function showResult() {
       quizCompleted = true;
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
       questionArea.style.display = 'none';
       resultArea.style.display = 'block';
 
@@ -782,15 +921,24 @@
       progressFill.style.width = '100%';
 
       let msg = '';
-      if (score === total) msg = '🌟 Perfect! You are a true Self Learner.';
-      else if (score >= total * 0.7) msg = '👏 Great job! Keep growing every day.';
-      else if (score >= total * 0.4) msg = '📖 Good effort! Review and try again.';
-      else msg = '💪 Learning is a journey. Restart and improve!';
+      if (quizTimedOut) {
+        msg = '⏰ Time ran out! ' + getScoreMessage(score, total);
+      } else {
+        msg = getScoreMessage(score, total);
+      }
       resultMessage.textContent = msg;
 
       scoreNumber.textContent = score;
       nextBtn.disabled = true;
       renderDots();
+      updateLegendCounts();
+    }
+
+    function getScoreMessage(score, total) {
+      if (score === total) return '🌟 Perfect! You are a true Self Learner.';
+      else if (score >= total * 0.7) return '👏 Great job! Keep growing every day.';
+      else if (score >= total * 0.4) return '📖 Good effort! Review and try again.';
+      else return '💪 Learning is a journey. Keep practicing!';
     }
 
     function renderDots() {
@@ -801,11 +949,10 @@
         dot.className = 'grid-dot';
         dot.textContent = i + 1;
 
-        if (i === currentIndex && !quizCompleted) {
+        if (i === currentIndex && !quizCompleted && !quizTimedOut) {
           dot.classList.add('active');
         }
         
-        // Check if this question has no answer in DB
         if (questions[i] && questions[i].correct === -1) {
           dot.classList.add('no-answer-dot');
         } else if (answerStatus[i] === true) {
@@ -813,35 +960,85 @@
         } else if (answerStatus[i] === false) {
           dot.classList.add('wrong-dot');
         }
+        
+        if (quizTimedOut && answerStatus[i] === null && questions[i] && questions[i].correct !== -1) {
+          dot.classList.add('timeout');
+        }
+        
         dotGrid.appendChild(dot);
       }
     }
 
+    function updateLegendCounts() {
+      let done = 0, active = 0, pending = 0, noAns = 0;
+      const total = questions.length;
+      
+      for (let i = 0; i < total; i++) {
+        if (questions[i] && questions[i].correct === -1) {
+          noAns++;
+        } else if (answerStatus[i] === true || answerStatus[i] === false) {
+          done++;
+        } else if (i === currentIndex && !quizCompleted && !quizTimedOut) {
+          active++;
+        } else {
+          pending++;
+        }
+      }
+      
+      // Adjust if current question has no answer
+      if (questions[currentIndex] && questions[currentIndex].correct === -1) {
+        // No answer questions are counted in noAns, not active
+        const qWithNoAns = questions[currentIndex];
+        if (qWithNoAns && qWithNoAns.correct === -1) {
+          // It's already counted in noAns above, remove from active if it was counted
+          if (active > 0 && currentIndex < total) {
+            // Recalculate more accurately
+            done = 0; active = 0; pending = 0; noAns = 0;
+            for (let i = 0; i < total; i++) {
+              if (questions[i] && questions[i].correct === -1) {
+                noAns++;
+              } else if (answerStatus[i] === true || answerStatus[i] === false) {
+                done++;
+              } else if (i === currentIndex && !quizCompleted && !quizTimedOut) {
+                active++;
+              } else {
+                pending++;
+              }
+            }
+          }
+        }
+      }
+      
+      doneCount.textContent = done;
+      activeCount.textContent = active;
+      pendingCount.textContent = pending;
+      noAnswerCount.textContent = noAns;
+    }
+
     function restartQuiz() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      
       if (questions.length === 0) {
         fetchQuestions();
         return;
       }
-      currentIndex = 0;
-      score = 0;
-      isAnswered = false;
-      quizCompleted = false;
-      answerStatus = new Array(questions.length).fill(null);
-      scoreNumber.textContent = '0';
-      resultArea.style.display = 'none';
-      questionArea.style.display = 'block';
-      renderQuestion(0);
-      nextBtn.disabled = true;
-      progressFill.style.width = '0%';
-      feedbackMessage.textContent = '✨ Select an answer';
-      feedbackMessage.style.background = '#f0f4f9';
-      renderDots();
+      
+      startQuiz();
     }
 
     // ----- EVENT LISTENERS -----
     nextBtn.addEventListener('click', goToNext);
-    restartBtn.addEventListener('click', restartQuiz);
     restartFromResult.addEventListener('click', restartQuiz);
+
+    // Keyboard shortcut: Enter key to go to next
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !nextBtn.disabled) {
+        goToNext();
+      }
+    });
 
     // ----- INIT -----
     fetchQuestions();
