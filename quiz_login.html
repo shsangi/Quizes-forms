@@ -736,9 +736,7 @@
         <div class="options-grid" id="optionsContainer"></div>
 
         <div class="action-bar">
-          <div class="feedback-msg" id="feedbackMessage">
-            <span>✨</span> Select an answer
-          </div>
+          <div class="feedback-msg" id="feedbackMessage"></div>
           <div class="nav-group">
             <button class="btn-primary" id="nextBtn" disabled>Next →</button>
           </div>
@@ -789,13 +787,11 @@
       let toastTimeout = null;
 
       function showToast(message, type = 'info', duration = 4000) {
-        // Clear any pending toast removal
         if (toastTimeout) {
           clearTimeout(toastTimeout);
           toastTimeout = null;
         }
 
-        // Remove existing toasts to prevent stacking
         while (toastContainer.firstChild) {
           toastContainer.removeChild(toastContainer.firstChild);
         }
@@ -971,7 +967,6 @@
             loginStatus.textContent = `✅ ${users.length} users loaded`;
             loginBtn.disabled = false;
 
-            // Check for saved session AFTER users are loaded
             checkAndRestoreSession();
           })
           .catch(err => {
@@ -1032,7 +1027,6 @@
         const session = loadSession();
         if (!session || !session.user) return;
 
-        // Verify user exists
         const userExists = users.some(u => 
           u.email.toLowerCase() === session.user.email.toLowerCase()
         );
@@ -1041,7 +1035,6 @@
           return;
         }
 
-        // Restore session silently without toasts
         loggedInUser = session.user;
         questions = session.questions || [];
         currentIndex = session.currentIndex || 0;
@@ -1054,26 +1047,21 @@
         quizTitleText = session.quizTitleText || 'Quiz';
         sessionRestored = true;
 
-        // Switch to quiz screen immediately
         loginScreen.style.display = 'none';
         quizScreen.style.display = 'block';
         updateUserBadge(loggedInUser);
         sessionBadge.textContent = '↻ Restored';
 
         if (quizCompleted) {
-          // Show result if quiz was already completed
           showResult();
           showToast(`📊 Quiz completed: ${score}/${totalQuestions}`, 'info', 3000);
           return;
         }
 
         if (questions.length > 0 && totalQuestions > 0) {
-          // Restore the quiz state
           restoreQuiz();
-          // Single toast notification
           showToast(`↻ Resumed: Question ${currentIndex + 1} of ${totalQuestions}`, 'info', 2500);
         } else {
-          // Need to fetch questions
           fetchQuizQuestions();
         }
       }
@@ -1096,17 +1084,14 @@
         quizTitle.textContent = quizTitleText;
         quizSubtitle.textContent = 'Self Learners';
         
-        // Restore timer
         if (timeRemaining > 0 && !quizCompleted) {
           updateTimerDisplay();
           startTimerFrom(timeRemaining);
         }
 
-        // Restore progress
         const progressPercent = totalQuestions > 0 ? (currentIndex / totalQuestions) * 100 : 0;
         progressFill.style.width = progressPercent + '%';
 
-        // Render the current question
         if (currentIndex < questions.length) {
           renderQuestion(currentIndex);
         } else {
@@ -1150,7 +1135,7 @@
 
       function fetchQuizQuestions() {
         questionText.textContent = '📥 Fetching questions...';
-        feedbackMessage.innerHTML = '<span>⏳</span> Loading...';
+        feedbackMessage.innerHTML = '';
 
         fetch(QUIZ_CSV_URL)
           .then(response => {
@@ -1164,7 +1149,6 @@
             quizTitleText = parsed.title || 'Quiz';
             totalQuestions = questions.length;
             
-            // Only reset if not restoring a session
             if (!sessionRestored) {
               answerStatus = new Array(totalQuestions).fill(null);
               currentIndex = 0;
@@ -1172,7 +1156,6 @@
               quizCompleted = false;
               quizTimedOut = false;
             } else {
-              // Ensure answerStatus matches questions length
               while (answerStatus.length < totalQuestions) {
                 answerStatus.push(null);
               }
@@ -1185,7 +1168,7 @@
           .catch(err => {
             console.error('Quiz load error:', err);
             questionText.textContent = '❌ Failed to load questions.';
-            feedbackMessage.innerHTML = '<span>❌</span> Error loading questions';
+            feedbackMessage.innerHTML = '';
             showToast('❌ Failed to load quiz questions.', 'error', 4000);
           });
       }
@@ -1292,7 +1275,7 @@
         quizTimedOut = true;
         quizCompleted = true;
         document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-        feedbackMessage.innerHTML = '<span>⏰</span> Time is up! Quiz submitted.';
+        feedbackMessage.innerHTML = '⏰ Time is up! Quiz submitted.';
         feedbackMessage.style.background = '#fff3cd';
         nextBtn.disabled = true;
         showToast('⏰ Time is up! Quiz submitted.', 'warning', 3000);
@@ -1309,7 +1292,6 @@
         quizTitle.textContent = quizTitleText;
         quizSubtitle.textContent = 'Self Learners';
 
-        // If session was restored, don't reset everything
         if (!sessionRestored) {
           currentIndex = 0;
           score = 0;
@@ -1377,7 +1359,7 @@
           }
         } else {
           if (!quizTimedOut && !quizCompleted) {
-            feedbackMessage.innerHTML = '<span>✨</span> Select an answer';
+            feedbackMessage.innerHTML = '';
             feedbackMessage.style.background = '#f0f4f9';
           }
         }
@@ -1417,7 +1399,7 @@
 
         if (isCorrect) {
           score += 1;
-          feedbackMessage.innerHTML = '<span>✅</span> Correct! +1 point';
+          feedbackMessage.innerHTML = '✅ Correct! +1 point';
           feedbackMessage.style.background = '#d4edda';
           answerStatus[currentIndex] = true;
         } else {
@@ -1586,7 +1568,6 @@
         }
       });
 
-      // Save session before page unload
       window.addEventListener('beforeunload', function() {
         if (loggedInUser && !quizCompleted) {
           saveSession();
