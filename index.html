@@ -60,20 +60,6 @@
       display: block !important;
     }
 
-    .brand-logo-fallback {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-
     .brand-title {
       display: flex;
       flex-direction: column;
@@ -489,7 +475,6 @@
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
-      .brand-logo-fallback { width: 36px; height: 36px; font-size: 1rem; }
       .brand-title h1 { font-size: 1.2rem; }
       .question-text { font-size: 1.1rem; min-height: 3.2rem; }
       .option-btn { padding: 0.6rem 1rem; font-size: 0.9rem; }
@@ -508,7 +493,7 @@
   <!-- header -->
   <div class="top-bar">
     <div class="brand">
-      <!-- Logo with fallback - using a data URI placeholder that works -->
+      <!-- Logo with fallback -->
       <img class="brand-logo" id="brandLogo" 
            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
            alt="Self Learners Logo"
@@ -577,7 +562,7 @@
     // ----- CONFIGURATION -----
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
     
-    // Your actual logo from Google Drive - using the correct direct download URL
+    // Your actual logo from Google Drive
     const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
 
     // ----- STATE -----
@@ -671,16 +656,16 @@
       let title = 'Quiz';
       const result = [];
 
-      // Try to read title from C2 (row 2, column C = index 2)
-      if (lines.length > 1) {
-        const secondRow = parseCSVLine(lines[1]);
-        if (secondRow.length > 2 && secondRow[2]) {
-          title = secondRow[2].trim() || 'Quiz';
+      // Try to read title from C1 (row 1, column C = index 2)
+      if (lines.length > 0) {
+        const firstRow = parseCSVLine(lines[0]);
+        if (firstRow.length > 2 && firstRow[2]) {
+          title = firstRow[2].trim() || 'Quiz';
         }
       }
 
-      // Start from row 3 (index 2) for actual questions
-      const startRow = Math.min(2, lines.length - 1);
+      // Start from row 2 (index 1) for actual questions (since row 1 is header/title)
+      const startRow = Math.min(1, lines.length - 1);
       
       for (let i = startRow; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
@@ -801,7 +786,7 @@
         return;
       }
 
-      // Update title from C2
+      // Update title from C1
       quizTitle.textContent = quizTitleText;
       quizSubtitle.textContent = 'Self Learners';
 
