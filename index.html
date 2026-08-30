@@ -558,9 +558,8 @@
     // ----- CONFIGURATION -----
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
     
-    // Your logo from Google Drive (replace with your actual shareable link)
-    // Make sure the link is publicly accessible
-    const LOGO_URL = 'https://drive.google.com/uc?export=view&id=YOUR_LOGO_FILE_ID';
+    // Your logo from Google Drive (direct download link)
+    const LOGO_URL = 'https://drive.google.com/uc?export=view&id=1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
 
     // ----- STATE -----
     let questions = [];
@@ -600,12 +599,8 @@
     const brandLogo = document.getElementById('brandLogo');
 
     // Set logo
-    if (LOGO_URL && LOGO_URL.includes('YOUR_LOGO_FILE_ID')) {
-      // If logo ID not set, hide the logo element
-      brandLogo.style.display = 'none';
-    } else {
-      brandLogo.src = LOGO_URL;
-    }
+    brandLogo.src = LOGO_URL;
+    brandLogo.alt = 'Self Learners Logo';
 
     // ----- FETCH & PARSE CSV -----
     function fetchQuestions() {
@@ -621,7 +616,7 @@
         })
         .then(csvText => {
           const parsed = parseCSV(csvText);
-          if (parsed.length === 0) {
+          if (parsed.questions.length === 0) {
             throw new Error('No data found in CSV');
           }
           questions = parsed.questions;
