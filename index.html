@@ -477,7 +477,6 @@
     const allAtOnceView = document.getElementById('allAtOnceView');
     const submittedBanner = document.getElementById('submittedBanner');
 
-    // Helper function to get actual attempted count
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
     }
@@ -670,6 +669,9 @@
         startTimer();
       }
       saveState();
+      
+      // Scroll to top when quiz starts
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function updateProgress() {
@@ -848,7 +850,6 @@
       finalScore.textContent = `${score} / ${total}`;
       progressFill.style.width = '100%';
       
-      // Show actual attempted count, not total
       const attempted = getAttemptedCount();
       attemptedCount.textContent = attempted;
       
@@ -973,7 +974,22 @@
       endQuizBtn.disabled = false;
       correctLegend.style.display = 'none';
       wrongLegend.style.display = 'none';
-      startQuiz();
+      
+      // Render everything first
+      totalCount.textContent = totalQuestions;
+      renderAllQuestions();
+      updateProgress();
+      renderDots();
+      updateOverview();
+      
+      // Start timer fresh
+      if (!quizCompleted && !isSubmitted) {
+        startTimer();
+      }
+      saveState();
+      
+      // Scroll to top smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     submitBtn.addEventListener('click', handleSubmit);
