@@ -103,9 +103,9 @@
       padding-right: 0.5rem;
       scroll-behavior: smooth;
     }
-    .all-questions-container::-webkit-scrollbar { width: 6px; }
-    .all-questions-container::-webkit-scrollbar-track { background: #e6edf5; border-radius: 10px; }
-    .all-questions-container::-webkit-scrollbar-thumb { background: #8aacbf; border-radius: 10px; }
+    /* Hide scrollbar but keep functionality */
+    .all-questions-container::-webkit-scrollbar { width: 0; background: transparent; }
+    .all-questions-container { scrollbar-width: none; -ms-overflow-style: none; }
 
     .all-q-item {
       background: #fafcfe;
@@ -209,22 +209,6 @@
     .btn-primary:hover:not(:disabled) { background: #1a4b62; transform: scale(1.02); }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .btn-secondary {
-      background: #6c8a9e;
-      border: none;
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 0.7rem 2.2rem;
-      border-radius: 60px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      transition: 0.15s;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-    .btn-secondary:hover:not(:disabled) { background: #5a7a8e; transform: scale(1.02); }
-    .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
     .btn-success {
       background: #1f8b4c;
       border: none;
@@ -325,6 +309,10 @@
       overflow-y: auto;
       padding-right: 0.5rem;
     }
+    .result-details::-webkit-scrollbar { width: 6px; }
+    .result-details::-webkit-scrollbar-track { background: #e6edf5; border-radius: 10px; }
+    .result-details::-webkit-scrollbar-thumb { background: #8aacbf; border-radius: 10px; }
+
     .result-details .detail-item {
       background: #fafcfe;
       border: 1px solid #e2eaf2;
@@ -370,7 +358,7 @@
       .timer-line { font-size: 0.8rem; }
       .result-details { max-height: 300px; }
       .action-bar { flex-direction: column; }
-      .btn-primary, .btn-secondary, .btn-success { width: 100%; justify-content: center; }
+      .btn-primary, .btn-success { width: 100%; justify-content: center; }
       .all-questions-container { max-height: 400px; }
     }
   </style>
@@ -654,10 +642,8 @@
       const items = allQuestionsContainer.querySelectorAll('.all-q-item');
       if (items[index]) {
         items[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Highlight effect
         items[index].classList.remove('highlight');
         setTimeout(() => items[index].classList.add('highlight'), 50);
-        // Update active dot
         renderDots(index);
       }
     }
