@@ -451,10 +451,8 @@
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
-    let attemptedQuestions = []; // Track which questions were actually attempted
 
     const progressFill = document.getElementById('progressFill');
-    const progressLabel = document.getElementById('progressLabel');
     const attemptedCount = document.getElementById('attemptedCount');
     const totalCount = document.getElementById('totalCount');
     const timerDisplay = document.getElementById('timerDisplay');
@@ -499,8 +497,7 @@
           score: score,
           timeRemaining: timeRemaining,
           quizTitleText: quizTitleText,
-          totalQuestions: totalQuestions,
-          attemptedQuestions: attemptedQuestions
+          totalQuestions: totalQuestions
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -534,12 +531,16 @@
         quizTimedOut = saved.quizTimedOut || false;
         score = saved.score || 0;
         timeRemaining = saved.timeRemaining || (totalQuestions * 60);
-        attemptedQuestions = saved.attemptedQuestions || new Array(questions.length).fill(false);
         
+        // Restore UI state immediately
         quizTitle.textContent = quizTitleText;
         totalCount.textContent = totalQuestions;
         
+        // Restore timer display
+        updateTimerDisplay();
+        
         if (quizCompleted) {
+          // If quiz was completed, show result screen
           renderAllQuestions();
           updateProgress();
           renderDots();
@@ -547,10 +548,13 @@
           showResult();
           return;
         }
+        
+        // Otherwise start the quiz with restored state
         startQuiz();
         return;
       }
 
+      // Fetch from CSV if no saved state
       fetch(CSV_URL)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(csvText => {
@@ -561,11 +565,11 @@
           totalQuestions = questions.length;
           answerStatus = new Array(questions.length).fill(null);
           selectedAllAnswers = new Array(questions.length).fill(null);
-          attemptedQuestions = new Array(questions.length).fill(false);
           isSubmitted = false;
           quizCompleted = false;
           quizTimedOut = false;
           score = 0;
+          timeRemaining = totalQuestions * 60;
           clearState();
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
@@ -670,8 +674,7 @@
     }
 
     function updateProgress() {
-      // Count only actually attempted questions (where user clicked an answer)
-      const answered = attemptedQuestions.filter(a => a === true).length;
+      const answered = selectedAllAnswers.filter(a => a !== null).length;
       attemptedCount.textContent = answered;
       const pct = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
       progressFill.style.width = `${pct}%`;
@@ -700,6 +703,7 @@
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
         
+        // Restore correct/wrong styling if already graded
         if (isSubmitted || quizCompleted) {
           if (q.correct !== -1) {
             if (answerStatus[idx] === true) div.classList.add('correct-item');
@@ -743,7 +747,6 @@
               btns.forEach(b => b.classList.remove('selected-opt'));
               this.classList.add('selected-opt');
               selectedAllAnswers[idx] = optIdx;
-              attemptedQuestions[idx] = true; // Mark as attempted
               updateProgress();
               renderDots();
               updateOverview();
@@ -846,8 +849,7 @@
       const total = questions.length;
       finalScore.textContent = `${score} / ${total}`;
       progressFill.style.width = '100%';
-      const answered = attemptedQuestions.filter(a => a === true).length;
-      attemptedCount.textContent = answered;
+      attemptedCount.textContent = total;
       let msg = quizTimedOut ? '⏰ Time ran out! ' + getScoreMsg(score,total) : getScoreMsg(score,total);
       resultMessage.textContent = msg;
 
@@ -903,7 +905,6 @@
         dot.textContent = i + 1;
         const q = questions[i];
         const hasAnswer = selectedAllAnswers[i] !== null;
-        const wasAttempted = attemptedQuestions[i] === true;
         
         if (isSubmitted || quizCompleted) {
           if (q && q.correct === -1) dot.classList.add('no-answer-dot');
@@ -911,7 +912,7 @@
           else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
           else if (q && q.correct !== -1) dot.classList.add('timeout');
         } else {
-          if (wasAttempted) dot.classList.add('done-dot');
+          if (hasAnswer) dot.classList.add('done-dot');
         }
         
         if (activeIndex !== undefined && i === activeIndex) {
@@ -930,7 +931,7 @@
       let done = 0, pending = 0, correct = 0, wrong = 0;
       const total = questions.length;
       for (let i = 0; i < total; i++) {
-        if (attemptedQuestions[i] === true) done++;
+        if (selectedAllAnswers[i] !== null) done++;
         else pending++;
         if (isSubmitted || quizCompleted) {
           if (answerStatus[i] === true) correct++;
@@ -956,7 +957,6 @@
       clearState();
       selectedAllAnswers = new Array(questions.length).fill(null);
       answerStatus = new Array(questions.length).fill(null);
-      attemptedQuestions = new Array(questions.length).fill(false);
       isSubmitted = false;
       quizCompleted = false;
       quizTimedOut = false;
