@@ -503,6 +503,36 @@
       transform: none;
       box-shadow: none;
     }
+    .quiz-wrapper .btn-secondary {
+      background: transparent;
+      border: 2px solid #dce6ef;
+      color: #1f4d66;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.5rem 1.6rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .quiz-wrapper .btn-secondary:hover {
+      background: #f0f4f9;
+      border-color: #b0c8d8;
+    }
+    .quiz-wrapper .btn-danger {
+      background: transparent;
+      border: 2px solid #dc3545;
+      color: #dc3545;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.5rem 1.6rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .quiz-wrapper .btn-danger:hover {
+      background: #dc3545;
+      color: white;
+    }
 
     .quiz-wrapper .overview-section {
       margin-top: 1.2rem;
@@ -630,6 +660,12 @@
       font-size: 1.1rem;
       margin: 0.2rem 0 1.6rem;
     }
+    .quiz-wrapper .result-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
     /* ---------- RESPONSIVE ---------- */
     @media (max-width: 600px) {
@@ -651,6 +687,7 @@
       .toast-container { top: 0.8rem; right: 0.8rem; max-width: calc(100% - 1.6rem); }
       .quiz-wrapper .session-restore { display: none; }
       .quiz-wrapper .feedback-msg { min-height: auto; padding: 0.3rem 1rem; }
+      .quiz-wrapper .result-actions { flex-direction: column; align-items: center; }
     }
 
     /* ---------- SCROLLBAR ---------- */
@@ -767,7 +804,10 @@
         <h2>Quiz Complete!</h2>
         <div class="result-score" id="finalScore">0 / 0</div>
         <p class="result-msg" id="resultMessage">Keep learning, Self Learner!</p>
-        <button class="btn-primary" id="restartFromResult">⟳ Try Again</button>
+        <div class="result-actions">
+          <button class="btn-primary" id="restartFromResult">⟳ Try Again</button>
+          <button class="btn-danger" id="logoutBtn">🚪 Logout</button>
+        </div>
       </div>
     </div>
   </div>
@@ -858,6 +898,7 @@
       const feedbackMessage = document.getElementById('feedbackMessage');
       const nextBtn = document.getElementById('nextBtn');
       const restartFromResult = document.getElementById('restartFromResult');
+      const logoutBtn = document.getElementById('logoutBtn');
       const questionArea = document.getElementById('questionArea');
       const resultArea = document.getElementById('resultArea');
       const finalScore = document.getElementById('finalScore');
@@ -957,7 +998,7 @@
       let sessionRestored = false;
 
       function fetchUsers() {
-        loginStatus.textContent = '⏳ Loading user data...';
+        loginStatus.textContent = '⏳ Loading...';
         loginBtn.disabled = true;
 
         fetch(LOGIN_CSV_URL)
@@ -968,7 +1009,7 @@
           .then(csvText => {
             users = parseLoginCSV(csvText);
             isLoadingUsers = false;
-            loginStatus.textContent = `✅ ${users.length} users loaded`;
+            loginStatus.textContent = '🔐 Sign in to continue';
             loginBtn.disabled = false;
 
             checkAndRestoreSession();
@@ -1025,7 +1066,32 @@
       }
 
       // --------------------------------------------------------------
-      // 9. SESSION RESTORE
+      // 9. LOGOUT FUNCTION
+      // --------------------------------------------------------------
+      function handleLogout() {
+        clearSession();
+        sessionRestored = false;
+        loggedInUser = null;
+        quizCompleted = false;
+        questions = [];
+        currentIndex = 0;
+        score = 0;
+        answerStatus = [];
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        // Reset UI
+        quizScreen.style.display = 'none';
+        loginScreen.style.display = 'block';
+        loginStatus.textContent = '🔐 Sign in to continue';
+        emailInput.value = '';
+        passwordInput.value = '';
+        showToast('👋 Logged out successfully.', 'info', 2500);
+      }
+
+      // --------------------------------------------------------------
+      // 10. SESSION RESTORE
       // --------------------------------------------------------------
       function checkAndRestoreSession() {
         const session = loadSession();
@@ -1123,7 +1189,7 @@
       }
 
       // --------------------------------------------------------------
-      // 10. QUIZ SYSTEM
+      // 11. QUIZ SYSTEM
       // --------------------------------------------------------------
       let questions = [];
       let currentIndex = 0;
@@ -1137,7 +1203,6 @@
       let totalQuestions = 0;
       let quizTitleText = 'Quiz';
 
-      // Helper to show feedback message
       function showFeedback(message, type = 'info') {
         feedbackMessage.textContent = message;
         feedbackMessage.className = 'feedback-msg visible';
@@ -1422,7 +1487,6 @@
           answerStatus[currentIndex] = false;
         }
 
-        // Hide feedback after answering
         hideFeedback();
 
         isAnswered = true;
@@ -1565,7 +1629,7 @@
       }
 
       // --------------------------------------------------------------
-      // 11. EVENT LISTENERS
+      // 12. EVENT LISTENERS
       // --------------------------------------------------------------
       loginBtn.addEventListener('click', handleLogin);
 
@@ -1580,6 +1644,7 @@
 
       nextBtn.addEventListener('click', goToNext);
       restartFromResult.addEventListener('click', restartQuiz);
+      logoutBtn.addEventListener('click', handleLogout);
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !nextBtn.disabled && quizScreen.style.display !== 'none') {
@@ -1594,7 +1659,7 @@
       });
 
       // --------------------------------------------------------------
-      // 12. INIT
+      // 13. INIT
       // --------------------------------------------------------------
       fetchUsers();
     })();
