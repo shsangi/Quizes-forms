@@ -160,7 +160,22 @@
       padding: 1rem 1.2rem;
       transition: 0.1s;
       scroll-margin-top: 80px;
+      cursor: pointer;
     }
+    .all-q-item:hover {
+      border-color: #6fa6c7;
+      box-shadow: 0 2px 8px rgba(47, 123, 158, 0.08);
+    }
+    .all-q-item .click-hint {
+      font-size: 0.7rem;
+      color: #8aacbf;
+      font-weight: 400;
+      display: block;
+      margin-top: 0.4rem;
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+    .all-q-item:hover .click-hint { opacity: 1; color: #2f7b9e; }
     .all-q-item.correct-item { border-color: #1f8b4c; background: #f0faf4; }
     .all-q-item.wrong-item { border-color: #b33c3c; background: #fdf2f2; }
     .all-q-item.highlight {
@@ -176,11 +191,13 @@
       font-size: 1.05rem;
       margin-bottom: 0.6rem;
       color: #0a212b;
+      pointer-events: none;
     }
     .all-q-options {
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
+      pointer-events: auto;
     }
     .all-q-options .option-btn {
       background: white;
@@ -451,6 +468,21 @@
     }
     .modal-actions .btn-secondary:hover { background: #c8d4df; }
 
+    .search-badge {
+      display: inline-block;
+      background: #eaf1f8;
+      color: #1f4d66;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.1rem 0.6rem;
+      border-radius: 30px;
+      margin-left: 0.5rem;
+      opacity: 0.6;
+      transition: 0.2s;
+      pointer-events: none;
+    }
+    .all-q-item:hover .search-badge { opacity: 1; background: #d4e3f0; }
+
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
@@ -650,6 +682,15 @@
       refreshBtn.disabled = false;
       refreshIcon.textContent = '🔄';
       refreshIcon.classList.remove('refresh-spin');
+    }
+
+    // --- Google Search function ---
+    function searchQuestionOnGoogle(questionText, event) {
+      if (event) event.stopPropagation();
+      // Encode the question text for URL
+      const encodedQuery = encodeURIComponent(questionText);
+      // Open in new tab
+      window.open(`https://www.google.com/search?q=${encodedQuery}`, '_blank');
     }
 
     function fetchQuestions(forceRefresh = false) {
@@ -873,6 +914,13 @@
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
         
+        // Click on question card to search on Google
+        div.addEventListener('click', function(e) {
+          // Don't trigger if click is on an option button
+          if (e.target.closest('.option-btn')) return;
+          searchQuestionOnGoogle(q.question, e);
+        });
+        
         if (isSubmitted || quizCompleted) {
           if (q.correct !== -1) {
             if (answerStatus[idx] === true) div.classList.add('correct-item');
@@ -882,8 +930,9 @@
         
         const qText = document.createElement('div');
         qText.className = 'all-q-text';
-        qText.textContent = `${idx+1}. ${q.question}`;
+        qText.innerHTML = `${idx+1}. ${q.question} <span class="search-badge">🔍 search</span>`;
         div.appendChild(qText);
+        
         const optsDiv = document.createElement('div');
         optsDiv.className = 'all-q-options';
         q.options.forEach((opt, optIdx) => {
@@ -910,6 +959,7 @@
             }
           } else {
             btn.addEventListener('click', function(e) {
+              e.stopPropagation(); // Prevent search on question click
               if (isSubmitted || quizCompleted) return;
               const parent = this.closest('.all-q-item');
               const btns = parent.querySelectorAll('.option-btn');
