@@ -117,6 +117,25 @@
       font-weight: 700;
     }
 
+    .refresh-bar {
+      text-align: right;
+      margin-bottom: 0.5rem;
+      font-size: 0.75rem;
+    }
+    .refresh-btn {
+      background: none;
+      border: none;
+      color: #6c8a9e;
+      cursor: pointer;
+      font-size: 0.75rem;
+      text-decoration: underline;
+      font-weight: 500;
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+      transition: 0.15s;
+    }
+    .refresh-btn:hover { background: #e6edf5; color: #0b2a3b; }
+
     .all-questions-container {
       display: flex;
       flex-direction: column;
@@ -359,6 +378,24 @@
       color: #1f8b4c;
     }
 
+    .loading-spinner {
+      text-align: center;
+      padding: 2rem;
+      color: #1f4d66;
+      font-weight: 500;
+    }
+    .loading-spinner .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #e6edf5;
+      border-top: 3px solid #2f7b9e;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 0.5rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
@@ -392,6 +429,10 @@
   <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
 
   <div id="quizContent">
+    <div class="refresh-bar">
+      <button class="refresh-btn" id="refreshBtn">🔄 Refresh Questions from Sheet</button>
+    </div>
+
     <div class="progress-block">
       <div class="progress-fill" id="progressFill" style="width:0%;"></div>
     </div>
@@ -442,20 +483,7 @@
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
     const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
     const STORAGE_KEY = 'selfLearnersQuizData';
-
-    // ============================================================
-    // Your Google Sheet should have the following columns:
-    // Column A: (optional) ID or timestamp
-    // Column B: (optional) Category
-    // Column C: Quiz Title (will be used as the quiz name)
-    // Column D: (optional) unused
-    // Column E: Question text
-    // Column F: Option A
-    // Column G: Option B
-    // Column H: Option C
-    // Column I: Option D
-    // Column J: Correct answer (must exactly match one of the options)
-    // ============================================================
+    const CACHE_VERSION_KEY = 'selfLearnersCacheVersion';
 
     let questions = [];
     let score = 0;
@@ -493,6 +521,7 @@
     const brandLogo = document.getElementById('brandLogo');
     const allAtOnceView = document.getElementById('allAtOnceView');
     const submittedBanner = document.getElementById('submittedBanner');
+    const refreshBtn = document.getElementById('refreshBtn');
 
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
@@ -506,6 +535,19 @@
     }
     loadLogo();
 
+    function getCacheVersion() {
+      return localStorage.getItem(CACHE_VERSION_KEY) || '1';
+    }
+
+    function setCacheVersion(version) {
+      localStorage.setItem(CACHE_VERSION_KEY, version);
+    }
+
+    function incrementCacheVersion() {
+      const current = parseInt(getCacheVersion()) || 1;
+      setCacheVersion(String(current + 1));
+    }
+
     function saveState() {
       try {
         const state = {
@@ -518,7 +560,8 @@
           score: score,
           timeRemaining: timeRemaining,
           quizTitleText: quizTitleText,
-          totalQuestions: totalQuestions
+          totalQuestions: totalQuestions,
+          cacheVersion: getCacheVersion()
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -530,6 +573,14 @@
         if (!raw) return null;
         const state = JSON.parse(raw);
         if (!state.questions || state.questions.length === 0) return null;
+        // Check cache version - if mismatch, don't load cached data
+        const savedVersion = state.cacheVersion || '0';
+        const currentVersion = getCacheVersion();
+        if (savedVersion !== currentVersion) {
+          console.log('Cache version mismatch, loading fresh from sheet');
+          localStorage.removeItem(STORAGE_KEY);
+          return null;
+        }
         return state;
       } catch (e) { return null; }
     }
@@ -541,40 +592,58 @@
     // ============================================================
     // FETCH QUESTIONS FROM GOOGLE SHEETS CSV
     // ============================================================
-    function fetchQuestions() {
+    function fetchQuestions(forceRefresh = false) {
+      // If force refresh, increment cache version to invalidate old cache
+      if (forceRefresh) {
+        incrementCacheVersion();
+        clearState();
+        // Also clear any cached data
+        console.log('Force refresh: Cache cleared, fetching fresh data');
+      }
+
       quizTitle.textContent = 'Loading...';
-      const saved = loadState();
-      if (saved && saved.questions && saved.questions.length > 0) {
-        questions = saved.questions;
-        quizTitleText = saved.quizTitleText || 'Quiz';
-        totalQuestions = saved.totalQuestions || questions.length;
-        selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
-        answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
-        isSubmitted = saved.isSubmitted || false;
-        quizCompleted = saved.quizCompleted || false;
-        quizTimedOut = saved.quizTimedOut || false;
-        score = saved.score || 0;
-        timeRemaining = saved.timeRemaining || (totalQuestions * 60);
-        
-        quizTitle.textContent = quizTitleText;
-        totalCount.textContent = totalQuestions;
-        updateTimerDisplay();
-        
-        if (quizCompleted) {
-          renderAllQuestions();
-          updateProgress();
-          renderDots();
-          updateOverview();
-          showResult();
+      allQuestionsContainer.innerHTML = `
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <div>Loading questions from Google Sheet...</div>
+        </div>
+      `;
+
+      // Only load from cache if not forcing refresh
+      if (!forceRefresh) {
+        const saved = loadState();
+        if (saved && saved.questions && saved.questions.length > 0) {
+          questions = saved.questions;
+          quizTitleText = saved.quizTitleText || 'Quiz';
+          totalQuestions = saved.totalQuestions || questions.length;
+          selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
+          answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
+          isSubmitted = saved.isSubmitted || false;
+          quizCompleted = saved.quizCompleted || false;
+          quizTimedOut = saved.quizTimedOut || false;
+          score = saved.score || 0;
+          timeRemaining = saved.timeRemaining || (totalQuestions * 60);
+          
+          quizTitle.textContent = quizTitleText;
+          totalCount.textContent = totalQuestions;
+          updateTimerDisplay();
+          
+          if (quizCompleted) {
+            renderAllQuestions();
+            updateProgress();
+            renderDots();
+            updateOverview();
+            showResult();
+            return;
+          }
+          
+          startQuiz();
           return;
         }
-        
-        startQuiz();
-        return;
       }
 
       // Fetch from Google Sheets CSV
-      fetch(CSV_URL)
+      fetch(CSV_URL + '&t=' + Date.now()) // Add timestamp to bypass cache
         .then(r => { 
           if (!r.ok) throw new Error(`HTTP ${r.status}`); 
           return r.text(); 
@@ -592,7 +661,9 @@
           quizTimedOut = false;
           score = 0;
           timeRemaining = totalQuestions * 60;
+          // Clear old state and save new one with current cache version
           clearState();
+          saveState();
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
           startQuiz();
@@ -622,14 +693,12 @@
       if (lines.length < 2) return { questions: [], title: 'Quiz' };
       
       let title = 'Quiz';
-      // Try to read title from Row 1, Column C (index 2)
       if (lines.length > 0) {
         const firstRow = parseCSVLine(lines[0]);
         if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'Quiz';
       }
 
       const result = [];
-      // Start from row 2 (index 1) for actual questions
       const startRow = Math.min(1, lines.length - 1);
       
       for (let i = startRow; i < lines.length; i++) {
@@ -1071,11 +1140,40 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // ============================================================
+    // REFRESH BUTTON - Force reload from Google Sheet
+    // ============================================================
+    function refreshQuestions() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      // Reset all state
+      selectedAllAnswers = new Array(questions.length).fill(null);
+      answerStatus = new Array(questions.length).fill(null);
+      isSubmitted = false;
+      quizCompleted = false;
+      quizTimedOut = false;
+      score = 0;
+      timeRemaining = totalQuestions * 60;
+      resultArea.style.display = 'none';
+      allAtOnceView.style.display = 'block';
+      submittedBanner.style.display = 'none';
+      submitBtn.textContent = '✅ Submit';
+      submitBtn.disabled = true;
+      endQuizBtn.textContent = '🏁 End Quiz';
+      endQuizBtn.disabled = true;
+      correctLegend.style.display = 'none';
+      wrongLegend.style.display = 'none';
+      
+      // Force fetch fresh data
+      fetchQuestions(true);
+    }
+
     submitBtn.addEventListener('click', handleSubmit);
     endQuizBtn.addEventListener('click', handleEndQuiz);
     restartFromResult.addEventListener('click', restartQuiz);
+    refreshBtn.addEventListener('click', refreshQuestions);
 
-    fetchQuestions();
+    // Initial load
+    fetchQuestions(false);
   })();
 </script>
 </body>
