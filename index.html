@@ -117,25 +117,6 @@
       font-weight: 700;
     }
 
-    .refresh-bar {
-      text-align: right;
-      margin-bottom: 0.5rem;
-      font-size: 0.75rem;
-    }
-    .refresh-btn {
-      background: none;
-      border: none;
-      color: #6c8a9e;
-      cursor: pointer;
-      font-size: 0.75rem;
-      text-decoration: underline;
-      font-weight: 500;
-      padding: 0.2rem 0.5rem;
-      border-radius: 20px;
-      transition: 0.15s;
-    }
-    .refresh-btn:hover { background: #e6edf5; color: #0b2a3b; }
-
     .all-questions-container {
       display: flex;
       flex-direction: column;
@@ -261,6 +242,25 @@
     .btn-success:hover:not(:disabled) { background: #167a3e; transform: scale(1.02); }
     .btn-success:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
+    .btn-refresh {
+      background: #6c8a9e;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: 0.15s;
+      border: 1px solid rgba(255,255,255,0.06);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-refresh:hover:not(:disabled) { background: #5a7a8e; transform: scale(1.02); }
+    .btn-refresh:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
     .overview-section {
       margin-top: 1.2rem;
       border-top: 1px solid #e2eaf2;
@@ -378,23 +378,74 @@
       color: #1f8b4c;
     }
 
-    .loading-spinner {
-      text-align: center;
-      padding: 2rem;
-      color: #1f4d66;
-      font-weight: 500;
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
     }
-    .loading-spinner .spinner {
-      display: inline-block;
-      width: 30px;
-      height: 30px;
-      border: 3px solid #e6edf5;
-      border-top: 3px solid #2f7b9e;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: white;
+      max-width: 440px;
+      width: 90%;
+      border-radius: 1.5rem;
+      padding: 2rem 1.8rem 1.8rem;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+      animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .modal-box h3 {
+      font-size: 1.3rem;
+      color: #0b2a3b;
       margin-bottom: 0.5rem;
     }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .modal-box p {
+      color: #1f4d66;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .modal-actions .btn-primary {
+      padding: 0.6rem 2rem;
+      font-size: 0.95rem;
+    }
+    .modal-actions .btn-secondary {
+      background: #dce6ef;
+      border: none;
+      color: #1f4d66;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.6rem 2rem;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .modal-actions .btn-secondary:hover { background: #c8d4df; }
+
+    .refresh-icon {
+      display: inline-block;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
 
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
@@ -408,7 +459,8 @@
       .timer-line { font-size: 0.8rem; }
       .result-details { max-height: 300px; }
       .action-bar { flex-direction: column; }
-      .btn-primary, .btn-success { width: 100%; justify-content: center; }
+      .btn-primary, .btn-success, .btn-refresh { width: 100%; justify-content: center; }
+      .modal-box { padding: 1.5rem 1.2rem; }
     }
   </style>
 </head>
@@ -424,15 +476,14 @@
         <span class="subtitle" id="quizSubtitle">Self Learners</span>
       </div>
     </div>
+    <button class="btn-refresh" id="refreshBtn">
+      <span class="refresh-icon">🔄</span> Refresh Quiz
+    </button>
   </div>
 
   <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
 
   <div id="quizContent">
-    <div class="refresh-bar">
-      <button class="refresh-btn" id="refreshBtn">🔄 Refresh Questions from Sheet</button>
-    </div>
-
     <div class="progress-block">
       <div class="progress-fill" id="progressFill" style="width:0%;"></div>
     </div>
@@ -441,7 +492,7 @@
     <!-- All questions view -->
     <div id="allAtOnceView">
       <div id="submittedBanner" style="display:none;" class="submitted-header">
-        ✅ Submitted — Review your answers below. Click "End Quiz" to see your final score.
+        ✅ Submitted — You can review your answers below. Click "End Quiz" to see your final score.
       </div>
       <div id="allQuestionsContainer" class="all-questions-container"></div>
       <div class="action-bar">
@@ -473,17 +524,25 @@
       <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
     </div>
   </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="refreshModal">
+    <div class="modal-box">
+      <h3>🔄 Refresh Quiz</h3>
+      <p>All your current progress will be reset. The quiz will reload the latest questions from the spreadsheet. Are you sure you want to continue?</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn-primary" id="modalConfirm">Yes, Refresh</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
   (function() {
-    // ============================================================
-    // CONFIGURATION — Edit this URL to point to your Google Sheet CSV
-    // ============================================================
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
     const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
     const STORAGE_KEY = 'selfLearnersQuizData';
-    const CACHE_VERSION_KEY = 'selfLearnersCacheVersion';
 
     let questions = [];
     let score = 0;
@@ -496,6 +555,7 @@
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
+    let isLoading = false;
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
@@ -512,6 +572,10 @@
     const resultMessage = document.getElementById('resultMessage');
     const resultDetails = document.getElementById('resultDetails');
     const restartFromResult = document.getElementById('restartFromResult');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const refreshModal = document.getElementById('refreshModal');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalConfirm = document.getElementById('modalConfirm');
     const doneCount = document.getElementById('doneCount');
     const pendingCount = document.getElementById('pendingCount');
     const correctCount = document.getElementById('correctCount');
@@ -521,7 +585,6 @@
     const brandLogo = document.getElementById('brandLogo');
     const allAtOnceView = document.getElementById('allAtOnceView');
     const submittedBanner = document.getElementById('submittedBanner');
-    const refreshBtn = document.getElementById('refreshBtn');
 
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
@@ -535,19 +598,6 @@
     }
     loadLogo();
 
-    function getCacheVersion() {
-      return localStorage.getItem(CACHE_VERSION_KEY) || '1';
-    }
-
-    function setCacheVersion(version) {
-      localStorage.setItem(CACHE_VERSION_KEY, version);
-    }
-
-    function incrementCacheVersion() {
-      const current = parseInt(getCacheVersion()) || 1;
-      setCacheVersion(String(current + 1));
-    }
-
     function saveState() {
       try {
         const state = {
@@ -560,8 +610,7 @@
           score: score,
           timeRemaining: timeRemaining,
           quizTitleText: quizTitleText,
-          totalQuestions: totalQuestions,
-          cacheVersion: getCacheVersion()
+          totalQuestions: totalQuestions
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -573,14 +622,6 @@
         if (!raw) return null;
         const state = JSON.parse(raw);
         if (!state.questions || state.questions.length === 0) return null;
-        // Check cache version - if mismatch, don't load cached data
-        const savedVersion = state.cacheVersion || '0';
-        const currentVersion = getCacheVersion();
-        if (savedVersion !== currentVersion) {
-          console.log('Cache version mismatch, loading fresh from sheet');
-          localStorage.removeItem(STORAGE_KEY);
-          return null;
-        }
         return state;
       } catch (e) { return null; }
     }
@@ -589,27 +630,24 @@
       localStorage.removeItem(STORAGE_KEY);
     }
 
-    // ============================================================
-    // FETCH QUESTIONS FROM GOOGLE SHEETS CSV
-    // ============================================================
-    function fetchQuestions(forceRefresh = false) {
-      // If force refresh, increment cache version to invalidate old cache
-      if (forceRefresh) {
-        incrementCacheVersion();
-        clearState();
-        // Also clear any cached data
-        console.log('Force refresh: Cache cleared, fetching fresh data');
-      }
-
+    // Show loading state
+    function showLoading() {
+      allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;color:#1f4d66;">🔄 Loading questions from spreadsheet...</div>';
       quizTitle.textContent = 'Loading...';
-      allQuestionsContainer.innerHTML = `
-        <div class="loading-spinner">
-          <div class="spinner"></div>
-          <div>Loading questions from Google Sheet...</div>
-        </div>
-      `;
+      submitBtn.disabled = true;
+      endQuizBtn.disabled = true;
+      refreshBtn.disabled = true;
+    }
 
-      // Only load from cache if not forcing refresh
+    // Hide loading state
+    function hideLoading() {
+      refreshBtn.disabled = false;
+    }
+
+    function fetchQuestions(forceRefresh = false) {
+      showLoading();
+      
+      // If not forced, check saved state first
       if (!forceRefresh) {
         const saved = loadState();
         if (saved && saved.questions && saved.questions.length > 0) {
@@ -627,6 +665,7 @@
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
           updateTimerDisplay();
+          hideLoading();
           
           if (quizCompleted) {
             renderAllQuestions();
@@ -642,15 +681,49 @@
         }
       }
 
-      // Fetch from Google Sheets CSV
-      fetch(CSV_URL + '&t=' + Date.now()) // Add timestamp to bypass cache
-        .then(r => { 
-          if (!r.ok) throw new Error(`HTTP ${r.status}`); 
-          return r.text(); 
-        })
+      // Force refresh: clear cache and fetch fresh
+      if (forceRefresh) {
+        clearState();
+        // Add cache-busting parameter
+        const fetchUrl = CSV_URL + '&_t=' + Date.now();
+        fetch(fetchUrl)
+          .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+          .then(csvText => {
+            const parsed = parseCSV(csvText);
+            if (parsed.questions.length === 0) throw new Error('No data');
+            questions = parsed.questions;
+            quizTitleText = parsed.title || 'Quiz';
+            totalQuestions = questions.length;
+            answerStatus = new Array(questions.length).fill(null);
+            selectedAllAnswers = new Array(questions.length).fill(null);
+            isSubmitted = false;
+            quizCompleted = false;
+            quizTimedOut = false;
+            score = 0;
+            timeRemaining = totalQuestions * 60;
+            quizTitle.textContent = quizTitleText;
+            totalCount.textContent = totalQuestions;
+            hideLoading();
+            startQuiz();
+            // Close modal
+            refreshModal.classList.remove('active');
+          })
+          .catch(err => {
+            console.error(err);
+            allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Please try again.</div>`;
+            quizTitle.textContent = 'Error';
+            hideLoading();
+            refreshModal.classList.remove('active');
+          });
+        return;
+      }
+
+      // Normal fetch (first load)
+      fetch(CSV_URL)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(csvText => {
           const parsed = parseCSV(csvText);
-          if (parsed.questions.length === 0) throw new Error('No data found in CSV');
+          if (parsed.questions.length === 0) throw new Error('No data');
           questions = parsed.questions;
           quizTitleText = parsed.title || 'Quiz';
           totalQuestions = questions.length;
@@ -661,116 +734,63 @@
           quizTimedOut = false;
           score = 0;
           timeRemaining = totalQuestions * 60;
-          // Clear old state and save new one with current cache version
           clearState();
-          saveState();
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
+          hideLoading();
           startQuiz();
         })
         .catch(err => {
-          console.error('Error loading questions:', err);
-          allQuestionsContainer.innerHTML = `
-            <div style="padding:2rem;text-align:center;color:#b33c3c;">
-              ❌ Failed to load questions from Google Sheets.<br>
-              <span style="font-size:0.85rem;color:#666;margin-top:0.5rem;display:block;">
-                Make sure your sheet is published and the URL is correct.
-              </span>
-              <button onclick="location.reload()" style="margin-top:1rem;padding:0.5rem 1.5rem;border-radius:60px;border:none;background:#0b2a3b;color:white;cursor:pointer;font-weight:600;">
-                🔄 Retry
-              </button>
-            </div>
-          `;
-          quizTitle.textContent = 'Error Loading Quiz';
+          console.error(err);
+          allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Check CSV link or reload.</div>`;
+          quizTitle.textContent = 'Error';
+          hideLoading();
         });
     }
 
-    // ============================================================
-    // PARSE CSV FROM GOOGLE SHEETS
-    // ============================================================
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim() !== '');
       if (lines.length < 2) return { questions: [], title: 'Quiz' };
-      
       let title = 'Quiz';
       if (lines.length > 0) {
         const firstRow = parseCSVLine(lines[0]);
         if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'Quiz';
       }
-
       const result = [];
       const startRow = Math.min(1, lines.length - 1);
-      
       for (let i = startRow; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 6) continue;
-
-        const question = cols[4] ? cols[4].trim() : '';
-        if (!question) continue;
-
-        const options = [
-          cols[5] ? cols[5].trim() : '',
-          cols[6] ? cols[6].trim() : '',
-          cols[7] ? cols[7].trim() : '',
-          cols[8] ? cols[8].trim() : ''
-        ];
-
-        const correctAnswer = cols[9] ? cols[9].trim() : '';
-
-        let correctIndex = -1;
-        if (correctAnswer) {
-          for (let j = 0; j < options.length; j++) {
-            if (options[j] === correctAnswer) {
-              correctIndex = j;
-              break;
-            }
-          }
-        }
-
-        result.push({
-          question: question,
-          options: options,
-          correct: correctIndex,
-          correctText: correctAnswer || 'No answer in db'
-        });
+        const q = cols[4]?.trim() || '';
+        if (!q) continue;
+        const opts = [ cols[5]?.trim() || '', cols[6]?.trim() || '', cols[7]?.trim() || '', cols[8]?.trim() || '' ];
+        const correctAns = cols[9]?.trim() || '';
+        let correctIdx = -1;
+        if (correctAns) { for (let j=0; j<opts.length; j++) { if (opts[j] === correctAns) { correctIdx = j; break; } } }
+        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns });
       }
-
-      return { questions: result, title: title };
+      return { questions: result, title };
     }
 
     function parseCSVLine(line) {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
+      const res = [];
+      let cur = '', inQuotes = false;
+      for (let i=0; i<line.length; i++) {
         const ch = line[i];
         if (inQuotes) {
-          if (ch === '"' && (i + 1 < line.length && line[i + 1] === '"')) {
-            current += '"';
-            i++;
-          } else if (ch === '"') {
-            inQuotes = false;
-          } else {
-            current += ch;
-          }
+          if (ch === '"' && (i+1 < line.length && line[i+1] === '"')) { cur += '"'; i++; }
+          else if (ch === '"') inQuotes = false;
+          else cur += ch;
         } else {
-          if (ch === '"') {
-            inQuotes = true;
-          } else if (ch === ',') {
-            result.push(current.trim());
-            current = '';
-          } else {
-            current += ch;
-          }
+          if (ch === '"') inQuotes = true;
+          else if (ch === ',') { res.push(cur.trim()); cur = ''; }
+          else cur += ch;
         }
       }
-      result.push(current.trim());
-      return result;
+      res.push(cur.trim());
+      return res;
     }
 
-    // ============================================================
-    // TIMER
-    // ============================================================
     function startTimer() {
       if (timeRemaining <= 0) timeRemaining = totalQuestions * 60;
       updateTimerDisplay();
@@ -803,14 +823,8 @@
       setTimeout(() => showResult(), 600);
     }
 
-    // ============================================================
-    // QUIZ CORE
-    // ============================================================
     function startQuiz() {
-      if (questions.length === 0) { 
-        allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">⚠️ No questions found.</div>'; 
-        return; 
-      }
+      if (questions.length === 0) { allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">⚠️ No questions found.</div>'; return; }
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
       submittedBanner.style.display = 'none';
@@ -1140,39 +1154,37 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ============================================================
-    // REFRESH BUTTON - Force reload from Google Sheet
-    // ============================================================
-    function refreshQuestions() {
+    // Refresh Quiz - show confirmation modal
+    function handleRefreshClick() {
+      refreshModal.classList.add('active');
+    }
+
+    function handleRefreshConfirm() {
+      // Clear everything and fetch fresh
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      // Reset all state
-      selectedAllAnswers = new Array(questions.length).fill(null);
-      answerStatus = new Array(questions.length).fill(null);
-      isSubmitted = false;
-      quizCompleted = false;
-      quizTimedOut = false;
-      score = 0;
-      timeRemaining = totalQuestions * 60;
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
-      submittedBanner.style.display = 'none';
-      submitBtn.textContent = '✅ Submit';
-      submitBtn.disabled = true;
-      endQuizBtn.textContent = '🏁 End Quiz';
-      endQuizBtn.disabled = true;
-      correctLegend.style.display = 'none';
-      wrongLegend.style.display = 'none';
-      
-      // Force fetch fresh data
       fetchQuestions(true);
     }
+
+    function handleRefreshCancel() {
+      refreshModal.classList.remove('active');
+    }
+
+    // Close modal on overlay click
+    refreshModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        refreshModal.classList.remove('active');
+      }
+    });
 
     submitBtn.addEventListener('click', handleSubmit);
     endQuizBtn.addEventListener('click', handleEndQuiz);
     restartFromResult.addEventListener('click', restartQuiz);
-    refreshBtn.addEventListener('click', refreshQuestions);
+    refreshBtn.addEventListener('click', handleRefreshClick);
+    modalConfirm.addEventListener('click', handleRefreshConfirm);
+    modalCancel.addEventListener('click', handleRefreshCancel);
 
-    // Initial load
     fetchQuestions(false);
   })();
 </script>
