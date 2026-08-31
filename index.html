@@ -75,6 +75,35 @@
       text-transform: uppercase;
     }
 
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 0.3rem;
+      border-radius: 50%;
+      transition: 0.15s;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1f4d66;
+    }
+    .btn-icon:hover { background: #eaf1f8; transform: scale(1.05); }
+    .btn-icon:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-icon .refresh-spin {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
     .timer-line {
       text-align: center;
       padding: 0.2rem 0 0.8rem 0;
@@ -241,25 +270,6 @@
     }
     .btn-success:hover:not(:disabled) { background: #167a3e; transform: scale(1.02); }
     .btn-success:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-    .btn-refresh {
-      background: #6c8a9e;
-      border: none;
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 0.7rem 1.5rem;
-      border-radius: 60px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      transition: 0.15s;
-      border: 1px solid rgba(255,255,255,0.06);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .btn-refresh:hover:not(:disabled) { background: #5a7a8e; transform: scale(1.02); }
-    .btn-refresh:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     .overview-section {
       margin-top: 1.2rem;
@@ -441,12 +451,6 @@
     }
     .modal-actions .btn-secondary:hover { background: #c8d4df; }
 
-    .refresh-icon {
-      display: inline-block;
-      font-size: 1.2rem;
-      line-height: 1;
-    }
-
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
@@ -459,7 +463,7 @@
       .timer-line { font-size: 0.8rem; }
       .result-details { max-height: 300px; }
       .action-bar { flex-direction: column; }
-      .btn-primary, .btn-success, .btn-refresh { width: 100%; justify-content: center; }
+      .btn-primary, .btn-success { width: 100%; justify-content: center; }
       .modal-box { padding: 1.5rem 1.2rem; }
     }
   </style>
@@ -476,9 +480,11 @@
         <span class="subtitle" id="quizSubtitle">Self Learners</span>
       </div>
     </div>
-    <button class="btn-refresh" id="refreshBtn">
-      <span class="refresh-icon">🔄</span> Refresh Quiz
-    </button>
+    <div class="top-actions">
+      <button class="btn-icon" id="refreshBtn" title="Refresh Quiz from spreadsheet">
+        <span id="refreshIcon">🔄</span>
+      </button>
+    </div>
   </div>
 
   <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
@@ -555,7 +561,6 @@
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
-    let isLoading = false;
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
@@ -573,6 +578,7 @@
     const resultDetails = document.getElementById('resultDetails');
     const restartFromResult = document.getElementById('restartFromResult');
     const refreshBtn = document.getElementById('refreshBtn');
+    const refreshIcon = document.getElementById('refreshIcon');
     const refreshModal = document.getElementById('refreshModal');
     const modalCancel = document.getElementById('modalCancel');
     const modalConfirm = document.getElementById('modalConfirm');
@@ -630,24 +636,25 @@
       localStorage.removeItem(STORAGE_KEY);
     }
 
-    // Show loading state
     function showLoading() {
       allQuestionsContainer.innerHTML = '<div style="padding:2rem;text-align:center;color:#1f4d66;">🔄 Loading questions from spreadsheet...</div>';
       quizTitle.textContent = 'Loading...';
       submitBtn.disabled = true;
       endQuizBtn.disabled = true;
       refreshBtn.disabled = true;
+      refreshIcon.textContent = '⟳';
+      refreshIcon.classList.add('refresh-spin');
     }
 
-    // Hide loading state
     function hideLoading() {
       refreshBtn.disabled = false;
+      refreshIcon.textContent = '🔄';
+      refreshIcon.classList.remove('refresh-spin');
     }
 
     function fetchQuestions(forceRefresh = false) {
       showLoading();
       
-      // If not forced, check saved state first
       if (!forceRefresh) {
         const saved = loadState();
         if (saved && saved.questions && saved.questions.length > 0) {
@@ -681,10 +688,8 @@
         }
       }
 
-      // Force refresh: clear cache and fetch fresh
       if (forceRefresh) {
         clearState();
-        // Add cache-busting parameter
         const fetchUrl = CSV_URL + '&_t=' + Date.now();
         fetch(fetchUrl)
           .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
@@ -705,7 +710,6 @@
             totalCount.textContent = totalQuestions;
             hideLoading();
             startQuiz();
-            // Close modal
             refreshModal.classList.remove('active');
           })
           .catch(err => {
@@ -718,7 +722,6 @@
         return;
       }
 
-      // Normal fetch (first load)
       fetch(CSV_URL)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(csvText => {
@@ -1154,13 +1157,11 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Refresh Quiz - show confirmation modal
     function handleRefreshClick() {
       refreshModal.classList.add('active');
     }
 
     function handleRefreshConfirm() {
-      // Clear everything and fetch fresh
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
@@ -1171,7 +1172,6 @@
       refreshModal.classList.remove('active');
     }
 
-    // Close modal on overlay click
     refreshModal.addEventListener('click', function(e) {
       if (e.target === this) {
         refreshModal.classList.remove('active');
