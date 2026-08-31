@@ -8,7 +8,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ---------- RESET & BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Inter', sans-serif;
       background: #f0f4f9;
@@ -18,6 +23,8 @@
       justify-content: center;
       padding: 1.2rem;
     }
+
+    /* ---------- TOAST NOTIFICATIONS ---------- */
     .toast-container {
       position: fixed;
       top: 1.5rem;
@@ -42,17 +49,151 @@
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255,255,255,0.2);
     }
-    .toast.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
-    .toast.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
-    .toast.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
-    .toast.info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
-    .toast .toast-icon { font-size: 1.3rem; flex-shrink: 0; }
-    .toast .toast-close { margin-left: auto; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: inherit; opacity: 0.6; padding: 0 0.2rem; transition: 0.2s; }
-    .toast .toast-close:hover { opacity: 1; }
-    @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
-    .toast.removing { animation: fadeOut 0.3s ease forwards; }
+    .toast.success {
+      background: #d4edda;
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+    .toast.error {
+      background: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+    .toast.warning {
+      background: #fff3cd;
+      color: #856404;
+      border-left: 4px solid #ffc107;
+    }
+    .toast.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border-left: 4px solid #17a2b8;
+    }
+    .toast .toast-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .toast .toast-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: inherit;
+      opacity: 0.6;
+      padding: 0 0.2rem;
+      transition: 0.2s;
+    }
+    .toast .toast-close:hover {
+      opacity: 1;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+    .toast.removing {
+      animation: fadeOut 0.3s ease forwards;
+    }
 
+    /* ---------- CUSTOM CONFIRM DIALOG ---------- */
+    .custom-confirm-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInOverlay 0.3s ease;
+    }
+    .custom-confirm-overlay.active {
+      display: flex;
+    }
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .custom-confirm-box {
+      background: white;
+      border-radius: 24px;
+      padding: 2rem 2.5rem;
+      max-width: 440px;
+      width: 90%;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      animation: scaleIn 0.3s ease;
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .custom-confirm-box .icon {
+      font-size: 2.8rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .custom-confirm-box h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0b2a3b;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .custom-confirm-box p {
+      color: #5a7a8e;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .custom-confirm-box .btn-group {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+    }
+    .custom-confirm-box .btn-group button {
+      padding: 0.6rem 2rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .custom-confirm-box .btn-cancel {
+      background: #f0f4f9;
+      color: #1f4d66;
+    }
+    .custom-confirm-box .btn-cancel:hover {
+      background: #e2eaf2;
+    }
+    .custom-confirm-box .btn-confirm {
+      background: #dc3545;
+      color: white;
+    }
+    .custom-confirm-box .btn-confirm:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
+    }
+    .custom-confirm-box .btn-confirm-success {
+      background: #28a745;
+      color: white;
+    }
+    .custom-confirm-box .btn-confirm-success:hover {
+      background: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.3);
+    }
+
+    /* ---------- LOGIN SCREEN ---------- */
     .login-wrapper {
       max-width: 420px;
       width: 100%;
@@ -165,6 +306,7 @@
       margin-top: 1.2rem;
     }
 
+    /* ---------- QUIZ SCREEN ---------- */
     .quiz-wrapper {
       max-width: 920px;
       width: 100%;
@@ -175,7 +317,10 @@
       display: none;
       animation: fadeIn 0.5s ease;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .quiz-wrapper .top-bar {
       display: flex;
@@ -215,6 +360,11 @@
       text-transform: uppercase;
       letter-spacing: 0.8px;
     }
+    .quiz-wrapper .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
     .quiz-wrapper .user-badge {
       display: flex;
       align-items: center;
@@ -225,6 +375,13 @@
       font-size: 0.8rem;
       font-weight: 500;
       color: #1f4d66;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 2px solid transparent;
+    }
+    .quiz-wrapper .user-badge:hover {
+      border-color: #2f7b9e;
+      background: #e8f0f8;
     }
     .quiz-wrapper .user-badge .avatar {
       width: 30px;
@@ -237,6 +394,7 @@
       justify-content: center;
       font-weight: 700;
       font-size: 0.8rem;
+      flex-shrink: 0;
     }
     .quiz-wrapper .session-restore {
       font-size: 0.7rem;
@@ -244,7 +402,35 @@
       background: #eef3f8;
       padding: 0.15rem 0.8rem;
       border-radius: 30px;
-      margin-left: 0.5rem;
+      margin-left: 0.3rem;
+    }
+
+    /* Refresh/Reset Button */
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid #e2eaf2;
+      background: white;
+      color: #1f4d66;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      background: #f0f4f9;
+      border-color: #2f7b9e;
+      transform: rotate(30deg);
+    }
+    .icon-btn:active {
+      transform: rotate(90deg);
+    }
+    .icon-btn .tooltip {
+      display: none;
     }
 
     .quiz-wrapper .timer-line {
@@ -263,9 +449,19 @@
       padding: 0.15rem 1.2rem;
       border-radius: 60px;
     }
-    .quiz-wrapper .timer-line .timer.warning { color: #856404; background: #fff3cd; }
-    .quiz-wrapper .timer-line .timer.danger { color: #b33c3c; background: #f8d7da; animation: pulse 1s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .quiz-wrapper .timer-line .timer.warning {
+      color: #856404;
+      background: #fff3cd;
+    }
+    .quiz-wrapper .timer-line .timer.danger {
+      color: #b33c3c;
+      background: #f8d7da;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
 
     .quiz-wrapper .progress-block {
       background: #e8eff5;
@@ -360,12 +556,32 @@
       flex-shrink: 0;
       transition: 0.2s;
     }
-    .quiz-wrapper .option-btn.correct { background: #d4edda; border-color: #28a745; box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15); }
-    .quiz-wrapper .option-btn.correct .letter { background: #28a745; color: white; }
-    .quiz-wrapper .option-btn.wrong { background: #f8d7da; border-color: #dc3545; box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12); }
-    .quiz-wrapper .option-btn.wrong .letter { background: #dc3545; color: white; }
-    .quiz-wrapper .option-btn:disabled { cursor: default; opacity: 0.85; }
-    .quiz-wrapper .option-btn:disabled:hover { transform: none; box-shadow: none; }
+    .quiz-wrapper .option-btn.correct {
+      background: #d4edda;
+      border-color: #28a745;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+    }
+    .quiz-wrapper .option-btn.correct .letter {
+      background: #28a745;
+      color: white;
+    }
+    .quiz-wrapper .option-btn.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+    }
+    .quiz-wrapper .option-btn.wrong .letter {
+      background: #dc3545;
+      color: white;
+    }
+    .quiz-wrapper .option-btn:disabled {
+      cursor: default;
+      opacity: 0.85;
+    }
+    .quiz-wrapper .option-btn:disabled:hover {
+      transform: none;
+      box-shadow: none;
+    }
 
     .quiz-wrapper .action-bar {
       display: flex;
@@ -387,9 +603,20 @@
       flex: 1;
       gap: 0.5rem;
     }
-    .quiz-wrapper .feedback-msg.visible { display: flex; }
-    .quiz-wrapper .feedback-msg .no-answer { font-size: 0.7rem; color: #999; font-weight: 400; }
-    .quiz-wrapper .nav-group { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; }
+    .quiz-wrapper .feedback-msg.visible {
+      display: flex;
+    }
+    .quiz-wrapper .feedback-msg .no-answer {
+      font-size: 0.7rem;
+      color: #999;
+      font-weight: 400;
+    }
+    .quiz-wrapper .nav-group {
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
     .quiz-wrapper .btn-primary {
       background: linear-gradient(145deg, #0b2a3b, #1a4b62);
       border: none;
@@ -423,7 +650,10 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .quiz-wrapper .btn-secondary:hover { background: #f0f4f9; border-color: #b0c8d8; }
+    .quiz-wrapper .btn-secondary:hover {
+      background: #f0f4f9;
+      border-color: #b0c8d8;
+    }
     .quiz-wrapper .btn-danger {
       background: transparent;
       border: 2px solid #dc3545;
@@ -435,7 +665,10 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .quiz-wrapper .btn-danger:hover { background: #dc3545; color: white; }
+    .quiz-wrapper .btn-danger:hover {
+      background: #dc3545;
+      color: white;
+    }
 
     .quiz-wrapper .overview-section {
       margin-top: 1.2rem;
@@ -472,8 +705,19 @@
       padding: 0.15rem 0.7rem 0.15rem 0.4rem;
       border-radius: 30px;
     }
-    .quiz-wrapper .legend-item .count { font-weight: 700; font-size: 0.75rem; min-width: 1.2rem; text-align: center; }
-    .quiz-wrapper .legend-dot { width: 12px; height: 12px; border-radius: 30px; display: inline-block; flex-shrink: 0; }
+    .quiz-wrapper .legend-item .count {
+      font-weight: 700;
+      font-size: 0.75rem;
+      min-width: 1.2rem;
+      text-align: center;
+    }
+    .quiz-wrapper .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 30px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
     .quiz-wrapper .legend-dot.correct-dot { background: #28a745; }
     .quiz-wrapper .legend-dot.wrong-dot { background: #dc3545; }
     .quiz-wrapper .legend-dot.active { background: #2f7b9e; }
@@ -500,19 +744,44 @@
       transition: 0.2s;
       cursor: default;
     }
-    .quiz-wrapper .grid-dot.active { background: #2f7b9e; color: white; box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.25); transform: scale(1.05); }
-    .quiz-wrapper .grid-dot.correct-dot { background: #28a745; color: white; }
-    .quiz-wrapper .grid-dot.wrong-dot { background: #dc3545; color: white; }
-    .quiz-wrapper .grid-dot.no-answer-dot { background: #adb5bd; color: white; }
-    .quiz-wrapper .grid-dot.timeout { background: #6c757d; color: white; opacity: 0.5; }
+    .quiz-wrapper .grid-dot.active {
+      background: #2f7b9e;
+      color: white;
+      box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.25);
+      transform: scale(1.05);
+    }
+    .quiz-wrapper .grid-dot.correct-dot {
+      background: #28a745;
+      color: white;
+    }
+    .quiz-wrapper .grid-dot.wrong-dot {
+      background: #dc3545;
+      color: white;
+    }
+    .quiz-wrapper .grid-dot.no-answer-dot {
+      background: #adb5bd;
+      color: white;
+    }
+    .quiz-wrapper .grid-dot.timeout {
+      background: #6c757d;
+      color: white;
+      opacity: 0.5;
+    }
 
     .quiz-wrapper .result-card {
       text-align: center;
       padding: 1.5rem 0.5rem 0.5rem;
       display: none;
     }
-    .quiz-wrapper .result-card .result-icon { font-size: 4rem; margin-bottom: 0.5rem; }
-    .quiz-wrapper .result-card h2 { font-size: 2.2rem; font-weight: 800; color: #0b2a3b; }
+    .quiz-wrapper .result-card .result-icon {
+      font-size: 4rem;
+      margin-bottom: 0.5rem;
+    }
+    .quiz-wrapper .result-card h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #0b2a3b;
+    }
     .quiz-wrapper .result-score {
       font-size: 4rem;
       font-weight: 800;
@@ -522,9 +791,19 @@
       color: transparent;
       margin: 0.2rem 0 0.1rem;
     }
-    .quiz-wrapper .result-msg { color: #1f4b61; font-size: 1.1rem; margin: 0.2rem 0 1.6rem; }
-    .quiz-wrapper .result-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .quiz-wrapper .result-msg {
+      color: #1f4b61;
+      font-size: 1.1rem;
+      margin: 0.2rem 0 1.6rem;
+    }
+    .quiz-wrapper .result-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
+    /* ---------- RESPONSIVE ---------- */
     @media (max-width: 600px) {
       .login-wrapper { padding: 2rem 1.4rem; }
       .login-wrapper h1 { font-size: 1.6rem; }
@@ -545,7 +824,13 @@
       .quiz-wrapper .session-restore { display: none; }
       .quiz-wrapper .feedback-msg { min-height: auto; padding: 0.3rem 1rem; }
       .quiz-wrapper .result-actions { flex-direction: column; align-items: center; }
+      .icon-btn { width: 32px; height: 32px; font-size: 0.9rem; }
+      .custom-confirm-box { padding: 1.5rem; }
+      .custom-confirm-box .btn-group { flex-direction: column; }
+      .custom-confirm-box .btn-group button { width: 100%; }
     }
+
+    /* ---------- SCROLLBAR ---------- */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
     ::-webkit-scrollbar-thumb { background: #b0c8d8; border-radius: 10px; }
@@ -553,32 +838,61 @@
   </style>
 </head>
 <body>
+
+  <!-- ============================================================ -->
+  <!-- TOAST CONTAINER -->
+  <!-- ============================================================ -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <!-- ============================================================ -->
+  <!-- CUSTOM CONFIRM DIALOG -->
+  <!-- ============================================================ -->
+  <div class="custom-confirm-overlay" id="confirmOverlay">
+    <div class="custom-confirm-box">
+      <div class="icon" id="confirmIcon">❓</div>
+      <h3 id="confirmTitle">Are you sure?</h3>
+      <p id="confirmMessage">This action cannot be undone.</p>
+      <div class="btn-group">
+        <button class="btn-cancel" id="confirmCancel">Cancel</button>
+        <button class="btn-confirm" id="confirmOk">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
   <!-- LOGIN SCREEN -->
+  <!-- ============================================================ -->
   <div class="login-wrapper" id="loginScreen">
     <img class="logo" id="loginLogo"
          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230b2a3b'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter, sans-serif' font-size='38' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
          alt="Logo" />
     <h1>Self Learners</h1>
     <p class="sub">Sign in to continue your quiz</p>
+
     <label for="emailInput">Email / Username</label>
     <div class="input-group">
       <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username" />
     </div>
+
     <label for="passwordInput">Password</label>
     <div class="input-group">
       <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password" />
-      <button class="toggle-password" id="togglePasswordBtn" type="button" aria-label="Toggle password visibility">👁️</button>
+      <button class="toggle-password" id="togglePasswordBtn" type="button" aria-label="Toggle password visibility">
+        👁️
+      </button>
     </div>
+
     <button class="btn-primary" id="loginBtn">Sign In</button>
     <div class="login-footer">
       <span id="loginStatus">Loading user data...</span>
     </div>
   </div>
 
+  <!-- ============================================================ -->
   <!-- QUIZ SCREEN -->
+  <!-- ============================================================ -->
   <div class="quiz-wrapper" id="quizScreen">
+    <!-- header -->
     <div class="top-bar">
       <div class="brand">
         <img class="brand-logo" id="quizLogo"
@@ -589,29 +903,41 @@
           <span class="subtitle" id="quizSubtitle">Self Learners</span>
         </div>
       </div>
-      <div class="user-badge" id="userBadge">
-        <span class="avatar" id="userAvatar">U</span>
-        <span id="userNameDisplay">User</span>
-        <span class="session-restore" id="sessionBadge"></span>
+      <div class="top-actions">
+        <!-- Refresh/Reset Button -->
+        <button class="icon-btn" id="refreshBtn" title="Refresh quiz data from spreadsheet">
+          🔄
+        </button>
+        <!-- User Badge (clickable for logout) -->
+        <div class="user-badge" id="userBadge">
+          <span class="avatar" id="userAvatar">U</span>
+          <span id="userNameDisplay">User</span>
+          <span class="session-restore" id="sessionBadge"></span>
+        </div>
       </div>
     </div>
 
+    <!-- timer -->
     <div class="timer-line">
       ⏱️ <span class="timer" id="timerDisplay">00:00</span>
     </div>
 
     <div id="quizContent">
+      <!-- progress -->
       <div class="progress-block">
         <div class="progress-fill" id="progressFill" style="width:0%;"></div>
       </div>
 
+      <!-- question area -->
       <div id="questionArea">
         <div class="q-meta">
           <span class="q-label" id="qNumber">QUESTION 1 OF 0</span>
           <span class="q-category" id="qCategory">📚 Loading...</span>
         </div>
         <div class="question-text" id="questionText">Loading questions from spreadsheet...</div>
+
         <div class="options-grid" id="optionsContainer"></div>
+
         <div class="action-bar">
           <div class="feedback-msg" id="feedbackMessage"></div>
           <div class="nav-group">
@@ -619,6 +945,7 @@
           </div>
         </div>
 
+        <!-- overview -->
         <div class="overview-section">
           <div class="overview-header">
             <span>📊 OVERVIEW</span>
@@ -633,6 +960,7 @@
         </div>
       </div>
 
+      <!-- result -->
       <div class="result-card" id="resultArea">
         <div class="result-icon" id="resultIcon">🏆</div>
         <h2>Quiz Complete!</h2>
@@ -646,35 +974,109 @@
     </div>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT -->
+  <!-- ============================================================ -->
   <script>
     (function() {
-      // CONFIG
+      // --------------------------------------------------------------
+      // 1. CONFIGURATION – CSV EXPORT URLs
+      // --------------------------------------------------------------
       const LOGIN_CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=2051134983';
       const QUIZ_CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
       const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
 
-      // TOAST
+      // --------------------------------------------------------------
+      // 2. TOAST SYSTEM
+      // --------------------------------------------------------------
       const toastContainer = document.getElementById('toastContainer');
       let toastTimeout = null;
+
       function showToast(message, type = 'info', duration = 4000) {
-        if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
-        while (toastContainer.firstChild) toastContainer.removeChild(toastContainer.firstChild);
-        const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+        if (toastTimeout) {
+          clearTimeout(toastTimeout);
+          toastTimeout = null;
+        }
+
+        while (toastContainer.firstChild) {
+          toastContainer.removeChild(toastContainer.firstChild);
+        }
+
+        const icons = {
+          success: '✅',
+          error: '❌',
+          warning: '⚠️',
+          info: 'ℹ️'
+        };
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.innerHTML = `<span class="toast-icon">${icons[type] || 'ℹ️'}</span><span>${message}</span><button class="toast-close">✕</button>`;
+        toast.innerHTML = `
+          <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+          <span>${message}</span>
+          <button class="toast-close" aria-label="Close notification">✕</button>
+        `;
         toastContainer.appendChild(toast);
-        toast.querySelector('.toast-close').addEventListener('click', () => { removeToast(toast); });
-        toastTimeout = setTimeout(() => { removeToast(toast); toastTimeout = null; }, duration);
+
+        toast.querySelector('.toast-close').addEventListener('click', () => {
+          removeToast(toast);
+        });
+
+        toastTimeout = setTimeout(() => {
+          removeToast(toast);
+          toastTimeout = null;
+        }, duration);
+
         return toast;
       }
+
       function removeToast(toast) {
         if (toast.classList.contains('removing')) return;
         toast.classList.add('removing');
-        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+        setTimeout(() => {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
       }
 
-      // DOM REFS
+      // --------------------------------------------------------------
+      // 3. CUSTOM CONFIRM DIALOG
+      // --------------------------------------------------------------
+      const confirmOverlay = document.getElementById('confirmOverlay');
+      const confirmIcon = document.getElementById('confirmIcon');
+      const confirmTitle = document.getElementById('confirmTitle');
+      const confirmMessage = document.getElementById('confirmMessage');
+      const confirmOk = document.getElementById('confirmOk');
+      const confirmCancel = document.getElementById('confirmCancel');
+      
+      let confirmResolve = null;
+
+      function showConfirm(icon, title, message, confirmClass = 'btn-confirm') {
+        return new Promise((resolve) => {
+          confirmIcon.textContent = icon || '❓';
+          confirmTitle.textContent = title || 'Are you sure?';
+          confirmMessage.textContent = message || 'This action cannot be undone.';
+          confirmOk.className = confirmClass;
+          confirmOverlay.classList.add('active');
+          confirmResolve = resolve;
+        });
+      }
+
+      function closeConfirm(result) {
+        confirmOverlay.classList.remove('active');
+        if (confirmResolve) {
+          confirmResolve(result);
+          confirmResolve = null;
+        }
+      }
+
+      confirmCancel.addEventListener('click', () => closeConfirm(false));
+      confirmOk.addEventListener('click', () => closeConfirm(true));
+      confirmOverlay.addEventListener('click', (e) => {
+        if (e.target === confirmOverlay) closeConfirm(false);
+      });
+
+      // --------------------------------------------------------------
+      // 4. DOM REFS – LOGIN
+      // --------------------------------------------------------------
       const loginScreen = document.getElementById('loginScreen');
       const quizScreen = document.getElementById('quizScreen');
       const emailInput = document.getElementById('emailInput');
@@ -684,6 +1086,9 @@
       const loginStatus = document.getElementById('loginStatus');
       const loginLogo = document.getElementById('loginLogo');
 
+      // --------------------------------------------------------------
+      // 5. DOM REFS – QUIZ
+      // --------------------------------------------------------------
       const progressFill = document.getElementById('progressFill');
       const qNumber = document.getElementById('qNumber');
       const qCategory = document.getElementById('qCategory');
@@ -711,10 +1116,24 @@
       const userAvatar = document.getElementById('userAvatar');
       const userNameDisplay = document.getElementById('userNameDisplay');
       const sessionBadge = document.getElementById('sessionBadge');
+      const refreshBtn = document.getElementById('refreshBtn');
 
-      function loadLogo(img) { if (!LOGO_URL) return; const i = new Image(); i.onload = function() { img.src = LOGO_URL; }; i.onerror = function() {}; i.src = LOGO_URL; }
-      loadLogo(loginLogo); loadLogo(quizLogo);
+      // --------------------------------------------------------------
+      // 6. LOAD LOGO
+      // --------------------------------------------------------------
+      function loadLogo(imgElement) {
+        if (!LOGO_URL) return;
+        const img = new Image();
+        img.onload = function() { imgElement.src = LOGO_URL; };
+        img.onerror = function() { /* keep fallback */ };
+        img.src = LOGO_URL;
+      }
+      loadLogo(loginLogo);
+      loadLogo(quizLogo);
 
+      // --------------------------------------------------------------
+      // 7. PASSWORD TOGGLE
+      // --------------------------------------------------------------
       let passwordVisible = false;
       togglePasswordBtn.addEventListener('click', function() {
         passwordVisible = !passwordVisible;
@@ -722,8 +1141,11 @@
         togglePasswordBtn.textContent = passwordVisible ? '🙈' : '👁️';
       });
 
-      // SESSION
+      // --------------------------------------------------------------
+      // 8. SESSION MANAGEMENT
+      // --------------------------------------------------------------
       const SESSION_KEY = 'quiz_session_data';
+
       function saveSession() {
         if (!loggedInUser || quizCompleted) return;
         const sessionData = {
@@ -739,14 +1161,37 @@
           quizTitleText: quizTitleText,
           timestamp: new Date().toISOString()
         };
-        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData)); } catch (e) { console.warn('Save failed', e); }
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+        } catch (e) {
+          console.warn('Could not save session:', e);
+        }
       }
-      function loadSession() {
-        try { const raw = sessionStorage.getItem(SESSION_KEY); if (!raw) return null; const data = JSON.parse(raw); if (Date.now() - new Date(data.timestamp).getTime() > 24 * 60 * 60 * 1000) { sessionStorage.removeItem(SESSION_KEY); return null; } return data; } catch (e) { return null; }
-      }
-      function clearSession() { sessionStorage.removeItem(SESSION_KEY); sessionBadge.textContent = ''; }
 
-      // LOGIN
+      function loadSession() {
+        try {
+          const raw = sessionStorage.getItem(SESSION_KEY);
+          if (!raw) return null;
+          const data = JSON.parse(raw);
+          const age = Date.now() - new Date(data.timestamp).getTime();
+          if (age > 24 * 60 * 60 * 1000) {
+            sessionStorage.removeItem(SESSION_KEY);
+            return null;
+          }
+          return data;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function clearSession() {
+        sessionStorage.removeItem(SESSION_KEY);
+        sessionBadge.textContent = '';
+      }
+
+      // --------------------------------------------------------------
+      // 9. LOGIN SYSTEM
+      // --------------------------------------------------------------
       let users = [];
       let isLoadingUsers = true;
       let loggedInUser = null;
@@ -755,12 +1200,30 @@
       function fetchUsers() {
         loginStatus.textContent = '⏳ Loading...';
         loginBtn.disabled = true;
-        fetch(LOGIN_CSV_URL).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
-          .then(csvText => { users = parseLoginCSV(csvText); isLoadingUsers = false; loginStatus.textContent = '🔐 Sign in to continue'; loginBtn.disabled = false; checkAndRestoreSession(); })
-          .catch(err => { console.error('Login load error:', err); loginStatus.textContent = '⚠️ Failed to load user data'; loginBtn.disabled = true; showToast('⚠️ Failed to load user data. Please refresh.', 'error', 4000); });
+
+        fetch(LOGIN_CSV_URL)
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.text();
+          })
+          .then(csvText => {
+            users = parseLoginCSV(csvText);
+            isLoadingUsers = false;
+            loginStatus.textContent = '🔐 Sign in to continue';
+            loginBtn.disabled = false;
+
+            checkAndRestoreSession();
+          })
+          .catch(err => {
+            console.error('Login load error:', err);
+            loginStatus.textContent = '⚠️ Failed to load user data';
+            loginBtn.disabled = true;
+            showToast('⚠️ Failed to load user data. Please refresh.', 'error', 4000);
+          });
       }
+
       function parseLoginCSV(text) {
-        const lines = text.split('\n').filter(l => l.trim() !== '');
+        const lines = text.split('\n').filter(line => line.trim() !== '');
         if (lines.length < 2) return [];
         const result = [];
         for (let i = 1; i < lines.length; i++) {
@@ -776,9 +1239,21 @@
       function handleLogin() {
         const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
-        if (!email || !password) { showToast('⚠️ Please enter both email and password.', 'warning', 3000); return; }
-        if (isLoadingUsers) { showToast('⏳ User data is still loading. Please wait.', 'warning', 2500); return; }
-        const matched = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+
+        if (!email || !password) {
+          showToast('⚠️ Please enter both email and password.', 'warning', 3000);
+          return;
+        }
+        if (isLoadingUsers) {
+          showToast('⏳ User data is still loading. Please wait.', 'warning', 2500);
+          return;
+        }
+
+        const matched = users.find(u =>
+          u.email.toLowerCase() === email.toLowerCase() &&
+          u.password === password
+        );
+
         if (matched) {
           loggedInUser = matched;
           clearSession();
@@ -790,16 +1265,46 @@
         }
       }
 
+      // --------------------------------------------------------------
+      // 10. LOGOUT FUNCTION
+      // --------------------------------------------------------------
       function handleLogout() {
-        clearSession(); sessionRestored = false; loggedInUser = null; quizCompleted = false; questions = []; currentIndex = 0; score = 0; answerStatus = []; if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        quizScreen.style.display = 'none'; loginScreen.style.display = 'block'; loginStatus.textContent = '🔐 Sign in to continue'; emailInput.value = ''; passwordInput.value = ''; showToast('👋 Logged out successfully.', 'info', 2500);
+        clearSession();
+        sessionRestored = false;
+        loggedInUser = null;
+        quizCompleted = false;
+        questions = [];
+        currentIndex = 0;
+        score = 0;
+        answerStatus = [];
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        // Reset UI
+        quizScreen.style.display = 'none';
+        loginScreen.style.display = 'block';
+        loginStatus.textContent = '🔐 Sign in to continue';
+        emailInput.value = '';
+        passwordInput.value = '';
+        showToast('👋 Logged out successfully.', 'info', 2500);
       }
 
+      // --------------------------------------------------------------
+      // 11. SESSION RESTORE
+      // --------------------------------------------------------------
       function checkAndRestoreSession() {
         const session = loadSession();
         if (!session || !session.user) return;
-        const userExists = users.some(u => u.email.toLowerCase() === session.user.email.toLowerCase());
-        if (!userExists) { clearSession(); return; }
+
+        const userExists = users.some(u => 
+          u.email.toLowerCase() === session.user.email.toLowerCase()
+        );
+        if (!userExists) {
+          clearSession();
+          return;
+        }
+
         loggedInUser = session.user;
         questions = session.questions || [];
         currentIndex = session.currentIndex || 0;
@@ -811,12 +1316,24 @@
         totalQuestions = session.totalQuestions || 0;
         quizTitleText = session.quizTitleText || 'Quiz';
         sessionRestored = true;
+
         loginScreen.style.display = 'none';
         quizScreen.style.display = 'block';
         updateUserBadge(loggedInUser);
         sessionBadge.textContent = '↻ Restored';
-        if (quizCompleted) { showResult(); showToast(`📊 Quiz completed: ${score}/${totalQuestions}`, 'info', 3000); return; }
-        if (questions.length > 0 && totalQuestions > 0) { restoreQuiz(); showToast(`↻ Resumed: Question ${currentIndex + 1} of ${totalQuestions}`, 'info', 2500); } else { fetchQuizQuestions(); }
+
+        if (quizCompleted) {
+          showResult();
+          showToast(`📊 Quiz completed: ${score}/${totalQuestions}`, 'info', 3000);
+          return;
+        }
+
+        if (questions.length > 0 && totalQuestions > 0) {
+          restoreQuiz();
+          showToast(`↻ Resumed: Question ${currentIndex + 1} of ${totalQuestions}`, 'info', 2500);
+        } else {
+          fetchQuizQuestions();
+        }
       }
 
       function initQuizForUser(user) {
@@ -836,11 +1353,21 @@
       function restoreQuiz() {
         quizTitle.textContent = quizTitleText;
         quizSubtitle.textContent = 'Self Learners';
-        if (timeRemaining > 0 && !quizCompleted) { updateTimerDisplay(); startTimerFrom(timeRemaining); }
+        
+        if (timeRemaining > 0 && !quizCompleted) {
+          updateTimerDisplay();
+          startTimerFrom(timeRemaining);
+        }
+
         const progressPercent = totalQuestions > 0 ? (currentIndex / totalQuestions) * 100 : 0;
         progressFill.style.width = progressPercent + '%';
-        if (currentIndex < questions.length) renderQuestion(currentIndex);
-        else showResult();
+
+        if (currentIndex < questions.length) {
+          renderQuestion(currentIndex);
+        } else {
+          showResult();
+        }
+        
         renderDots();
         updateLegendCounts();
       }
@@ -853,11 +1380,17 @@
           timeRemaining--;
           updateTimerDisplay();
           if (timeRemaining % 10 === 0) saveSession();
-          if (timeRemaining <= 0) { clearInterval(timerInterval); timerInterval = null; handleTimeout(); }
+          if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            handleTimeout();
+          }
         }, 1000);
       }
 
-      // QUIZ SYSTEM
+      // --------------------------------------------------------------
+      // 12. QUIZ SYSTEM
+      // --------------------------------------------------------------
       let questions = [];
       let currentIndex = 0;
       let score = 0;
@@ -873,61 +1406,136 @@
       function showFeedback(message, type = 'info') {
         feedbackMessage.textContent = message;
         feedbackMessage.className = 'feedback-msg visible';
-        feedbackMessage.style.background = type === 'warning' ? '#fff3cd' : type === 'error' ? '#f8d7da' : type === 'success' ? '#d4edda' : '#f0f4f9';
+        if (type === 'warning') {
+          feedbackMessage.style.background = '#fff3cd';
+        } else if (type === 'error') {
+          feedbackMessage.style.background = '#f8d7da';
+        } else if (type === 'success') {
+          feedbackMessage.style.background = '#d4edda';
+        } else {
+          feedbackMessage.style.background = '#f0f4f9';
+        }
       }
-      function hideFeedback() { feedbackMessage.className = 'feedback-msg'; feedbackMessage.textContent = ''; feedbackMessage.style.background = '#f0f4f9'; }
+
+      function hideFeedback() {
+        feedbackMessage.className = 'feedback-msg';
+        feedbackMessage.textContent = '';
+        feedbackMessage.style.background = '#f0f4f9';
+      }
 
       function fetchQuizQuestions() {
         questionText.textContent = '📥 Fetching questions...';
         hideFeedback();
-        fetch(QUIZ_CSV_URL).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
+
+        fetch(QUIZ_CSV_URL)
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.text();
+          })
           .then(csvText => {
             const parsed = parseQuizCSV(csvText);
             if (parsed.questions.length === 0) throw new Error('No questions found');
             questions = parsed.questions;
             quizTitleText = parsed.title || 'Quiz';
             totalQuestions = questions.length;
-            if (!sessionRestored) { answerStatus = new Array(totalQuestions).fill(null); currentIndex = 0; score = 0; quizCompleted = false; quizTimedOut = false; } else { while (answerStatus.length < totalQuestions) answerStatus.push(null); }
+            
+            if (!sessionRestored) {
+              answerStatus = new Array(totalQuestions).fill(null);
+              currentIndex = 0;
+              score = 0;
+              quizCompleted = false;
+              quizTimedOut = false;
+            } else {
+              while (answerStatus.length < totalQuestions) {
+                answerStatus.push(null);
+              }
+            }
+            
             sessionRestored = false;
             showToast(`✅ ${totalQuestions} questions loaded!`, 'success', 2000);
             startQuiz();
           })
-          .catch(err => { console.error('Quiz load error:', err); questionText.textContent = '❌ Failed to load questions.'; hideFeedback(); showToast('❌ Failed to load quiz questions.', 'error', 4000); });
+          .catch(err => {
+            console.error('Quiz load error:', err);
+            questionText.textContent = '❌ Failed to load questions.';
+            hideFeedback();
+            showToast('❌ Failed to load quiz questions.', 'error', 4000);
+          });
       }
 
       function parseQuizCSV(text) {
-        const lines = text.split('\n').filter(l => l.trim() !== '');
+        const lines = text.split('\n').filter(line => line.trim() !== '');
         if (lines.length < 2) return { questions: [], title: 'Quiz' };
-        let title = 'Quiz'; const result = [];
-        if (lines.length > 0) { const firstRow = parseCSVLine(lines[0]); if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'Quiz'; }
+
+        let title = 'Quiz';
+        const result = [];
+
+        if (lines.length > 0) {
+          const firstRow = parseCSVLine(lines[0]);
+          if (firstRow.length > 2 && firstRow[2]) {
+            title = firstRow[2].trim() || 'Quiz';
+          }
+        }
+
         for (let i = 1; i < lines.length; i++) {
           const cols = parseCSVLine(lines[i]);
           if (cols.length < 6) continue;
           const question = cols[4] ? cols[4].trim() : '';
           if (!question) continue;
-          const options = [ cols[5] ? cols[5].trim() : '', cols[6] ? cols[6].trim() : '', cols[7] ? cols[7].trim() : '', cols[8] ? cols[8].trim() : '' ];
+          const options = [
+            cols[5] ? cols[5].trim() : '',
+            cols[6] ? cols[6].trim() : '',
+            cols[7] ? cols[7].trim() : '',
+            cols[8] ? cols[8].trim() : ''
+          ];
           const correctAnswer = cols[9] ? cols[9].trim() : '';
           let correctIndex = -1;
-          if (correctAnswer) { for (let j = 0; j < options.length; j++) { if (options[j] === correctAnswer) { correctIndex = j; break; } } }
-          result.push({ question, options, correct: correctIndex, correctText: correctAnswer || 'No answer in db' });
+          if (correctAnswer) {
+            for (let j = 0; j < options.length; j++) {
+              if (options[j] === correctAnswer) { correctIndex = j; break; }
+            }
+          }
+          result.push({
+            question,
+            options,
+            correct: correctIndex,
+            correctText: correctAnswer || 'No answer in db'
+          });
         }
         return { questions: result, title };
       }
 
       function parseCSVLine(line) {
-        const result = []; let current = ''; let inQuotes = false;
+        const result = [];
+        let current = '';
+        let inQuotes = false;
         for (let i = 0; i < line.length; i++) {
           const ch = line[i];
           if (inQuotes) {
-            if (ch === '"' && (i + 1 < line.length && line[i + 1] === '"')) { current += '"'; i++; } else if (ch === '"') { inQuotes = false; } else { current += ch; }
+            if (ch === '"' && (i + 1 < line.length && line[i + 1] === '"')) {
+              current += '"';
+              i++;
+            } else if (ch === '"') {
+              inQuotes = false;
+            } else {
+              current += ch;
+            }
           } else {
-            if (ch === '"') { inQuotes = true; } else if (ch === ',') { result.push(current.trim()); current = ''; } else { current += ch; }
+            if (ch === '"') {
+              inQuotes = true;
+            } else if (ch === ',') {
+              result.push(current.trim());
+              current = '';
+            } else {
+              current += ch;
+            }
           }
         }
         result.push(current.trim());
         return result;
       }
 
+      // ----- Timer -----
       function startTimer() {
         timeRemaining = totalQuestions * 60;
         updateTimerDisplay();
@@ -936,7 +1544,11 @@
           timeRemaining--;
           updateTimerDisplay();
           if (timeRemaining % 10 === 0) saveSession();
-          if (timeRemaining <= 0) { clearInterval(timerInterval); timerInterval = null; handleTimeout(); }
+          if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            handleTimeout();
+          }
         }, 1000);
       }
 
@@ -950,7 +1562,8 @@
       }
 
       function handleTimeout() {
-        quizTimedOut = true; quizCompleted = true;
+        quizTimedOut = true;
+        quizCompleted = true;
         document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
         showFeedback('⏰ Time is up! Quiz submitted.', 'warning');
         nextBtn.disabled = true;
@@ -959,28 +1572,48 @@
         setTimeout(showResult, 1500);
       }
 
+      // ----- Quiz Flow -----
       function startQuiz() {
-        if (questions.length === 0) { questionText.textContent = '⚠️ No questions found.'; return; }
+        if (questions.length === 0) {
+          questionText.textContent = '⚠️ No questions found.';
+          return;
+        }
         quizTitle.textContent = quizTitleText;
         quizSubtitle.textContent = 'Self Learners';
-        if (!sessionRestored) { currentIndex = 0; score = 0; isAnswered = false; quizCompleted = false; quizTimedOut = false; answerStatus = new Array(questions.length).fill(null); }
+
+        if (!sessionRestored) {
+          currentIndex = 0;
+          score = 0;
+          isAnswered = false;
+          quizCompleted = false;
+          quizTimedOut = false;
+          answerStatus = new Array(questions.length).fill(null);
+        }
+
         resultArea.style.display = 'none';
         questionArea.style.display = 'block';
+
         renderQuestion(currentIndex);
         renderDots();
         updateLegendCounts();
-        if (!sessionRestored) startTimer();
+        
+        if (!sessionRestored) {
+          startTimer();
+        }
         saveSession();
       }
 
       function renderQuestion(index) {
         const q = questions[index];
         if (!q) return;
+
         const total = questions.length;
         progressFill.style.width = ((index) / total * 100) + '%';
+
         qNumber.textContent = `QUESTION ${index+1} OF ${total}`;
         qCategory.textContent = `📚 Question ${index+1}`;
         questionText.textContent = q.question;
+
         const letters = ['A', 'B', 'C', 'D'];
         optionsContainer.innerHTML = '';
         q.options.forEach((opt, idx) => {
@@ -989,10 +1622,15 @@
           btn.innerHTML = `<span class="letter">${letters[idx]}</span> ${opt || '(Empty)'}`;
           btn.dataset.index = idx;
           btn.addEventListener('click', () => handleOptionClick(idx));
-          if (!opt || quizTimedOut) { btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
+          if (!opt || quizTimedOut) {
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+          }
           optionsContainer.appendChild(btn);
         });
+
         hideFeedback();
+
         if (q.correct === -1) {
           showFeedback(`⚠️ No answer in db (Column J doesn't match any choice)`, 'warning');
           if (!quizTimedOut && !quizCompleted) {
@@ -1009,9 +1647,15 @@
             }, 800);
           }
         }
+
         isAnswered = false;
         nextBtn.disabled = true;
-        document.querySelectorAll('.option-btn').forEach(btn => { btn.disabled = quizTimedOut || quizCompleted; btn.classList.remove('correct', 'wrong'); });
+
+        document.querySelectorAll('.option-btn').forEach(btn => {
+          btn.disabled = quizTimedOut || quizCompleted;
+          btn.classList.remove('correct', 'wrong');
+        });
+
         resultArea.style.display = 'none';
         questionArea.style.display = 'block';
         renderDots();
@@ -1022,16 +1666,29 @@
       function handleOptionClick(selectedIdx) {
         if (isAnswered || quizTimedOut || quizCompleted) return;
         const q = questions[currentIndex];
-        if (q.correct === -1) { showFeedback(`⚠️ No answer in db (No match in Column J)`, 'warning'); return; }
+        if (q.correct === -1) {
+          showFeedback(`⚠️ No answer in db (No match in Column J)`, 'warning');
+          return;
+        }
+
         const isCorrect = (selectedIdx === q.correct);
         const allOptions = document.querySelectorAll('.option-btn');
+
         allOptions.forEach(btn => btn.disabled = true);
         allOptions.forEach((btn, idx) => {
           if (idx === q.correct) btn.classList.add('correct');
           else if (idx === selectedIdx && !isCorrect) btn.classList.add('wrong');
         });
-        if (isCorrect) { score += 1; answerStatus[currentIndex] = true; } else { answerStatus[currentIndex] = false; }
+
+        if (isCorrect) {
+          score += 1;
+          answerStatus[currentIndex] = true;
+        } else {
+          answerStatus[currentIndex] = false;
+        }
+
         hideFeedback();
+
         isAnswered = true;
         nextBtn.disabled = false;
         renderDots();
@@ -1041,32 +1698,51 @@
 
       function goToNext() {
         if (!isAnswered || quizCompleted) return;
-        if (currentIndex + 1 < questions.length) { currentIndex++; renderQuestion(currentIndex); }
-        else { if (!quizTimedOut) { clearInterval(timerInterval); timerInterval = null; } showResult(); }
+        if (currentIndex + 1 < questions.length) {
+          currentIndex++;
+          renderQuestion(currentIndex);
+        } else {
+          if (!quizTimedOut) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+          showResult();
+        }
       }
 
       function showResult() {
         quizCompleted = true;
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+
         questionArea.style.display = 'none';
         resultArea.style.display = 'block';
+
         const total = questions.length;
         const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
         finalScore.textContent = `${score} / ${total}`;
         progressFill.style.width = '100%';
+
         let msg = quizTimedOut ? '⏰ Time ran out! ' : '';
         msg += getScoreMessage(score, total);
         resultMessage.textContent = msg;
+
         if (percentage === 100) resultIcon.textContent = '🌟';
         else if (percentage >= 70) resultIcon.textContent = '🎉';
         else if (percentage >= 40) resultIcon.textContent = '📖';
         else resultIcon.textContent = '💪';
+
         nextBtn.disabled = true;
         renderDots();
         updateLegendCounts();
         clearSession();
         hideFeedback();
-        if (!sessionRestored) showToast(`🏁 Quiz complete! Score: ${score}/${total} (${percentage}%)`, 'info', 4000);
+        
+        if (!sessionRestored) {
+          showToast(`🏁 Quiz complete! Score: ${score}/${total} (${percentage}%)`, 'info', 4000);
+        }
       }
 
       function getScoreMessage(score, total) {
@@ -1084,11 +1760,20 @@
           const dot = document.createElement('div');
           dot.className = 'grid-dot';
           dot.textContent = i + 1;
-          if (i === currentIndex && !quizCompleted && !quizTimedOut) dot.classList.add('active');
-          if (questions[i] && questions[i].correct === -1) dot.classList.add('no-answer-dot');
-          else if (answerStatus[i] === true) dot.classList.add('correct-dot');
-          else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
-          if (quizTimedOut && answerStatus[i] === null && questions[i] && questions[i].correct !== -1) dot.classList.add('timeout');
+
+          if (i === currentIndex && !quizCompleted && !quizTimedOut) {
+            dot.classList.add('active');
+          }
+          if (questions[i] && questions[i].correct === -1) {
+            dot.classList.add('no-answer-dot');
+          } else if (answerStatus[i] === true) {
+            dot.classList.add('correct-dot');
+          } else if (answerStatus[i] === false) {
+            dot.classList.add('wrong-dot');
+          }
+          if (quizTimedOut && answerStatus[i] === null && questions[i] && questions[i].correct !== -1) {
+            dot.classList.add('timeout');
+          }
           dotGrid.appendChild(dot);
         }
       }
@@ -1097,11 +1782,17 @@
         let correct = 0, wrong = 0, active = 0, pending = 0;
         const total = questions.length;
         for (let i = 0; i < total; i++) {
-          if (questions[i] && questions[i].correct === -1) pending++;
-          else if (answerStatus[i] === true) correct++;
-          else if (answerStatus[i] === false) wrong++;
-          else if (i === currentIndex && !quizCompleted && !quizTimedOut) active++;
-          else pending++;
+          if (questions[i] && questions[i].correct === -1) {
+            pending++;
+          } else if (answerStatus[i] === true) {
+            correct++;
+          } else if (answerStatus[i] === false) {
+            wrong++;
+          } else if (i === currentIndex && !quizCompleted && !quizTimedOut) {
+            active++;
+          } else {
+            pending++;
+          }
         }
         correctCount.textContent = correct;
         wrongCount.textContent = wrong;
@@ -1109,14 +1800,75 @@
         pendingCount.textContent = pending;
       }
 
+      // ----- Refresh / Reset Functions -----
+      async function handleRefresh() {
+        const confirmed = await showConfirm(
+          '🔄',
+          'Refresh Quiz Data?',
+          'This will reset your current progress and load the latest questions from the spreadsheet. Your current progress will be lost.',
+          'btn-confirm-success'
+        );
+        
+        if (!confirmed) return;
+
+        // Reset everything
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        clearSession();
+        sessionRestored = false;
+        quizCompleted = false;
+        quizTimedOut = false;
+        questions = [];
+        currentIndex = 0;
+        score = 0;
+        answerStatus = [];
+        timeRemaining = 0;
+        
+        // Show loading state
+        questionText.textContent = '🔄 Refreshing data from spreadsheet...';
+        hideFeedback();
+        showToast('🔄 Refreshing quiz data...', 'info', 2000);
+        
+        // Fetch fresh data
+        fetchQuizQuestions();
+      }
+
+      async function handleUserBadgeClick() {
+        const confirmed = await showConfirm(
+          '🚪',
+          'Logout?',
+          'Are you sure you want to logout? Your current progress will be saved and can be resumed later.',
+          'btn-confirm'
+        );
+        
+        if (confirmed) {
+          handleLogout();
+        }
+      }
+
+      // ----- Restart Quiz -----
       function restartQuiz() {
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        clearSession(); sessionRestored = false;
-        if (questions.length === 0) { fetchQuizQuestions(); return; }
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        clearSession();
+        sessionRestored = false;
+        if (questions.length === 0) {
+          fetchQuizQuestions();
+          return;
+        }
         showToast('🔄 Restarting quiz...', 'info', 1500);
-        currentIndex = 0; score = 0; isAnswered = false; quizCompleted = false; quizTimedOut = false;
+        currentIndex = 0;
+        score = 0;
+        isAnswered = false;
+        quizCompleted = false;
+        quizTimedOut = false;
         answerStatus = new Array(questions.length).fill(null);
-        resultArea.style.display = 'none'; questionArea.style.display = 'block';
+        resultArea.style.display = 'none';
+        questionArea.style.display = 'block';
         hideFeedback();
         renderQuestion(0);
         renderDots();
@@ -1125,16 +1877,41 @@
         saveSession();
       }
 
-      // EVENT LISTENERS
+      // --------------------------------------------------------------
+      // 13. EVENT LISTENERS
+      // --------------------------------------------------------------
       loginBtn.addEventListener('click', handleLogin);
-      document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !loginBtn.disabled) { const active = document.activeElement; if (active === emailInput || active === passwordInput) handleLogin(); } });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !loginBtn.disabled) {
+          const active = document.activeElement;
+          if (active === emailInput || active === passwordInput) {
+            handleLogin();
+          }
+        }
+      });
+
       nextBtn.addEventListener('click', goToNext);
       restartFromResult.addEventListener('click', restartQuiz);
       logoutBtn.addEventListener('click', handleLogout);
-      document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !nextBtn.disabled && quizScreen.style.display !== 'none') goToNext(); });
-      window.addEventListener('beforeunload', function() { if (loggedInUser && !quizCompleted) saveSession(); });
+      refreshBtn.addEventListener('click', handleRefresh);
+      userBadge.addEventListener('click', handleUserBadgeClick);
 
-      // INIT
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !nextBtn.disabled && quizScreen.style.display !== 'none') {
+          goToNext();
+        }
+      });
+
+      window.addEventListener('beforeunload', function() {
+        if (loggedInUser && !quizCompleted) {
+          saveSession();
+        }
+      });
+
+      // --------------------------------------------------------------
+      // 14. INIT
+      // --------------------------------------------------------------
       fetchUsers();
     })();
   </script>
