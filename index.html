@@ -340,31 +340,10 @@
       padding: 0.5rem 0.5rem 0.5rem;
       display: none;
     }
-    .result-card h2 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #0b2a3b;
-      margin-bottom: 0.5rem;
-    }
-    .result-score {
-      font-size: 3.6rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #1a5a7a, #48a0c7);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin: 0.3rem 0 0.2rem;
-    }
-    .result-msg {
-      color: #1f4b61;
-      font-size: 1.1rem;
-      margin: 0.2rem 0 1.6rem;
-    }
-    .result-card .btn-primary {
-      font-size: 1rem;
-      padding: 0.7rem 2.8rem;
-      margin-top: 0.5rem;
-    }
+    .result-card h2 { font-size: 2.2rem; font-weight: 700; color: #0b2a3b; }
+    .result-score { font-size: 3.6rem; font-weight: 800; background: linear-gradient(135deg, #1a5a7a, #48a0c7); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 0.3rem 0 0.2rem; }
+    .result-msg { color: #1f4b61; font-size: 1.1rem; margin: 0.2rem 0 1.6rem; }
+    .result-card .btn-primary { font-size: 1rem; padding: 0.7rem 2.8rem; }
 
     .result-details {
       text-align: left;
@@ -472,6 +451,14 @@
     }
     .modal-actions .btn-secondary:hover { background: #c8d4df; }
 
+    .result-attempted {
+      font-size: 0.9rem;
+      color: #1f4d66;
+      margin: 0.2rem 0 0.5rem 0;
+      font-weight: 500;
+    }
+    .result-attempted span { font-weight: 700; color: #0b2a3b; }
+
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
@@ -486,7 +473,6 @@
       .action-bar { flex-direction: column; }
       .btn-primary, .btn-success { width: 100%; justify-content: center; }
       .modal-box { padding: 1.5rem 1.2rem; }
-      .result-score { font-size: 2.8rem; }
     }
   </style>
 </head>
@@ -547,9 +533,10 @@
     <div class="result-card" id="resultArea">
       <h2>🏁 Quiz Complete</h2>
       <div class="result-score" id="finalScore">0 / 0</div>
+      <div class="result-attempted" id="resultAttempted">Attempted: <span id="resultAttemptedCount">0</span> / <span id="resultTotalCount">0</span></div>
       <p class="result-msg" id="resultMessage">Keep learning!</p>
-      <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
       <div class="result-details" id="resultDetails"></div>
+      <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
     </div>
   </div>
 
@@ -598,6 +585,8 @@
     const finalScore = document.getElementById('finalScore');
     const resultMessage = document.getElementById('resultMessage');
     const resultDetails = document.getElementById('resultDetails');
+    const resultAttemptedCount = document.getElementById('resultAttemptedCount');
+    const resultTotalCount = document.getElementById('resultTotalCount');
     const restartFromResult = document.getElementById('restartFromResult');
     const refreshBtn = document.getElementById('refreshBtn');
     const refreshIcon = document.getElementById('refreshIcon');
@@ -1043,6 +1032,8 @@
       
       const attempted = getAttemptedCount();
       attemptedCount.textContent = attempted;
+      resultAttemptedCount.textContent = attempted;
+      resultTotalCount.textContent = total;
       
       let msg = quizTimedOut ? '⏰ Time ran out! ' + getScoreMsg(score,total) : getScoreMsg(score,total);
       resultMessage.textContent = msg;
