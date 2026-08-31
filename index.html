@@ -451,14 +451,6 @@
     }
     .modal-actions .btn-secondary:hover { background: #c8d4df; }
 
-    .result-attempted {
-      font-size: 0.9rem;
-      color: #1f4d66;
-      margin: 0.2rem 0 0.5rem 0;
-      font-weight: 500;
-    }
-    .result-attempted span { font-weight: 700; color: #0b2a3b; }
-
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
@@ -533,7 +525,6 @@
     <div class="result-card" id="resultArea">
       <h2>🏁 Quiz Complete</h2>
       <div class="result-score" id="finalScore">0 / 0</div>
-      <div class="result-attempted" id="resultAttempted">Attempted: <span id="resultAttemptedCount">0</span> / <span id="resultTotalCount">0</span></div>
       <p class="result-msg" id="resultMessage">Keep learning!</p>
       <div class="result-details" id="resultDetails"></div>
       <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
@@ -585,8 +576,6 @@
     const finalScore = document.getElementById('finalScore');
     const resultMessage = document.getElementById('resultMessage');
     const resultDetails = document.getElementById('resultDetails');
-    const resultAttemptedCount = document.getElementById('resultAttemptedCount');
-    const resultTotalCount = document.getElementById('resultTotalCount');
     const restartFromResult = document.getElementById('restartFromResult');
     const refreshBtn = document.getElementById('refreshBtn');
     const refreshIcon = document.getElementById('refreshIcon');
@@ -1032,8 +1021,6 @@
       
       const attempted = getAttemptedCount();
       attemptedCount.textContent = attempted;
-      resultAttemptedCount.textContent = attempted;
-      resultTotalCount.textContent = total;
       
       let msg = quizTimedOut ? '⏰ Time ran out! ' + getScoreMsg(score,total) : getScoreMsg(score,total);
       resultMessage.textContent = msg;
