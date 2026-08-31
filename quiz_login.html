@@ -380,8 +380,8 @@
       border: 2px solid transparent;
     }
     .quiz-wrapper .user-badge:hover {
-      border-color: #2f7b9e;
-      background: #e8f0f8;
+      border-color: #dc3545;
+      background: #fde8ea;
     }
     .quiz-wrapper .user-badge .avatar {
       width: 30px;
@@ -428,9 +428,6 @@
     }
     .icon-btn:active {
       transform: rotate(90deg);
-    }
-    .icon-btn .tooltip {
-      display: none;
     }
 
     .quiz-wrapper .timer-line {
@@ -1266,9 +1263,10 @@
       }
 
       // --------------------------------------------------------------
-      // 10. LOGOUT FUNCTION
+      // 10. LOGOUT FUNCTION - DOES NOT SAVE PROGRESS
       // --------------------------------------------------------------
       function handleLogout() {
+        // Clear session without saving
         clearSession();
         sessionRestored = false;
         loggedInUser = null;
@@ -1287,7 +1285,7 @@
         loginStatus.textContent = '🔐 Sign in to continue';
         emailInput.value = '';
         passwordInput.value = '';
-        showToast('👋 Logged out successfully.', 'info', 2500);
+        showToast('👋 Logged out successfully. Progress not saved.', 'info', 3000);
       }
 
       // --------------------------------------------------------------
@@ -1839,7 +1837,7 @@
         const confirmed = await showConfirm(
           '🚪',
           'Logout?',
-          'Are you sure you want to logout? Your current progress will be saved and can be resumed later.',
+          'Are you sure you want to logout? Your current progress will NOT be saved and you will lose all your answers.',
           'btn-confirm'
         );
         
