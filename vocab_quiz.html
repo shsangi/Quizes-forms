@@ -3,330 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 Live Spreadsheet Data</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        }
-        body {
-            background: #f1f5f9;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .container {
-            max-width: 1400px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            padding: 30px;
-            overflow-x: auto;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid #eef2f6;
-        }
-        h1 {
-            font-size: 1.9rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin: 0;
-            letter-spacing: -0.5px;
-        }
-        h1 span {
-            background: #dbeafe;
-            color: #1e4a7a;
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 2px 14px;
-            border-radius: 30px;
-            margin-left: 12px;
-            letter-spacing: 0;
-        }
-        .status-badge {
-            background: #f1f5f9;
-            color: #334155;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .status-badge .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .dot.loading { background: #f59e0b; animation: pulse 1.5s infinite; }
-        .dot.success { background: #22c55e; }
-        .dot.error { background: #ef4444; }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 16px;
-            border: 1px solid #e9edf2;
-            background: #fafcfe;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-            min-width: 500px;
-        }
-        th {
-            background: #f8fafc;
-            color: #0f172a;
-            font-weight: 600;
-            padding: 14px 20px;
-            text-align: left;
-            border-bottom: 2px solid #e2e8f0;
-            white-space: nowrap;
-            position: sticky;
-            top: 0;
-            z-index: 5;
-        }
-        td {
-            padding: 12px 20px;
-            border-bottom: 1px solid #eef2f6;
-            color: #1e293b;
-        }
-        tr:nth-child(even) { background: #fafcfe; }
-        tr:hover { background: #f1f8ff; }
-        .state-message {
-            text-align: center;
-            padding: 60px 20px;
-            font-size: 1.1rem;
-            color: #64748b;
-        }
-        .state-message .icon { font-size: 2.5rem; display: block; margin-bottom: 16px; }
-        .error-box {
-            background: #fef2f2;
-            color: #991b1b;
-            border-radius: 16px;
-            padding: 30px 40px;
-            text-align: left;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        .error-box strong { display: block; font-size: 1.2rem; margin-bottom: 8px; }
-        .error-box ul { padding-left: 24px; line-height: 1.8; }
-        .error-box code {
-            background: #fee2e2;
-            padding: 2px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
-        .footer {
-            margin-top: 24px;
-            font-size: 0.85rem;
-            color: #94a3b8;
-            text-align: center;
-            border-top: 1px solid #eef2f6;
-            padding-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .footer .count {
-            background: #f1f5f9;
-            padding: 2px 16px;
-            border-radius: 30px;
-            color: #334155;
-        }
-        @media (max-width: 700px) {
-            .container { padding: 16px; }
-            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            h1 { font-size: 1.4rem; }
-            h1 span { font-size: 0.7rem; margin-left: 8px; padding: 2px 10px; }
-            th, td { padding: 8px 12px; font-size: 0.85rem; }
-            .error-box { padding: 20px; }
-        }
-    </style>
+    <title>Google Sheets Data Viewer</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PapaParse for easy CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Spreadsheet Viewer <span>Live</span></h1>
-            <div class="status-badge">
-                <span class="dot loading" id="statusDot"></span>
-                <span id="statusText">Connecting...</span>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-p-6">
+
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">Spreadsheet Data</h1>
+            <p class="text-sm text-gray-500 mt-1">Data is fetched live from your Google Sheet.</p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <span class="ml-3 text-lg font-medium text-gray-600">Loading data...</span>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="hidden bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-md">
+            <div class="flex">
+                <div class="ml-3">
+                    <p class="text-sm text-red-700" id="error-message">Failed to load data. Please check your network or spreadsheet link.</p>
+                </div>
             </div>
         </div>
 
-        <div class="table-wrapper" id="tableContainer">
-            <div class="state-message">
-                <span class="icon">⏳</span>
-                Loading your spreadsheet data...
+        <!-- Table Container -->
+        <div id="table-container" class="hidden bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+            <div class="overflow-x-auto">
+                <table id="data-table" class="min-w-full divide-y divide-gray-200">
+                    <thead id="table-head" class="bg-gray-100">
+                        <!-- Table headers will be injected here -->
+                    </thead>
+                    <tbody id="table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Table rows will be injected here -->
+                    </tbody>
+                </table>
             </div>
-        </div>
-
-        <div class="footer">
-            <span>Data loaded directly from Google Sheets</span>
-            <span class="count" id="rowCount">0 rows</span>
         </div>
     </div>
 
+    <!-- Script to Fetch and Render CSV -->
     <script>
-        // ================================================================
-        // YOUR PUBLISHED CSV URL (with CORS proxy to bypass restrictions)
-        // ================================================================
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwqiqAHnqVpS5790H4PQl0gkl3UwaM1-AvSfHRAv8lIQTmWzl2q8OuV9z9Gk42cMCq_xbiKCyyCePQ/pub?output=csv";
-        const PROXY_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(SHEET_URL);
+        // Your Google Sheet CSV URL
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwqiqAHnqVpS5790H4PQl0gkl3UwaM1-AvSfHRAv8lIQTmWzl2q8OuV9z9Gk42cMCq_xbiKCyyCePQ/pub?output=csv";
 
-        // Use the proxy URL to avoid CORS errors
-        const CSV_URL = PROXY_URL;
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+        const errorMessageEl = document.getElementById('error-message');
+        const tableContainerEl = document.getElementById('table-container');
+        const tableHeadEl = document.getElementById('table-head');
+        const tableBodyEl = document.getElementById('table-body');
 
-        // ================================================================
-        // NO NEED TO EDIT BELOW
-        // ================================================================
+        // Fetch and parse CSV using PapaParse
+        Papa.parse(csvUrl, {
+            download: true,
+            header: true, // Set to true if the first row of your sheet contains column headers
+            skipEmptyLines: true,
+            complete: function(results) {
+                loadingEl.style.display = 'none';
 
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-        const container = document.getElementById('tableContainer');
-        const rowCountEl = document.getElementById('rowCount');
-
-        function setStatus(state, message) {
-            statusDot.className = 'dot ' + state;
-            statusText.textContent = message;
-        }
-
-        async function loadData() {
-            setStatus('loading', 'Fetching data...');
-            
-            try {
-                const response = await fetch(CSV_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const csvText = await response.text();
-                
-                if (!csvText || csvText.trim() === '') {
-                    throw new Error('The CSV file appears to be empty.');
-                }
-
-                const rows = parseCSV(csvText);
-                
-                if (rows.length === 0) {
-                    container.innerHTML = `<div class="state-message"><span class="icon">📭</span>No data found in the spreadsheet.</div>`;
-                    setStatus('error', 'No data');
-                    rowCountEl.textContent = '0 rows';
+                if (results.errors.length > 0) {
+                    console.error(results.errors);
+                    errorEl.classList.remove('hidden');
+                    errorMessageEl.textContent = "Error parsing the CSV data.";
                     return;
                 }
 
-                // Build table
-                let html = `<table><thead><tr>`;
-                rows[0].forEach(header => {
-                    html += `<th>${escapeHTML(header || '')}</th>`;
+                const data = results.data;
+
+                if (data.length === 0) {
+                    errorEl.classList.remove('hidden');
+                    errorMessageEl.textContent = "The spreadsheet is empty.";
+                    return;
+                }
+
+                // Generate Table Headers
+                const headers = Object.keys(data[0]);
+                let headerHtml = '<tr>';
+                headers.forEach(header => {
+                    headerHtml += `<th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${header}</th>`;
                 });
-                html += `</tr></thead><tbody>`;
-                
-                for (let i = 1; i < rows.length; i++) {
-                    html += `<tr>`;
-                    const row = rows[i];
-                    for (let j = 0; j < rows[0].length; j++) {
-                        html += `<td>${escapeHTML(row[j] || '')}</td>`;
-                    }
-                    html += `</tr>`;
-                }
-                html += `</tbody></table>`;
+                headerHtml += '</tr>';
+                tableHeadEl.innerHTML = headerHtml;
 
-                container.innerHTML = html;
-                const count = rows.length - 1;
-                rowCountEl.textContent = count + ' rows';
-                setStatus('success', `Loaded ${count} rows`);
+                // Generate Table Rows
+                let bodyHtml = '';
+                data.forEach((row, index) => {
+                    const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50'; // Zebra striping
+                    bodyHtml += `<tr class="${rowBg} hover:bg-indigo-50 transition-colors">`;
+                    headers.forEach(header => {
+                        const cellValue = row[header] !== undefined ? row[header] : '';
+                        bodyHtml += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${cellValue}</td>`;
+                    });
+                    bodyHtml += `</tr>`;
+                });
+                tableBodyEl.innerHTML = bodyHtml;
 
-            } catch (error) {
-                console.error('Error:', error);
-                container.innerHTML = `
-                    <div class="state-message">
-                        <div class="error-box">
-                            <strong>⚠️ Failed to load spreadsheet</strong>
-                            <p style="color: #7f1d1d;">${error.message}</p>
-                            <hr style="border-color: #fecaca; margin: 16px 0;">
-                            <div style="font-size: 0.95rem; color: #991b1b;">
-                                <strong>Quick fixes:</strong>
-                                <ul>
-                                    <li>Make sure your sheet is published: <code>File → Share → Publish to web</code></li>
-                                    <li>Check that the URL in the code is correct</li>
-                                    <li>Try opening this page in a different browser (Chrome, Firefox, Edge)</li>
-                                    <li>If using a VPN or proxy, try disabling it</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                setStatus('error', 'Error loading');
-                rowCountEl.textContent = '0 rows';
+                // Show Table
+                tableContainerEl.classList.remove('hidden');
+            },
+            error: function(err) {
+                loadingEl.style.display = 'none';
+                errorEl.classList.remove('hidden');
+                errorMessageEl.textContent = "Failed to fetch Google Sheet. Make sure the sheet is published to the web as a CSV.";
+                console.error(err);
             }
-        }
-
-        // CSV parser with quoted field support
-        function parseCSV(text) {
-            const lines = [];
-            let current = [];
-            let field = '';
-            let inQuotes = false;
-            
-            const data = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n') + '\n';
-            
-            for (let i = 0; i < data.length; i++) {
-                const c = data[i];
-                
-                if (c === '"') {
-                    if (inQuotes && data[i + 1] === '"') {
-                        field += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (c === ',' && !inQuotes) {
-                    current.push(field.trim());
-                    field = '';
-                } else if (c === '\n' && !inQuotes) {
-                    current.push(field.trim());
-                    if (current.some(f => f !== '')) {
-                        lines.push(current);
-                    }
-                    current = [];
-                    field = '';
-                } else {
-                    field += c;
-                }
-            }
-            return lines.filter(line => line.length > 0);
-        }
-
-        function escapeHTML(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        // Start
-        loadData();
+        });
     </script>
 </body>
 </html>
