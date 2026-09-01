@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data Viewer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f4f7fc;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+            padding: 24px;
+            overflow-x: auto;
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        .status {
+            color: #475569;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        th {
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: 600;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+        tr:hover {
+            background: #f8fafc;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 12px; }
+            th, td { padding: 8px 10px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 CSV Data Viewer</h1>
+        <div class="status" id="statusMessage">Loading data...</div>
+        <div id="tableContainer">
+            <div class="loading">⏳ Fetching CSV data...</div>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS URL with your working CSV link
+        const CSV_URL = "https://people.sc.fsu.edu/~jburkardt/data/csv/hw_200.csv";
+
+        async function fetchAndDisplayCSV() {
+            const statusEl = document.getElementById('statusMessage');
+            const container = document.getElementById('tableContainer');
+
+            try {
+                const response = await fetch(CSV_URL);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+
+                if (rows.length === 0) {
+                    container.innerHTML = `<div class="error">No data found in CSV.</div>`;
+                    statusEl.textContent = '❌ No data';
+                    return;
+                }
+
+                // Build HTML table
+                let html = `<table><thead><tr>`;
+                // Header row
+                rows[0].forEach(header => {
+                    html += `<th>${escapeHTML(header)}</th>`;
+                });
+                html += `</tr></thead><tbody>`;
+                // Data rows (skip header)
+                for (let i = 1; i < rows.length; i++) {
+                    html += `<tr>`;
+                    rows[i].forEach(cell => {
+                        html += `<td>${escapeHTML(cell)}</td>`;
+                    });
+                    html += `</tr>`;
+                }
+                html += `</tbody></table>`;
+
+                container.innerHTML = html;
+                statusEl.textContent = `✅ Loaded ${rows.length - 1} rows from ${rows[0].length} columns.`;
+
+            } catch (error) {
+                console.error('CSV Fetch Error:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        <strong>⚠️ Failed to load CSV.</strong><br>
+                        ${error.message}<br><br>
+                        <strong>Possible solutions:</strong><br>
+                        1. Verify your CSV URL is correct and publicly accessible.<br>
+                        2. Check the Google Sheets sharing settings (Publish to web).<br>
+                        3. Make sure CORS is not blocking the request (try a different browser or proxy).
+                    </div>
+                `;
+                statusEl.textContent = '❌ Error loading data';
+            }
+        }
+
+        // Simple CSV parser (handles commas and basic quotes)
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+            return lines.map(line => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            });
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                if (m === '"') return '&quot;';
+                return m;
+            });
+        }
+
+        // Run the fetch
+        fetchAndDisplayCSV();
+    </script>
+</body>
+</html>
