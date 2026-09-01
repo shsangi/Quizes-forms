@@ -10,19 +10,12 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Inter', sans-serif; }
-        .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); }
         .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .card-hover:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
         .url-link { color: #2563eb; text-decoration: none; border-bottom: 1px dashed #93c5fd; transition: all 0.2s; }
         .url-link:hover { color: #1d4ed8; border-bottom-color: #2563eb; background: #eff6ff; padding: 0 4px; border-radius: 4px; }
         .search-btn { transition: all 0.2s; }
         .search-btn:hover { transform: scale(1.1); background: #e0e7ff; }
-        .badge-pulse { animation: pulse-badge 2s infinite; }
-        @keyframes pulse-badge {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .tab-active { background: white; color: #4f46e5; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15); }
         .tab-inactive { color: #6b7280; }
         .tab-inactive:hover { background: rgba(255,255,255,0.5); color: #1f2937; }
@@ -42,38 +35,38 @@
         .heading-gradient-8 { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
         .heading-gradient-9 { background: linear-gradient(135deg, #fddb92 0%, #d1fdff 100%); }
         .heading-gradient-10 { background: linear-gradient(135deg, #c1f1c6 0%, #f9d976 100%); }
+        
+        /* Hide header card, show only tabs */
+        .header-hidden { display: none; }
+        .tabs-only { 
+            background: rgba(255,255,255,0.7); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 16px;
+            padding: 8px 12px;
+            display: inline-flex;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        .tabs-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 16px 0 24px 0;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="glass-card rounded-2xl shadow-xl border border-white/50 p-6 md:p-8 mb-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="gradient-bg w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-table text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                            Cards Dashboard
-                        </h1>
-                        <p class="text-sm text-gray-500 mt-0.5 flex items-center gap-2">
-                            <i class="fas fa-sync-alt text-xs text-green-500 badge-pulse"></i>
-                            Live from Google Sheets
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Only 2 tabs: Cards and Table -->
-                <div id="view-tabs" class="hidden bg-white/70 backdrop-blur-sm p-1 rounded-xl shadow-sm border border-gray-200/50">
-                    <button id="btn-cards" onclick="switchView('cards')" class="px-5 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2">
-                        <i class="fas fa-th-large"></i> Cards
-                    </button>
-                    <button id="btn-table" onclick="switchView('table')" class="px-5 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
-                        <i class="fas fa-list-ul"></i> Table
-                    </button>
-                </div>
+        
+        <!-- Horizontal Tabs Only (no header card) -->
+        <div class="tabs-wrapper">
+            <div id="view-tabs" class="hidden tabs-only">
+                <button id="btn-cards" onclick="switchView('cards')" class="px-6 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2">
+                    <i class="fas fa-th-large"></i> Data Cards
+                </button>
+                <button id="btn-table" onclick="switchView('table')" class="px-6 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
+                    <i class="fas fa-list-ul"></i> Table View
+                </button>
             </div>
         </div>
 
@@ -141,7 +134,6 @@
         const tableBodyEl = document.getElementById('table-body');
         const tableCountEl = document.getElementById('table-count');
 
-        // Heading gradients
         const headingGradients = [
             'heading-gradient-1', 'heading-gradient-2', 'heading-gradient-3', 
             'heading-gradient-4', 'heading-gradient-5', 'heading-gradient-6',
@@ -231,7 +223,6 @@
                     renderCards();
 
                     viewTabsEl.classList.remove('hidden');
-                    // Default: Cards view
                     switchView('cards');
                 },
                 error: function(err) {
@@ -255,13 +246,13 @@
             if (view === 'cards') {
                 cardsViewEl.classList.remove('hidden');
                 tableViewEl.classList.add('hidden');
-                btnCards.className = "px-5 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
-                btnTable.className = "px-5 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnCards.className = "px-6 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnTable.className = "px-6 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
             } else {
                 tableViewEl.classList.remove('hidden');
                 cardsViewEl.classList.add('hidden');
-                btnTable.className = "px-5 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
-                btnCards.className = "px-5 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnTable.className = "px-6 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnCards.className = "px-6 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
             }
         }
         window.switchView = switchView;
@@ -345,11 +336,10 @@
                             }
                         }
                         
-                        const isSpecial = (i === 0 || i === 1);
+                        // No stars — removed the isSpecial check and star icon
                         cardsHtml += `
-                            <div class="text-sm flex justify-between items-start gap-2 py-2 border-b border-gray-50 last:border-0 card-field rounded-lg px-2 -mx-2 ${isSpecial ? 'bg-indigo-50/30' : ''}">
-                                <span class="font-medium text-gray-500 text-xs uppercase tracking-wider flex items-center gap-1">
-                                    ${isSpecial ? '<i class="fas fa-star text-amber-400 text-[10px]"></i>' : ''}
+                            <div class="text-sm flex justify-between items-start gap-2 py-2 border-b border-gray-50 last:border-0 card-field rounded-lg px-2 -mx-2">
+                                <span class="font-medium text-gray-500 text-xs uppercase tracking-wider">
                                     ${header}
                                 </span>
                                 <span class="text-gray-800 text-right break-all max-w-[65%]">${displayVal}</span>
