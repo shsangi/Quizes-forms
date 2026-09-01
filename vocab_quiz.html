@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>✨ Spreadsheet Viewer · Live</title>
-    <!-- Google Font for a polished look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -37,7 +36,6 @@
             transition: all 0.2s ease;
         }
 
-        /* ---- Header ---- */
         .header {
             display: flex;
             justify-content: space-between;
@@ -104,7 +102,6 @@
             50% { opacity: 0.4; transform: scale(0.9); }
         }
 
-        /* ---- Table Wrapper ---- */
         .table-wrapper {
             overflow-x: auto;
             border-radius: 1.5rem;
@@ -157,7 +154,6 @@
             background: #f1f8ff;
         }
 
-        /* ---- Clickable URL & Search ---- */
         .cell-content {
             display: flex;
             align-items: center;
@@ -210,11 +206,6 @@
             color: #15803d;
         }
 
-        .tooltip-trigger {
-            position: relative;
-        }
-
-        /* ---- State messages ---- */
         .state-message {
             text-align: center;
             padding: 4rem 1.5rem;
@@ -257,7 +248,6 @@
             font-size: 0.8rem;
         }
 
-        /* ---- Footer ---- */
         .footer {
             margin-top: 1.8rem;
             display: flex;
@@ -280,7 +270,6 @@
             font-size: 0.8rem;
         }
 
-        /* ---- Responsive ---- */
         @media (max-width: 700px) {
             body { padding: 1rem 0.8rem; }
             .container { padding: 1.2rem; border-radius: 1.8rem; }
@@ -300,7 +289,6 @@
 </head>
 <body>
 <div class="container">
-    <!-- Header -->
     <div class="header">
         <div class="title-group">
             <h1>📊 Spreadsheet Viewer</h1>
@@ -312,7 +300,6 @@
         </div>
     </div>
 
-    <!-- Table -->
     <div class="table-wrapper" id="tableContainer">
         <div class="state-message">
             <span class="icon">⏳</span>
@@ -321,7 +308,6 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <div class="footer">
         <span>📌 Click <span style="background:#dbeafe; padding:0.1rem 0.5rem; border-radius:12px; font-weight:500;">🔗</span> to open URL · <span style="background:#e6f7e6; padding:0.1rem 0.5rem; border-radius:12px; font-weight:500;">🔍</span> to search</span>
         <span class="count" id="rowCount">0 rows</span>
@@ -331,12 +317,11 @@
 <script>
     (function() {
         // ============================================================
-        // YOUR PUBLISHED CSV URL (with CORS proxy)
+        // YOUR ORIGINAL WORKING CSV URL (with CORS proxy)
         // ============================================================
         const PUBLISHED_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwqiqAHnqVpS5790H4PQl0gkl3UwaM1-AvSfHRAv8lIQTmWzl2q8OuV9z9Gk42cMCq_xbiKCyyCePQ/pub?output=csv";
         const CSV_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(PUBLISHED_CSV_URL);
 
-        // DOM refs
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
         const container = document.getElementById('tableContainer');
@@ -347,7 +332,6 @@
             statusText.textContent = message;
         }
 
-        // ----- escape HTML -----
         function escapeHTML(str) {
             if (!str) return '';
             return String(str)
@@ -358,15 +342,12 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // ----- detect if text looks like a URL -----
         function isURL(str) {
             if (!str) return false;
             const trimmed = str.trim();
-            // simple but robust: starts with http:// or https://
             return /^https?:\/\/\S+$/i.test(trimmed);
         }
 
-        // ----- build cell with actions -----
         function buildCellContent(rawText) {
             const text = rawText || '';
             const trimmed = text.trim();
@@ -376,11 +357,9 @@
             html += `<span class="cell-actions">`;
 
             if (isUrl) {
-                // clickable URL button
                 html += `<a href="${escapeHTML(trimmed)}" target="_blank" rel="noopener noreferrer" class="btn-icon url-btn" title="Open URL">🔗</a>`;
             }
 
-            // search button (always)
             const searchQuery = encodeURIComponent(trimmed);
             html += `<a href="https://www.google.com/search?q=${searchQuery}" target="_blank" rel="noopener noreferrer" class="btn-icon search-btn" title="Search on Google">🔍</a>`;
 
@@ -388,7 +367,6 @@
             return html;
         }
 
-        // ----- CSV parser (handles quotes & newlines) -----
         function parseCSV(text) {
             const lines = [];
             let current = [];
@@ -422,7 +400,6 @@
             return lines.filter(line => line.length > 0);
         }
 
-        // ----- main fetch -----
         async function loadData() {
             setStatus('loading', 'Fetching data…');
             try {
@@ -440,15 +417,12 @@
                     return;
                 }
 
-                // --- Build table with enhanced cells ---
                 let html = `<table><thead><tr>`;
-                // header row
                 rows[0].forEach(header => {
                     html += `<th>${escapeHTML(header || '')}</th>`;
                 });
                 html += `</tr></thead><tbody>`;
 
-                // data rows
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i];
                     html += `<tr>`;
@@ -489,7 +463,6 @@
             }
         }
 
-        // start
         loadData();
     })();
 </script>
