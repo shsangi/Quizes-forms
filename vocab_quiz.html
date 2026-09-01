@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 Quiz Dashboard</title>
+    <title>📊 Quiz & Data Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -63,7 +63,6 @@
         .compact-card .search-btn { width: 22px !important; height: 22px !important; }
         .compact-card .search-btn i { font-size: 10px !important; }
         
-        /* Quiz styles */
         .quiz-option {
             transition: all 0.2s;
             cursor: pointer;
@@ -74,38 +73,26 @@
         .quiz-option.correct { border-color: #22c55e; background: #dcfce7; }
         .quiz-option.wrong { border-color: #ef4444; background: #fee2e2; }
         .quiz-option.show-correct { border-color: #22c55e; background: #dcfce7; }
-        .quiz-card {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        .quiz-progress {
-            height: 4px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .quiz-progress-bar {
-            height: 100%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            transition: width 0.3s ease;
-        }
+        .quiz-card { max-width: 700px; margin: 0 auto; }
+        .quiz-progress { height: 4px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .quiz-progress-bar { height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); transition: width 0.3s ease; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
 
     <div class="max-w-7xl mx-auto">
         
-        <!-- Horizontal Tabs -->
+        <!-- Horizontal Tabs: Quiz, Cards, Table -->
         <div class="tabs-wrapper">
             <div id="view-tabs" class="hidden tabs-only">
-                <button id="btn-cards" onclick="switchView('cards')" class="px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2">
-                    <i class="fas fa-th-large"></i> Data Cards
+                <button id="btn-quiz" onclick="switchView('quiz')" class="px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2">
+                    <i class="fas fa-question-circle"></i> Quiz
+                </button>
+                <button id="btn-cards" onclick="switchView('cards')" class="px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
+                    <i class="fas fa-th-large"></i> Cards
                 </button>
                 <button id="btn-table" onclick="switchView('table')" class="px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
-                    <i class="fas fa-list-ul"></i> Table View
-                </button>
-                <button id="btn-quiz" onclick="switchView('quiz')" class="px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
-                    <i class="fas fa-question-circle"></i> Quiz View
+                    <i class="fas fa-list-ul"></i> Table
                 </button>
             </div>
         </div>
@@ -132,6 +119,18 @@
             </div>
         </div>
 
+        <!-- Quiz View (default) -->
+        <div id="quiz-view">
+            <div id="quiz-container" class="quiz-card">
+                <!-- Quiz content injected here -->
+            </div>
+        </div>
+
+        <!-- Cards View -->
+        <div id="cards-view" class="hidden grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+            <!-- Cards injected here -->
+        </div>
+
         <!-- Table View -->
         <div id="table-view" class="hidden bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
             <div class="overflow-x-auto p-2">
@@ -145,18 +144,6 @@
                 <span id="table-count">0 rows</span>
             </div>
         </div>
-
-        <!-- Cards View -->
-        <div id="cards-view" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            <!-- Cards injected here -->
-        </div>
-
-        <!-- Quiz View -->
-        <div id="quiz-view" class="hidden">
-            <div id="quiz-container" class="quiz-card">
-                <!-- Quiz content injected here -->
-            </div>
-        </div>
     </div>
 
     <script>
@@ -164,7 +151,7 @@
 
         let sheetData = [];
         let sheetHeaders = [];
-        let currentView = 'cards';
+        let currentView = 'quiz';
         let quizIndex = 0;
         let quizQuestions = [];
         let quizAnswered = false;
@@ -176,14 +163,14 @@
         const errorMessageEl = document.getElementById('error-message');
         const viewTabsEl = document.getElementById('view-tabs');
         
-        const tableViewEl = document.getElementById('table-view');
-        const cardsViewEl = document.getElementById('cards-view');
         const quizViewEl = document.getElementById('quiz-view');
+        const cardsViewEl = document.getElementById('cards-view');
+        const tableViewEl = document.getElementById('table-view');
         const quizContainerEl = document.getElementById('quiz-container');
         
+        const btnQuiz = document.getElementById('btn-quiz');
         const btnCards = document.getElementById('btn-cards');
         const btnTable = document.getElementById('btn-table');
-        const btnQuiz = document.getElementById('btn-quiz');
         const tableHeadEl = document.getElementById('table-head');
         const tableBodyEl = document.getElementById('table-body');
         const tableCountEl = document.getElementById('table-count');
@@ -271,14 +258,13 @@
 
                     tableCountEl.textContent = sheetData.length + ' rows';
 
-                    // Build quiz questions
                     buildQuizQuestions();
-
                     renderTable();
                     renderCards();
 
                     viewTabsEl.classList.remove('hidden');
-                    switchView('cards');
+                    // Default: Quiz view
+                    switchView('quiz');
                 },
                 error: function(err) {
                     loadingEl.style.display = 'none';
@@ -363,27 +349,27 @@
                 renderQuiz();
             }
             
-            if (view === 'cards') {
-                cardsViewEl.classList.remove('hidden');
-                tableViewEl.classList.add('hidden');
-                quizViewEl.classList.add('hidden');
-                btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
-                btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
-                btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
-            } else if (view === 'table') {
-                tableViewEl.classList.remove('hidden');
-                cardsViewEl.classList.add('hidden');
-                quizViewEl.classList.add('hidden');
-                btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
-                btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
-                btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
-            } else {
+            if (view === 'quiz') {
                 quizViewEl.classList.remove('hidden');
                 cardsViewEl.classList.add('hidden');
                 tableViewEl.classList.add('hidden');
                 btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
                 btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
                 btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+            } else if (view === 'cards') {
+                cardsViewEl.classList.remove('hidden');
+                quizViewEl.classList.add('hidden');
+                tableViewEl.classList.add('hidden');
+                btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+            } else {
+                tableViewEl.classList.remove('hidden');
+                quizViewEl.classList.add('hidden');
+                cardsViewEl.classList.add('hidden');
+                btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
             }
         }
         window.switchView = switchView;
@@ -577,7 +563,6 @@
             
             if (isCorrect) quizScore++;
             
-            // Show correct/wrong styles
             const allOpts = document.querySelectorAll('.quiz-option');
             allOpts.forEach((el, i) => {
                 const opt = q.options[i];
@@ -595,8 +580,6 @@
             });
             
             quizAnswered = true;
-            
-            // Show details
             document.getElementById('quiz-details').classList.remove('hidden');
             document.getElementById('quiz-details').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -632,7 +615,7 @@
                         </button>
                         <button onclick="switchView('cards')" 
                                 class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-th-large"></i> Back to Cards
+                            <i class="fas fa-th-large"></i> View Cards
                         </button>
                     </div>
                 </div>
