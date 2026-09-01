@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Cards Dashboard</title>
+    <title>📊 Compact Cards</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Inter', sans-serif; }
-        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card-hover:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
+        .card-hover { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -8px rgba(0,0,0,0.12); }
         .url-link { color: #2563eb; text-decoration: none; border-bottom: 1px dashed #93c5fd; transition: all 0.2s; }
         .url-link:hover { color: #1d4ed8; border-bottom-color: #2563eb; background: #eff6ff; padding: 0 4px; border-radius: 4px; }
         .search-btn { transition: all 0.2s; }
@@ -23,7 +23,7 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
-        .card-field { transition: background 0.15s; }
+        .card-field { transition: background 0.15s; padding: 4px 8px; margin: 0 -8px; border-radius: 6px; }
         .card-field:hover { background: #f8fafc; }
         .heading-gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .heading-gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
@@ -36,64 +36,69 @@
         .heading-gradient-9 { background: linear-gradient(135deg, #fddb92 0%, #d1fdff 100%); }
         .heading-gradient-10 { background: linear-gradient(135deg, #c1f1c6 0%, #f9d976 100%); }
         
-        /* Hide header card, show only tabs */
-        .header-hidden { display: none; }
         .tabs-only { 
             background: rgba(255,255,255,0.7); 
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255,255,255,0.5);
             border-radius: 16px;
-            padding: 8px 12px;
+            padding: 6px 10px;
             display: inline-flex;
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
         .tabs-wrapper {
             display: flex;
             justify-content: center;
-            padding: 16px 0 24px 0;
+            padding: 12px 0 18px 0;
         }
+        /* Compact card styles */
+        .compact-card .card-body { padding: 10px 14px !important; }
+        .compact-card .card-heading { padding: 8px 14px !important; }
+        .compact-card .card-heading h3 { font-size: 0.95rem !important; }
+        .compact-card .field-label { font-size: 0.6rem !important; letter-spacing: 0.04em; }
+        .compact-card .field-value { font-size: 0.8rem !important; }
+        .compact-card .field-row { padding: 2px 0 !important; margin: 0 !important; border-bottom: none !important; }
+        .compact-card .field-row + .field-row { border-top: 1px solid #f3f4f6; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-8">
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
 
     <div class="max-w-7xl mx-auto">
         
-        <!-- Horizontal Tabs Only (no header card) -->
+        <!-- Horizontal Tabs Only -->
         <div class="tabs-wrapper">
             <div id="view-tabs" class="hidden tabs-only">
-                <button id="btn-cards" onclick="switchView('cards')" class="px-6 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2">
+                <button id="btn-cards" onclick="switchView('cards')" class="px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2">
                     <i class="fas fa-th-large"></i> Data Cards
                 </button>
-                <button id="btn-table" onclick="switchView('table')" class="px-6 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
+                <button id="btn-table" onclick="switchView('table')" class="px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
                     <i class="fas fa-list-ul"></i> Table View
                 </button>
             </div>
         </div>
 
         <!-- Loading -->
-        <div id="loading" class="flex flex-col items-center justify-center py-32 bg-white/60 rounded-2xl backdrop-blur-sm border border-white/30">
+        <div id="loading" class="flex flex-col items-center justify-center py-24 bg-white/60 rounded-2xl backdrop-blur-sm border border-white/30">
             <div class="relative">
-                <div class="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
-                <i class="fas fa-spinner absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-indigo-400 text-sm"></i>
+                <div class="animate-spin rounded-full h-14 w-14 border-4 border-indigo-200 border-t-indigo-600"></div>
             </div>
-            <span class="mt-4 text-sm font-medium text-gray-500 animate-pulse">Loading your data...</span>
+            <span class="mt-3 text-sm font-medium text-gray-500 animate-pulse">Loading...</span>
         </div>
 
         <!-- Error -->
-        <div id="error" class="hidden bg-red-50/90 backdrop-blur-sm border-l-4 border-red-500 p-5 rounded-xl shadow-lg mb-6">
+        <div id="error" class="hidden bg-red-50/90 backdrop-blur-sm border-l-4 border-red-500 p-4 rounded-xl shadow-lg mb-6">
             <div class="flex items-start gap-3">
-                <i class="fas fa-exclamation-circle text-red-500 text-xl mt-0.5"></i>
+                <i class="fas fa-exclamation-circle text-red-500 text-lg mt-0.5"></i>
                 <div>
-                    <h4 class="font-semibold text-red-800">Failed to load data</h4>
-                    <p class="text-sm text-red-700 mt-1" id="error-message">Please check your connection and try again.</p>
-                    <button onclick="retryLoad()" class="mt-3 text-sm bg-red-100 hover:bg-red-200 text-red-700 px-4 py-1.5 rounded-lg transition flex items-center gap-2">
+                    <h4 class="font-semibold text-red-800">Failed to load</h4>
+                    <p class="text-sm text-red-700 mt-1" id="error-message">Please check your connection.</p>
+                    <button onclick="retryLoad()" class="mt-2 text-sm bg-red-100 hover:bg-red-200 text-red-700 px-4 py-1 rounded-lg transition flex items-center gap-2">
                         <i class="fas fa-redo"></i> Retry
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Table View (hidden by default) -->
+        <!-- Table View -->
         <div id="table-view" class="hidden bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
             <div class="overflow-x-auto p-2">
                 <table class="min-w-full divide-y divide-gray-200/60">
@@ -101,14 +106,14 @@
                     <tbody id="table-body" class="bg-white divide-y divide-gray-100"></tbody>
                 </table>
             </div>
-            <div class="bg-gray-50/50 px-6 py-3 text-xs text-gray-400 border-t border-gray-200/50 flex justify-between items-center">
-                <span><i class="fas fa-mouse-pointer mr-1"></i> Click URLs to open · Click <i class="fas fa-search text-indigo-400 mx-1"></i> to search</span>
+            <div class="bg-gray-50/50 px-5 py-2 text-xs text-gray-400 border-t border-gray-200/50 flex justify-between items-center">
+                <span><i class="fas fa-mouse-pointer mr-1"></i> Click URLs · <i class="fas fa-search text-indigo-400 mx-1"></i> Search</span>
                 <span id="table-count">0 rows</span>
             </div>
         </div>
 
-        <!-- Cards View (default, visible) -->
-        <div id="cards-view" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        <!-- Cards View - Compact -->
+        <div id="cards-view" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             <!-- Cards injected here -->
         </div>
     </div>
@@ -159,15 +164,14 @@
             const trimmed = String(value).trim();
             
             if (isURL(trimmed)) {
-                const displayUrl = trimmed.length > 40 ? trimmed.substring(0, 40) + '…' : trimmed;
+                const displayUrl = trimmed.length > 30 ? trimmed.substring(0, 30) + '…' : trimmed;
                 return `
                     <a href="${trimmed.startsWith('http') ? trimmed : 'https://' + trimmed}" 
                        target="_blank" 
-                       class="url-link inline-flex items-center gap-1.5 group"
+                       class="url-link inline-flex items-center gap-1 group text-sm"
                        title="Open: ${trimmed}">
-                        <i class="fas fa-external-link-alt text-[10px] text-indigo-400 group-hover:text-indigo-600"></i>
+                        <i class="fas fa-external-link-alt text-[9px] text-indigo-400"></i>
                         ${displayUrl}
-                        <span class="text-[10px] text-gray-400 group-hover:text-indigo-400">↗</span>
                     </a>
                 `;
             }
@@ -175,17 +179,16 @@
             const isSearchable = trimmed.length > 2 && !/^[\d\s,.]+$/.test(trimmed);
             if (isSearchable) {
                 return `
-                    <span class="flex items-center gap-2">
-                        <span>${value}</span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="text-sm">${value}</span>
                         <button onclick="searchGoogle('${encodeURIComponent(trimmed)}')" 
-                                class="search-btn text-gray-400 hover:text-indigo-600 text-xs w-6 h-6 rounded-full hover:bg-indigo-50 flex items-center justify-center transition-all"
-                                title="Search Google for '${trimmed}'">
-                            <i class="fas fa-search text-[10px]"></i>
+                                class="search-btn text-gray-400 hover:text-indigo-600 text-[10px] w-5 h-5 rounded-full hover:bg-indigo-50 flex items-center justify-center transition-all">
+                            <i class="fas fa-search text-[9px]"></i>
                         </button>
                     </span>
                 `;
             }
-            return value;
+            return `<span class="text-sm">${value}</span>`;
         }
 
         function searchGoogle(query) {
@@ -227,7 +230,7 @@
                 },
                 error: function(err) {
                     loadingEl.style.display = 'none';
-                    showError("Failed to fetch Google Sheet. Ensure it is published as a CSV.");
+                    showError("Failed to fetch Google Sheet.");
                     console.error(err);
                 }
             });
@@ -246,13 +249,13 @@
             if (view === 'cards') {
                 cardsViewEl.classList.remove('hidden');
                 tableViewEl.classList.add('hidden');
-                btnCards.className = "px-6 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
-                btnTable.className = "px-6 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
             } else {
                 tableViewEl.classList.remove('hidden');
                 cardsViewEl.classList.add('hidden');
-                btnTable.className = "px-6 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
-                btnCards.className = "px-6 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
             }
         }
         window.switchView = switchView;
@@ -262,7 +265,7 @@
             
             let headerHtml = '<tr>';
             sheetHeaders.forEach(header => {
-                headerHtml += `<th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${header}</th>`;
+                headerHtml += `<th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${header}</th>`;
             });
             headerHtml += '</tr>';
             tableHeadEl.innerHTML = headerHtml;
@@ -270,10 +273,10 @@
             let bodyHtml = '';
             sheetData.forEach((row, index) => {
                 const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/60';
-                bodyHtml += `<tr class="${rowBg} cell-highlight transition-colors">`;
+                bodyHtml += `<tr class="${rowBg} hover:bg-indigo-50/50 transition-colors">`;
                 sheetHeaders.forEach(header => {
                     const cellValue = row[header] !== undefined && row[header] !== null ? row[header] : '';
-                    bodyHtml += `<td class="px-6 py-4 text-sm text-gray-700">${renderCellContent(cellValue, header)}</td>`;
+                    bodyHtml += `<td class="px-4 py-3 text-sm text-gray-700">${renderCellContent(cellValue, header)}</td>`;
                 });
                 bodyHtml += `</tr>`;
             });
@@ -294,19 +297,21 @@
                 const gradientClass = headingGradients[index % headingGradients.length];
 
                 cardsHtml += `
-                    <div class="bg-white rounded-xl shadow-md border border-gray-200/60 card-hover overflow-hidden">
-                        <div class="${gradientClass} px-5 py-4 border-b border-white/20 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <i class="fas fa-tag text-white/70 text-sm"></i>
-                                ${headingText}
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200/60 card-hover overflow-hidden compact-card">
+                        <!-- Compact Heading -->
+                        <div class="${gradientClass} card-heading px-4 py-2 border-b border-white/20 flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-white flex items-center gap-1.5 truncate">
+                                <i class="fas fa-tag text-white/60 text-[10px]"></i>
+                                <span class="truncate">${headingText}</span>
                             </h3>
                             <button onclick="searchGoogle('${encodeURIComponent(headingText)}')" 
-                                    class="text-white/70 hover:text-white text-sm w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center transition-all">
-                                <i class="fas fa-search"></i>
+                                    class="text-white/60 hover:text-white text-xs w-6 h-6 rounded-full hover:bg-white/20 flex items-center justify-center transition-all flex-shrink-0">
+                                <i class="fas fa-search text-[10px]"></i>
                             </button>
                         </div>
                         
-                        <div class="p-5 space-y-2.5">
+                        <!-- Compact Body -->
+                        <div class="card-body px-4 py-2 space-y-0">
                 `;
 
                 for (let i = 0; i < sheetHeaders.length; i++) {
@@ -318,31 +323,30 @@
                         
                         if (isUrl) {
                             const domain = getDomain(val);
-                            displayVal = `<a href="${val.startsWith('http') ? val : 'https://' + val}" target="_blank" class="url-link text-sm inline-flex items-center gap-1">
-                                <i class="fas fa-external-link-alt text-[10px]"></i> ${domain}
+                            displayVal = `<a href="${val.startsWith('http') ? val : 'https://' + val}" target="_blank" class="url-link text-xs inline-flex items-center gap-1">
+                                <i class="fas fa-external-link-alt text-[8px]"></i> ${domain}
                             </a>`;
                         } else {
                             const searchable = String(val).length > 2 && !/^[\d\s,.]+$/.test(String(val));
                             if (searchable) {
                                 displayVal = `
-                                    <span class="flex items-center gap-2 flex-wrap">
-                                        <span>${val}</span>
+                                    <span class="flex items-center gap-1 flex-wrap">
+                                        <span class="text-xs">${val}</span>
                                         <button onclick="searchGoogle('${encodeURIComponent(String(val).trim())}')" 
-                                                class="text-gray-400 hover:text-indigo-500 text-xs transition-all">
-                                            <i class="fas fa-search"></i>
+                                                class="text-gray-400 hover:text-indigo-500 text-[10px] transition-all">
+                                            <i class="fas fa-search text-[8px]"></i>
                                         </button>
                                     </span>
                                 `;
                             }
                         }
                         
-                        // No stars — removed the isSpecial check and star icon
                         cardsHtml += `
-                            <div class="text-sm flex justify-between items-start gap-2 py-2 border-b border-gray-50 last:border-0 card-field rounded-lg px-2 -mx-2">
-                                <span class="font-medium text-gray-500 text-xs uppercase tracking-wider">
+                            <div class="field-row flex justify-between items-center gap-2 py-1">
+                                <span class="field-label font-medium text-gray-400 text-[10px] uppercase tracking-wider flex-shrink-0">
                                     ${header}
                                 </span>
-                                <span class="text-gray-800 text-right break-all max-w-[65%]">${displayVal}</span>
+                                <span class="field-value text-gray-700 text-right break-all max-w-[60%]">${displayVal}</span>
                             </div>
                         `;
                     }
