@@ -3,118 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sheets Data Viewer</title>
-    <!-- Tailwind CSS for styling -->
+    <title>Google Sheets Multi-View Viewer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse for easy CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased min-p-6">
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen">
 
     <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <!-- Header -->
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-900">Spreadsheet Data</h1>
-            <p class="text-sm text-gray-500 mt-1">Data is fetched live from your Google Sheet.</p>
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-gray-200 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Spreadsheet Dashboard</h1>
+                <p class="text-sm text-gray-500 mt-1">Live data synced from your Google Sheet.</p>
+            </div>
+
+            <div id="view-tabs" class="hidden flex bg-gray-200 p-1 rounded-lg">
+                <button id="btn-table" onclick="switchView('table')" class="px-4 py-2 text-sm font-medium rounded-md bg-white text-indigo-600 shadow-sm transition-all">Table View</button>
+                <button id="btn-cards" onclick="switchView('cards')" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all">Cards View</button>
+            </div>
         </div>
 
-        <!-- Loading State -->
         <div id="loading" class="flex justify-center items-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
             <span class="ml-3 text-lg font-medium text-gray-600">Loading data...</span>
         </div>
 
-        <!-- Error State -->
         <div id="error" class="hidden bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-md">
             <div class="flex">
                 <div class="ml-3">
-                    <p class="text-sm text-red-700" id="error-message">Failed to load data. Please check your network or spreadsheet link.</p>
+                    <p class="text-sm text-red-700" id="error-message">Failed to load data.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Table Container -->
-        <div id="table-container" class="hidden bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+        <div id="table-view" class="hidden bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
             <div class="overflow-x-auto">
-                <table id="data-table" class="min-w-full divide-y divide-gray-200">
-                    <thead id="table-head" class="bg-gray-100">
-                        <!-- Table headers will be injected here -->
-                    </thead>
-                    <tbody id="table-body" class="bg-white divide-y divide-gray-200">
-                        <!-- Table rows will be injected here -->
-                    </tbody>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead id="table-head" class="bg-gray-100"></thead>
+                    <tbody id="table-body" class="bg-white divide-y divide-gray-200"></tbody>
                 </table>
             </div>
         </div>
+
+        <div id="cards-view" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
     </div>
 
-    <!-- Script to Fetch and Render CSV -->
     <script>
-        // Your Google Sheet CSV URL
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwqiqAHnqVpS5790H4PQl0gkl3UwaM1-AvSfHRAv8lIQTmWzl2q8OuV9z9Gk42cMCq_xbiKCyyCePQ/pub?output=csv";
+
+        let sheetData = [];
+        let sheetHeaders = [];
 
         const loadingEl = document.getElementById('loading');
         const errorEl = document.getElementById('error');
         const errorMessageEl = document.getElementById('error-message');
-        const tableContainerEl = document.getElementById('table-container');
+        const viewTabsEl = document.getElementById('view-tabs');
+        
+        const tableViewEl = document.getElementById('table-view');
+        const cardsViewEl = document.getElementById('cards-view');
+        
+        const btnTable = document.getElementById('btn-table');
+        const btnCards = document.getElementById('btn-cards');
+
         const tableHeadEl = document.getElementById('table-head');
         const tableBodyEl = document.getElementById('table-body');
 
-        // Fetch and parse CSV using PapaParse
+        // Fetch and parse CSV
         Papa.parse(csvUrl, {
             download: true,
-            header: true, // Set to true if the first row of your sheet contains column headers
+            header: true,
             skipEmptyLines: true,
             complete: function(results) {
                 loadingEl.style.display = 'none';
 
                 if (results.errors.length > 0) {
-                    console.error(results.errors);
-                    errorEl.classList.remove('hidden');
-                    errorMessageEl.textContent = "Error parsing the CSV data.";
+                    showError("Error parsing the CSV data.");
                     return;
                 }
 
-                const data = results.data;
-
-                if (data.length === 0) {
-                    errorEl.classList.remove('hidden');
-                    errorMessageEl.textContent = "The spreadsheet is empty.";
+                sheetData = results.data;
+                if (sheetData.length === 0) {
+                    showError("The spreadsheet is empty.");
                     return;
                 }
 
-                // Generate Table Headers
-                const headers = Object.keys(data[0]);
-                let headerHtml = '<tr>';
-                headers.forEach(header => {
-                    headerHtml += `<th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${header}</th>`;
-                });
-                headerHtml += '</tr>';
-                tableHeadEl.innerHTML = headerHtml;
+                sheetHeaders = Object.keys(sheetData[0]);
 
-                // Generate Table Rows
-                let bodyHtml = '';
-                data.forEach((row, index) => {
-                    const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50'; // Zebra striping
-                    bodyHtml += `<tr class="${rowBg} hover:bg-indigo-50 transition-colors">`;
-                    headers.forEach(header => {
-                        const cellValue = row[header] !== undefined ? row[header] : '';
-                        bodyHtml += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${cellValue}</td>`;
-                    });
-                    bodyHtml += `</tr>`;
-                });
-                tableBodyEl.innerHTML = bodyHtml;
+                // Render both views ahead of time
+                renderTable();
+                renderCards();
 
-                // Show Table
-                tableContainerEl.classList.remove('hidden');
+                // Reveal tabs and default view (Table)
+                viewTabsEl.classList.remove('hidden');
+                switchView('table');
             },
             error: function(err) {
                 loadingEl.style.display = 'none';
-                errorEl.classList.remove('hidden');
-                errorMessageEl.textContent = "Failed to fetch Google Sheet. Make sure the sheet is published to the web as a CSV.";
+                showError("Failed to fetch Google Sheet. Ensure it is published as a CSV.");
                 console.error(err);
             }
         });
+
+        function showError(msg) {
+            errorEl.classList.remove('hidden');
+            errorMessageEl.textContent = msg;
+        }
+
+        // Switch between 'table' and 'cards'
+        function switchView(view) {
+            if (view === 'table') {
+                tableViewEl.classList.remove('hidden');
+                cardsViewEl.classList.add('hidden');
+                
+                btnTable.className = "px-4 py-2 text-sm font-medium rounded-md bg-white text-indigo-600 shadow-sm transition-all";
+                btnCards.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all";
+            } else {
+                cardsViewEl.classList.remove('hidden');
+                tableViewEl.classList.add('hidden');
+                
+                btnCards.className = "px-4 py-2 text-sm font-medium rounded-md bg-white text-indigo-600 shadow-sm transition-all";
+                btnTable.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 transition-all";
+            }
+        }
+
+        // Render Table View
+        function renderTable() {
+            let headerHtml = '<tr>';
+            sheetHeaders.forEach(header => {
+                headerHtml += `<th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${header}</th>`;
+            });
+            headerHtml += '</tr>';
+            tableHeadEl.innerHTML = headerHtml;
+
+            let bodyHtml = '';
+            sheetData.forEach((row, index) => {
+                const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                bodyHtml += `<tr class="${rowBg} hover:bg-indigo-50 transition-colors">`;
+                sheetHeaders.forEach(header => {
+                    const cellValue = row[header] !== undefined ? row[header] : '';
+                    bodyHtml += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${cellValue}</td>`;
+                });
+                bodyHtml += `</tr>`;
+            });
+            tableBodyEl.innerHTML = bodyHtml;
+        }
+
+        // Render Cards View
+        function renderCards() {
+            let cardsHtml = '';
+            sheetData.forEach((row) => {
+                // Use the first column as the card title, and the rest as details
+                const titleHeader = sheetHeaders[0];
+                const titleValue = row[titleHeader] || 'Untitled';
+
+                cardsHtml += `
+                    bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col justify-between hover:shadow-lg transition-shadow
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col justify-between hover:shadow-lg transition-shadow">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 mb-3">${titleValue}</h3>
+                            <div class="space-y-2">
+                `;
+
+                // Render remaining columns as key-value pairs inside the card
+                for (let i = 1; i < sheetHeaders.length; i++) {
+                    const header = sheetHeaders[i];
+                    const val = row[header] !== undefined ? row[header] : '';
+                    if (val !== '') {
+                        cardsHtml += `
+                            <div class="text-sm flex justify-between">
+                                <span class="font-medium text-gray-500">${header}:</span>
+                                <span class="text-gray-800 text-right">${val}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                cardsHtml += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            cardsViewEl.innerHTML = cardsHtml;
+        }
     </script>
 </body>
 </html>
