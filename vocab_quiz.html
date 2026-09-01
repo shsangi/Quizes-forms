@@ -76,17 +76,95 @@
         .quiz-card { max-width: 700px; margin: 0 auto; }
         .quiz-progress { height: 4px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .quiz-progress-bar { height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); transition: width 0.3s ease; }
+
+        /* Quiz2 styles - Self Learners format */
+        .quiz2-wrapper {
+            max-width: 880px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem 2rem 1.8rem;
+            box-shadow: 0 25px 50px -10px rgba(0, 20, 30, 0.15);
+        }
+        .quiz2-brand { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; }
+        .quiz2-brand h1 { font-size: 1.6rem; font-weight: 700; background: linear-gradient(145deg, #0b2a3b, #1b5a7a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .quiz2-brand .subtitle { font-size: 0.7rem; font-weight: 500; color: #6c8a9e; text-transform: uppercase; }
+        .quiz2-timer { text-align: center; padding: 0.2rem 0 0.8rem; font-weight: 500; color: #1f4d66; }
+        .quiz2-progress-block { background: #e6edf5; height: 8px; border-radius: 20px; margin: 0.6rem 0 0.3rem; overflow: hidden; }
+        .quiz2-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #2f7b9e, #4ba3c7); border-radius: 20px; transition: width 0.35s ease; }
+        .quiz2-progress-label { text-align: center; font-size: 0.8rem; font-weight: 600; color: #1f4d66; margin-bottom: 0.8rem; }
+        .quiz2-q-item { background: #fafcfe; border: 1px solid #e2eaf2; border-radius: 1.2rem; padding: 1rem 1.2rem; margin-bottom: 1.2rem; transition: 0.1s; cursor: pointer; }
+        .quiz2-q-item:hover { border-color: #6fa6c7; box-shadow: 0 2px 8px rgba(47, 123, 158, 0.08); }
+        .quiz2-q-item.correct-item { border-color: #1f8b4c; background: #f0faf4; }
+        .quiz2-q-item.wrong-item { border-color: #b33c3c; background: #fdf2f2; }
+        .quiz2-q-text { font-weight: 600; font-size: 1.05rem; margin-bottom: 0.6rem; color: #0a212b; }
+        .quiz2-options { display: flex; flex-direction: column; gap: 0.4rem; }
+        .quiz2-option { background: white; border: 1.5px solid #dce6ef; border-radius: 60px; padding: 0.5rem 1.4rem; font-size: 0.95rem; font-weight: 500; color: #1d3847; text-align: left; cursor: pointer; transition: all 0.12s; display: flex; align-items: center; gap: 0.8rem; }
+        .quiz2-option:hover:not(:disabled) { background: #f5faff; border-color: #6fa6c7; }
+        .quiz2-option .letter { background: #e7f0f7; color: #1a5a7a; font-weight: 700; width: 28px; height: 28px; border-radius: 30px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .quiz2-option.correct { background: #d8eddf; border-color: #1f8b4c; }
+        .quiz2-option.correct .letter { background: #1f8b4c; color: white; }
+        .quiz2-option.wrong { background: #f5dddd; border-color: #b33c3c; }
+        .quiz2-option.wrong .letter { background: #b33c3c; color: white; }
+        .quiz2-option.selected-opt { border-color: #2f7b9e; background: #e6f0f7; }
+        .quiz2-option:disabled { cursor: default; opacity: 0.8; }
+        .quiz2-action-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem; margin: 0.4rem 0 0.2rem; }
+        .quiz2-btn-primary { background: #0b2a3b; border: none; color: white; font-weight: 600; font-size: 1rem; padding: 0.7rem 2.2rem; border-radius: 60px; cursor: pointer; box-shadow: 0 6px 14px rgba(11,42,59,0.16); transition: 0.15s; }
+        .quiz2-btn-primary:hover:not(:disabled) { background: #1a4b62; transform: scale(1.02); }
+        .quiz2-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .quiz2-btn-success { background: #1f8b4c; border: none; color: white; font-weight: 600; font-size: 1rem; padding: 0.7rem 2.2rem; border-radius: 60px; cursor: pointer; box-shadow: 0 6px 14px rgba(31,139,76,0.25); transition: 0.15s; }
+        .quiz2-btn-success:hover:not(:disabled) { background: #167a3e; transform: scale(1.02); }
+        .quiz2-btn-success:disabled { opacity: 0.4; cursor: not-allowed; }
+        .quiz2-dot-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-top: 0.2rem; }
+        .quiz2-dot { width: 32px; height: 32px; border-radius: 30px; background: #dce6ef; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.7rem; color: #1d4b61; transition: 0.1s; cursor: pointer; border: 2px solid transparent; font-family: inherit; }
+        .quiz2-dot:hover { transform: scale(1.08); filter: brightness(0.92); }
+        .quiz2-dot.done-dot { background: #2f7b9e; color: white; }
+        .quiz2-dot.correct-dot { background: #1f8b4c; color: white; }
+        .quiz2-dot.wrong-dot { background: #b33c3c; color: white; }
+        .quiz2-dot.active-dot { border-color: #0b2a3b; transform: scale(1.1); }
+        .quiz2-legend { display: flex; gap: 1rem; font-size: 0.8rem; font-weight: 500; color: #2d5a72; flex-wrap: wrap; }
+        .quiz2-legend-item { display: flex; align-items: center; gap: 0.3rem; }
+        .quiz2-legend-dot { width: 14px; height: 14px; border-radius: 30px; display: inline-block; flex-shrink: 0; }
+        .quiz2-legend-dot.done-dot { background: #2f7b9e; }
+        .quiz2-legend-dot.pending-dot { background: #dce6ef; }
+        .quiz2-legend-dot.correct-dot { background: #1f8b4c; }
+        .quiz2-legend-dot.wrong-dot { background: #b33c3c; }
+        .quiz2-result { text-align: center; padding: 0.5rem; display: none; }
+        .quiz2-result h2 { font-size: 2.2rem; font-weight: 700; color: #0b2a3b; }
+        .quiz2-result-score { font-size: 3.6rem; font-weight: 800; background: linear-gradient(135deg, #1a5a7a, #48a0c7); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .quiz2-result-details { text-align: left; margin: 1.5rem 0 1rem; max-height: 400px; overflow-y: auto; }
+        .quiz2-result-detail { background: #fafcfe; border: 1px solid #e2eaf2; border-radius: 1rem; padding: 0.8rem 1rem; margin-bottom: 0.8rem; }
+        .quiz2-result-detail.correct-detail { border-left: 6px solid #1f8b4c; }
+        .quiz2-result-detail.wrong-detail { border-left: 6px solid #b33c3c; }
+        .quiz2-overview { margin-top: 1.2rem; border-top: 1px solid #e2eaf2; padding-top: 1rem; }
+        .quiz2-overview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.4rem; }
+        .quiz2-overview-header span { font-weight: 600; font-size: 0.9rem; color: #1f4d66; }
+        .quiz2-submitted { text-align: center; padding: 0.5rem; background: #d8eddf; border-radius: 60px; margin-bottom: 1rem; font-weight: 600; color: #1f8b4c; }
+        .quiz2-search-badge { display: inline-block; background: #eaf1f8; color: #1f4d66; font-size: 0.65rem; font-weight: 600; padding: 0.1rem 0.6rem; border-radius: 30px; margin-left: 0.5rem; opacity: 0.6; }
+        .quiz2-q-item:hover .quiz2-search-badge { opacity: 1; background: #d4e3f0; }
+        .quiz2-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .quiz2-modal-overlay.active { display: flex; }
+        .quiz2-modal-box { background: white; max-width: 440px; width: 90%; border-radius: 1.5rem; padding: 2rem 1.8rem 1.8rem; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: modalIn 0.3s ease; }
+        @keyframes modalIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .quiz2-modal-actions { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+        .quiz2-btn-secondary { background: #dce6ef; border: none; color: #1f4d66; font-weight: 600; font-size: 0.95rem; padding: 0.6rem 2rem; border-radius: 60px; cursor: pointer; transition: 0.15s; }
+        .quiz2-btn-secondary:hover { background: #c8d4df; }
+        .quiz2-refresh-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
 
     <div class="max-w-7xl mx-auto">
         
-        <!-- Horizontal Tabs: Quiz, Cards, Table -->
+        <!-- Tabs: Quiz, Quiz2, Cards, Table -->
         <div class="tabs-wrapper">
             <div id="view-tabs" class="hidden tabs-only">
                 <button id="btn-quiz" onclick="switchView('quiz')" class="px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2">
                     <i class="fas fa-question-circle"></i> Quiz
+                </button>
+                <button id="btn-quiz2" onclick="switchView('quiz2')" class="px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
+                    <i class="fas fa-brain"></i> Quiz2
                 </button>
                 <button id="btn-cards" onclick="switchView('cards')" class="px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
                     <i class="fas fa-th-large"></i> Cards
@@ -119,10 +197,17 @@
             </div>
         </div>
 
-        <!-- Quiz View (default) -->
+        <!-- Quiz View -->
         <div id="quiz-view">
             <div id="quiz-container" class="quiz-card">
                 <!-- Quiz content injected here -->
+            </div>
+        </div>
+
+        <!-- Quiz2 View -->
+        <div id="quiz2-view" class="hidden">
+            <div id="quiz2-container" class="quiz2-wrapper">
+                <!-- Quiz2 content injected here -->
             </div>
         </div>
 
@@ -158,17 +243,31 @@
         let quizScore = 0;
         let quizTotal = 0;
 
+        // Quiz2 state
+        let quiz2Questions = [];
+        let quiz2Selected = [];
+        let quiz2AnswerStatus = [];
+        let quiz2IsSubmitted = false;
+        let quiz2Completed = false;
+        let quiz2Score = 0;
+        let quiz2Timer = null;
+        let quiz2TimeRemaining = 0;
+        let quiz2Total = 0;
+
         const loadingEl = document.getElementById('loading');
         const errorEl = document.getElementById('error');
         const errorMessageEl = document.getElementById('error-message');
         const viewTabsEl = document.getElementById('view-tabs');
         
         const quizViewEl = document.getElementById('quiz-view');
+        const quiz2ViewEl = document.getElementById('quiz2-view');
         const cardsViewEl = document.getElementById('cards-view');
         const tableViewEl = document.getElementById('table-view');
         const quizContainerEl = document.getElementById('quiz-container');
+        const quiz2ContainerEl = document.getElementById('quiz2-container');
         
         const btnQuiz = document.getElementById('btn-quiz');
+        const btnQuiz2 = document.getElementById('btn-quiz2');
         const btnCards = document.getElementById('btn-cards');
         const btnTable = document.getElementById('btn-table');
         const tableHeadEl = document.getElementById('table-head');
@@ -259,11 +358,11 @@
                     tableCountEl.textContent = sheetData.length + ' rows';
 
                     buildQuizQuestions();
+                    buildQuiz2Questions();
                     renderTable();
                     renderCards();
 
                     viewTabsEl.classList.remove('hidden');
-                    // Default: Quiz view
                     switchView('quiz');
                 },
                 error: function(err) {
@@ -284,7 +383,7 @@
             const answerCol = findColumn('answer');
             
             if (!wordCol || !option1Col || !answerCol) {
-                console.warn('Quiz columns not found. Skipping quiz.');
+                console.warn('Quiz columns not found.');
                 return;
             }
 
@@ -319,6 +418,51 @@
             });
         }
 
+        function buildQuiz2Questions() {
+            quiz2Questions = [];
+            // Try to find columns for Quiz2 format
+            const qCol = findColumn('question') || findColumn('word');
+            const opt1Col = findColumn('option1');
+            const opt2Col = findColumn('option2');
+            const opt3Col = findColumn('option3');
+            const opt4Col = findColumn('option4');
+            const ansCol = findColumn('answer');
+            
+            if (!qCol || !opt1Col || !ansCol) {
+                console.warn('Quiz2 columns not found.');
+                return;
+            }
+
+            sheetData.forEach(row => {
+                const q = row[qCol] || '';
+                const options = [
+                    row[opt1Col] || '',
+                    row[opt2Col] || '',
+                    row[opt3Col] || '',
+                    row[opt4Col] || ''
+                ].filter(o => o.trim() !== '');
+                const answer = row[ansCol] || '';
+                let correctIdx = -1;
+                if (answer) {
+                    for (let j = 0; j < options.length; j++) {
+                        if (options[j] === answer) { correctIdx = j; break; }
+                    }
+                }
+                if (q && options.length > 0) {
+                    quiz2Questions.push({
+                        question: q,
+                        options: options,
+                        correct: correctIdx,
+                        correctText: answer
+                    });
+                }
+            });
+            quiz2Total = quiz2Questions.length;
+            quiz2Selected = new Array(quiz2Total).fill(null);
+            quiz2AnswerStatus = new Array(quiz2Total).fill(null);
+            quiz2TimeRemaining = quiz2Total * 60;
+        }
+
         function findColumn(keyword) {
             const lowerKeyword = keyword.toLowerCase();
             for (let h of sheetHeaders) {
@@ -340,35 +484,46 @@
         function switchView(view) {
             currentView = view;
             
-            // Reset quiz when switching to quiz
             if (view === 'quiz') {
                 quizIndex = 0;
                 quizScore = 0;
                 quizTotal = quizQuestions.length;
                 quizAnswered = false;
                 renderQuiz();
+            } else if (view === 'quiz2') {
+                renderQuiz2();
             }
             
+            // Hide all views
+            quizViewEl.classList.add('hidden');
+            quiz2ViewEl.classList.add('hidden');
+            cardsViewEl.classList.add('hidden');
+            tableViewEl.classList.add('hidden');
+            
+            // Show selected
             if (view === 'quiz') {
                 quizViewEl.classList.remove('hidden');
-                cardsViewEl.classList.add('hidden');
-                tableViewEl.classList.add('hidden');
                 btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnQuiz2.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+            } else if (view === 'quiz2') {
+                quiz2ViewEl.classList.remove('hidden');
+                btnQuiz2.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
                 btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
                 btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
             } else if (view === 'cards') {
                 cardsViewEl.classList.remove('hidden');
-                quizViewEl.classList.add('hidden');
-                tableViewEl.classList.add('hidden');
                 btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
                 btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnQuiz2.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
                 btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
             } else {
                 tableViewEl.classList.remove('hidden');
-                quizViewEl.classList.add('hidden');
-                cardsViewEl.classList.add('hidden');
                 btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
                 btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                btnQuiz2.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
                 btnCards.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
             }
         }
@@ -472,14 +627,14 @@
             cardsViewEl.innerHTML = cardsHtml;
         }
 
-        // ============ QUIZ FUNCTIONS ============
+        // ============ QUIZ 1 FUNCTIONS ============
         function renderQuiz() {
             if (quizQuestions.length === 0) {
                 quizContainerEl.innerHTML = `
                     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-8 text-center">
                         <i class="fas fa-book-open text-4xl text-gray-300 mb-4"></i>
                         <h3 class="text-lg font-semibold text-gray-700">No Quiz Questions Found</h3>
-                        <p class="text-sm text-gray-500 mt-2">Make sure your sheet has columns: word, option1, option2, option3, option4, answer</p>
+                        <p class="text-sm text-gray-500 mt-2">Make sure your sheet has columns: word, option1-4, answer</p>
                     </div>
                 `;
                 return;
@@ -515,7 +670,6 @@
 
             quizContainerEl.innerHTML = `
                 <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 md:p-8">
-                    <!-- Progress -->
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-sm font-medium text-gray-500">Question ${quizIndex + 1} of ${quizQuestions.length}</span>
                         <span class="text-sm font-medium text-indigo-600">Score: ${quizScore}</span>
@@ -524,18 +678,15 @@
                         <div class="quiz-progress-bar" style="width: ${progress}%"></div>
                     </div>
                     
-                    <!-- Word -->
                     <div class="mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">${q.word}</h2>
                         ${q.urdu ? `<p class="text-sm text-gray-500 mt-1">${q.urdu}</p>` : ''}
                     </div>
                     
-                    <!-- Options -->
                     <div class="space-y-2.5" id="quiz-options">
                         ${optionsHtml}
                     </div>
                     
-                    <!-- Extra info (shown after answer) -->
                     <div id="quiz-details" class="mt-4 hidden">
                         <div class="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
                             ${q.synonym ? `<div><span class="font-medium text-gray-500">Synonym:</span> <span class="text-gray-700">${q.synonym}</span></div>` : ''}
@@ -630,6 +781,294 @@
         window.resetQuiz = resetQuiz;
         window.selectQuizOption = selectQuizOption;
         window.nextQuizQuestion = nextQuizQuestion;
+
+        // ============ QUIZ 2 FUNCTIONS ============
+        function renderQuiz2() {
+            if (quiz2Questions.length === 0) {
+                quiz2ContainerEl.innerHTML = `
+                    <div class="bg-white/80 rounded-2xl p-8 text-center">
+                        <i class="fas fa-book-open text-4xl text-gray-300 mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-700">No Quiz2 Questions Found</h3>
+                        <p class="text-sm text-gray-500 mt-2">Make sure your sheet has columns: question, option1-4, answer</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (quiz2Completed) {
+                showQuiz2Results();
+                return;
+            }
+
+            const total = quiz2Questions.length;
+            const attempted = quiz2Selected.filter(a => a !== null).length;
+            const progress = (attempted / total) * 100;
+
+            let questionsHtml = '';
+            const letters = ['A', 'B', 'C', 'D'];
+            
+            quiz2Questions.forEach((q, idx) => {
+                const isCorrect = quiz2AnswerStatus[idx] === true;
+                const isWrong = quiz2AnswerStatus[idx] === false;
+                let itemClass = 'quiz2-q-item';
+                if (quiz2IsSubmitted || quiz2Completed) {
+                    if (isCorrect) itemClass += ' correct-item';
+                    else if (isWrong) itemClass += ' wrong-item';
+                }
+
+                questionsHtml += `
+                    <div class="${itemClass}" data-qidx="${idx}" onclick="searchQuiz2Question(${idx})">
+                        <div class="quiz2-q-text">
+                            ${idx+1}. ${q.question}
+                            <span class="quiz2-search-badge">🔍 search</span>
+                        </div>
+                        <div class="quiz2-options">
+                `;
+
+                q.options.forEach((opt, optIdx) => {
+                    let btnClass = 'quiz2-option';
+                    if (quiz2Selected[idx] === optIdx) btnClass += ' selected-opt';
+                    if (quiz2IsSubmitted || quiz2Completed) {
+                        if (q.correct === optIdx) btnClass += ' correct';
+                        else if (quiz2Selected[idx] === optIdx && quiz2Selected[idx] !== q.correct) btnClass += ' wrong';
+                        btnClass += ' disabled';
+                    }
+                    const disabled = (quiz2IsSubmitted || quiz2Completed) ? 'disabled' : '';
+
+                    questionsHtml += `
+                        <button class="${btnClass}" ${disabled} onclick="event.stopPropagation(); selectQuiz2Option(${idx}, ${optIdx})">
+                            <span class="letter">${letters[optIdx]}</span> ${opt || '(Empty)'}
+                        </button>
+                    `;
+                });
+
+                questionsHtml += `</div></div>`;
+            });
+
+            const mins = Math.floor(quiz2TimeRemaining / 60);
+            const secs = quiz2TimeRemaining % 60;
+
+            quiz2ContainerEl.innerHTML = `
+                <div class="quiz2-brand">
+                    <div>
+                        <h1>Self Learners · Quiz</h1>
+                        <span class="subtitle">Self Learners</span>
+                    </div>
+                </div>
+                <div class="quiz2-timer">⏱️ <span class="timer">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</span></div>
+                <div class="quiz2-progress-block">
+                    <div class="quiz2-progress-fill" style="width:${progress}%"></div>
+                </div>
+                <div class="quiz2-progress-label">Attempted: <span class="attempted">${attempted}</span> / <span class="total">${total}</span></div>
+                
+                ${quiz2IsSubmitted ? '<div class="quiz2-submitted">✅ Submitted — You can review your answers below. Click "End Quiz" to see your final score.</div>' : ''}
+                
+                <div id="quiz2-questions-container">${questionsHtml}</div>
+                
+                <div class="quiz2-action-bar">
+                    <button class="quiz2-btn-primary" id="quiz2-submit-btn" ${quiz2IsSubmitted || quiz2Completed ? 'disabled' : ''}>
+                        ✅ Submit
+                    </button>
+                    <button class="quiz2-btn-success" id="quiz2-end-btn" ${quiz2Completed ? 'disabled' : ''}>
+                        🏁 End Quiz
+                    </button>
+                </div>
+                
+                <div class="quiz2-overview">
+                    <div class="quiz2-overview-header">
+                        <span>OVERVIEW</span>
+                        <div class="quiz2-legend">
+                            <span class="quiz2-legend-item"><span class="quiz2-legend-dot done-dot"></span> Done <span class="count" id="quiz2-done-count">${attempted}</span></span>
+                            <span class="quiz2-legend-item"><span class="quiz2-legend-dot pending-dot"></span> Pending <span class="count" id="quiz2-pending-count">${total - attempted}</span></span>
+                            ${quiz2IsSubmitted || quiz2Completed ? `
+                                <span class="quiz2-legend-item"><span class="quiz2-legend-dot correct-dot"></span> Correct <span class="count" id="quiz2-correct-count">${quiz2AnswerStatus.filter(s => s === true).length}</span></span>
+                                <span class="quiz2-legend-item"><span class="quiz2-legend-dot wrong-dot"></span> Wrong <span class="count" id="quiz2-wrong-count">${quiz2AnswerStatus.filter(s => s === false).length}</span></span>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="quiz2-dot-grid" id="quiz2-dot-grid"></div>
+                </div>
+                
+                <div class="quiz2-result" id="quiz2-result-area">
+                    <h2>🏁 Quiz Complete</h2>
+                    <div class="quiz2-result-score" id="quiz2-final-score">0 / 0</div>
+                    <p class="result-msg" id="quiz2-result-msg">Keep learning!</p>
+                    <div class="quiz2-result-details" id="quiz2-result-details"></div>
+                    <button class="quiz2-btn-primary" onclick="restartQuiz2()">⟳ Try again</button>
+                </div>
+            `;
+
+            renderQuiz2Dots();
+
+            document.getElementById('quiz2-submit-btn').addEventListener('click', handleQuiz2Submit);
+            document.getElementById('quiz2-end-btn').addEventListener('click', handleQuiz2End);
+
+            if (!quiz2IsSubmitted && !quiz2Completed) {
+                if (quiz2Timer) clearInterval(quiz2Timer);
+                quiz2Timer = setInterval(() => {
+                    quiz2TimeRemaining--;
+                    if (quiz2TimeRemaining <= 0) {
+                        clearInterval(quiz2Timer);
+                        quiz2Timer = null;
+                        handleQuiz2Timeout();
+                    }
+                    renderQuiz2Timer();
+                }, 1000);
+            }
+        }
+
+        function renderQuiz2Timer() {
+            const mins = Math.floor(quiz2TimeRemaining / 60);
+            const secs = quiz2TimeRemaining % 60;
+            const timerEl = quiz2ContainerEl.querySelector('.quiz2-timer .timer');
+            if (timerEl) {
+                timerEl.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+            }
+        }
+
+        function renderQuiz2Dots() {
+            const grid = document.getElementById('quiz2-dot-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            quiz2Questions.forEach((q, idx) => {
+                const dot = document.createElement('button');
+                dot.className = 'quiz2-dot';
+                dot.textContent = idx + 1;
+                const hasAnswer = quiz2Selected[idx] !== null;
+                if (quiz2IsSubmitted || quiz2Completed) {
+                    if (quiz2AnswerStatus[idx] === true) dot.classList.add('correct-dot');
+                    else if (quiz2AnswerStatus[idx] === false) dot.classList.add('wrong-dot');
+                } else {
+                    if (hasAnswer) dot.classList.add('done-dot');
+                }
+                dot.addEventListener('click', () => {
+                    const el = document.querySelector(`.quiz2-q-item[data-qidx="${idx}"]`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+                grid.appendChild(dot);
+            });
+        }
+
+        function selectQuiz2Option(qIdx, optIdx) {
+            if (quiz2IsSubmitted || quiz2Completed) return;
+            quiz2Selected[qIdx] = optIdx;
+            renderQuiz2();
+        }
+
+        function searchQuiz2Question(idx) {
+            const q = quiz2Questions[idx];
+            if (q) {
+                window.open(`https://www.google.com/search?q=${encodeURIComponent(q.question)}`, '_blank');
+            }
+        }
+        window.searchQuiz2Question = searchQuiz2Question;
+
+        function handleQuiz2Submit() {
+            if (quiz2IsSubmitted || quiz2Completed) return;
+            quiz2IsSubmitted = true;
+            gradeQuiz2();
+            renderQuiz2();
+        }
+
+        function handleQuiz2End() {
+            if (quiz2Completed) return;
+            if (!quiz2IsSubmitted) {
+                quiz2IsSubmitted = true;
+                gradeQuiz2();
+            }
+            quiz2Completed = true;
+            if (quiz2Timer) { clearInterval(quiz2Timer); quiz2Timer = null; }
+            showQuiz2Results();
+        }
+
+        function handleQuiz2Timeout() {
+            quiz2IsSubmitted = true;
+            quiz2Completed = true;
+            gradeQuiz2();
+            renderQuiz2();
+            setTimeout(showQuiz2Results, 600);
+        }
+
+        function gradeQuiz2() {
+            let correct = 0;
+            quiz2Questions.forEach((q, idx) => {
+                const selected = quiz2Selected[idx];
+                if (selected !== null && selected === q.correct) {
+                    quiz2AnswerStatus[idx] = true;
+                    correct++;
+                } else if (selected !== null && selected !== q.correct) {
+                    quiz2AnswerStatus[idx] = false;
+                } else {
+                    quiz2AnswerStatus[idx] = null;
+                }
+            });
+            quiz2Score = correct;
+        }
+
+        function showQuiz2Results() {
+            const total = quiz2Questions.length;
+            const pct = Math.round((quiz2Score / total) * 100);
+            let emoji = '😢';
+            let color = '#b33c3c';
+            if (pct >= 90) { emoji = '🎉'; color = '#1f8b4c'; }
+            else if (pct >= 70) { emoji = '😊'; color = '#2f7b9e'; }
+            else if (pct >= 50) { emoji = '🤔'; color = '#856404'; }
+
+            const resultArea = document.getElementById('quiz2-result-area');
+            const finalScore = document.getElementById('quiz2-final-score');
+            const resultMsg = document.getElementById('quiz2-result-msg');
+            const resultDetails = document.getElementById('quiz2-result-details');
+
+            resultArea.style.display = 'block';
+            finalScore.textContent = `${quiz2Score} / ${total}`;
+            resultMsg.textContent = `${emoji} ${pct}% correct — ${getQuiz2Message(pct)}`;
+
+            resultDetails.innerHTML = '';
+            quiz2Questions.forEach((q, idx) => {
+                const div = document.createElement('div');
+                div.className = 'quiz2-result-detail';
+                const isCorrect = quiz2AnswerStatus[idx] === true;
+                const isWrong = quiz2AnswerStatus[idx] === false;
+                if (isCorrect) div.classList.add('correct-detail');
+                else if (isWrong) div.classList.add('wrong-detail');
+                else div.style.borderLeft = '6px solid #999';
+
+                const userAns = (quiz2Selected[idx] !== null && q.options[quiz2Selected[idx]]) ? q.options[quiz2Selected[idx]] : 'Not answered';
+                const correctAns = (q.correct !== -1 && q.options[q.correct]) ? q.options[q.correct] : 'Not available';
+
+                div.innerHTML = `
+                    <div class="detail-q">${idx+1}. ${q.question}</div>
+                    <div class="detail-answer">
+                        ${isCorrect ? `✅ Your answer: <span style="color:#1f8b4c;font-weight:600;">${userAns}</span>` :
+                          isWrong ? `❌ Your answer: <span style="color:#b33c3c;font-weight:600;">${userAns}</span> &nbsp; Correct: <span style="color:#1f8b4c;font-weight:600;">${correctAns}</span>` :
+                          `⏭️ Skipped &nbsp; Correct: <span style="color:#1f8b4c;font-weight:600;">${correctAns}</span>`}
+                    </div>
+                `;
+                resultDetails.appendChild(div);
+            });
+
+            document.getElementById('quiz2-submit-btn').disabled = true;
+            document.getElementById('quiz2-end-btn').disabled = true;
+        }
+
+        function getQuiz2Message(pct) {
+            if (pct >= 90) return 'Perfect! You are a true Self Learner.';
+            if (pct >= 70) return 'Great job! Keep growing every day.';
+            if (pct >= 40) return 'Good effort! Review and try again.';
+            return 'Learning is a journey. Keep practicing!';
+        }
+
+        function restartQuiz2() {
+            quiz2Selected = new Array(quiz2Total).fill(null);
+            quiz2AnswerStatus = new Array(quiz2Total).fill(null);
+            quiz2IsSubmitted = false;
+            quiz2Completed = false;
+            quiz2Score = 0;
+            quiz2TimeRemaining = quiz2Total * 60;
+            if (quiz2Timer) { clearInterval(quiz2Timer); quiz2Timer = null; }
+            renderQuiz2();
+        }
+        window.restartQuiz2 = restartQuiz2;
 
         loadData();
     </script>
