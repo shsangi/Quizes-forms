@@ -3,468 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Spreadsheet Viewer · Live</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <title>✨ Smart Spreadsheet Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
+        .url-link { color: #2563eb; text-decoration: none; border-bottom: 1px dashed #93c5fd; transition: all 0.2s; }
+        .url-link:hover { color: #1d4ed8; border-bottom-color: #2563eb; background: #eff6ff; padding: 0 4px; border-radius: 4px; }
+        .search-btn { transition: all 0.2s; }
+        .search-btn:hover { transform: scale(1.1); background: #e0e7ff; }
+        .badge-pulse { animation: pulse-badge 2s infinite; }
+        @keyframes pulse-badge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
-
-        body {
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
-            background: linear-gradient(145deg, #f6f9fc 0%, #edf2f7 100%);
-            min-height: 100vh;
-            padding: 2rem 1.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            max-width: 1400px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-radius: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-            padding: 2rem 2rem 1.8rem;
-            transition: all 0.2s ease;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .title-group {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .title-group h1 {
-            font-size: 1.9rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #0b2b4a, #1e4a7a);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .badge-live {
-            background: #22c55e;
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.25rem 0.9rem;
-            border-radius: 40px;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
-        }
-
-        .status-badge {
-            background: white;
-            border-radius: 40px;
-            padding: 0.5rem 1.5rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #e9edf2;
-        }
-
-        .status-badge .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .dot.loading { background: #f59e0b; animation: pulse 1.5s infinite; }
-        .dot.success { background: #22c55e; }
-        .dot.error { background: #ef4444; }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.9); }
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 1.5rem;
-            border: 1px solid #e9edf2;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            min-width: 600px;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #0f172a;
-            font-weight: 600;
-            padding: 1rem 1.2rem;
-            text-align: left;
-            border-bottom: 2px solid #e2e8f0;
-            white-space: nowrap;
-            position: sticky;
-            top: 0;
-            z-index: 5;
-            font-size: 0.8rem;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            color: #475569;
-        }
-
-        td {
-            padding: 0.9rem 1.2rem;
-            border-bottom: 1px solid #f1f5f9;
-            color: #1e293b;
-            vertical-align: middle;
-            word-break: break-word;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:nth-child(even) td {
-            background: #fafcfe;
-        }
-
-        tr:hover td {
-            background: #f1f8ff;
-        }
-
-        .cell-content {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .cell-text {
-            word-break: break-all;
-        }
-
-        .cell-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            flex-shrink: 0;
-            margin-left: auto;
-        }
-
-        .btn-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 30px;
-            border: none;
-            background: transparent;
-            color: #64748b;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            text-decoration: none;
-            padding: 0;
-        }
-
-        .btn-icon:hover {
-            background: #e2e8f0;
-            color: #0f172a;
-            transform: scale(1.05);
-        }
-
-        .btn-icon.url-btn:hover {
-            background: #dbeafe;
-            color: #1e4a7a;
-        }
-
-        .btn-icon.search-btn:hover {
-            background: #e6f7e6;
-            color: #15803d;
-        }
-
-        .state-message {
-            text-align: center;
-            padding: 4rem 1.5rem;
-            color: #64748b;
-        }
-        .state-message .icon {
-            font-size: 2.8rem;
-            display: block;
-            margin-bottom: 1rem;
-        }
-        .state-message .sub {
-            font-size: 0.95rem;
-            opacity: 0.8;
-        }
-
-        .error-box {
-            background: #fef2f2;
-            border-radius: 1.5rem;
-            padding: 2rem 2.5rem;
-            text-align: left;
-            max-width: 700px;
-            margin: 0 auto;
-            border: 1px solid #fecaca;
-        }
-        .error-box strong {
-            display: block;
-            font-size: 1.2rem;
-            color: #991b1b;
-            margin-bottom: 0.5rem;
-        }
-        .error-box ul {
-            padding-left: 1.5rem;
-            line-height: 1.8;
-            color: #7f1d1d;
-        }
-        .error-box code {
-            background: #fee2e2;
-            padding: 0.15rem 0.6rem;
-            border-radius: 8px;
-            font-size: 0.8rem;
-        }
-
-        .footer {
-            margin-top: 1.8rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.75rem 1.5rem;
-            font-size: 0.8rem;
-            color: #94a3b8;
-            border-top: 1px solid #eef2f6;
-            padding-top: 1.5rem;
-        }
-
-        .footer .count {
-            background: #f1f5f9;
-            padding: 0.2rem 1.2rem;
-            border-radius: 30px;
-            color: #334155;
-            font-weight: 500;
-            font-size: 0.8rem;
-        }
-
-        @media (max-width: 700px) {
-            body { padding: 1rem 0.8rem; }
-            .container { padding: 1.2rem; border-radius: 1.8rem; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .title-group h1 { font-size: 1.5rem; }
-            .status-badge { font-size: 0.75rem; padding: 0.3rem 1rem; }
-            th, td { padding: 0.6rem 0.8rem; font-size: 0.8rem; }
-            .btn-icon { width: 24px; height: 24px; font-size: 0.75rem; }
-            .error-box { padding: 1.2rem; }
-        }
-
-        @media (max-width: 500px) {
-            .cell-actions { gap: 0.1rem; }
-            .btn-icon { width: 22px; height: 22px; font-size: 0.7rem; }
-        }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .tab-active { background: white; color: #4f46e5; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15); }
+        .tab-inactive { color: #6b7280; }
+        .tab-inactive:hover { background: rgba(255,255,255,0.5); color: #1f2937; }
+        .cell-highlight { transition: background 0.2s; }
+        .cell-highlight:hover { background: #dbeafe !important; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
     </style>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <div class="title-group">
-            <h1>📊 Spreadsheet Viewer</h1>
-            <span class="badge-live">● Live</span>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="glass-card rounded-2xl shadow-xl border border-white/50 p-6 md:p-8 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <div class="gradient-bg w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-table text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                                Data Dashboard
+                            </h1>
+                            <p class="text-sm text-gray-500 mt-0.5 flex items-center gap-2">
+                                <i class="fas fa-sync-alt text-xs text-green-500 badge-pulse"></i>
+                                Live from Google Sheets
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="view-tabs" class="hidden bg-white/70 backdrop-blur-sm p-1 rounded-xl shadow-sm border border-gray-200/50">
+                    <button id="btn-table" onclick="switchView('table')" class="px-5 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2">
+                        <i class="fas fa-list-ul"></i> Table
+                    </button>
+                    <button id="btn-cards" onclick="switchView('cards')" class="px-5 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2">
+                        <i class="fas fa-th-large"></i> Cards
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Bar -->
+            <div id="stats-bar" class="hidden mt-6 flex flex-wrap gap-4 pt-4 border-t border-gray-200/50">
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                    <i class="fas fa-database text-indigo-400"></i>
+                    <span id="row-count">0</span> rows
+                </div>
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                    <i class="fas fa-columns text-indigo-400"></i>
+                    <span id="col-count">0</span> columns
+                </div>
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                    <i class="fas fa-clock text-indigo-400"></i>
+                    <span id="update-time">Just now</span>
+                </div>
+            </div>
         </div>
-        <div class="status-badge">
-            <span class="dot loading" id="statusDot"></span>
-            <span id="statusText">Connecting…</span>
+
+        <!-- Loading -->
+        <div id="loading" class="flex flex-col items-center justify-center py-32 bg-white/60 rounded-2xl backdrop-blur-sm border border-white/30">
+            <div class="relative">
+                <div class="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
+                <i class="fas fa-spinner absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-indigo-400 text-sm"></i>
+            </div>
+            <span class="mt-4 text-sm font-medium text-gray-500 animate-pulse">Loading your data...</span>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="hidden bg-red-50/90 backdrop-blur-sm border-l-4 border-red-500 p-5 rounded-xl shadow-lg mb-6">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-exclamation-circle text-red-500 text-xl mt-0.5"></i>
+                <div>
+                    <h4 class="font-semibold text-red-800">Failed to load data</h4>
+                    <p class="text-sm text-red-700 mt-1" id="error-message">Please check your connection and try again.</p>
+                    <button onclick="retryLoad()" class="mt-3 text-sm bg-red-100 hover:bg-red-200 text-red-700 px-4 py-1.5 rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-redo"></i> Retry
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div id="table-view" class="hidden bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
+            <div class="overflow-x-auto p-2">
+                <table class="min-w-full divide-y divide-gray-200/60">
+                    <thead id="table-head" class="bg-gradient-to-r from-indigo-50 to-purple-50"></thead>
+                    <tbody id="table-body" class="bg-white divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+            <div class="bg-gray-50/50 px-6 py-3 text-xs text-gray-400 border-t border-gray-200/50 flex justify-between items-center">
+                <span><i class="fas fa-mouse-pointer mr-1"></i> Click URLs to open · Click <i class="fas fa-search text-indigo-400 mx-1"></i> to search</span>
+                <span id="table-count">0 rows</span>
+            </div>
+        </div>
+
+        <!-- Cards View -->
+        <div id="cards-view" class="hidden grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- Cards injected here -->
         </div>
     </div>
 
-    <div class="table-wrapper" id="tableContainer">
-        <div class="state-message">
-            <span class="icon">⏳</span>
-            Loading your data…
-            <div class="sub">Fetching from Google Sheets</div>
-        </div>
-    </div>
+    <script>
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwqiqAHnqVpS5790H4PQl0gkl3UwaM1-AvSfHRAv8lIQTmWzl2q8OuV9z9Gk42cMCq_xbiKCyyCePQ/pub?output=csv";
 
-    <div class="footer">
-        <span>📌 Click <span style="background:#dbeafe; padding:0.1rem 0.5rem; border-radius:12px; font-weight:500;">🔗</span> to open URL · <span style="background:#e6f7e6; padding:0.1rem 0.5rem; border-radius:12px; font-weight:500;">🔍</span> to search</span>
-        <span class="count" id="rowCount">0 rows</span>
-    </div>
-</div>
+        let sheetData = [];
+        let sheetHeaders = [];
+        let currentView = 'table';
 
-<script>
-    (function() {
-        // ============================================================
-        // YOUR ORIGINAL WORKING CSV URL (with CORS proxy)
-        // ============================================================
-        const PUBLISHED_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwqiqAHnqVpS5790H4PQl0gkl3UwaM1-AvSfHRAv8lIQTmWzl2q8OuV9z9Gk42cMCq_xbiKCyyCePQ/pub?output=csv";
-        const CSV_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(PUBLISHED_CSV_URL);
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+        const errorMessageEl = document.getElementById('error-message');
+        const viewTabsEl = document.getElementById('view-tabs');
+        const statsBarEl = document.getElementById('stats-bar');
+        
+        const tableViewEl = document.getElementById('table-view');
+        const cardsViewEl = document.getElementById('cards-view');
+        
+        const btnTable = document.getElementById('btn-table');
+        const btnCards = document.getElementById('btn-cards');
+        const tableHeadEl = document.getElementById('table-head');
+        const tableBodyEl = document.getElementById('table-body');
+        const rowCountEl = document.getElementById('row-count');
+        const colCountEl = document.getElementById('col-count');
+        const updateTimeEl = document.getElementById('update-time');
+        const tableCountEl = document.getElementById('table-count');
 
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-        const container = document.getElementById('tableContainer');
-        const rowCountEl = document.getElementById('rowCount');
-
-        function setStatus(state, message) {
-            statusDot.className = 'dot ' + state;
-            statusText.textContent = message;
-        }
-
-        function escapeHTML(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
+        // Detect if a string is a URL
         function isURL(str) {
-            if (!str) return false;
-            const trimmed = str.trim();
-            return /^https?:\/\/\S+$/i.test(trimmed);
+            if (!str || typeof str !== 'string') return false;
+            const pattern = /^(https?:\/\/|www\.)[^\s]+$/i;
+            return pattern.test(str.trim());
         }
 
-        function buildCellContent(rawText) {
-            const text = rawText || '';
-            const trimmed = text.trim();
-            const isUrl = isURL(trimmed);
-
-            let html = `<span class="cell-text">${escapeHTML(text)}</span>`;
-            html += `<span class="cell-actions">`;
-
-            if (isUrl) {
-                html += `<a href="${escapeHTML(trimmed)}" target="_blank" rel="noopener noreferrer" class="btn-icon url-btn" title="Open URL">🔗</a>`;
-            }
-
-            const searchQuery = encodeURIComponent(trimmed);
-            html += `<a href="https://www.google.com/search?q=${searchQuery}" target="_blank" rel="noopener noreferrer" class="btn-icon search-btn" title="Search on Google">🔍</a>`;
-
-            html += `</span>`;
-            return html;
-        }
-
-        function parseCSV(text) {
-            const lines = [];
-            let current = [];
-            let field = '';
-            let inQuotes = false;
-            const data = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n') + '\n';
-
-            for (let i = 0; i < data.length; i++) {
-                const c = data[i];
-                if (c === '"') {
-                    if (inQuotes && data[i + 1] === '"') {
-                        field += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (c === ',' && !inQuotes) {
-                    current.push(field.trim());
-                    field = '';
-                } else if (c === '\n' && !inQuotes) {
-                    current.push(field.trim());
-                    if (current.some(f => f !== '')) {
-                        lines.push(current);
-                    }
-                    current = [];
-                    field = '';
-                } else {
-                    field += c;
-                }
-            }
-            return lines.filter(line => line.length > 0);
-        }
-
-        async function loadData() {
-            setStatus('loading', 'Fetching data…');
+        // Extract domain for display
+        function getDomain(url) {
             try {
-                const response = await fetch(CSV_URL);
-                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+                return u.hostname.replace('www.', '');
+            } catch { return url; }
+        }
 
-                const csvText = await response.text();
-                if (!csvText || csvText.trim() === '') throw new Error('CSV is empty.');
+        // Render cell content with clickable URLs and search buttons
+        function renderCellContent(value, header) {
+            if (!value) return '';
+            const trimmed = String(value).trim();
+            
+            // If it's a URL
+            if (isURL(trimmed)) {
+                const displayUrl = trimmed.length > 40 ? trimmed.substring(0, 40) + '…' : trimmed;
+                return `
+                    <a href="${trimmed.startsWith('http') ? trimmed : 'https://' + trimmed}" 
+                       target="_blank" 
+                       class="url-link inline-flex items-center gap-1.5 group"
+                       title="Open: ${trimmed}">
+                        <i class="fas fa-external-link-alt text-[10px] text-indigo-400 group-hover:text-indigo-600"></i>
+                        ${displayUrl}
+                        <span class="text-[10px] text-gray-400 group-hover:text-indigo-400">↗</span>
+                    </a>
+                `;
+            }
+            
+            // Check if it might be searchable (text with multiple words or looks like a name/title)
+            const isSearchable = trimmed.length > 2 && !/^[\d\s,.]+$/.test(trimmed);
+            if (isSearchable) {
+                return `
+                    <span class="flex items-center gap-2">
+                        <span>${value}</span>
+                        <button onclick="searchGoogle('${encodeURIComponent(trimmed)}')" 
+                                class="search-btn text-gray-400 hover:text-indigo-600 text-xs w-6 h-6 rounded-full hover:bg-indigo-50 flex items-center justify-center transition-all"
+                                title="Search Google for '${trimmed}'">
+                            <i class="fas fa-search text-[10px]"></i>
+                        </button>
+                    </span>
+                `;
+            }
+            
+            return value;
+        }
 
-                const rows = parseCSV(csvText);
-                if (rows.length === 0) {
-                    container.innerHTML = `<div class="state-message"><span class="icon">📭</span>No data found.<div class="sub">The sheet seems empty.</div></div>`;
-                    setStatus('error', 'No data');
-                    rowCountEl.textContent = '0 rows';
-                    return;
-                }
+        // Google Search function
+        function searchGoogle(query) {
+            window.open('https://www.google.com/search?q=' + query, '_blank');
+        }
 
-                let html = `<table><thead><tr>`;
-                rows[0].forEach(header => {
-                    html += `<th>${escapeHTML(header || '')}</th>`;
-                });
-                html += `</tr></thead><tbody>`;
+        // Make search function globally accessible
+        window.searchGoogle = searchGoogle;
 
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    html += `<tr>`;
-                    for (let j = 0; j < rows[0].length; j++) {
-                        const cellValue = row[j] || '';
-                        html += `<td><div class="cell-content">${buildCellContent(cellValue)}</div></td>`;
+        // Fetch and parse CSV
+        function loadData() {
+            loadingEl.style.display = 'flex';
+            errorEl.classList.add('hidden');
+            
+            Papa.parse(csvUrl, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    loadingEl.style.display = 'none';
+
+                    if (results.errors.length > 0) {
+                        showError("Error parsing the CSV data. Please check the format.");
+                        return;
                     }
-                    html += `</tr>`;
+
+                    sheetData = results.data;
+                    if (sheetData.length === 0) {
+                        showError("The spreadsheet is empty.");
+                        return;
+                    }
+
+                    sheetHeaders = Object.keys(sheetData[0]).filter(h => h && h.trim() !== '');
+
+                    // Update stats
+                    rowCountEl.textContent = sheetData.length;
+                    colCountEl.textContent = sheetHeaders.length;
+                    updateTimeEl.textContent = new Date().toLocaleTimeString();
+                    tableCountEl.textContent = sheetData.length + ' rows';
+                    statsBarEl.classList.remove('hidden');
+
+                    // Render views
+                    renderTable();
+                    renderCards();
+
+                    // Show tabs and default view
+                    viewTabsEl.classList.remove('hidden');
+                    switchView('table');
+                },
+                error: function(err) {
+                    loadingEl.style.display = 'none';
+                    showError("Failed to fetch Google Sheet. Ensure it is published as a CSV and accessible.");
+                    console.error(err);
                 }
-                html += `</tbody></table>`;
+            });
+        }
 
-                container.innerHTML = html;
-                const count = rows.length - 1;
-                rowCountEl.textContent = count + ' rows';
-                setStatus('success', `Loaded ${count} rows`);
+        function retryLoad() {
+            loadData();
+        }
+        window.retryLoad = retryLoad;
 
-            } catch (error) {
-                console.error('Load error:', error);
-                container.innerHTML = `
-                    <div class="state-message">
-                        <div class="error-box">
-                            <strong>⚠️ Failed to load spreadsheet</strong>
-                            <p style="color:#7f1d1d; margin-bottom:0.5rem;">${escapeHTML(error.message)}</p>
-                            <hr style="border-color:#fecaca; margin:1rem 0;">
-                            <div style="font-size:0.9rem;">
-                                <ul>
-                                    <li>Check that your sheet is published: <code>File → Share → Publish to web</code></li>
-                                    <li>Verify the CSV URL in the code is correct</li>
-                                    <li>Try a different browser (Chrome, Firefox, Edge)</li>
-                                    <li>Disable VPN / proxy extensions temporarily</li>
-                                </ul>
+        function showError(msg) {
+            errorEl.classList.remove('hidden');
+            errorMessageEl.textContent = msg;
+        }
+
+        // Switch between views
+        function switchView(view) {
+            currentView = view;
+            if (view === 'table') {
+                tableViewEl.classList.remove('hidden');
+                cardsViewEl.classList.add('hidden');
+                btnTable.className = "px-5 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnCards.className = "px-5 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+            } else {
+                cardsViewEl.classList.remove('hidden');
+                tableViewEl.classList.add('hidden');
+                btnCards.className = "px-5 py-2.5 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
+                btnTable.className = "px-5 py-2.5 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+            }
+        }
+        window.switchView = switchView;
+
+        // Render Table View
+        function renderTable() {
+            if (sheetHeaders.length === 0) return;
+            
+            let headerHtml = '<tr>';
+            sheetHeaders.forEach(header => {
+                headerHtml += `<th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${header}</th>`;
+            });
+            headerHtml += '</tr>';
+            tableHeadEl.innerHTML = headerHtml;
+
+            let bodyHtml = '';
+            sheetData.forEach((row, index) => {
+                const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/60';
+                bodyHtml += `<tr class="${rowBg} cell-highlight transition-colors">`;
+                sheetHeaders.forEach(header => {
+                    const cellValue = row[header] !== undefined && row[header] !== null ? row[header] : '';
+                    bodyHtml += `<td class="px-6 py-4 text-sm text-gray-700">${renderCellContent(cellValue, header)}</td>`;
+                });
+                bodyHtml += `</tr>`;
+            });
+            tableBodyEl.innerHTML = bodyHtml;
+        }
+
+        // Render Cards View
+        function renderCards() {
+            if (sheetHeaders.length === 0) return;
+            
+            let cardsHtml = '';
+            const titleHeader = sheetHeaders[0] || 'Item';
+            
+            sheetData.forEach((row, index) => {
+                const titleValue = row[titleHeader] || 'Untitled';
+                const colorVariants = ['from-indigo-100 to-purple-100', 'from-blue-100 to-cyan-100', 'from-emerald-100 to-teal-100', 'from-rose-100 to-pink-100', 'from-amber-100 to-orange-100'];
+                const color = colorVariants[index % colorVariants.length];
+
+                cardsHtml += `
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200/60 card-hover overflow-hidden">
+                        <div class="bg-gradient-to-r ${color} px-5 py-4 border-b border-gray-200/40">
+                            <h3 class="text-lg font-bold text-gray-800 flex items-center justify-between">
+                                <span>${titleValue}</span>
+                                <button onclick="searchGoogle('${encodeURIComponent(titleValue)}')" 
+                                        class="text-gray-500 hover:text-indigo-600 text-sm w-7 h-7 rounded-full hover:bg-white/50 flex items-center justify-center transition-all">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </h3>
+                        </div>
+                        <div class="p-5 space-y-2.5">
+                `;
+
+                for (let i = 1; i < sheetHeaders.length; i++) {
+                    const header = sheetHeaders[i];
+                    let val = row[header] !== undefined && row[header] !== null ? row[header] : '';
+                    if (val !== '') {
+                        const isUrl = isURL(String(val).trim());
+                        let displayVal = val;
+                        if (isUrl) {
+                            const domain = getDomain(val);
+                            displayVal = `<a href="${val.startsWith('http') ? val : 'https://' + val}" target="_blank" class="url-link text-sm inline-flex items-center gap-1">
+                                <i class="fas fa-external-link-alt text-[10px]"></i> ${domain}
+                            </a>`;
+                        } else {
+                            // Add search button to card values too
+                            const searchable = String(val).length > 2 && !/^[\d\s,.]+$/.test(String(val));
+                            if (searchable) {
+                                displayVal = `
+                                    <span class="flex items-center gap-2">
+                                        <span>${val}</span>
+                                        <button onclick="searchGoogle('${encodeURIComponent(String(val).trim())}')" 
+                                                class="text-gray-400 hover:text-indigo-500 text-xs">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </span>
+                                `;
+                            }
+                        }
+                        cardsHtml += `
+                            <div class="text-sm flex justify-between items-start gap-2 py-1 border-b border-gray-50 last:border-0">
+                                <span class="font-medium text-gray-500 text-xs uppercase tracking-wider">${header}</span>
+                                <span class="text-gray-800 text-right break-all max-w-[65%]">${displayVal}</span>
                             </div>
+                        `;
+                    }
+                }
+                cardsHtml += `
                         </div>
                     </div>
                 `;
-                setStatus('error', 'Error');
-                rowCountEl.textContent = '0 rows';
-            }
+            });
+            cardsViewEl.innerHTML = cardsHtml;
         }
 
+        // Initial load
         loadData();
-    })();
-</script>
+    </script>
 </body>
 </html>
