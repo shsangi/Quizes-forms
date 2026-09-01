@@ -23,7 +23,7 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
-        .card-field { transition: background 0.15s; padding: 4px 8px; margin: 0 -8px; border-radius: 6px; }
+        .card-field { transition: background 0.15s; padding: 6px 10px; margin: 0 -10px; border-radius: 6px; }
         .card-field:hover { background: #f8fafc; }
         .heading-gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .heading-gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
@@ -50,14 +50,17 @@
             justify-content: center;
             padding: 12px 0 18px 0;
         }
-        /* Compact card styles */
-        .compact-card .card-body { padding: 10px 14px !important; }
-        .compact-card .card-heading { padding: 8px 14px !important; }
-        .compact-card .card-heading h3 { font-size: 0.95rem !important; }
-        .compact-card .field-label { font-size: 0.6rem !important; letter-spacing: 0.04em; }
-        .compact-card .field-value { font-size: 0.8rem !important; }
-        .compact-card .field-row { padding: 2px 0 !important; margin: 0 !important; border-bottom: none !important; }
+        /* Compact card styles - increased size */
+        .compact-card .card-body { padding: 12px 16px !important; }
+        .compact-card .card-heading { padding: 10px 16px !important; }
+        .compact-card .card-heading h3 { font-size: 1rem !important; }
+        .compact-card .field-label { font-size: 0.65rem !important; letter-spacing: 0.04em; }
+        .compact-card .field-value { font-size: 0.85rem !important; }
+        .compact-card .field-row { padding: 4px 0 !important; margin: 0 !important; border-bottom: none !important; }
         .compact-card .field-row + .field-row { border-top: 1px solid #f3f4f6; }
+        .compact-card .url-link { font-size: 0.85rem !important; }
+        .compact-card .search-btn { width: 22px !important; height: 22px !important; }
+        .compact-card .search-btn i { font-size: 10px !important; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
@@ -112,8 +115,8 @@
             </div>
         </div>
 
-        <!-- Cards View - Compact -->
-        <div id="cards-view" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <!-- Cards View - Compact +1 size -->
+        <div id="cards-view" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
             <!-- Cards injected here -->
         </div>
     </div>
@@ -164,13 +167,13 @@
             const trimmed = String(value).trim();
             
             if (isURL(trimmed)) {
-                const displayUrl = trimmed.length > 30 ? trimmed.substring(0, 30) + '…' : trimmed;
+                const displayUrl = trimmed.length > 35 ? trimmed.substring(0, 35) + '…' : trimmed;
                 return `
                     <a href="${trimmed.startsWith('http') ? trimmed : 'https://' + trimmed}" 
                        target="_blank" 
-                       class="url-link inline-flex items-center gap-1 group text-sm"
+                       class="url-link inline-flex items-center gap-1 group"
                        title="Open: ${trimmed}">
-                        <i class="fas fa-external-link-alt text-[9px] text-indigo-400"></i>
+                        <i class="fas fa-external-link-alt text-[10px] text-indigo-400"></i>
                         ${displayUrl}
                     </a>
                 `;
@@ -180,15 +183,15 @@
             if (isSearchable) {
                 return `
                     <span class="flex items-center gap-1.5">
-                        <span class="text-sm">${value}</span>
+                        <span>${value}</span>
                         <button onclick="searchGoogle('${encodeURIComponent(trimmed)}')" 
-                                class="search-btn text-gray-400 hover:text-indigo-600 text-[10px] w-5 h-5 rounded-full hover:bg-indigo-50 flex items-center justify-center transition-all">
+                                class="search-btn text-gray-400 hover:text-indigo-600 text-xs w-5 h-5 rounded-full hover:bg-indigo-50 flex items-center justify-center transition-all">
                             <i class="fas fa-search text-[9px]"></i>
                         </button>
                     </span>
                 `;
             }
-            return `<span class="text-sm">${value}</span>`;
+            return `<span>${value}</span>`;
         }
 
         function searchGoogle(query) {
@@ -299,19 +302,19 @@
                 cardsHtml += `
                     <div class="bg-white rounded-xl shadow-md border border-gray-200/60 card-hover overflow-hidden compact-card">
                         <!-- Compact Heading -->
-                        <div class="${gradientClass} card-heading px-4 py-2 border-b border-white/20 flex items-center justify-between">
-                            <h3 class="text-sm font-bold text-white flex items-center gap-1.5 truncate">
-                                <i class="fas fa-tag text-white/60 text-[10px]"></i>
+                        <div class="${gradientClass} card-heading px-4 py-2.5 border-b border-white/20 flex items-center justify-between">
+                            <h3 class="text-base font-bold text-white flex items-center gap-1.5 truncate">
+                                <i class="fas fa-tag text-white/60 text-[11px]"></i>
                                 <span class="truncate">${headingText}</span>
                             </h3>
                             <button onclick="searchGoogle('${encodeURIComponent(headingText)}')" 
-                                    class="text-white/60 hover:text-white text-xs w-6 h-6 rounded-full hover:bg-white/20 flex items-center justify-center transition-all flex-shrink-0">
-                                <i class="fas fa-search text-[10px]"></i>
+                                    class="text-white/60 hover:text-white text-xs w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center transition-all flex-shrink-0">
+                                <i class="fas fa-search text-[11px]"></i>
                             </button>
                         </div>
                         
                         <!-- Compact Body -->
-                        <div class="card-body px-4 py-2 space-y-0">
+                        <div class="card-body px-4 py-2.5 space-y-0">
                 `;
 
                 for (let i = 0; i < sheetHeaders.length; i++) {
@@ -323,18 +326,18 @@
                         
                         if (isUrl) {
                             const domain = getDomain(val);
-                            displayVal = `<a href="${val.startsWith('http') ? val : 'https://' + val}" target="_blank" class="url-link text-xs inline-flex items-center gap-1">
-                                <i class="fas fa-external-link-alt text-[8px]"></i> ${domain}
+                            displayVal = `<a href="${val.startsWith('http') ? val : 'https://' + val}" target="_blank" class="url-link text-sm inline-flex items-center gap-1">
+                                <i class="fas fa-external-link-alt text-[9px]"></i> ${domain}
                             </a>`;
                         } else {
                             const searchable = String(val).length > 2 && !/^[\d\s,.]+$/.test(String(val));
                             if (searchable) {
                                 displayVal = `
-                                    <span class="flex items-center gap-1 flex-wrap">
-                                        <span class="text-xs">${val}</span>
+                                    <span class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="text-sm">${val}</span>
                                         <button onclick="searchGoogle('${encodeURIComponent(String(val).trim())}')" 
-                                                class="text-gray-400 hover:text-indigo-500 text-[10px] transition-all">
-                                            <i class="fas fa-search text-[8px]"></i>
+                                                class="text-gray-400 hover:text-indigo-500 text-[11px] transition-all">
+                                            <i class="fas fa-search text-[9px]"></i>
                                         </button>
                                     </span>
                                 `;
@@ -342,8 +345,8 @@
                         }
                         
                         cardsHtml += `
-                            <div class="field-row flex justify-between items-center gap-2 py-1">
-                                <span class="field-label font-medium text-gray-400 text-[10px] uppercase tracking-wider flex-shrink-0">
+                            <div class="field-row flex justify-between items-center gap-2 py-1.5">
+                                <span class="field-label font-medium text-gray-400 text-[11px] uppercase tracking-wider flex-shrink-0">
                                     ${header}
                                 </span>
                                 <span class="field-value text-gray-700 text-right break-all max-w-[60%]">${displayVal}</span>
