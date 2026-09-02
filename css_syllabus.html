@@ -167,7 +167,7 @@
     </div>
 
     <div class="table-container">
-      <div id="loading">Loading syllabus data from published sheet...</div>
+      <div id="loading">Loading syllabus data...</div>
       <table id="dataTable" style="display: none;">
         <thead>
           <tr>
@@ -189,10 +189,10 @@
   <script>
     let globalData = [];
 
-    // Global callback required for JSONP bypass
+    // JSONP response handler to bypass CORS
     function parseGVizResponse(json) {
       if (!json || !json.table || !json.table.rows) {
-        document.getElementById('loading').innerText = 'Error parsing spreadsheet response.';
+        document.getElementById('loading').innerText = 'Error loading spreadsheet data.';
         return;
       }
 
@@ -215,14 +215,14 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Use Google Visualization API query endpoint with jsonp callback
-      const sheetKey = '2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac';
-      const scriptUrl = `https://docs.google.com/spreadsheets/d/e/${sheetKey}/gviz/tq?tqx=responseHandler:parseGVizResponse`;
+      // Connect to the published document ID via JSONP
+      const pubId = '2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac';
+      const scriptUrl = `https://docs.google.com/spreadsheets/d/e/${pubId}/gviz/tq?tqx=responseHandler:parseGVizResponse`;
       
       const script = document.createElement('script');
       script.src = scriptUrl;
       script.onerror = () => {
-        document.getElementById('loading').innerText = 'Failed to fetch data. Check spreadsheet publishing settings.';
+        document.getElementById('loading').innerText = 'Failed to load spreadsheet data.';
       };
       document.body.appendChild(script);
 
