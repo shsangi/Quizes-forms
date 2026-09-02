@@ -13,7 +13,7 @@
         body {
             background: #eef2f7;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            padding: 16px 14px 40px;
+            padding: 14px 12px 32px;
             color: #0b1e32;
             min-height: 100vh;
             display: flex;
@@ -28,11 +28,11 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             gap: 6px 4px;
         }
         .header h1 {
-            font-size: 1.7rem;
+            font-size: 1.4rem;
             font-weight: 700;
             letter-spacing: -0.3px;
             display: flex;
@@ -42,18 +42,18 @@
         }
         .header h1 span {
             background: #d4e2f5;
-            padding: 0 12px;
+            padding: 0 10px;
             border-radius: 40px;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             font-weight: 500;
             color: #1b3f69;
             line-height: 1.8;
         }
         .count-badge {
             background: #dce6f0;
-            padding: 4px 16px;
+            padding: 4px 14px;
             border-radius: 40px;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: #1a3857;
             white-space: nowrap;
@@ -62,7 +62,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .controls-row {
             display: flex;
@@ -76,11 +76,11 @@
         }
         .search-box input {
             width: 100%;
-            padding: 12px 16px 12px 42px;
+            padding: 10px 14px 10px 38px;
             border: 1px solid #c5d2e0;
             border-radius: 60px;
             background: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-family: inherit;
             box-shadow: 0 1px 4px rgba(0,0,0,0.04);
             transition: 0.15s;
@@ -93,55 +93,32 @@
         .search-box::before {
             content: "🔍";
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             opacity: 0.5;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
         }
         .subject-select {
-            padding: 12px 38px 12px 18px;
+            padding: 10px 36px 10px 16px;
             border: 1px solid #c5d2e0;
             border-radius: 60px;
             background: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-family: inherit;
             color: #1a2e4a;
             cursor: pointer;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233b5a7a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 16px center;
+            background-position: right 14px center;
             background-size: 14px;
-            min-width: 150px;
+            min-width: 130px;
             flex: 0 1 auto;
         }
         .subject-select:focus {
             outline: none;
             border-color: #2a6df4;
-        }
-
-        .print-btn {
-            background: #1a4a7a;
-            color: white;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 60px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.15s;
-            font-family: inherit;
-            white-space: nowrap;
-        }
-        .print-btn:hover {
-            background: #0d3a60;
-        }
-        .print-btn:active {
-            transform: scale(0.97);
         }
 
         /* ----- syllabus style ----- */
@@ -152,11 +129,11 @@
         }
         .paper-block {
             background: #ffffff;
-            border-radius: 24px;
-            padding: 20px 18px 16px;
-            margin-bottom: 18px;
+            border-radius: 20px;
+            padding: 16px 14px 14px;
+            margin-bottom: 14px;
             border: 1px solid #dce5ef;
-            box-shadow: 0 4px 16px rgba(0,20,40,0.06);
+            box-shadow: 0 2px 12px rgba(0,20,40,0.05);
             transition: 0.15s;
         }
         .paper-block:last-child {
@@ -169,7 +146,7 @@
             background: #f8faff;
         }
         .paper-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #0b2b4a;
             letter-spacing: -0.2px;
@@ -182,10 +159,10 @@
         }
         .paper-title .marks {
             font-weight: 500;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #3d6185;
             background: #eef3fa;
-            padding: 0 14px;
+            padding: 0 12px;
             border-radius: 40px;
             line-height: 2;
         }
@@ -202,18 +179,19 @@
         }
         .paper-title .subject-link::after {
             content: "🔗";
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             opacity: 0.5;
         }
 
+        /* Last studied - smaller font */
         .last-studied {
-            font-size: 0.85rem;
-            color: #1a3a5a;
+            font-size: 0.6rem;
+            color: #2a4a6a;
             background: #e8eff8;
-            padding: 6px 16px;
+            padding: 3px 12px;
             border-radius: 40px;
             display: inline-block;
-            margin: 6px 0 12px 0;
+            margin: 4px 0 8px 0;
             font-weight: 450;
             border: 1px solid #d5e0ec;
         }
@@ -224,27 +202,27 @@
         .last-studied .pkt-badge {
             font-weight: 400;
             color: #5a7a9a;
-            font-size: 0.7rem;
+            font-size: 0.55rem;
             margin-left: 4px;
         }
 
         .subject-divider {
             border: none;
             border-top: 2px solid #dce5f0;
-            margin: 8px 0 14px 0;
+            margin: 6px 0 10px 0;
         }
 
         .module-group {
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
         .module-group:last-child {
             margin-bottom: 0;
         }
         .module-head {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: #1f406a;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             display: flex;
             align-items: baseline;
             gap: 6px;
@@ -252,25 +230,25 @@
         }
         .module-head .module-marks {
             font-weight: 400;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: #3f6187;
             background: #f0f5fc;
-            padding: 0 12px;
+            padding: 0 10px;
             border-radius: 40px;
             line-height: 1.9;
         }
         .topic-item {
-            padding: 8px 0 8px 16px;
+            padding: 6px 0 6px 14px;
             border-left: 3px solid #b8cce0;
             margin-left: 4px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .topic-item:last-child {
             margin-bottom: 0;
         }
         .topic-item .topic-label {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: #0b2b4a;
             display: flex;
             flex-wrap: wrap;
@@ -290,29 +268,29 @@
         }
         .topic-item .topic-label .topic-link::after {
             content: "🔗";
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             opacity: 0.4;
         }
         .topic-item .topic-desc {
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             color: #1f3d60;
             line-height: 1.5;
             margin-top: 2px;
         }
         .subtopic-list {
-            margin: 6px 0 4px 8px;
+            margin: 4px 0 2px 6px;
             padding-left: 4px;
             list-style: none;
             counter-reset: sub-counter;
         }
         .subtopic-list li {
             counter-increment: sub-counter;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #1f3d60;
-            line-height: 1.6;
-            padding: 2px 0 2px 28px;
+            line-height: 1.5;
+            padding: 1px 0 1px 24px;
             position: relative;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
         .subtopic-list li::before {
             content: counter(sub-counter) ".";
@@ -320,7 +298,7 @@
             left: 2px;
             font-weight: 500;
             color: #2a6df4;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
         }
         .subtopic-list li .sub-link {
             color: #1f3d60;
@@ -335,19 +313,19 @@
         }
         .subtopic-list li .sub-link::after {
             content: "🔗";
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             opacity: 0.35;
         }
         .sub-subtopic-list {
-            margin: 4px 0 4px 24px;
+            margin: 2px 0 2px 20px;
             padding-left: 4px;
             list-style: none;
         }
         .sub-subtopic-list li {
-            font-size: 0.88rem;
+            font-size: 0.78rem;
             color: #1f3d60;
-            line-height: 1.6;
-            padding: 2px 0 2px 20px;
+            line-height: 1.5;
+            padding: 1px 0 1px 18px;
             position: relative;
             margin-bottom: 0px;
         }
@@ -357,7 +335,7 @@
             left: 0px;
             font-weight: 450;
             color: #3a6a9a;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
         }
         .sub-subtopic-list li .sub-link {
             color: #1f3d60;
@@ -369,14 +347,14 @@
         }
         .sub-subtopic-list li .sub-link::after {
             content: "🔗";
-            font-size: 0.55rem;
+            font-size: 0.45rem;
             opacity: 0.3;
             margin-left: 2px;
         }
         .topic-item .book-ref {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #3d6185;
-            margin-top: 4px;
+            margin-top: 3px;
         }
         .topic-item .book-ref .book-link {
             color: #3d6185;
@@ -391,30 +369,30 @@
         }
         .topic-item .book-ref .book-link::after {
             content: "🔗";
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             opacity: 0.35;
         }
         .empty-state {
-            padding: 50px 16px;
+            padding: 40px 16px;
             text-align: center;
             background: white;
             border-radius: 40px;
             color: #3b5f82;
             border: 1px solid #e3eaf3;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 12px;
-            padding: 50px 0;
+            gap: 10px;
+            padding: 40px 0;
             color: #2f557a;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
         .spinner {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             border: 3px solid #d5dfea;
             border-top: 3px solid #2a6df4;
             border-radius: 50%;
@@ -422,30 +400,29 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .footer {
-            margin-top: 20px;
-            font-size: 0.8rem;
+            margin-top: 16px;
+            font-size: 0.7rem;
             color: #5f7c99;
             text-align: right;
             border-top: 1px solid #dce5ef;
-            padding-top: 14px;
+            padding-top: 12px;
         }
 
         @media print {
-            body { background: white !important; padding: 10px !important; font-size: 11px !important; }
+            body { background: white !important; padding: 10px !important; font-size: 10px !important; }
             .app { max-width: 100% !important; }
             .controls { display: none !important; }
-            .print-btn { display: none !important; }
-            .paper-block { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; padding: 14px !important; margin-bottom: 12px !important; }
+            .paper-block { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; padding: 12px !important; margin-bottom: 10px !important; }
             .paper-block:nth-child(odd), .paper-block:nth-child(even) { background: white !important; }
             .subject-link::after, .topic-link::after, .sub-link::after, .book-link::after { content: "" !important; display: none !important; }
             .last-studied { background: #f0f4f8 !important; border: 1px solid #d0d8e0 !important; }
-            .module-head { font-size: 0.9rem !important; }
-            .topic-item .topic-label { font-size: 0.9rem !important; }
-            .subtopic-list li { font-size: 0.85rem !important; }
-            .sub-subtopic-list li { font-size: 0.85rem !important; }
-            .topic-item .book-ref { font-size: 0.8rem !important; }
-            .footer { font-size: 0.7rem !important; border-top: 1px solid #ccc !important; }
-            .header h1 { font-size: 1.3rem !important; }
+            .module-head { font-size: 0.8rem !important; }
+            .topic-item .topic-label { font-size: 0.8rem !important; }
+            .subtopic-list li { font-size: 0.75rem !important; }
+            .sub-subtopic-list li { font-size: 0.75rem !important; }
+            .topic-item .book-ref { font-size: 0.7rem !important; }
+            .footer { font-size: 0.6rem !important; border-top: 1px solid #ccc !important; }
+            .header h1 { font-size: 1.1rem !important; }
             .count-badge { display: none !important; }
             .subject-divider { border-top: 1px solid #ccc !important; }
         }
@@ -455,10 +432,7 @@
 <div class="app">
     <div class="header">
         <h1>📘 CSS <span>syllabus</span></h1>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span class="count-badge" id="countDisplay">0</span>
-            <button class="print-btn" onclick="window.print()">🖨️ Print / PDF</button>
-        </div>
+        <span class="count-badge" id="countDisplay">0</span>
     </div>
 
     <div class="controls">
@@ -555,27 +529,20 @@
             window.open(url, '_blank');
         }
 
-        // ---------- smart split: handles mixed lettered + numbered items ----------
+        // ---------- smart split ----------
         function smartSplit(text) {
             if (!text || text.trim() === '') return [];
 
-            // First try: split by newlines (common in your data)
             if (text.includes('\n')) {
                 const parts = text.split('\n').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
             }
 
-            // Try: split by numbered items like "1. ... 2. ..." but also detect "c) Stacks" followed by "2. Queues"
-            // We need to handle mixed format: a) b) c) and then 1. 2. 3.
-            // Let's first try to split by lettered items
             const letterMatch = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
             if (letterMatch && letterMatch.length > 1) {
-                // Check if there are also numbered items after the lettered ones
                 const afterLetters = text.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
                 if (afterLetters && /\d+\./.test(afterLetters)) {
-                    // Mixed: lettered + numbered - split lettered first
                     const result = [...letterMatch];
-                    // Then extract numbered items from the remainder
                     const numberedMatch = afterLetters.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
                     if (numberedMatch) {
                         for (const item of numberedMatch) {
@@ -587,25 +554,21 @@
                 return letterMatch.map(s => s.trim());
             }
 
-            // Try numbered items
             const numberedMatch = text.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
             if (numberedMatch && numberedMatch.length > 1) {
                 return numberedMatch.map(s => s.trim());
             }
 
-            // Split by semicolon
             if (text.includes(';')) {
                 const parts = text.split(';').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
             }
 
-            // Split by comma
             if (text.includes(',')) {
                 const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
             }
 
-            // Split by period with space
             if (text.includes('. ')) {
                 const parts = text.split('. ').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
@@ -614,37 +577,21 @@
             return [text.trim()];
         }
 
-        // ---------- detect if item is lettered (a, b, c) ----------
-        function isLettered(text) {
-            return /^[a-z]\)/.test(text.trim());
-        }
-
-        // ---------- detect if item is numbered (1., 2., 3.) ----------
         function isNumbered(text) {
             return /^\d+\./.test(text.trim());
-        }
-
-        // ---------- extract lettered sub-items ----------
-        function extractSubLetters(text) {
-            if (!text) return [];
-            // Extract all a) b) c) patterns
-            const matches = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
-            if (!matches) return [];
-            return matches.map(s => s.trim());
-        }
-
-        // ---------- extract numbered sub-items ----------
-        function extractNumberedItems(text) {
-            if (!text) return [];
-            const matches = text.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
-            if (!matches) return [];
-            return matches.map(s => s.trim());
         }
 
         function hasSubLetters(text) {
             if (!text) return false;
             return /[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi.test(text) && 
                    (text.match(/[a-z]\)/gi) || []).length > 1;
+        }
+
+        function extractSubLetters(text) {
+            if (!text) return [];
+            const matches = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
+            if (!matches) return [];
+            return matches.map(s => s.trim());
         }
 
         function formatDateInPKT(dateStr) {
@@ -746,8 +693,6 @@
                         if (subItems.length > 0) {
                             html += `<ul class="subtopic-list">`;
                             for (const sub of subItems) {
-                                const cleanSub = sub.replace(/^\d+\.\s*/, '').replace(/^[a-z]\)\s*/, '').trim();
-                                // Check if this item has lettered sub-items within it
                                 if (hasSubLetters(sub)) {
                                     const subLetters = extractSubLetters(sub);
                                     const mainPart = sub.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
@@ -762,20 +707,19 @@
                                         const letters = 'abcdefghijklmnopqrstuvwxyz';
                                         for (let i = 0; i < subLetters.length; i++) {
                                             const letter = letters[i] || '?';
-                                            const cleanSubItem = subLetters[i].replace(/^[a-z]\)\s*/, '').trim();
-                                            html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSubItem.replace(/'/g, "\\'")}')">${cleanSubItem}</span></li>`;
+                                            const cleanSub = subLetters[i].replace(/^[a-z]\)\s*/, '').trim();
+                                            html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
                                         }
                                         html += `</ul>`;
                                     }
                                 } else if (isNumbered(sub)) {
-                                    // Numbered item without letter prefix
                                     const numClean = sub.replace(/^\d+\.\s*/, '').trim();
                                     html += `<li><span class="sub-link" onclick="googleSearch('${numClean.replace(/'/g, "\\'")}')">${numClean}</span></li>`;
                                 } else {
-                                    // Regular item
-                                    const finalClean = cleanSub.replace(/[;,:]\s*$/, '').trim();
-                                    if (finalClean) {
-                                        html += `<li><span class="sub-link" onclick="googleSearch('${finalClean.replace(/'/g, "\\'")}')">${finalClean}</span></li>`;
+                                    let cleanSub = sub.replace(/^\d+\.\s*/, '').trim();
+                                    cleanSub = cleanSub.replace(/[;,:]\s*$/, '').trim();
+                                    if (cleanSub) {
+                                        html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
                                     }
                                 }
                             }
