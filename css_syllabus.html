@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-  <title>CSS · subject cards</title>
+  <title>CSS · course content</title>
   <style>
     * {
       margin: 0;
@@ -11,7 +11,7 @@
       box-sizing: border-box;
     }
     body {
-      background: #f3f7fc;
+      background: #f2f6fc;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       padding: 16px 12px 32px;
       color: #0b1e32;
@@ -20,10 +20,9 @@
       justify-content: center;
     }
     .app {
-      max-width: 600px;
+      max-width: 620px;
       width: 100%;
     }
-    /* header */
     .header {
       display: flex;
       flex-wrap: wrap;
@@ -58,7 +57,6 @@
       color: #1a3857;
       white-space: nowrap;
     }
-    /* controls */
     .controls {
       display: flex;
       flex-direction: column;
@@ -241,12 +239,12 @@
       font-size: 0.8rem;
       color: #1f3d60;
       background: #f6faff;
-      padding: 6px 12px;
+      padding: 8px 12px;
       border-radius: 14px;
       border-left: 3px solid #b7cce5;
       margin: 6px 0 4px;
       word-break: break-word;
-      line-height: 1.4;
+      line-height: 1.5;
     }
     .card-subtopics strong {
       font-weight: 500;
@@ -321,7 +319,7 @@
 <body>
 <div class="app">
   <div class="header">
-    <h1>📘 CSS <span>cards</span></h1>
+    <h1>📘 CSS <span>content</span></h1>
     <span class="count-badge" id="countDisplay">0</span>
   </div>
 
@@ -354,7 +352,7 @@
     let allRecords = [];
     let filtered = [];
 
-    // ---------- simple CSV parse ----------
+    // ---------- CSV parse ----------
     function parseLine(line) {
       const res = [];
       let cur = '', inside = false;
@@ -380,14 +378,18 @@
       const h = parseLine(lines[0]);
       const idx = {
         srno: h.indexOf('srno'),
-        subject: h.indexOf('subject'),
+        subject: h.indexOf('subjectPaper') !== -1 ? h.indexOf('subjectPaper') : h.indexOf('subject'),
         Module: h.indexOf('Module'),
         topicNumber: h.indexOf('Topic Number'),
         topicName: h.indexOf('Topic Name / Detail'),
         inFPSC: h.indexOf('Given in FPSC CSS Syllabus?'),
         book: h.indexOf('Recommended Book / Source to Study'),
-        url: h.indexOf('topic online_url')
+        url: h.indexOf('topic online_url'),
+        subtopics: h.indexOf('Possible Subtopics (FPSC Syllabus Past Papers & Recent Topics)')
       };
+      // fallback: if subtopics not found, use topicName as subtopics
+      const subtopicsIdx = idx.subtopics !== -1 ? idx.subtopics : idx.topicName;
+
       const rows = [];
       for (let i = 1; i < lines.length; i++) {
         const c = parseLine(lines[i]);
@@ -400,7 +402,8 @@
           topicName: c[idx.topicName] || '',
           inFPSC: c[idx.inFPSC] || '',
           book: c[idx.book] || '',
-          url: c[idx.url] || ''
+          url: c[idx.url] || '',
+          subtopics: c[subtopicsIdx] || ''
         };
         if (!isNaN(parseFloat(r.srno)) && r.srno.trim() !== '') rows.push(r);
       }
@@ -421,8 +424,7 @@
         const dotColor = inFPSC ? '#1f9d5a' : '#b34a4a';
         const url = r.url && r.url.startsWith('http') ? r.url : '#';
         const book = r.book || '—';
-        // use topicName as "subtopics" (last column concept) – we put it in a dedicated block
-        const subtopics = r.topicName || '';
+        const subtopics = r.subtopics || r.topicName || '—';
 
         html += `
           <div class="card">
@@ -443,8 +445,8 @@
             </div>
             <div class="card-topic">${r.topicName || '—'}</div>
             <div class="card-subtopics">
-              <strong>📌 subtopics / detail</strong><br />
-              ${subtopics || '—'}
+              <strong>📌 Possible Subtopics</strong><br />
+              ${subtopics}
             </div>
             <div>
               <span class="card-book">📖 ${book}</span>
@@ -463,7 +465,7 @@
       const subject = subjectSelect.value;
       filtered = allRecords.filter(r => {
         if (search) {
-          const all = `${r.srno} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.url}`.toLowerCase();
+          const all = `${r.srno} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.url} ${r.subtopics}`.toLowerCase();
           if (!all.includes(search)) return false;
         }
         if (subject && r.subject !== subject) return false;
@@ -511,7 +513,6 @@
       }
     }
 
-    // events
     searchInput.addEventListener('input', applyFilters);
     subjectSelect.addEventListener('change', applyFilters);
 
