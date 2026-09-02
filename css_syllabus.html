@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Written Optional Subjects Checklist</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #0f172a;
+      --border-color: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --badge-bg: #e0e7ff;
+      --badge-text: #3730a3;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"], select {
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      background-color: #fff;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    select {
+      min-width: 180px;
+    }
+
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow-x: auto;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background-color: var(--badge-bg);
+      color: var(--badge-text);
+      white-space: nowrap;
+    }
+
+    .subtopics {
+      color: #475569;
+      font-size: 0.825rem;
+    }
+
+    .btn-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 40px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .checkbox-col {
+      text-align: center;
+      width: 40px;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>CSS Optional Subjects Syllabus Dashboard</h1>
+      <p class="subtitle">Live dynamic sync from Google Sheets CSV output</p>
+    </header>
+
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="Search topics, modules, subtopics...">
+      <select id="subjectFilter">
+        <option value="">All Subjects</option>
+      </select>
+    </div>
+
+    <div class="table-container">
+      <div id="loading">Fetching syllabus data from Google Sheets...</div>
+      <table id="dataTable" style="display: none;">
+        <thead>
+          <tr>
+            <th class="checkbox-col">Done</th>
+            <th>Sr#</th>
+            <th>Subject</th>
+            <th>Paper / Module</th>
+            <th>Topic #</th>
+            <th>Topic Name & Details</th>
+            <th>Subtopics & High-Yield Focus</th>
+            <th>Resource</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/1yVLhveDpRjFtrLLmb7q6VrrcXa1WL4q9hhcIO6fFOWQ/export?format=csv&gid=806242082';
+
+    let globalData = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchData();
+
+      document.getElementById('searchInput').addEventListener('input', filterData);
+      document.getElementById('subjectFilter').addEventListener('change', filterData);
+    });
+
+    function fetchData() {
+      Papa.parse(CSV_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          globalData = results.data;
+          populateSubjectFilter(globalData);
+          renderTable(globalData);
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('dataTable').style.display = 'table';
+        },
+        error: function(err) {
+          document.getElementById('loading').innerText = 'Failed to load spreadsheet data. Make sure the Google Sheet is published or shared publicly.';
+        }
+      });
+    }
+
+    function populateSubjectFilter(data) {
+      const select = document.getElementById('subjectFilter');
+      const subjects = [...new Set(data.map(item => item['Module / Section'] || item['subject']).filter(Boolean))];
+      
+      subjects.forEach(sub => {
+        const option = document.createElement('option');
+        option.value = sub;
+        option.textContent = sub;
+        select.appendChild(option);
+      });
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+
+        const srNo = row['srno'] || (index + 1);
+        const moduleSection = row['Module / Section'] || row['subject'] || '-';
+        const paper = row['Paper'] || '-';
+        const topicNo = row['Topic Number'] || '-';
+        const topicName = row['Topic Name / Detail'] || '-';
+        const subtopics = row['Possible Subtopics (FPSC Syllabus Past Papers & Recent Topics)'] || '-';
+        const book = row['Recommended Book / Source to Study'] || 'Syllabus Source';
+        const link = row['topic online_url'] || '#';
+
+        tr.innerHTML = `
+          <td class="checkbox-col"><input type="checkbox" id="check-${index}"></td>
+          <td>${srNo}</td>
+          <td><span class="badge">${moduleSection}</span></td>
+          <td>${paper}</td>
+          <td><strong>${topicNo}</strong></td>
+          <td><strong>${topicName}</strong></td>
+          <td class="subtopics">${subtopics}</td>
+          <td><a href="${link}" target="_blank" class="btn-link">${book}</a></td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterData() {
+      const searchValue = document.getElementById('searchInput').value.toLowerCase();
+      const selectedSubject = document.getElementById('subjectFilter').value;
+
+      const filtered = globalData.filter(row => {
+        const matchesSubject = !selectedSubject || (row['Module / Section'] === selectedSubject || row['subject'] === selectedSubject);
+        const matchesSearch = Object.values(row).some(val => String(val).toLowerCase().includes(searchValue));
+        return matchesSubject && matchesSearch;
+      });
+
+      renderTable(filtered);
+    }
+  </script>
+</body>
+</html>
