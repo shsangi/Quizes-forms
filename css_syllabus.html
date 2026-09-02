@@ -1,514 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CSS syllabus · subject cards</title>
-    <!-- Inter font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #f2f6fc;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            padding: 2rem 1.5rem;
-            color: #0b1b33;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        /* header */
-        .header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1.2rem 0.8rem;
-            margin-bottom: 2.2rem;
-        }
-        .header h1 {
-            font-size: 1.9rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .header h1 span {
-            background: #d0e0f5;
-            padding: 0.1rem 0.8rem;
-            border-radius: 60px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #1f3f6a;
-        }
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            align-items: center;
-        }
-        .search-box {
-            position: relative;
-            min-width: 220px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 0.65rem 1rem 0.65rem 2.6rem;
-            border: 1px solid #d5dfea;
-            border-radius: 60px;
-            background: white;
-            font-size: 0.9rem;
-            font-family: inherit;
-            transition: 0.15s;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-        }
-        .search-box input:focus {
-            outline: none;
-            border-color: #2a6df4;
-            box-shadow: 0 0 0 3px rgba(42, 109, 244, 0.15);
-        }
-        .search-box::before {
-            content: "🔍";
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.6;
-            font-size: 1rem;
-        }
-        .subject-select {
-            padding: 0.6rem 2.2rem 0.6rem 1.2rem;
-            border: 1px solid #d5dfea;
-            border-radius: 60px;
-            background: white;
-            font-size: 0.9rem;
-            font-family: inherit;
-            color: #1a2a44;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233b4a5e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 12px;
-            min-width: 160px;
-        }
-        .subject-select:focus {
-            outline: none;
-            border-color: #2a6df4;
-        }
-        .count-badge {
-            background: #e2eaf5;
-            padding: 0.3rem 1.1rem;
-            border-radius: 60px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #1e3a5f;
-            white-space: nowrap;
-        }
-
-        /* card grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 1.5rem;
-        }
-        .card {
-            background: white;
-            border-radius: 24px;
-            padding: 1.4rem 1.2rem 1.2rem;
-            box-shadow: 0 6px 18px rgba(0, 20, 40, 0.06);
-            border: 1px solid #e9edf4;
-            transition: 0.15s;
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-        .card:hover {
-            box-shadow: 0 12px 28px rgba(0, 20, 40, 0.10);
-            border-color: #cbd8ea;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 0.2rem;
-        }
-        .card-srno {
-            font-weight: 500;
-            color: #546e8a;
-            font-size: 0.75rem;
-            background: #eef3fa;
-            padding: 0.15rem 0.6rem;
-            border-radius: 40px;
-        }
-        .card-subject {
-            font-weight: 600;
-            color: #10345e;
-            font-size: 0.8rem;
-            letter-spacing: 0.01em;
-            background: #e5edf8;
-            padding: 0.15rem 0.8rem;
-            border-radius: 40px;
-        }
-        .card-module {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #2b4c73;
-            background: #f0f4fb;
-            padding: 0.15rem 0.7rem;
-            border-radius: 30px;
-            display: inline-block;
-            margin: 0.2rem 0 0.2rem;
-        }
-        .card-topic {
-            font-size: 1.05rem;
-            font-weight: 600;
-            line-height: 1.3;
-            color: #0b213b;
-            margin: 0.3rem 0 0.1rem;
-        }
-        .card-topic-number {
-            font-weight: 400;
-            color: #3b5f83;
-            font-size: 0.8rem;
-            background: #f3f7fe;
-            padding: 0.1rem 0.6rem;
-            border-radius: 30px;
-            display: inline-block;
-        }
-        .card-detail {
-            font-size: 0.9rem;
-            color: #1b3450;
-            margin: 0.3rem 0 0.1rem;
-            line-height: 1.5;
-        }
-        .card-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem 0.6rem;
-            margin: 0.5rem 0 0.3rem;
-            align-items: center;
-        }
-        .card-book {
-            background: #f5f7fb;
-            padding: 0.2rem 0.8rem;
-            border-radius: 60px;
-            font-size: 0.75rem;
-            color: #1d3a5c;
-            border: 1px solid #e1e8f0;
-            word-break: break-word;
-        }
-        .card-fpsc {
-            font-weight: 500;
-            font-size: 0.7rem;
-            padding: 0.15rem 0.7rem;
-            border-radius: 60px;
-            background: #e3f0e8;
-            color: #0b482b;
-        }
-        .card-fpsc.no {
-            background: #f3e9e9;
-            color: #7a4646;
-        }
-        .card-url {
-            margin-top: 0.3rem;
-        }
-        .card-url a {
-            color: #1a5bbf;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-            border-bottom: 1px dashed #b7ccf0;
-        }
-        .card-url a:hover {
-            color: #0d3d8a;
-            border-bottom: 1px solid #0d3d8a;
-        }
-        .card-url a::after {
-            content: "↗";
-            font-size: 0.7rem;
-            opacity: 0.6;
-        }
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 3.5rem 1.5rem;
-            background: white;
-            border-radius: 40px;
-            color: #3b5a7a;
-            border: 1px solid #e3eaf3;
-        }
-        .loading-state {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 3rem 0;
-            color: #2f557a;
-        }
-        .spinner {
-            width: 26px;
-            height: 26px;
-            border: 3px solid #d5dfea;
-            border-top: 3px solid #2a6df4;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .footer-note {
-            margin-top: 2rem;
-            font-size: 0.8rem;
-            color: #5a738f;
-            text-align: right;
-            border-top: 1px solid #dce5ef;
-            padding-top: 1rem;
-        }
-
-        @media (max-width: 600px) {
-            body { padding: 1rem 0.8rem; }
-            .header { flex-direction: column; align-items: stretch; }
-            .controls { flex-wrap: wrap; }
-            .search-box { min-width: 100%; }
-            .subject-select { min-width: 100%; }
-            .cards-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>CSS syllabus · cards</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f4f7fb;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      padding: 16px 12px 32px;
+      color: #0b1e32;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .app {
+      max-width: 600px;
+      width: 100%;
+    }
+    /* header */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 8px 4px;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .header h1 span {
+      background: #d4e2f5;
+      padding: 0 10px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #1b3f69;
+      line-height: 1.6;
+    }
+    .count-badge {
+      background: #e0e9f3;
+      padding: 4px 14px;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #1a3857;
+      white-space: nowrap;
+    }
+    /* controls */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .search-box {
+      flex: 1;
+      position: relative;
+      min-width: 140px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 1px solid #d0dbe8;
+      border-radius: 60px;
+      background: white;
+      font-size: 0.9rem;
+      font-family: inherit;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+      transition: 0.15s;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: #2a6df4;
+      box-shadow: 0 0 0 3px rgba(42,109,244,0.12);
+    }
+    .search-box::before {
+      content: "🔍";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.5;
+      font-size: 0.95rem;
+    }
+    .subject-select {
+      padding: 10px 36px 10px 16px;
+      border: 1px solid #d0dbe8;
+      border-radius: 60px;
+      background: white;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #1a2e4a;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233b5a7a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 12px;
+      min-width: 130px;
+      flex: 0 1 auto;
+    }
+    .subject-select:focus {
+      outline: none;
+      border-color: #2a6df4;
+    }
+    /* cards grid */
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px 14px 14px;
+      box-shadow: 0 4px 12px rgba(0, 20, 30, 0.04);
+      border: 1px solid #e4ebf3;
+      transition: 0.1s;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .card:active {
+      background: #fafcff;
+    }
+    .card-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    .card-srno {
+      background: #eef3fa;
+      padding: 0 10px;
+      border-radius: 40px;
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: #3c5a7a;
+      line-height: 1.8;
+    }
+    .card-subject {
+      background: #e1ebf7;
+      padding: 0 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #10345e;
+      line-height: 1.8;
+    }
+    .card-module {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #2b4f77;
+      background: #eef4fb;
+      padding: 0 10px;
+      border-radius: 30px;
+      display: inline-block;
+      line-height: 1.8;
+      margin: 4px 0 2px;
+      align-self: flex-start;
+    }
+    .card-topic {
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #08203b;
+      margin: 4px 0 2px;
+    }
+    .card-topic-num {
+      font-weight: 400;
+      color: #3f6187;
+      font-size: 0.7rem;
+      background: #f3f8ff;
+      padding: 0 10px;
+      border-radius: 30px;
+      display: inline-block;
+      line-height: 1.8;
+    }
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 8px;
+      margin: 8px 0 4px;
+      align-items: center;
+    }
+    .card-fpsc {
+      font-weight: 500;
+      font-size: 0.7rem;
+      padding: 0 12px;
+      border-radius: 60px;
+      line-height: 2;
+      background: #ddf0e6;
+      color: #0b452b;
+    }
+    .card-fpsc.no {
+      background: #f3eaea;
+      color: #7a4646;
+    }
+    .card-book {
+      background: #f5f8fd;
+      padding: 0 12px;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      color: #1c3f64;
+      border: 1px solid #e0e8f0;
+      line-height: 2;
+      word-break: break-word;
+      max-width: 100%;
+    }
+    .card-url {
+      margin-top: 4px;
+    }
+    .card-url a {
+      color: #1a5bbf;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.8rem;
+      border-bottom: 1px dashed #b7ccf0;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .card-url a::after {
+      content: "↗";
+      font-size: 0.7rem;
+      opacity: 0.6;
+    }
+    .empty-state {
+      padding: 40px 16px;
+      text-align: center;
+      background: white;
+      border-radius: 40px;
+      color: #3b5f82;
+      border: 1px solid #e3eaf3;
+    }
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 40px 0;
+      color: #2f557a;
+    }
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid #d5dfea;
+      border-top: 3px solid #2a6df4;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .footer {
+      margin-top: 18px;
+      font-size: 0.7rem;
+      color: #5f7c99;
+      text-align: right;
+      border-top: 1px solid #dce5ef;
+      padding-top: 12px;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>📚 CSS syllabus <span>cards</span></h1>
-        <div class="controls">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search topics, books…" />
-            </div>
-            <select id="subjectSelect" class="subject-select">
-                <option value="">All subjects</option>
-            </select>
-            <span class="count-badge" id="countDisplay">0 cards</span>
-        </div>
-    </div>
+<div class="app">
+  <div class="header">
+    <h1>📘 CSS <span>cards</span></h1>
+    <span class="count-badge" id="countDisplay">0</span>
+  </div>
 
-    <div class="cards-grid" id="cardsContainer">
-        <div class="loading-state">
-            <span class="spinner"></span> Loading data from Google Sheets…
-        </div>
+  <div class="controls">
+    <div class="controls-row">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search topic, book…" />
+      </div>
+      <select id="subjectSelect" class="subject-select">
+        <option value="">All subjects</option>
+      </select>
     </div>
-    <div class="footer-note">Data from FPSC CSS syllabus · live CSV</div>
+  </div>
+
+  <div class="cards" id="cardsContainer">
+    <div class="loading"><span class="spinner"></span> loading…</div>
+  </div>
+  <div class="footer">FPSC syllabus · live from Google Sheets</div>
 </div>
 
 <script>
-    (function() {
-        // ---------- CONFIG ----------
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac/pub?output=csv';
+  (function() {
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac/pub?output=csv';
 
-        // DOM refs
-        const container = document.getElementById('cardsContainer');
-        const searchInput = document.getElementById('searchInput');
-        const subjectSelect = document.getElementById('subjectSelect');
-        const countDisplay = document.getElementById('countDisplay');
+    const container = document.getElementById('cardsContainer');
+    const searchInput = document.getElementById('searchInput');
+    const subjectSelect = document.getElementById('subjectSelect');
+    const countDisplay = document.getElementById('countDisplay');
 
-        // state
-        let allRecords = [];         // array of objects
-        let filteredRecords = [];
+    let allRecords = [];
+    let filtered = [];
 
-        // ---------- helpers: CSV parse ----------
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
-            let insideQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const ch = line[i];
-                if (insideQuotes) {
-                    if (ch === '"' && line[i+1] === '"') {
-                        current += '"';
-                        i++;
-                    } else if (ch === '"') {
-                        insideQuotes = false;
-                    } else {
-                        current += ch;
-                    }
-                } else {
-                    if (ch === ',') {
-                        result.push(current.trim());
-                        current = '';
-                    } else if (ch === '"') {
-                        insideQuotes = true;
-                    } else {
-                        current += ch;
-                    }
-                }
-            }
-            result.push(current.trim());
-            return result;
+    // ---------- simple CSV parse ----------
+    function parseLine(line) {
+      const res = [];
+      let cur = '', inside = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inside) {
+          if (ch === '"' && line[i+1] === '"') { cur += '"'; i++; }
+          else if (ch === '"') inside = false;
+          else cur += ch;
+        } else {
+          if (ch === ',') { res.push(cur.trim()); cur = ''; }
+          else if (ch === '"') inside = true;
+          else cur += ch;
         }
+      }
+      res.push(cur.trim());
+      return res;
+    }
 
-        function parseCSV(csvText) {
-            const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
-            if (lines.length < 2) return [];
+    function parseCSV(text) {
+      const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+      if (lines.length < 2) return [];
+      const h = parseLine(lines[0]);
+      const idx = {
+        srno: h.indexOf('srno'),
+        subject: h.indexOf('subject'),
+        Module: h.indexOf('Module'),
+        topicNumber: h.indexOf('Topic Number'),
+        topicName: h.indexOf('Topic Name / Detail'),
+        inFPSC: h.indexOf('Given in FPSC CSS Syllabus?'),
+        book: h.indexOf('Recommended Book / Source to Study'),
+        url: h.indexOf('topic online_url')
+      };
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const c = parseLine(lines[i]);
+        if (c.length < 8) continue;
+        const r = {
+          srno: c[idx.srno] || '',
+          subject: c[idx.subject] || '',
+          Module: c[idx.Module] || '',
+          topicNumber: c[idx.topicNumber] || '',
+          topicName: c[idx.topicName] || '',
+          inFPSC: c[idx.inFPSC] || '',
+          book: c[idx.book] || '',
+          url: c[idx.url] || ''
+        };
+        if (!isNaN(parseFloat(r.srno)) && r.srno.trim() !== '') rows.push(r);
+      }
+      return rows;
+    }
 
-            const header = parseCSVLine(lines[0]);
-            const idx = {
-                srno: header.indexOf('srno'),
-                subject: header.indexOf('subject'),
-                Module: header.indexOf('Module'),
-                topicNumber: header.indexOf('Topic Number'),
-                topicName: header.indexOf('Topic Name / Detail'),
-                inFPSC: header.indexOf('Given in FPSC CSS Syllabus?'),
-                book: header.indexOf('Recommended Book / Source to Study'),
-                url: header.indexOf('topic online_url')
-            };
+    // ---------- render cards ----------
+    function render(records) {
+      if (!records || records.length === 0) {
+        container.innerHTML = `<div class="empty-state">✨ No cards match</div>`;
+        countDisplay.textContent = '0';
+        return;
+      }
+      let html = '';
+      for (const r of records) {
+        const inFPSC = r.inFPSC && r.inFPSC.toLowerCase().includes('yes') ? 'Yes' : 'No';
+        const fpscClass = inFPSC === 'Yes' ? '' : 'no';
+        const url = r.url && r.url.startsWith('http') ? r.url : '#';
+        const book = r.book || '—';
+        html += `
+          <div class="card">
+            <div class="card-top">
+              <span class="card-srno">#${r.srno || ''}</span>
+              <span class="card-subject">${r.subject || ''}</span>
+            </div>
+            <div>
+              <span class="card-module">${r.Module || '—'}</span>
+              ${r.topicNumber ? `<span class="card-topic-num">${r.topicNumber}</span>` : ''}
+            </div>
+            <div class="card-topic">${r.topicName || '—'}</div>
+            <div class="card-meta">
+              <span class="card-fpsc ${fpscClass}">${inFPSC === 'Yes' ? '✅ In FPSC' : '❌ Not in FPSC'}</span>
+              <span class="card-book">📖 ${book}</span>
+            </div>
+            ${url !== '#' ? `<div class="card-url"><a href="${url}" target="_blank">online</a></div>` : ''}
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+      countDisplay.textContent = records.length;
+    }
 
-            const rows = [];
-            for (let i = 1; i < lines.length; i++) {
-                const cols = parseCSVLine(lines[i]);
-                if (cols.length < 8) continue;
-                const row = {
-                    srno: cols[idx.srno] || '',
-                    subject: cols[idx.subject] || '',
-                    Module: cols[idx.Module] || '',
-                    topicNumber: cols[idx.topicNumber] || '',
-                    topicName: cols[idx.topicName] || '',
-                    inFPSC: cols[idx.inFPSC] || '',
-                    book: cols[idx.book] || '',
-                    url: cols[idx.url] || ''
-                };
-                // keep if srno is numeric
-                if (!isNaN(parseFloat(row.srno)) && row.srno.trim() !== '') {
-                    rows.push(row);
-                }
-            }
-            return rows;
+    // ---------- filter ----------
+    function applyFilters() {
+      const search = searchInput.value.trim().toLowerCase();
+      const subject = subjectSelect.value;
+      filtered = allRecords.filter(r => {
+        if (search) {
+          const all = `${r.srno} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.url}`.toLowerCase();
+          if (!all.includes(search)) return false;
         }
+        if (subject && r.subject !== subject) return false;
+        return true;
+      });
+      render(filtered);
+    }
 
-        // ---------- render cards ----------
-        function renderCards(records) {
-            if (!records || records.length === 0) {
-                container.innerHTML = `<div class="empty-state">✨ No cards match your filters</div>`;
-                countDisplay.textContent = '0 cards';
-                return;
-            }
+    // ---------- populate subject dropdown ----------
+    function updateSubjects(records) {
+      const subs = new Set();
+      records.forEach(r => { if (r.subject) subs.add(r.subject); });
+      const current = subjectSelect.value;
+      subjectSelect.innerHTML = `<option value="">All subjects</option>`;
+      [...subs].sort().forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        subjectSelect.appendChild(opt);
+      });
+      if ([...subs].includes(current)) subjectSelect.value = current;
+      else subjectSelect.value = '';
+    }
 
-            let html = '';
-            for (const r of records) {
-                const inFPSC = r.inFPSC && r.inFPSC.toLowerCase().includes('yes') ? 'Yes' : 'No';
-                const fpscClass = inFPSC === 'Yes' ? '' : 'no';
-                const url = r.url && r.url.startsWith('http') ? r.url : '#';
-                const bookText = r.book || '—';
-                const moduleDisplay = r.Module || '—';
-                const subjectDisplay = r.subject || '—';
-                const topicNumber = r.topicNumber || '';
-
-                html += `
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-srno">#${r.srno || ''}</span>
-                            <span class="card-subject">${subjectDisplay}</span>
-                        </div>
-                        <div>
-                            <span class="card-module">${moduleDisplay}</span>
-                            ${topicNumber ? `<span class="card-topic-number">${topicNumber}</span>` : ''}
-                        </div>
-                        <div class="card-topic">${r.topicName || '—'}</div>
-                        <div class="card-meta">
-                            <span class="card-fpsc ${fpscClass}">${inFPSC === 'Yes' ? '✅ In FPSC' : '❌ Not in FPSC'}</span>
-                            <span class="card-book">📖 ${bookText}</span>
-                        </div>
-                        ${url !== '#' ? `<div class="card-url"><a href="${url}" target="_blank">topic online</a></div>` : ''}
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-            countDisplay.textContent = `${records.length} cards`;
+    // ---------- load ----------
+    async function load() {
+      try {
+        container.innerHTML = `<div class="loading"><span class="spinner"></span> loading…</div>`;
+        const resp = await fetch(CSV_URL);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const text = await resp.text();
+        const parsed = parseCSV(text);
+        if (parsed.length === 0) {
+          container.innerHTML = `<div class="empty-state">⚠️ No data found</div>`;
+          countDisplay.textContent = '0';
+          return;
         }
+        allRecords = parsed;
+        updateSubjects(allRecords);
+        applyFilters();
+      } catch (e) {
+        console.error(e);
+        container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ ${e.message}</div>`;
+        countDisplay.textContent = 'err';
+      }
+    }
 
-        // ---------- filter logic ----------
-        function applyFilters() {
-            const searchTerm = searchInput.value.trim().toLowerCase();
-            const subjectVal = subjectSelect.value;
+    // events
+    searchInput.addEventListener('input', applyFilters);
+    subjectSelect.addEventListener('change', applyFilters);
 
-            filteredRecords = allRecords.filter(rec => {
-                // search in: srno, subject, Module, topicNumber, topicName, book, url
-                if (searchTerm) {
-                    const combined = `${rec.srno} ${rec.subject} ${rec.Module} ${rec.topicNumber} ${rec.topicName} ${rec.book} ${rec.url}`.toLowerCase();
-                    if (!combined.includes(searchTerm)) return false;
-                }
-                // subject filter
-                if (subjectVal && rec.subject !== subjectVal) return false;
-                return true;
-            });
-
-            renderCards(filteredRecords);
-        }
-
-        // ---------- populate subject dropdown ----------
-        function updateSubjectOptions(records) {
-            const subjects = new Set();
-            records.forEach(r => { if (r.subject) subjects.add(r.subject); });
-            const currentVal = subjectSelect.value;
-            subjectSelect.innerHTML = `<option value="">All subjects</option>`;
-            const sorted = Array.from(subjects).sort();
-            for (const sub of sorted) {
-                const opt = document.createElement('option');
-                opt.value = sub;
-                opt.textContent = sub;
-                subjectSelect.appendChild(opt);
-            }
-            // restore if still present
-            if ([...subjects].includes(currentVal)) {
-                subjectSelect.value = currentVal;
-            } else {
-                subjectSelect.value = '';
-            }
-        }
-
-        // ---------- load data from google sheets ----------
-        async function loadData() {
-            try {
-                container.innerHTML = `<div class="loading-state"><span class="spinner"></span> Fetching data…</div>`;
-                const response = await fetch(CSV_URL);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const csvText = await response.text();
-
-                const parsed = parseCSV(csvText);
-                if (parsed.length === 0) {
-                    container.innerHTML = `<div class="empty-state">⚠️ No data found. Check CSV format.</div>`;
-                    countDisplay.textContent = '0 cards';
-                    return;
-                }
-
-                allRecords = parsed;
-                // update subject filter options
-                updateSubjectOptions(allRecords);
-                // apply filters (show all)
-                applyFilters();
-            } catch (err) {
-                console.error('Error loading CSV:', err);
-                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load: ${err.message}</div>`;
-                countDisplay.textContent = 'error';
-            }
-        }
-
-        // ---------- event listeners ----------
-        searchInput.addEventListener('input', applyFilters);
-        subjectSelect.addEventListener('change', applyFilters);
-
-        // start
-        loadData();
-    })();
+    load();
+  })();
 </script>
 </body>
 </html>
