@@ -11,9 +11,9 @@
       box-sizing: border-box;
     }
     body {
-      background: #f2f6fc;
+      background: #f3f7fc;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      padding: 16px 12px 32px;
+      padding: 16px 14px 40px;
       color: #0b1e32;
       min-height: 100vh;
       display: flex;
@@ -28,11 +28,11 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       gap: 6px 4px;
     }
     .header h1 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 600;
       letter-spacing: -0.3px;
       display: flex;
@@ -43,10 +43,10 @@
       background: #d4e2f5;
       padding: 0 10px;
       border-radius: 40px;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 500;
       color: #1b3f69;
-      line-height: 1.6;
+      line-height: 1.7;
     }
     .count-badge {
       background: #e0e9f3;
@@ -119,167 +119,143 @@
       outline: none;
       border-color: #2a6df4;
     }
-    /* cards */
-    .cards {
+
+    /* ----- syllabus style (no cards) ----- */
+    .syllabus {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 0;
     }
-    .card {
+    .paper-block {
       background: white;
-      border-radius: 24px;
-      padding: 18px 16px 16px;
-      box-shadow: 0 4px 14px rgba(0, 20, 30, 0.04);
+      border-radius: 20px;
+      padding: 18px 16px 14px;
+      margin-bottom: 16px;
       border: 1px solid #e4ebf3;
-      transition: 0.1s;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      box-shadow: 0 2px 10px rgba(0,20,30,0.03);
     }
-    .card:active {
-      background: #fafcff;
+    .paper-block:last-child {
+      margin-bottom: 0;
     }
-    /* paper = subject */
-    .card-paper {
+    .paper-title {
       font-size: 1.1rem;
-      font-weight: 600;
+      font-weight: 700;
       color: #0b2b4a;
       letter-spacing: -0.2px;
+      border-bottom: 2px solid #dce5f0;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: baseline;
       flex-wrap: wrap;
       gap: 4px 8px;
-      border-bottom: 1px solid #eaeef5;
-      padding-bottom: 8px;
-      margin-bottom: 6px;
     }
-    .card-paper small {
-      font-weight: 400;
-      font-size: 0.7rem;
+    .paper-title .marks {
+      font-weight: 500;
+      font-size: 0.75rem;
       color: #3d6185;
       background: #eef3fa;
-      padding: 0 10px;
-      border-radius: 40px;
-      line-height: 1.8;
-    }
-    .card-srno-module {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 6px 10px;
-      margin-bottom: 4px;
-    }
-    .card-srno {
-      background: #eef3fa;
-      padding: 0 10px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #3c5a7a;
-      line-height: 1.8;
-    }
-    .card-module {
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #2b4f77;
-      background: #eef4fb;
       padding: 0 12px;
-      border-radius: 30px;
-      line-height: 1.8;
+      border-radius: 40px;
+      line-height: 1.9;
     }
-    /* fpsc green light */
-    .fpsc-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.7rem;
-      font-weight: 500;
-      background: #e3f0e8;
-      color: #0b452b;
-      padding: 0 10px 0 6px;
-      border-radius: 60px;
-      line-height: 1.8;
-      margin: 4px 0 2px;
-      align-self: flex-start;
+    .module-group {
+      margin-bottom: 12px;
     }
-    .fpsc-indicator.no {
-      background: #f3eaea;
-      color: #7a4646;
+    .module-group:last-child {
+      margin-bottom: 0;
     }
-    .fpsc-indicator .dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #1f9d5a;
-      margin-right: 2px;
-    }
-    .fpsc-indicator.no .dot {
-      background: #b34a4a;
-    }
-    .card-topic {
-      font-size: 1.05rem;
+    .module-head {
       font-weight: 600;
-      line-height: 1.3;
-      color: #08203b;
-      margin: 2px 0 2px;
+      font-size: 0.85rem;
+      color: #1f406a;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-wrap: wrap;
     }
-    .card-topic-num {
+    .module-head .module-marks {
       font-weight: 400;
-      color: #3f6187;
       font-size: 0.7rem;
-      background: #f3f8ff;
+      color: #3f6187;
+      background: #f0f5fc;
       padding: 0 10px;
-      border-radius: 30px;
+      border-radius: 40px;
+      line-height: 1.8;
+    }
+    .topic-item {
+      padding: 4px 0 4px 16px;
+      border-left: 2px solid #cad8ea;
+      margin-left: 4px;
+      margin-bottom: 6px;
+    }
+    .topic-item:last-child {
+      margin-bottom: 0;
+    }
+    .topic-item .topic-label {
+      font-weight: 500;
+      font-size: 0.82rem;
+      color: #0b2b4a;
+    }
+    .topic-item .topic-desc {
+      font-size: 0.82rem;
+      color: #1f3d60;
+      line-height: 1.5;
+      margin-top: 1px;
+    }
+    .topic-item .topic-desc em {
+      color: #3d6185;
+      font-style: italic;
+      font-weight: 400;
+    }
+    .topic-item .topic-marks {
+      font-size: 0.7rem;
+      color: #3f6187;
+      background: #f0f5fc;
+      padding: 0 8px;
+      border-radius: 40px;
       line-height: 1.8;
       display: inline-block;
+      margin-left: 4px;
     }
-    .card-subtopics {
-      font-size: 0.8rem;
+    .recommended {
+      background: white;
+      border-radius: 20px;
+      padding: 16px 16px 12px;
+      margin-top: 16px;
+      border: 1px solid #e4ebf3;
+    }
+    .recommended h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0b2b4a;
+      border-bottom: 1px solid #dce5f0;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+    .recommended ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .recommended ul li {
+      font-size: 0.82rem;
       color: #1f3d60;
-      background: #f6faff;
-      padding: 8px 12px;
-      border-radius: 14px;
-      border-left: 3px solid #b7cce5;
-      margin: 6px 0 4px;
-      word-break: break-word;
+      padding: 2px 0 2px 20px;
+      position: relative;
       line-height: 1.5;
     }
-    .card-subtopics strong {
-      font-weight: 500;
-      color: #12315a;
-    }
-    .card-book {
-      background: #f5f8fd;
-      padding: 0 12px;
-      border-radius: 60px;
-      font-size: 0.75rem;
-      color: #1c3f64;
-      border: 1px solid #e0e8f0;
-      line-height: 2;
-      word-break: break-word;
-      max-width: 100%;
-      display: inline-block;
-      margin-top: 2px;
-    }
-    .card-url {
-      margin-top: 6px;
-    }
-    .card-url a {
-      color: #1a5bbf;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.8rem;
-      border-bottom: 1px dashed #b7ccf0;
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-    }
-    .card-url a::after {
-      content: "↗";
-      font-size: 0.7rem;
-      opacity: 0.6;
+    .recommended ul li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      color: #2a6df4;
+      font-weight: 700;
     }
     .empty-state {
       padding: 40px 16px;
@@ -319,7 +295,7 @@
 <body>
 <div class="app">
   <div class="header">
-    <h1>📘 CSS <span>content</span></h1>
+    <h1>📘 CSS <span>syllabus</span></h1>
     <span class="count-badge" id="countDisplay">0</span>
   </div>
 
@@ -334,7 +310,7 @@
     </div>
   </div>
 
-  <div class="cards" id="cardsContainer">
+  <div class="syllabus" id="syllabusContainer">
     <div class="loading"><span class="spinner"></span> loading…</div>
   </div>
   <div class="footer">FPSC syllabus · live from Google Sheets</div>
@@ -344,7 +320,7 @@
   (function() {
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac/pub?output=csv';
 
-    const container = document.getElementById('cardsContainer');
+    const container = document.getElementById('syllabusContainer');
     const searchInput = document.getElementById('searchInput');
     const subjectSelect = document.getElementById('subjectSelect');
     const countDisplay = document.getElementById('countDisplay');
@@ -387,7 +363,6 @@
         url: h.indexOf('topic online_url'),
         subtopics: h.indexOf('Possible Subtopics (FPSC Syllabus Past Papers & Recent Topics)')
       };
-      // fallback: if subtopics not found, use topicName as subtopics
       const subtopicsIdx = idx.subtopics !== -1 ? idx.subtopics : idx.topicName;
 
       const rows = [];
@@ -410,51 +385,67 @@
       return rows;
     }
 
-    // ---------- render cards ----------
+    // ---------- render syllabus (no cards, structured) ----------
     function render(records) {
       if (!records || records.length === 0) {
-        container.innerHTML = `<div class="empty-state">✨ No cards match</div>`;
+        container.innerHTML = `<div class="empty-state">✨ No topics match</div>`;
         countDisplay.textContent = '0';
         return;
       }
-      let html = '';
-      for (const r of records) {
-        const inFPSC = r.inFPSC && r.inFPSC.toLowerCase().includes('yes') ? true : false;
-        const fpscClass = inFPSC ? '' : 'no';
-        const dotColor = inFPSC ? '#1f9d5a' : '#b34a4a';
-        const url = r.url && r.url.startsWith('http') ? r.url : '#';
-        const book = r.book || '—';
-        const subtopics = r.subtopics || r.topicName || '—';
 
-        html += `
-          <div class="card">
-            <div class="card-paper">
-              <span>📄 ${r.subject || 'Subject'}</span>
-              <small>#${r.srno || ''}</small>
-            </div>
-            <div class="card-srno-module">
-              <span class="card-srno">srno ${r.srno || ''}</span>
-              <span class="card-module">${r.Module || '—'}</span>
-            </div>
-            <div class="fpsc-indicator ${fpscClass}">
-              <span class="dot" style="background:${dotColor};"></span>
-              ${inFPSC ? 'In FPSC' : 'Not in FPSC'}
-            </div>
-            <div>
-              ${r.topicNumber ? `<span class="card-topic-num">${r.topicNumber}</span>` : ''}
-            </div>
-            <div class="card-topic">${r.topicName || '—'}</div>
-            <div class="card-subtopics">
-              <strong>📌 Possible Subtopics</strong><br />
-              ${subtopics}
-            </div>
-            <div>
-              <span class="card-book">📖 ${book}</span>
-            </div>
-            ${url !== '#' ? `<div class="card-url"><a href="${url}" target="_blank">reference link</a></div>` : ''}
-          </div>
-        `;
+      // group by subject
+      const groups = {};
+      for (const r of records) {
+        const key = r.subject || 'Uncategorized';
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(r);
       }
+
+      let html = '';
+      for (const [subject, items] of Object.entries(groups)) {
+        // sort by srno
+        items.sort((a,b) => parseInt(a.srno) - parseInt(b.srno));
+
+        html += `<div class="paper-block">`;
+        html += `<div class="paper-title">📄 ${subject} <span class="marks">${items.length} topics</span></div>`;
+
+        // group by Module
+        const moduleMap = {};
+        for (const item of items) {
+          const mod = item.Module || 'General';
+          if (!moduleMap[mod]) moduleMap[mod] = [];
+          moduleMap[mod].push(item);
+        }
+
+        for (const [mod, topics] of Object.entries(moduleMap)) {
+          html += `<div class="module-group">`;
+          html += `<div class="module-head">${mod}</div>`;
+          for (const t of topics) {
+            const inFPSC = t.inFPSC && t.inFPSC.toLowerCase().includes('yes') ? true : false;
+            const fpscBadge = inFPSC ? '✅' : '❌';
+            const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
+            const subtopics = t.subtopics || t.topicName || '';
+
+            html += `<div class="topic-item">`;
+            html += `<div class="topic-label">${topicNum} ${t.topicName || '—'} ${fpscBadge}</div>`;
+            if (subtopics && subtopics !== t.topicName) {
+              html += `<div class="topic-desc">${subtopics}</div>`;
+            } else if (subtopics) {
+              html += `<div class="topic-desc"><em>${subtopics}</em></div>`;
+            }
+            if (t.book && t.book !== '—') {
+              html += `<div class="topic-desc" style="font-size:0.75rem;color:#3d6185;margin-top:2px;">📖 ${t.book}</div>`;
+            }
+            if (t.url && t.url.startsWith('http')) {
+              html += `<div style="margin-top:2px;"><a href="${t.url}" target="_blank" style="font-size:0.7rem;color:#1a5bbf;text-decoration:none;border-bottom:1px dashed #b7ccf0;">🔗 reference</a></div>`;
+            }
+            html += `</div>`;
+          }
+          html += `</div>`;
+        }
+        html += `</div>`;
+      }
+
       container.innerHTML = html;
       countDisplay.textContent = records.length;
     }
