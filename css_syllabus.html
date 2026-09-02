@@ -121,6 +121,30 @@
             border-color: #2a6df4;
         }
 
+        /* ----- Print/PDF button ----- */
+        .print-btn {
+            background: #1a4a7a;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.15s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .print-btn:hover {
+            background: #0d3a60;
+        }
+        .print-btn:active {
+            transform: scale(0.97);
+        }
+
         /* ----- syllabus style ----- */
         .syllabus {
             display: flex;
@@ -139,7 +163,6 @@
         .paper-block:last-child {
             margin-bottom: 0;
         }
-        /* alternating card colors */
         .paper-block:nth-child(odd) {
             background: #ffffff;
         }
@@ -316,7 +339,6 @@
             font-size: 0.6rem;
             opacity: 0.35;
         }
-        /* Sub-subtopics (a, b, c format) */
         .sub-subtopic-list {
             margin: 4px 0 4px 24px;
             padding-left: 4px;
@@ -408,12 +430,75 @@
             border-top: 1px solid #dce5ef;
             padding-top: 14px;
         }
-        .search-hint {
-            font-size: 0.8rem;
-            color: #5f7c99;
-            text-align: center;
-            margin-top: 4px;
-            opacity: 0.7;
+
+        /* ---------- PRINT STYLES ---------- */
+        @media print {
+            body {
+                background: white !important;
+                padding: 10px !important;
+                font-size: 11px !important;
+            }
+            .app {
+                max-width: 100% !important;
+            }
+            .controls {
+                display: none !important;
+            }
+            .print-btn {
+                display: none !important;
+            }
+            .paper-block {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+                background: white !important;
+                padding: 14px !important;
+                margin-bottom: 12px !important;
+            }
+            .paper-block:nth-child(odd),
+            .paper-block:nth-child(even) {
+                background: white !important;
+            }
+            .subject-link::after,
+            .topic-link::after,
+            .sub-link::after,
+            .book-link::after {
+                content: "" !important;
+                display: none !important;
+            }
+            .last-studied {
+                background: #f0f4f8 !important;
+                border: 1px solid #d0d8e0 !important;
+            }
+            .module-head {
+                font-size: 0.9rem !important;
+            }
+            .topic-item .topic-label {
+                font-size: 0.9rem !important;
+            }
+            .subtopic-list li {
+                font-size: 0.85rem !important;
+            }
+            .sub-subtopic-list li {
+                font-size: 0.85rem !important;
+            }
+            .topic-item .book-ref {
+                font-size: 0.8rem !important;
+            }
+            .footer {
+                font-size: 0.7rem !important;
+                border-top: 1px solid #ccc !important;
+            }
+            .header h1 {
+                font-size: 1.3rem !important;
+            }
+            .count-badge {
+                display: none !important;
+            }
+            .subject-divider {
+                border-top: 1px solid #ccc !important;
+            }
         }
     </style>
 </head>
@@ -421,7 +506,10 @@
 <div class="app">
     <div class="header">
         <h1>📘 CSS <span>syllabus</span></h1>
-        <span class="count-badge" id="countDisplay">0</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="count-badge" id="countDisplay">0</span>
+            <button class="print-btn" onclick="window.print()">🖨️ Print / PDF</button>
+        </div>
     </div>
 
     <div class="controls">
@@ -433,7 +521,6 @@
                 <option value="">All subjects</option>
             </select>
         </div>
-        <div class="search-hint">🔗 Click any subject, topic, subtopic, or book to search Google</div>
     </div>
 
     <div class="syllabus" id="syllabusContainer">
@@ -523,48 +610,40 @@
         function smartSplit(text) {
             if (!text || text.trim() === '') return [];
 
-            // First, try to split by numbered items like "1. ... 2. ..."
             const numberedMatch = text.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
             if (numberedMatch && numberedMatch.length > 1) {
                 return numberedMatch.map(s => s.trim());
             }
 
-            // Then try to split by a) b) c) pattern
             const letterMatch = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
             if (letterMatch && letterMatch.length > 1) {
                 return letterMatch.map(s => s.trim());
             }
 
-            // Split by semicolon (most common in your data)
             if (text.includes(';')) {
                 const parts = text.split(';').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
             }
 
-            // Split by comma
             if (text.includes(',')) {
                 const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
             }
 
-            // Split by period with space
             if (text.includes('. ')) {
                 const parts = text.split('. ').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
             }
 
-            // Single item
             return [text.trim()];
         }
 
-        // ---------- check if subtopic has a, b, c sub-items ----------
         function hasSubLetters(text) {
             if (!text) return false;
             return /[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi.test(text) && 
                    (text.match(/[a-z]\)/gi) || []).length > 1;
         }
 
-        // ---------- extract sub-subtopics (a, b, c) ----------
         function extractSubLetters(text) {
             if (!text) return [];
             const matches = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
@@ -572,7 +651,6 @@
             return matches.map(s => s.trim());
         }
 
-        // ---------- format date in PKT ----------
         function formatDateInPKT(dateStr) {
             if (!dateStr || dateStr.trim() === '') return '';
             try {
@@ -601,7 +679,6 @@
             }
         }
 
-        // ---------- render syllabus ----------
         function render(records) {
             if (!records || records.length === 0) {
                 container.innerHTML = `<div class="empty-state">✨ No topics match</div>`;
@@ -669,17 +746,14 @@
                                     <span class="topic-link" onclick="googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>
                                 </div>`;
 
-                        // Process subtopics with smart split
                         const subText = t.subtopics || t.topicName || '';
                         const subItems = smartSplit(subText);
                         
                         if (subItems.length > 0) {
                             html += `<ul class="subtopic-list">`;
                             for (const sub of subItems) {
-                                // Check if this subtopic has a, b, c sub-items
                                 if (hasSubLetters(sub)) {
                                     const subLetters = extractSubLetters(sub);
-                                    // Get the main part before the first letter
                                     const mainPart = sub.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
                                     const cleanMain = mainPart.replace(/[:–-]\s*$/, '').trim();
                                     
@@ -687,7 +761,6 @@
                                         html += `<li><span class="sub-link" onclick="googleSearch('${cleanMain.replace(/'/g, "\\'")}')">${cleanMain}</span></li>`;
                                     }
                                     
-                                    // Add sub-subtopics as nested list
                                     if (subLetters.length > 0) {
                                         html += `<ul class="sub-subtopic-list">`;
                                         const letters = 'abcdefghijklmnopqrstuvwxyz';
@@ -699,7 +772,6 @@
                                         html += `</ul>`;
                                     }
                                 } else {
-                                    // Regular subtopic - clean up extra punctuation
                                     let cleanSub = sub.replace(/^\d+\.\s*/, '').trim();
                                     cleanSub = cleanSub.replace(/[;,:]\s*$/, '').trim();
                                     if (cleanSub) {
@@ -726,7 +798,6 @@
             countDisplay.textContent = records.length;
         }
 
-        // ---------- filter (case-insensitive) ----------
         function applyFilters() {
             const search = searchInput.value.trim().toLowerCase();
             const subject = subjectSelect.value;
@@ -741,7 +812,6 @@
             render(filtered);
         }
 
-        // ---------- populate subject dropdown ----------
         function updateSubjects(records) {
             const subs = new Set();
             records.forEach(r => { if (r.subject) subs.add(r.subject); });
@@ -757,7 +827,6 @@
             else subjectSelect.value = '';
         }
 
-        // ---------- load ----------
         async function load() {
             try {
                 container.innerHTML = `<div class="loading"><span class="spinner"></span> loading…</div>`;
