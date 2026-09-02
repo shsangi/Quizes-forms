@@ -508,8 +508,8 @@
             window.open(url, '_blank');
         }
 
-        // ---------- split subtopics with a, b, c support ----------
-        function splitSubtopics(text) {
+        // ---------- smart split: handles commas, semicolons, and mixed separators ----------
+        function smartSplit(text) {
             if (!text || text.trim() === '') return [];
 
             // First, try to split by numbered items like "1. ... 2. ..."
@@ -519,14 +519,28 @@
             }
 
             // Then try to split by a) b) c) pattern
-            const letterMatch = text.match(/[a-z]\)\s*[^,.]*?(?:[.,]\s*(?=[a-z]\))|$)/gi);
+            const letterMatch = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
             if (letterMatch && letterMatch.length > 1) {
                 return letterMatch.map(s => s.trim());
             }
 
-            // Fallback: split by comma
-            const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
-            if (parts.length > 1) return parts;
+            // Split by semicolon (most common in your data)
+            if (text.includes(';')) {
+                const parts = text.split(';').map(s => s.trim()).filter(s => s.length > 0);
+                if (parts.length > 1) return parts;
+            }
+
+            // Split by comma
+            if (text.includes(',')) {
+                const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                if (parts.length > 1) return parts;
+            }
+
+            // Split by period with space
+            if (text.includes('. ')) {
+                const parts = text.split('. ').map(s => s.trim()).filter(s => s.length > 0);
+                if (parts.length > 1) return parts;
+            }
 
             // Single item
             return [text.trim()];
@@ -535,14 +549,14 @@
         // ---------- check if subtopic has a, b, c sub-items ----------
         function hasSubLetters(text) {
             if (!text) return false;
-            return /[a-z]\)\s*[^,.]*?(?:[.,]\s*(?=[a-z]\))|$)/gi.test(text) && 
+            return /[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi.test(text) && 
                    (text.match(/[a-z]\)/gi) || []).length > 1;
         }
 
         // ---------- extract sub-subtopics (a, b, c) ----------
         function extractSubLetters(text) {
             if (!text) return [];
-            const matches = text.match(/[a-z]\)\s*[^,.]*?(?:[.,]\s*(?=[a-z]\))|$)/gi);
+            const matches = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
             if (!matches) return [];
             return matches.map(s => s.trim());
         }
@@ -642,9 +656,9 @@
                                     <span class="topic-link" onclick="googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>
                                 </div>`;
 
-                        // Process subtopics
+                        // Process subtopics with smart split
                         const subText = t.subtopics || t.topicName || '';
-                        const subItems = splitSubtopics(subText);
+                        const subItems = smartSplit(subText);
                         
                         if (subItems.length > 0) {
                             html += `<ul class="subtopic-list">`;
@@ -653,8 +667,7 @@
                                 if (hasSubLetters(sub)) {
                                     const subLetters = extractSubLetters(sub);
                                     // Get the main part before the first letter
-                                    const mainPart = sub.replace(/[a-z]\)\s*[^,.]*?(?:[.,]\s*(?=[a-z]\))|$)/gi, '').trim();
-                                    // Remove trailing colon or dash
+                                    const mainPart = sub.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
                                     const cleanMain = mainPart.replace(/[:–-]\s*$/, '').trim();
                                     
                                     if (cleanMain) {
@@ -673,9 +686,13 @@
                                         html += `</ul>`;
                                     }
                                 } else {
-                                    // Regular subtopic
-                                    const cleanSub = sub.replace(/^\d+\.\s*/, '').trim();
-                                    html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
+                                    // Regular subtopic - clean up extra punctuation
+                                    let cleanSub = sub.replace(/^\d+\.\s*/, '').trim();
+                                    // Remove trailing semicolon or comma
+                                    cleanSub = cleanSub.replace(/[;,:]\s*$/, '').trim();
+                                    if (cleanSub) {
+                                        html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
+                                    }
                                 }
                             }
                             html += `</ul>`;
