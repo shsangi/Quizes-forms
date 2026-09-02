@@ -203,19 +203,6 @@
       align-items: baseline;
       gap: 4px 8px;
     }
-    .topic-item .topic-label .fpsc-badge {
-      font-size: 0.65rem;
-      font-weight: 500;
-      background: #e3f0e8;
-      color: #0b452b;
-      padding: 0 8px;
-      border-radius: 40px;
-      line-height: 1.8;
-    }
-    .topic-item .topic-label .fpsc-badge.no {
-      background: #f3eaea;
-      color: #7a4646;
-    }
     .topic-item .topic-desc {
       font-size: 0.82rem;
       color: #1f3d60;
@@ -384,26 +371,12 @@
       return rows;
     }
 
-    // ---------- helper: split subtopics into numbered items ----------
-    function splitSubtopics(text) {
+    // ---------- split subtopics by comma ----------
+    function splitSubtopicsByComma(text) {
       if (!text || text.trim() === '') return [];
-      // try to split by common separators: 1., 2., etc or newlines or semicolons
-      let items = [];
-      // check for numbered pattern: "1. ... 2. ..."
-      const numberedMatch = text.match(/(\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$))/g);
-      if (numberedMatch && numberedMatch.length > 1) {
-        items = numberedMatch.map(s => s.trim().replace(/^\d+\.\s*/, '').trim());
-      } else {
-        // try splitting by newline, semicolon, or period+space
-        const parts = text.split(/[\n;]+/).filter(p => p.trim() !== '');
-        if (parts.length > 1) {
-          items = parts.map(p => p.trim().replace(/^[•\-*]\s*/, '').trim());
-        } else {
-          // fallback: single item
-          items = [text.trim()];
-        }
-      }
-      return items.filter(s => s.length > 0);
+      // split by comma, trim each part
+      const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      return parts;
     }
 
     // ---------- render syllabus ----------
@@ -441,16 +414,13 @@
           html += `<div class="module-group">`;
           html += `<div class="module-head">${mod}</div>`;
           for (const t of topics) {
-            const inFPSC = t.inFPSC && t.inFPSC.toLowerCase().includes('yes') ? true : false;
-            const fpscClass = inFPSC ? '' : 'no';
-            const fpscLabel = inFPSC ? '✅ In FPSC' : '❌ Not in FPSC';
             const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
 
             html += `<div class="topic-item">`;
-            html += `<div class="topic-label">${topicNum} ${t.topicName || '—'} <span class="fpsc-badge ${fpscClass}">${fpscLabel}</span></div>`;
+            html += `<div class="topic-label">${topicNum} ${t.topicName || '—'}</div>`;
 
-            // subtopics as numbered bullet list
-            const subItems = splitSubtopics(t.subtopics || t.topicName || '');
+            // subtopics split by comma -> numbered bullet list
+            const subItems = splitSubtopicsByComma(t.subtopics || t.topicName || '');
             if (subItems.length > 0) {
               html += `<ul class="subtopic-list">`;
               for (const sub of subItems) {
