@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS Written Optional Subjects Checklist</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <title>CSS Optional Subjects Syllabus Dashboard</title>
   <style>
     :root {
       --bg-color: #f8fafc;
@@ -12,7 +11,6 @@
       --text-color: #0f172a;
       --border-color: #e2e8f0;
       --primary: #2563eb;
-      --primary-hover: #1d4ed8;
       --badge-bg: #e0e7ff;
       --badge-text: #3730a3;
     }
@@ -43,7 +41,6 @@
     h1 {
       font-size: 1.875rem;
       font-weight: 700;
-      color: var(--text-color);
       margin-bottom: 8px;
     }
 
@@ -159,7 +156,7 @@
   <div class="container">
     <header>
       <h1>CSS Optional Subjects Syllabus Dashboard</h1>
-      <p class="subtitle">Live dynamic sync from Google Sheets CSV output</p>
+      <p class="subtitle">Live dynamic sync from published Google Sheet</p>
     </header>
 
     <div class="controls">
@@ -170,7 +167,7 @@
     </div>
 
     <div class="table-container">
-      <div id="loading">Fetching syllabus data from Google Sheets...</div>
+      <div id="loading">Loading syllabus data from published sheet...</div>
       <table id="dataTable" style="display: none;">
         <thead>
           <tr>
@@ -190,34 +187,48 @@
   </div>
 
   <script>
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/1yVLhveDpRjFtrLLmb7q6VrrcXa1WL4q9hhcIO6fFOWQ/export?format=csv&gid=806242082';
-
     let globalData = [];
 
+    // Global callback required for JSONP bypass
+    function parseGVizResponse(json) {
+      if (!json || !json.table || !json.table.rows) {
+        document.getElementById('loading').innerText = 'Error parsing spreadsheet response.';
+        return;
+      }
+
+      const cols = json.table.cols.map(col => col.label ? col.label.trim() : '');
+      
+      globalData = json.table.rows.map(row => {
+        let rowObj = {};
+        row.c.forEach((cell, idx) => {
+          const colName = cols[idx] || `col_${idx}`;
+          rowObj[colName] = cell && cell.v !== null && cell.v !== undefined ? cell.v : '';
+        });
+        return rowObj;
+      });
+
+      populateSubjectFilter(globalData);
+      renderTable(globalData);
+      
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('dataTable').style.display = 'table';
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      fetchData();
+      // Use Google Visualization API query endpoint with jsonp callback
+      const sheetKey = '2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac';
+      const scriptUrl = `https://docs.google.com/spreadsheets/d/e/${sheetKey}/gviz/tq?tqx=responseHandler:parseGVizResponse`;
+      
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      script.onerror = () => {
+        document.getElementById('loading').innerText = 'Failed to fetch data. Check spreadsheet publishing settings.';
+      };
+      document.body.appendChild(script);
 
       document.getElementById('searchInput').addEventListener('input', filterData);
       document.getElementById('subjectFilter').addEventListener('change', filterData);
     });
-
-    function fetchData() {
-      Papa.parse(CSV_URL, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          globalData = results.data;
-          populateSubjectFilter(globalData);
-          renderTable(globalData);
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('dataTable').style.display = 'table';
-        },
-        error: function(err) {
-          document.getElementById('loading').innerText = 'Failed to load spreadsheet data. Make sure the Google Sheet is published or shared publicly.';
-        }
-      });
-    }
 
     function populateSubjectFilter(data) {
       const select = document.getElementById('subjectFilter');
@@ -244,7 +255,7 @@
         const topicNo = row['Topic Number'] || '-';
         const topicName = row['Topic Name / Detail'] || '-';
         const subtopics = row['Possible Subtopics (FPSC Syllabus Past Papers & Recent Topics)'] || '-';
-        const book = row['Recommended Book / Source to Study'] || 'Syllabus Source';
+        const book = row['Recommended Book / Source to Study'] || 'Source Link';
         const link = row['topic online_url'] || '#';
 
         tr.innerHTML = `
