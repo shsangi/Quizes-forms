@@ -121,7 +121,6 @@
             border-color: #2a6df4;
         }
 
-        /* ----- Print/PDF button ----- */
         .print-btn {
             background: #1a4a7a;
             color: white;
@@ -431,74 +430,24 @@
             padding-top: 14px;
         }
 
-        /* ---------- PRINT STYLES ---------- */
         @media print {
-            body {
-                background: white !important;
-                padding: 10px !important;
-                font-size: 11px !important;
-            }
-            .app {
-                max-width: 100% !important;
-            }
-            .controls {
-                display: none !important;
-            }
-            .print-btn {
-                display: none !important;
-            }
-            .paper-block {
-                break-inside: avoid;
-                page-break-inside: avoid;
-                border: 1px solid #ccc !important;
-                box-shadow: none !important;
-                background: white !important;
-                padding: 14px !important;
-                margin-bottom: 12px !important;
-            }
-            .paper-block:nth-child(odd),
-            .paper-block:nth-child(even) {
-                background: white !important;
-            }
-            .subject-link::after,
-            .topic-link::after,
-            .sub-link::after,
-            .book-link::after {
-                content: "" !important;
-                display: none !important;
-            }
-            .last-studied {
-                background: #f0f4f8 !important;
-                border: 1px solid #d0d8e0 !important;
-            }
-            .module-head {
-                font-size: 0.9rem !important;
-            }
-            .topic-item .topic-label {
-                font-size: 0.9rem !important;
-            }
-            .subtopic-list li {
-                font-size: 0.85rem !important;
-            }
-            .sub-subtopic-list li {
-                font-size: 0.85rem !important;
-            }
-            .topic-item .book-ref {
-                font-size: 0.8rem !important;
-            }
-            .footer {
-                font-size: 0.7rem !important;
-                border-top: 1px solid #ccc !important;
-            }
-            .header h1 {
-                font-size: 1.3rem !important;
-            }
-            .count-badge {
-                display: none !important;
-            }
-            .subject-divider {
-                border-top: 1px solid #ccc !important;
-            }
+            body { background: white !important; padding: 10px !important; font-size: 11px !important; }
+            .app { max-width: 100% !important; }
+            .controls { display: none !important; }
+            .print-btn { display: none !important; }
+            .paper-block { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; padding: 14px !important; margin-bottom: 12px !important; }
+            .paper-block:nth-child(odd), .paper-block:nth-child(even) { background: white !important; }
+            .subject-link::after, .topic-link::after, .sub-link::after, .book-link::after { content: "" !important; display: none !important; }
+            .last-studied { background: #f0f4f8 !important; border: 1px solid #d0d8e0 !important; }
+            .module-head { font-size: 0.9rem !important; }
+            .topic-item .topic-label { font-size: 0.9rem !important; }
+            .subtopic-list li { font-size: 0.85rem !important; }
+            .sub-subtopic-list li { font-size: 0.85rem !important; }
+            .topic-item .book-ref { font-size: 0.8rem !important; }
+            .footer { font-size: 0.7rem !important; border-top: 1px solid #ccc !important; }
+            .header h1 { font-size: 1.3rem !important; }
+            .count-badge { display: none !important; }
+            .subject-divider { border-top: 1px solid #ccc !important; }
         }
     </style>
 </head>
@@ -606,30 +555,57 @@
             window.open(url, '_blank');
         }
 
-        // ---------- smart split: handles commas, semicolons, and mixed separators ----------
+        // ---------- smart split: handles mixed lettered + numbered items ----------
         function smartSplit(text) {
             if (!text || text.trim() === '') return [];
 
+            // First try: split by newlines (common in your data)
+            if (text.includes('\n')) {
+                const parts = text.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+                if (parts.length > 1) return parts;
+            }
+
+            // Try: split by numbered items like "1. ... 2. ..." but also detect "c) Stacks" followed by "2. Queues"
+            // We need to handle mixed format: a) b) c) and then 1. 2. 3.
+            // Let's first try to split by lettered items
+            const letterMatch = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
+            if (letterMatch && letterMatch.length > 1) {
+                // Check if there are also numbered items after the lettered ones
+                const afterLetters = text.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
+                if (afterLetters && /\d+\./.test(afterLetters)) {
+                    // Mixed: lettered + numbered - split lettered first
+                    const result = [...letterMatch];
+                    // Then extract numbered items from the remainder
+                    const numberedMatch = afterLetters.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
+                    if (numberedMatch) {
+                        for (const item of numberedMatch) {
+                            if (item.trim()) result.push(item.trim());
+                        }
+                    }
+                    return result;
+                }
+                return letterMatch.map(s => s.trim());
+            }
+
+            // Try numbered items
             const numberedMatch = text.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
             if (numberedMatch && numberedMatch.length > 1) {
                 return numberedMatch.map(s => s.trim());
             }
 
-            const letterMatch = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
-            if (letterMatch && letterMatch.length > 1) {
-                return letterMatch.map(s => s.trim());
-            }
-
+            // Split by semicolon
             if (text.includes(';')) {
                 const parts = text.split(';').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
             }
 
+            // Split by comma
             if (text.includes(',')) {
                 const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
             }
 
+            // Split by period with space
             if (text.includes('. ')) {
                 const parts = text.split('. ').map(s => s.trim()).filter(s => s.length > 0);
                 if (parts.length > 1) return parts;
@@ -638,17 +614,37 @@
             return [text.trim()];
         }
 
+        // ---------- detect if item is lettered (a, b, c) ----------
+        function isLettered(text) {
+            return /^[a-z]\)/.test(text.trim());
+        }
+
+        // ---------- detect if item is numbered (1., 2., 3.) ----------
+        function isNumbered(text) {
+            return /^\d+\./.test(text.trim());
+        }
+
+        // ---------- extract lettered sub-items ----------
+        function extractSubLetters(text) {
+            if (!text) return [];
+            // Extract all a) b) c) patterns
+            const matches = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
+            if (!matches) return [];
+            return matches.map(s => s.trim());
+        }
+
+        // ---------- extract numbered sub-items ----------
+        function extractNumberedItems(text) {
+            if (!text) return [];
+            const matches = text.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
+            if (!matches) return [];
+            return matches.map(s => s.trim());
+        }
+
         function hasSubLetters(text) {
             if (!text) return false;
             return /[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi.test(text) && 
                    (text.match(/[a-z]\)/gi) || []).length > 1;
-        }
-
-        function extractSubLetters(text) {
-            if (!text) return [];
-            const matches = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
-            if (!matches) return [];
-            return matches.map(s => s.trim());
         }
 
         function formatDateInPKT(dateStr) {
@@ -694,7 +690,6 @@
             }
 
             let html = '';
-            let blockIndex = 0;
             for (const [subject, items] of Object.entries(groups)) {
                 items.sort((a,b) => parseFloat(a.srno) - parseFloat(b.srno));
 
@@ -710,7 +705,6 @@
                     }
                 }
 
-                blockIndex++;
                 html += `<div class="paper-block">`;
                 const subjectSearch = subject;
                 html += `<div class="paper-title">
@@ -752,6 +746,8 @@
                         if (subItems.length > 0) {
                             html += `<ul class="subtopic-list">`;
                             for (const sub of subItems) {
+                                const cleanSub = sub.replace(/^\d+\.\s*/, '').replace(/^[a-z]\)\s*/, '').trim();
+                                // Check if this item has lettered sub-items within it
                                 if (hasSubLetters(sub)) {
                                     const subLetters = extractSubLetters(sub);
                                     const mainPart = sub.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
@@ -766,16 +762,20 @@
                                         const letters = 'abcdefghijklmnopqrstuvwxyz';
                                         for (let i = 0; i < subLetters.length; i++) {
                                             const letter = letters[i] || '?';
-                                            const cleanSub = subLetters[i].replace(/^[a-z]\)\s*/, '').trim();
-                                            html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
+                                            const cleanSubItem = subLetters[i].replace(/^[a-z]\)\s*/, '').trim();
+                                            html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSubItem.replace(/'/g, "\\'")}')">${cleanSubItem}</span></li>`;
                                         }
                                         html += `</ul>`;
                                     }
+                                } else if (isNumbered(sub)) {
+                                    // Numbered item without letter prefix
+                                    const numClean = sub.replace(/^\d+\.\s*/, '').trim();
+                                    html += `<li><span class="sub-link" onclick="googleSearch('${numClean.replace(/'/g, "\\'")}')">${numClean}</span></li>`;
                                 } else {
-                                    let cleanSub = sub.replace(/^\d+\.\s*/, '').trim();
-                                    cleanSub = cleanSub.replace(/[;,:]\s*$/, '').trim();
-                                    if (cleanSub) {
-                                        html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
+                                    // Regular item
+                                    const finalClean = cleanSub.replace(/[;,:]\s*$/, '').trim();
+                                    if (finalClean) {
+                                        html += `<li><span class="sub-link" onclick="googleSearch('${finalClean.replace(/'/g, "\\'")}')">${finalClean}</span></li>`;
                                     }
                                 }
                             }
