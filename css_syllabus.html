@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-  <title>CSS · course content</title>
+  <title>CSS · syllabus with subtopics</title>
   <style>
     * {
       margin: 0;
@@ -186,76 +186,75 @@
       line-height: 1.8;
     }
     .topic-item {
-      padding: 4px 0 4px 16px;
+      padding: 6px 0 6px 16px;
       border-left: 2px solid #cad8ea;
       margin-left: 4px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .topic-item:last-child {
       margin-bottom: 0;
     }
     .topic-item .topic-label {
-      font-weight: 500;
-      font-size: 0.82rem;
+      font-weight: 600;
+      font-size: 0.85rem;
       color: #0b2b4a;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 4px 8px;
+    }
+    .topic-item .topic-label .fpsc-badge {
+      font-size: 0.65rem;
+      font-weight: 500;
+      background: #e3f0e8;
+      color: #0b452b;
+      padding: 0 8px;
+      border-radius: 40px;
+      line-height: 1.8;
+    }
+    .topic-item .topic-label .fpsc-badge.no {
+      background: #f3eaea;
+      color: #7a4646;
     }
     .topic-item .topic-desc {
       font-size: 0.82rem;
       color: #1f3d60;
       line-height: 1.5;
-      margin-top: 1px;
+      margin-top: 2px;
     }
-    .topic-item .topic-desc em {
-      color: #3d6185;
-      font-style: italic;
-      font-weight: 400;
-    }
-    .topic-item .topic-marks {
-      font-size: 0.7rem;
-      color: #3f6187;
-      background: #f0f5fc;
-      padding: 0 8px;
-      border-radius: 40px;
-      line-height: 1.8;
-      display: inline-block;
-      margin-left: 4px;
-    }
-    .recommended {
-      background: white;
-      border-radius: 20px;
-      padding: 16px 16px 12px;
-      margin-top: 16px;
-      border: 1px solid #e4ebf3;
-    }
-    .recommended h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #0b2b4a;
-      border-bottom: 1px solid #dce5f0;
-      padding-bottom: 6px;
-      margin-bottom: 10px;
-    }
-    .recommended ul {
+    /* subtopics as numbered bullet list */
+    .subtopic-list {
+      margin: 4px 0 2px 8px;
+      padding-left: 4px;
       list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+      counter-reset: sub-counter;
     }
-    .recommended ul li {
-      font-size: 0.82rem;
+    .subtopic-list li {
+      counter-increment: sub-counter;
+      font-size: 0.8rem;
       color: #1f3d60;
-      padding: 2px 0 2px 20px;
-      position: relative;
       line-height: 1.5;
+      padding: 1px 0 1px 24px;
+      position: relative;
+      margin-bottom: 1px;
     }
-    .recommended ul li::before {
-      content: "•";
+    .subtopic-list li::before {
+      content: counter(sub-counter) ".";
       position: absolute;
       left: 2px;
+      font-weight: 500;
       color: #2a6df4;
-      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    .topic-item .book-ref {
+      font-size: 0.75rem;
+      color: #3d6185;
+      margin-top: 3px;
+    }
+    .topic-item .book-ref a {
+      color: #1a5bbf;
+      text-decoration: none;
+      border-bottom: 1px dashed #b7ccf0;
     }
     .empty-state {
       padding: 40px 16px;
@@ -385,7 +384,29 @@
       return rows;
     }
 
-    // ---------- render syllabus (no cards, structured) ----------
+    // ---------- helper: split subtopics into numbered items ----------
+    function splitSubtopics(text) {
+      if (!text || text.trim() === '') return [];
+      // try to split by common separators: 1., 2., etc or newlines or semicolons
+      let items = [];
+      // check for numbered pattern: "1. ... 2. ..."
+      const numberedMatch = text.match(/(\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$))/g);
+      if (numberedMatch && numberedMatch.length > 1) {
+        items = numberedMatch.map(s => s.trim().replace(/^\d+\.\s*/, '').trim());
+      } else {
+        // try splitting by newline, semicolon, or period+space
+        const parts = text.split(/[\n;]+/).filter(p => p.trim() !== '');
+        if (parts.length > 1) {
+          items = parts.map(p => p.trim().replace(/^[•\-*]\s*/, '').trim());
+        } else {
+          // fallback: single item
+          items = [text.trim()];
+        }
+      }
+      return items.filter(s => s.length > 0);
+    }
+
+    // ---------- render syllabus ----------
     function render(records) {
       if (!records || records.length === 0) {
         container.innerHTML = `<div class="empty-state">✨ No topics match</div>`;
@@ -403,7 +424,6 @@
 
       let html = '';
       for (const [subject, items] of Object.entries(groups)) {
-        // sort by srno
         items.sort((a,b) => parseInt(a.srno) - parseInt(b.srno));
 
         html += `<div class="paper-block">`;
@@ -422,23 +442,31 @@
           html += `<div class="module-head">${mod}</div>`;
           for (const t of topics) {
             const inFPSC = t.inFPSC && t.inFPSC.toLowerCase().includes('yes') ? true : false;
-            const fpscBadge = inFPSC ? '✅' : '❌';
+            const fpscClass = inFPSC ? '' : 'no';
+            const fpscLabel = inFPSC ? '✅ In FPSC' : '❌ Not in FPSC';
             const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
-            const subtopics = t.subtopics || t.topicName || '';
 
             html += `<div class="topic-item">`;
-            html += `<div class="topic-label">${topicNum} ${t.topicName || '—'} ${fpscBadge}</div>`;
-            if (subtopics && subtopics !== t.topicName) {
-              html += `<div class="topic-desc">${subtopics}</div>`;
-            } else if (subtopics) {
-              html += `<div class="topic-desc"><em>${subtopics}</em></div>`;
+            html += `<div class="topic-label">${topicNum} ${t.topicName || '—'} <span class="fpsc-badge ${fpscClass}">${fpscLabel}</span></div>`;
+
+            // subtopics as numbered bullet list
+            const subItems = splitSubtopics(t.subtopics || t.topicName || '');
+            if (subItems.length > 0) {
+              html += `<ul class="subtopic-list">`;
+              for (const sub of subItems) {
+                html += `<li>${sub}</li>`;
+              }
+              html += `</ul>`;
             }
+
+            // book & url
             if (t.book && t.book !== '—') {
-              html += `<div class="topic-desc" style="font-size:0.75rem;color:#3d6185;margin-top:2px;">📖 ${t.book}</div>`;
+              html += `<div class="book-ref">📖 ${t.book}</div>`;
             }
             if (t.url && t.url.startsWith('http')) {
-              html += `<div style="margin-top:2px;"><a href="${t.url}" target="_blank" style="font-size:0.7rem;color:#1a5bbf;text-decoration:none;border-bottom:1px dashed #b7ccf0;">🔗 reference</a></div>`;
+              html += `<div class="book-ref"><a href="${t.url}" target="_blank">🔗 reference link</a></div>`;
             }
+
             html += `</div>`;
           }
           html += `</div>`;
