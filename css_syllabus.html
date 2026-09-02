@@ -175,7 +175,6 @@
             opacity: 0.5;
         }
 
-        /* last studied date below subject - PKT format */
         .last-studied {
             font-size: 0.72rem;
             color: #2a4a6a;
@@ -198,7 +197,6 @@
             margin-left: 4px;
         }
 
-        /* dividing line */
         .subject-divider {
             border: none;
             border-top: 2px solid #dce5f0;
@@ -308,6 +306,42 @@
             content: "🔗";
             font-size: 0.55rem;
             opacity: 0.35;
+        }
+        /* Sub-subtopics (a, b, c format) */
+        .sub-subtopic-list {
+            margin: 2px 0 2px 20px;
+            padding-left: 4px;
+            list-style: none;
+        }
+        .sub-subtopic-list li {
+            font-size: 0.78rem;
+            color: #1f3d60;
+            line-height: 1.5;
+            padding: 1px 0 1px 18px;
+            position: relative;
+            margin-bottom: 0px;
+        }
+        .sub-subtopic-list li::before {
+            content: attr(data-letter) ")";
+            position: absolute;
+            left: 0px;
+            font-weight: 450;
+            color: #3a6a9a;
+            font-size: 0.7rem;
+        }
+        .sub-subtopic-list li .sub-link {
+            color: #1f3d60;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .sub-subtopic-list li .sub-link:hover {
+            color: #2a6df4;
+        }
+        .sub-subtopic-list li .sub-link::after {
+            content: "🔗";
+            font-size: 0.5rem;
+            opacity: 0.3;
+            margin-left: 2px;
         }
         .topic-item .book-ref {
             font-size: 0.75rem;
@@ -474,22 +508,53 @@
             window.open(url, '_blank');
         }
 
-        // ---------- split subtopics by comma ----------
-        function splitSubtopicsByComma(text) {
+        // ---------- split subtopics with a, b, c support ----------
+        function splitSubtopics(text) {
             if (!text || text.trim() === '') return [];
+
+            // First, try to split by numbered items like "1. ... 2. ..."
+            const numberedMatch = text.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
+            if (numberedMatch && numberedMatch.length > 1) {
+                return numberedMatch.map(s => s.trim());
+            }
+
+            // Then try to split by a) b) c) pattern
+            const letterMatch = text.match(/[a-z]\)\s*[^,.]*?(?:[.,]\s*(?=[a-z]\))|$)/gi);
+            if (letterMatch && letterMatch.length > 1) {
+                return letterMatch.map(s => s.trim());
+            }
+
+            // Fallback: split by comma
             const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
-            return parts;
+            if (parts.length > 1) return parts;
+
+            // Single item
+            return [text.trim()];
         }
 
-        // ---------- format date in PKT time ----------
+        // ---------- check if subtopic has a, b, c sub-items ----------
+        function hasSubLetters(text) {
+            if (!text) return false;
+            return /[a-z]\)\s*[^,.]*?(?:[.,]\s*(?=[a-z]\))|$)/gi.test(text) && 
+                   (text.match(/[a-z]\)/gi) || []).length > 1;
+        }
+
+        // ---------- extract sub-subtopics (a, b, c) ----------
+        function extractSubLetters(text) {
+            if (!text) return [];
+            const matches = text.match(/[a-z]\)\s*[^,.]*?(?:[.,]\s*(?=[a-z]\))|$)/gi);
+            if (!matches) return [];
+            return matches.map(s => s.trim());
+        }
+
+        // ---------- format date in PKT ----------
         function formatDateInPKT(dateStr) {
             if (!dateStr || dateStr.trim() === '') return '';
             try {
                 const d = new Date(dateStr);
                 if (isNaN(d.getTime())) return dateStr;
                 
-                // Convert to PKT (UTC+5)
-                const pktOffset = 5 * 60; // 5 hours in minutes
+                const pktOffset = 5 * 60;
                 const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
                 const pktDate = new Date(utc + (pktOffset * 60000));
                 
@@ -530,7 +595,6 @@
             for (const [subject, items] of Object.entries(groups)) {
                 items.sort((a,b) => parseInt(a.srno) - parseInt(b.srno));
 
-                // Find the most recent date_read for this subject
                 let latestDate = '';
                 for (const item of items) {
                     if (item.dateRead && item.dateRead.trim() !== '') {
@@ -550,7 +614,6 @@
                             <span class="marks">${items.length} topics</span>
                         </div>`;
 
-                // Last studied date in PKT format below subject
                 if (latestDate) {
                     const formatted = formatDateInPKT(latestDate);
                     html += `<div class="last-studied">📅 Last studied: <span>${formatted}</span> <span class="pkt-badge">(PKT)</span></div>`;
@@ -558,7 +621,6 @@
                     html += `<div class="last-studied" style="opacity:0.6;">📅 Not studied yet</div>`;
                 }
 
-                // Dividing line
                 html += `<hr class="subject-divider" />`;
 
                 const moduleMap = {};
@@ -580,18 +642,45 @@
                                     <span class="topic-link" onclick="googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>
                                 </div>`;
 
-                        // subtopics split by comma -> numbered bullet list, each clickable
-                        const subItems = splitSubtopicsByComma(t.subtopics || t.topicName || '');
+                        // Process subtopics
+                        const subText = t.subtopics || t.topicName || '';
+                        const subItems = splitSubtopics(subText);
+                        
                         if (subItems.length > 0) {
                             html += `<ul class="subtopic-list">`;
                             for (const sub of subItems) {
-                                const subSearch = sub;
-                                html += `<li><span class="sub-link" onclick="googleSearch('${subSearch.replace(/'/g, "\\'")}')">${sub}</span></li>`;
+                                // Check if this subtopic has a, b, c sub-items
+                                if (hasSubLetters(sub)) {
+                                    const subLetters = extractSubLetters(sub);
+                                    // Get the main part before the first letter
+                                    const mainPart = sub.replace(/[a-z]\)\s*[^,.]*?(?:[.,]\s*(?=[a-z]\))|$)/gi, '').trim();
+                                    // Remove trailing colon or dash
+                                    const cleanMain = mainPart.replace(/[:–-]\s*$/, '').trim();
+                                    
+                                    if (cleanMain) {
+                                        html += `<li><span class="sub-link" onclick="googleSearch('${cleanMain.replace(/'/g, "\\'")}')">${cleanMain}</span></li>`;
+                                    }
+                                    
+                                    // Add sub-subtopics as nested list
+                                    if (subLetters.length > 0) {
+                                        html += `<ul class="sub-subtopic-list">`;
+                                        const letters = 'abcdefghijklmnopqrstuvwxyz';
+                                        for (let i = 0; i < subLetters.length; i++) {
+                                            const letter = letters[i] || '?';
+                                            const cleanSub = subLetters[i].replace(/^[a-z]\)\s*/, '').trim();
+                                            html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
+                                        }
+                                        html += `</ul>`;
+                                    }
+                                } else {
+                                    // Regular subtopic
+                                    const cleanSub = sub.replace(/^\d+\.\s*/, '').trim();
+                                    html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
+                                }
                             }
                             html += `</ul>`;
                         }
 
-                        // book is clickable -> search "css + book"
                         if (t.book && t.book !== '—') {
                             const bookSearch = t.book;
                             html += `<div class="book-ref">📖 <span class="book-link" onclick="googleSearch('${bookSearch.replace(/'/g, "\\'")}')">${t.book}</span></div>`;
@@ -662,7 +751,6 @@
             }
         }
 
-        // make googleSearch globally accessible for onclick
         window.googleSearch = googleSearch;
 
         searchInput.addEventListener('input', applyFilters);
