@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSS syllabus · FPSC topics</title>
-    <!-- Font & basic styling -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS syllabus · subject cards</title>
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -15,69 +15,60 @@
             box-sizing: border-box;
         }
         body {
-            background: #f8fafc;
+            background: #f2f6fc;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            padding: 2rem 1rem;
+            padding: 2rem 1.5rem;
             color: #0b1b33;
         }
         .container {
-            max-width: 1440px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px -12px rgba(0, 20, 30, 0.2);
-            padding: 2rem 1.5rem 2.5rem;
-            transition: 0.2s;
         }
-        h1 {
+        /* header */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.2rem 0.8rem;
+            margin-bottom: 2.2rem;
+        }
+        .header h1 {
             font-size: 1.9rem;
             font-weight: 600;
             letter-spacing: -0.02em;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 0.3rem;
         }
-        .subhead {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.8rem;
-            border-bottom: 1px solid #e9edf2;
-            padding-bottom: 1rem;
-        }
-        .subhead p {
-            color: #3b4a5e;
-            font-size: 0.95rem;
-            background: #f1f4f9;
-            padding: 0.3rem 1rem;
+        .header h1 span {
+            background: #d0e0f5;
+            padding: 0.1rem 0.8rem;
             border-radius: 60px;
-            font-weight: 450;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1f3f6a;
         }
-        .toolbar {
+        .controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem 0.8rem;
-            margin-bottom: 2rem;
+            gap: 0.8rem;
             align-items: center;
-            justify-content: space-between;
         }
         .search-box {
-            flex: 1 1 260px;
             position: relative;
+            min-width: 220px;
         }
         .search-box input {
             width: 100%;
-            padding: 0.7rem 1rem 0.7rem 2.8rem;
-            border: 1px solid #dce1e9;
+            padding: 0.65rem 1rem 0.65rem 2.6rem;
+            border: 1px solid #d5dfea;
             border-radius: 60px;
-            font-size: 0.95rem;
             background: white;
-            transition: 0.2s;
+            font-size: 0.9rem;
             font-family: inherit;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: 0.15s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
         }
         .search-box input:focus {
             outline: none;
@@ -91,17 +82,11 @@
             top: 50%;
             transform: translateY(-50%);
             opacity: 0.6;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
-        .filter-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            align-items: center;
-        }
-        .filter-group select {
-            padding: 0.6rem 1.8rem 0.6rem 1rem;
-            border: 1px solid #dce1e9;
+        .subject-select {
+            padding: 0.6rem 2.2rem 0.6rem 1.2rem;
+            border: 1px solid #d5dfea;
             border-radius: 60px;
             background: white;
             font-size: 0.9rem;
@@ -111,220 +96,237 @@
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233b4a5e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 0.8rem center;
+            background-position: right 1rem center;
             background-size: 12px;
-            min-width: 130px;
+            min-width: 160px;
         }
-        .filter-group select:focus {
+        .subject-select:focus {
             outline: none;
             border-color: #2a6df4;
         }
-        .badge-count {
-            background: #eef2f8;
-            padding: 0.25rem 0.9rem;
+        .count-badge {
+            background: #e2eaf5;
+            padding: 0.3rem 1.1rem;
             border-radius: 60px;
             font-size: 0.8rem;
             font-weight: 500;
-            color: #1e3349;
+            color: #1e3a5f;
             white-space: nowrap;
         }
-        .table-wrap {
-            overflow-x: auto;
-            border-radius: 18px;
-            border: 1px solid #eaeef4;
+
+        /* card grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
             background: white;
+            border-radius: 24px;
+            padding: 1.4rem 1.2rem 1.2rem;
+            box-shadow: 0 6px 18px rgba(0, 20, 40, 0.06);
+            border: 1px solid #e9edf4;
+            transition: 0.15s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            min-width: 780px;
+        .card:hover {
+            box-shadow: 0 12px 28px rgba(0, 20, 40, 0.10);
+            border-color: #cbd8ea;
         }
-        th {
-            background: #f2f6fd;
-            text-align: left;
-            padding: 1rem 0.8rem 0.9rem;
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.2rem;
+        }
+        .card-srno {
+            font-weight: 500;
+            color: #546e8a;
+            font-size: 0.75rem;
+            background: #eef3fa;
+            padding: 0.15rem 0.6rem;
+            border-radius: 40px;
+        }
+        .card-subject {
             font-weight: 600;
+            color: #10345e;
             font-size: 0.8rem;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
+            letter-spacing: 0.01em;
+            background: #e5edf8;
+            padding: 0.15rem 0.8rem;
+            border-radius: 40px;
+        }
+        .card-module {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #2b4c73;
+            background: #f0f4fb;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin: 0.2rem 0 0.2rem;
+        }
+        .card-topic {
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #0b213b;
+            margin: 0.3rem 0 0.1rem;
+        }
+        .card-topic-number {
+            font-weight: 400;
+            color: #3b5f83;
+            font-size: 0.8rem;
+            background: #f3f7fe;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            display: inline-block;
+        }
+        .card-detail {
+            font-size: 0.9rem;
+            color: #1b3450;
+            margin: 0.3rem 0 0.1rem;
+            line-height: 1.5;
+        }
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 0.6rem;
+            margin: 0.5rem 0 0.3rem;
+            align-items: center;
+        }
+        .card-book {
+            background: #f5f7fb;
+            padding: 0.2rem 0.8rem;
+            border-radius: 60px;
+            font-size: 0.75rem;
             color: #1d3a5c;
-            border-bottom: 2px solid #dce4ee;
-            position: sticky;
-            top: 0;
-            z-index: 5;
+            border: 1px solid #e1e8f0;
+            word-break: break-word;
         }
-        td {
-            padding: 0.9rem 0.8rem;
-            border-bottom: 1px solid #eaedf3;
-            vertical-align: middle;
-            background: white;
+        .card-fpsc {
+            font-weight: 500;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.7rem;
+            border-radius: 60px;
+            background: #e3f0e8;
+            color: #0b482b;
         }
-        tr:last-child td {
-            border-bottom: none;
+        .card-fpsc.no {
+            background: #f3e9e9;
+            color: #7a4646;
         }
-        tr:hover td {
-            background: #fafcff;
+        .card-url {
+            margin-top: 0.3rem;
         }
-        .topic-link {
+        .card-url a {
             color: #1a5bbf;
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
-            transition: 0.1s;
-            word-break: break-all;
+            gap: 0.2rem;
+            border-bottom: 1px dashed #b7ccf0;
         }
-        .topic-link:hover {
+        .card-url a:hover {
             color: #0d3d8a;
-            text-decoration: underline;
+            border-bottom: 1px solid #0d3d8a;
         }
-        .topic-link::after {
+        .card-url a::after {
             content: "↗";
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             opacity: 0.6;
         }
-        .yes-badge {
-            background: #d7f0df;
-            color: #0d542b;
-            padding: 0.2rem 0.7rem;
-            border-radius: 60px;
-            font-weight: 500;
-            font-size: 0.75rem;
-            display: inline-block;
-        }
-        .no-badge {
-            background: #f1e8e8;
-            color: #7a4a4a;
-            padding: 0.2rem 0.7rem;
-            border-radius: 60px;
-            font-size: 0.75rem;
-            display: inline-block;
-        }
-        .module-tag {
-            background: #e5ecf5;
-            padding: 0.2rem 0.7rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: #1f3f64;
-            display: inline-block;
-            white-space: nowrap;
-        }
-        .sr-col {
-            font-weight: 450;
-            color: #3f5a7a;
-            width: 50px;
-        }
-        .subject-col {
-            font-weight: 500;
-            color: #143157;
-        }
         .empty-state {
-            padding: 3rem 1.5rem;
+            grid-column: 1 / -1;
             text-align: center;
-            color: #5a6e89;
+            padding: 3.5rem 1.5rem;
+            background: white;
+            border-radius: 40px;
+            color: #3b5a7a;
+            border: 1px solid #e3eaf3;
         }
-        .loading {
+        .loading-state {
+            grid-column: 1 / -1;
             display: flex;
             justify-content: center;
-            padding: 3rem 0;
-            color: #3f5a7a;
-            gap: 0.6rem;
             align-items: center;
+            gap: 0.8rem;
+            padding: 3rem 0;
+            color: #2f557a;
         }
         .spinner {
-            width: 22px;
-            height: 22px;
-            border: 3px solid #dce4ee;
+            width: 26px;
+            height: 26px;
+            border: 3px solid #d5dfea;
             border-top: 3px solid #2a6df4;
             border-radius: 50%;
             animation: spin 0.9s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .footnote {
-            margin-top: 1.2rem;
+
+        .footer-note {
+            margin-top: 2rem;
             font-size: 0.8rem;
-            color: #5b728b;
+            color: #5a738f;
             text-align: right;
+            border-top: 1px solid #dce5ef;
+            padding-top: 1rem;
         }
-        @media (max-width: 640px) {
-            .container { padding: 1.2rem 0.8rem; }
-            h1 { font-size: 1.4rem; }
-            .toolbar { flex-direction: column; align-items: stretch; }
-            .filter-group { flex-wrap: wrap; }
+
+        @media (max-width: 600px) {
+            body { padding: 1rem 0.8rem; }
+            .header { flex-direction: column; align-items: stretch; }
+            .controls { flex-wrap: wrap; }
+            .search-box { min-width: 100%; }
+            .subject-select { min-width: 100%; }
+            .cards-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="subhead">
-        <h1>📘 FPSC CSS · syllabus topics</h1>
-        <p>📌 compulsory_islamiat</p>
-    </div>
-
-    <div class="toolbar">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search topic, module, book…" aria-label="search topics">
-        </div>
-        <div class="filter-group">
-            <select id="moduleFilter">
-                <option value="">All modules</option>
-                <option value="MODULE 1: INTRODUCTION TO ISLAM">MODULE 1</option>
-                <option value="MODULE 2">MODULE 2</option>
-                <!-- additional modules will appear dynamically -->
+    <div class="header">
+        <h1>📚 CSS syllabus <span>cards</span></h1>
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search topics, books…" />
+            </div>
+            <select id="subjectSelect" class="subject-select">
+                <option value="">All subjects</option>
             </select>
-            <select id="syllabusFilter">
-                <option value="">All (syllabus)</option>
-                <option value="Yes">✅ Yes</option>
-                <option value="No">❌ No</option>
-            </select>
-            <span class="badge-count" id="rowCounter">0 topics</span>
+            <span class="count-badge" id="countDisplay">0 cards</span>
         </div>
     </div>
 
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Subject</th>
-                    <th>Module</th>
-                    <th>Topic</th>
-                    <th>Topic Name / Detail</th>
-                    <th>In FPSC</th>
-                    <th>Recommended Book</th>
-                    <th>Online URL</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="8" class="loading"><span class="spinner"></span> Loading data from Google Sheets…</td></tr>
-            </tbody>
-        </table>
+    <div class="cards-grid" id="cardsContainer">
+        <div class="loading-state">
+            <span class="spinner"></span> Loading data from Google Sheets…
+        </div>
     </div>
-    <div class="footnote">Data source: FPSC CSS syllabus · fetched from Google Sheets (CSV)</div>
+    <div class="footer-note">Data from FPSC CSS syllabus · live CSV</div>
 </div>
 
 <script>
     (function() {
-        // === CONFIG ===
+        // ---------- CONFIG ----------
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac/pub?output=csv';
 
         // DOM refs
-        const tbody = document.getElementById('tableBody');
+        const container = document.getElementById('cardsContainer');
         const searchInput = document.getElementById('searchInput');
-        const moduleFilter = document.getElementById('moduleFilter');
-        const syllabusFilter = document.getElementById('syllabusFilter');
-        const rowCounter = document.getElementById('rowCounter');
+        const subjectSelect = document.getElementById('subjectSelect');
+        const countDisplay = document.getElementById('countDisplay');
 
         // state
-        let allRows = [];              // array of objects (raw)
-        let filteredRows = [];
+        let allRecords = [];         // array of objects
+        let filteredRecords = [];
 
-        // ---------- helpers ----------
+        // ---------- helpers: CSV parse ----------
         function parseCSVLine(line) {
-            // simple CSV parse (handles quoted fields, but we don't have complex quotes here)
             const result = [];
             let current = '';
             let insideQuotes = false;
@@ -358,9 +360,7 @@
             const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
             if (lines.length < 2) return [];
 
-            // header: srno,subject,Module,Topic Number,Topic Name / Detail,Given in FPSC CSS Syllabus?,Recommended Book / Source to Study,topic online_url
             const header = parseCSVLine(lines[0]);
-            // map column index
             const idx = {
                 srno: header.indexOf('srno'),
                 subject: header.indexOf('subject'),
@@ -375,7 +375,6 @@
             const rows = [];
             for (let i = 1; i < lines.length; i++) {
                 const cols = parseCSVLine(lines[i]);
-                // if row is incomplete, skip
                 if (cols.length < 8) continue;
                 const row = {
                     srno: cols[idx.srno] || '',
@@ -387,7 +386,7 @@
                     book: cols[idx.book] || '',
                     url: cols[idx.url] || ''
                 };
-                // keep only if srno is numeric (basic sanity)
+                // keep if srno is numeric
                 if (!isNaN(parseFloat(row.srno)) && row.srno.trim() !== '') {
                     rows.push(row);
                 }
@@ -395,122 +394,121 @@
             return rows;
         }
 
-        // ---------- render table ----------
-        function renderTable(rows) {
-            if (!rows || rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="empty-state">✨ No topics match your filters</td></tr>`;
-                rowCounter.textContent = '0 topics';
+        // ---------- render cards ----------
+        function renderCards(records) {
+            if (!records || records.length === 0) {
+                container.innerHTML = `<div class="empty-state">✨ No cards match your filters</div>`;
+                countDisplay.textContent = '0 cards';
                 return;
             }
 
             let html = '';
-            for (const r of rows) {
+            for (const r of records) {
                 const inFPSC = r.inFPSC && r.inFPSC.toLowerCase().includes('yes') ? 'Yes' : 'No';
-                const badge = inFPSC === 'Yes' ? `<span class="yes-badge">✓ Yes</span>` : `<span class="no-badge">✕ No</span>`;
-                // module short
-                const moduleShort = r.Module || '—';
+                const fpscClass = inFPSC === 'Yes' ? '' : 'no';
                 const url = r.url && r.url.startsWith('http') ? r.url : '#';
                 const bookText = r.book || '—';
+                const moduleDisplay = r.Module || '—';
+                const subjectDisplay = r.subject || '—';
+                const topicNumber = r.topicNumber || '';
 
-                html += `<tr>
-                    <td class="sr-col">${r.srno || ''}</td>
-                    <td class="subject-col">${r.subject || ''}</td>
-                    <td><span class="module-tag">${moduleShort}</span></td>
-                    <td>${r.topicNumber || ''}</td>
-                    <td><strong>${r.topicName || ''}</strong></td>
-                    <td>${badge}</td>
-                    <td style="max-width:200px; font-size:0.85rem;">${bookText}</td>
-                    <td>${url !== '#' ? `<a href="${url}" target="_blank" class="topic-link">open</a>` : '—'}</td>
-                </tr>`;
+                html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-srno">#${r.srno || ''}</span>
+                            <span class="card-subject">${subjectDisplay}</span>
+                        </div>
+                        <div>
+                            <span class="card-module">${moduleDisplay}</span>
+                            ${topicNumber ? `<span class="card-topic-number">${topicNumber}</span>` : ''}
+                        </div>
+                        <div class="card-topic">${r.topicName || '—'}</div>
+                        <div class="card-meta">
+                            <span class="card-fpsc ${fpscClass}">${inFPSC === 'Yes' ? '✅ In FPSC' : '❌ Not in FPSC'}</span>
+                            <span class="card-book">📖 ${bookText}</span>
+                        </div>
+                        ${url !== '#' ? `<div class="card-url"><a href="${url}" target="_blank">topic online</a></div>` : ''}
+                    </div>
+                `;
             }
-            tbody.innerHTML = html;
-            rowCounter.textContent = `${rows.length} topics`;
+            container.innerHTML = html;
+            countDisplay.textContent = `${records.length} cards`;
         }
 
-        // ---------- filtering ----------
+        // ---------- filter logic ----------
         function applyFilters() {
             const searchTerm = searchInput.value.trim().toLowerCase();
-            const moduleVal = moduleFilter.value;
-            const syllabusVal = syllabusFilter.value;
+            const subjectVal = subjectSelect.value;
 
-            filteredRows = allRows.filter(row => {
-                // search: srno, subject, module, topicName, book, url
+            filteredRecords = allRecords.filter(rec => {
+                // search in: srno, subject, Module, topicNumber, topicName, book, url
                 if (searchTerm) {
-                    const combined = `${row.srno} ${row.subject} ${row.Module} ${row.topicNumber} ${row.topicName} ${row.book} ${row.url}`.toLowerCase();
+                    const combined = `${rec.srno} ${rec.subject} ${rec.Module} ${rec.topicNumber} ${rec.topicName} ${rec.book} ${rec.url}`.toLowerCase();
                     if (!combined.includes(searchTerm)) return false;
                 }
-                // module filter
-                if (moduleVal && row.Module !== moduleVal) return false;
-                // syllabus filter
-                if (syllabusVal) {
-                    const inFPSC = row.inFPSC && row.inFPSC.toLowerCase().includes('yes') ? 'Yes' : 'No';
-                    if (inFPSC !== syllabusVal) return false;
-                }
+                // subject filter
+                if (subjectVal && rec.subject !== subjectVal) return false;
                 return true;
             });
 
-            renderTable(filteredRows);
+            renderCards(filteredRecords);
         }
 
-        // ---------- populate module filter from data ----------
-        function updateModuleOptions(rows) {
-            const modules = new Set();
-            rows.forEach(r => { if (r.Module) modules.add(r.Module); });
-            // keep existing options + add new ones
-            const currentVal = moduleFilter.value;
-            moduleFilter.innerHTML = `<option value="">All modules</option>`;
-            // sort module names
-            const sorted = Array.from(modules).sort();
-            for (const mod of sorted) {
+        // ---------- populate subject dropdown ----------
+        function updateSubjectOptions(records) {
+            const subjects = new Set();
+            records.forEach(r => { if (r.subject) subjects.add(r.subject); });
+            const currentVal = subjectSelect.value;
+            subjectSelect.innerHTML = `<option value="">All subjects</option>`;
+            const sorted = Array.from(subjects).sort();
+            for (const sub of sorted) {
                 const opt = document.createElement('option');
-                opt.value = mod;
-                opt.textContent = mod;
-                moduleFilter.appendChild(opt);
+                opt.value = sub;
+                opt.textContent = sub;
+                subjectSelect.appendChild(opt);
             }
-            // restore selected if still exists
-            if ([...modules].includes(currentVal)) {
-                moduleFilter.value = currentVal;
+            // restore if still present
+            if ([...subjects].includes(currentVal)) {
+                subjectSelect.value = currentVal;
             } else {
-                moduleFilter.value = '';
+                subjectSelect.value = '';
             }
         }
 
-        // ---------- fetch and init ----------
+        // ---------- load data from google sheets ----------
         async function loadData() {
             try {
-                tbody.innerHTML = `<tr><td colspan="8" class="loading"><span class="spinner"></span> Fetching data…</td></tr>`;
+                container.innerHTML = `<div class="loading-state"><span class="spinner"></span> Fetching data…</div>`;
                 const response = await fetch(CSV_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
 
                 const parsed = parseCSV(csvText);
                 if (parsed.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">⚠️ No data found. Check CSV format.</td></tr>`;
-                    rowCounter.textContent = '0 topics';
+                    container.innerHTML = `<div class="empty-state">⚠️ No data found. Check CSV format.</div>`;
+                    countDisplay.textContent = '0 cards';
                     return;
                 }
 
-                allRows = parsed;
-                // update module filter dropdown
-                updateModuleOptions(allRows);
-                // apply filters (initial: all)
+                allRecords = parsed;
+                // update subject filter options
+                updateSubjectOptions(allRecords);
+                // apply filters (show all)
                 applyFilters();
             } catch (err) {
                 console.error('Error loading CSV:', err);
-                tbody.innerHTML = `<tr><td colspan="8" class="empty-state" style="color:#b33;">❌ Failed to load data: ${err.message}</td></tr>`;
-                rowCounter.textContent = 'error';
+                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load: ${err.message}</div>`;
+                countDisplay.textContent = 'error';
             }
         }
 
         // ---------- event listeners ----------
         searchInput.addEventListener('input', applyFilters);
-        moduleFilter.addEventListener('change', applyFilters);
-        syllabusFilter.addEventListener('change', applyFilters);
+        subjectSelect.addEventListener('change', applyFilters);
 
         // start
         loadData();
     })();
 </script>
-
 </body>
 </html>
