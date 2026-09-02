@@ -167,6 +167,7 @@
     .all-q-item:hover .click-hint { opacity: 1; color: #2f7b9e; }
     .all-q-item.correct-item { border-color: #1f8b4c; background: #f0faf4; }
     .all-q-item.wrong-item { border-color: #b33c3c; background: #fdf2f2; }
+    .all-q-item.locked-item { opacity: 0.85; }
     .all-q-item.highlight {
       animation: highlightPulse 0.8s ease;
     }
@@ -180,6 +181,17 @@
       font-size: 1.05rem;
       margin-bottom: 0.6rem;
       color: #0a212b;
+      pointer-events: none;
+    }
+    .all-q-text .locked-badge {
+      display: inline-block;
+      background: #dce6ef;
+      color: #1f4d66;
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 0.1rem 0.6rem;
+      border-radius: 30px;
+      margin-left: 0.5rem;
       pointer-events: none;
     }
     .all-q-options {
@@ -233,6 +245,11 @@
       border-color: #2f7b9e;
       background: #e6f0f7;
     }
+    .all-q-options .option-btn.locked-btn {
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+    .all-q-options .option-btn.locked-btn:hover { transform: none; background: inherit; }
     .all-q-options .option-btn:disabled { cursor: default; opacity: 0.8; }
     .all-q-options .option-btn:disabled:hover { transform: none; }
 
@@ -577,6 +594,7 @@
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
+    let lockedQuestions = []; // track which questions are locked
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
@@ -632,7 +650,8 @@
           score: score,
           timeRemaining: timeRemaining,
           quizTitleText: quizTitleText,
-          totalQuestions: totalQuestions
+          totalQuestions: totalQuestions,
+          lockedQuestions: lockedQuestions
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -668,7 +687,6 @@
       refreshIcon.classList.remove('refresh-spin');
     }
 
-    // --- Google Search function (click on question card) ---
     function searchQuestionOnGoogle(questionText, event) {
       if (event) event.stopPropagation();
       const encodedQuery = encodeURIComponent(questionText);
@@ -686,6 +704,7 @@
           totalQuestions = saved.totalQuestions || questions.length;
           selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
           answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
+          lockedQuestions = saved.lockedQuestions || new Array(questions.length).fill(false);
           isSubmitted = saved.isSubmitted || false;
           quizCompleted = saved.quizCompleted || false;
           quizTimedOut = saved.quizTimedOut || false;
@@ -724,6 +743,7 @@
             totalQuestions = questions.length;
             answerStatus = new Array(questions.length).fill(null);
             selectedAllAnswers = new Array(questions.length).fill(null);
+            lockedQuestions = new Array(questions.length).fill(false);
             isSubmitted = false;
             quizCompleted = false;
             quizTimedOut = false;
@@ -755,6 +775,7 @@
           totalQuestions = questions.length;
           answerStatus = new Array(questions.length).fill(null);
           selectedAllAnswers = new Array(questions.length).fill(null);
+          lockedQuestions = new Array(questions.length).fill(false);
           isSubmitted = false;
           quizCompleted = false;
           quizTimedOut = false;
@@ -886,7 +907,6 @@
       }
     }
 
-    // ----- renderAllQuestions with INSTANT feedback on select -----
     function renderAllQuestions() {
       allQuestionsContainer.innerHTML = '';
       const letters = ['A','B','C','D'];
@@ -896,13 +916,16 @@
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
         
-        // Click on question card -> search
+        // If question is locked, add locked class
+        if (lockedQuestions[idx]) {
+          div.classList.add('locked-item');
+        }
+        
         div.addEventListener('click', function(e) {
           if (e.target.closest('.option-btn')) return;
           searchQuestionOnGoogle(q.question, e);
         });
         
-        // if already submitted/completed, show final styles
         if (isSubmitted || quizCompleted) {
           if (q.correct !== -1) {
             if (answerStatus[idx] === true) div.classList.add('correct-item');
@@ -912,7 +935,11 @@
         
         const qText = document.createElement('div');
         qText.className = 'all-q-text';
-        qText.innerHTML = `${idx+1}. ${q.question} <span class="search-badge">🔍 search</span>`;
+        let badge = '';
+        if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) {
+          badge = ' <span class="locked-badge">🔒 locked</span>';
+        }
+        qText.innerHTML = `${idx+1}. ${q.question}${badge} <span class="search-badge">🔍 search</span>`;
         div.appendChild(qText);
         
         const optsDiv = document.createElement('div');
@@ -924,12 +951,16 @@
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
           
-          // if already selected (from saved state)
+          // If question is locked, disable the button and add locked class
+          if (lockedQuestions[idx]) {
+            btn.disabled = true;
+            btn.classList.add('locked-btn');
+          }
+          
           if (selectedAllAnswers[idx] === optIdx) {
             btn.classList.add('selected-opt');
           }
           
-          // if submitted or completed, disable and show correct/wrong
           if (isSubmitted || quizCompleted) {
             btn.disabled = true;
             if (q.correct !== -1) {
@@ -941,51 +972,59 @@
             if (q.correct === -1 && optIdx === selectedAllAnswers[idx]) {
               btn.classList.add('no-answer-dot');
             }
-          } else {
-            // --- ACTIVE mode: instant feedback on selection ---
+          } else if (!lockedQuestions[idx]) {
+            // Only add click listener if not locked
             btn.addEventListener('click', function(e) {
               e.stopPropagation();
               if (isSubmitted || quizCompleted) return;
+              if (lockedQuestions[idx]) return; // Extra safety
               
               const parent = this.closest('.all-q-item');
               const btns = parent.querySelectorAll('.option-btn');
               
-              // remove previous selected style
-              btns.forEach(b => b.classList.remove('selected-opt'));
-              this.classList.add('selected-opt');
+              // Lock this question immediately
+              lockedQuestions[idx] = true;
+              parent.classList.add('locked-item');
               
-              // store selection
+              // Disable all buttons in this question
+              btns.forEach(b => {
+                b.disabled = true;
+                b.classList.add('locked-btn');
+              });
+              
+              // Mark selected
+              this.classList.add('selected-opt');
               selectedAllAnswers[idx] = optIdx;
               
-              // --- INSTANT FEEDBACK: show correct/wrong immediately ---
-              // remove previous instant feedback classes
+              // Show correct/wrong feedback
               btns.forEach(b => {
                 b.classList.remove('correct', 'wrong');
               });
               
-              // if correct answer exists in data
               if (q.correct !== -1) {
                 btns.forEach((b, i) => {
                   if (i === q.correct) {
-                    b.classList.add('correct');   // highlight correct
+                    b.classList.add('correct');
                   }
                   if (i === optIdx && optIdx !== q.correct) {
-                    b.classList.add('wrong');     // highlight wrong selection
+                    b.classList.add('wrong');
                   }
                 });
-                // also mark the whole question card
                 parent.classList.remove('correct-item', 'wrong-item');
                 if (optIdx === q.correct) {
                   parent.classList.add('correct-item');
                 } else {
                   parent.classList.add('wrong-item');
                 }
-              } else {
-                // no correct answer in data: just mark as attempted
-                parent.classList.remove('correct-item', 'wrong-item');
               }
               
-              // update progress, dots, overview
+              // Update the question text to show locked badge
+              const qTextEl = parent.querySelector('.all-q-text');
+              const badgeSpan = qTextEl.querySelector('.locked-badge');
+              if (!badgeSpan) {
+                qTextEl.innerHTML = qTextEl.innerHTML.replace('</span>', ' <span class="locked-badge">🔒 locked</span></span>');
+              }
+              
               updateProgress();
               renderDots();
               updateOverview();
@@ -1030,7 +1069,6 @@
       }
       score = correctCountLocal;
       
-      // update UI to show final correct/wrong (disable buttons)
       questions.forEach((q, idx) => {
         const item = allQuestionsContainer.children[idx];
         if (!item) return;
@@ -1200,6 +1238,7 @@
       clearState();
       selectedAllAnswers = new Array(questions.length).fill(null);
       answerStatus = new Array(questions.length).fill(null);
+      lockedQuestions = new Array(questions.length).fill(false);
       isSubmitted = false;
       quizCompleted = false;
       quizTimedOut = false;
