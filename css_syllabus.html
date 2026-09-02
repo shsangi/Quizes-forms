@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-  <title>CSS syllabus · cards</title>
+  <title>CSS · subject cards</title>
   <style>
     * {
       margin: 0;
@@ -11,7 +11,7 @@
       box-sizing: border-box;
     }
     body {
-      background: #f4f7fb;
+      background: #f3f7fc;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       padding: 16px 12px 32px;
       color: #0b1e32;
@@ -29,8 +29,8 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 18px;
-      gap: 8px 4px;
+      margin-bottom: 16px;
+      gap: 6px 4px;
     }
     .header h1 {
       font-size: 1.5rem;
@@ -121,17 +121,17 @@
       outline: none;
       border-color: #2a6df4;
     }
-    /* cards grid */
+    /* cards */
     .cards {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
     .card {
       background: white;
-      border-radius: 20px;
-      padding: 16px 14px 14px;
-      box-shadow: 0 4px 12px rgba(0, 20, 30, 0.04);
+      border-radius: 24px;
+      padding: 18px 16px 16px;
+      box-shadow: 0 4px 14px rgba(0, 20, 30, 0.04);
       border: 1px solid #e4ebf3;
       transition: 0.1s;
       display: flex;
@@ -141,29 +141,44 @@
     .card:active {
       background: #fafcff;
     }
-    .card-top {
+    /* paper = subject */
+    .card-paper {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0b2b4a;
+      letter-spacing: -0.2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      border-bottom: 1px solid #eaeef5;
+      padding-bottom: 8px;
+      margin-bottom: 6px;
+    }
+    .card-paper small {
+      font-weight: 400;
+      font-size: 0.7rem;
+      color: #3d6185;
+      background: #eef3fa;
+      padding: 0 10px;
+      border-radius: 40px;
+      line-height: 1.8;
+    }
+    .card-srno-module {
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 2px;
+      gap: 6px 10px;
+      margin-bottom: 4px;
     }
     .card-srno {
       background: #eef3fa;
       padding: 0 10px;
       border-radius: 40px;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       font-weight: 500;
       color: #3c5a7a;
-      line-height: 1.8;
-    }
-    .card-subject {
-      background: #e1ebf7;
-      padding: 0 12px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: #10345e;
       line-height: 1.8;
     }
     .card-module {
@@ -171,19 +186,46 @@
       font-weight: 500;
       color: #2b4f77;
       background: #eef4fb;
-      padding: 0 10px;
+      padding: 0 12px;
       border-radius: 30px;
-      display: inline-block;
+      line-height: 1.8;
+    }
+    /* fpsc green light */
+    .fpsc-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: #e3f0e8;
+      color: #0b452b;
+      padding: 0 10px 0 6px;
+      border-radius: 60px;
       line-height: 1.8;
       margin: 4px 0 2px;
       align-self: flex-start;
+    }
+    .fpsc-indicator.no {
+      background: #f3eaea;
+      color: #7a4646;
+    }
+    .fpsc-indicator .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #1f9d5a;
+      margin-right: 2px;
+    }
+    .fpsc-indicator.no .dot {
+      background: #b34a4a;
     }
     .card-topic {
       font-size: 1.05rem;
       font-weight: 600;
       line-height: 1.3;
       color: #08203b;
-      margin: 4px 0 2px;
+      margin: 2px 0 2px;
     }
     .card-topic-num {
       font-weight: 400;
@@ -192,42 +234,39 @@
       background: #f3f8ff;
       padding: 0 10px;
       border-radius: 30px;
-      display: inline-block;
       line-height: 1.8;
+      display: inline-block;
     }
-    .card-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 8px;
-      margin: 8px 0 4px;
-      align-items: center;
+    .card-subtopics {
+      font-size: 0.8rem;
+      color: #1f3d60;
+      background: #f6faff;
+      padding: 6px 12px;
+      border-radius: 14px;
+      border-left: 3px solid #b7cce5;
+      margin: 6px 0 4px;
+      word-break: break-word;
+      line-height: 1.4;
     }
-    .card-fpsc {
+    .card-subtopics strong {
       font-weight: 500;
-      font-size: 0.7rem;
-      padding: 0 12px;
-      border-radius: 60px;
-      line-height: 2;
-      background: #ddf0e6;
-      color: #0b452b;
-    }
-    .card-fpsc.no {
-      background: #f3eaea;
-      color: #7a4646;
+      color: #12315a;
     }
     .card-book {
       background: #f5f8fd;
       padding: 0 12px;
       border-radius: 60px;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: #1c3f64;
       border: 1px solid #e0e8f0;
       line-height: 2;
       word-break: break-word;
       max-width: 100%;
+      display: inline-block;
+      margin-top: 2px;
     }
     .card-url {
-      margin-top: 4px;
+      margin-top: 6px;
     }
     .card-url a {
       color: #1a5bbf;
@@ -377,26 +416,40 @@
       }
       let html = '';
       for (const r of records) {
-        const inFPSC = r.inFPSC && r.inFPSC.toLowerCase().includes('yes') ? 'Yes' : 'No';
-        const fpscClass = inFPSC === 'Yes' ? '' : 'no';
+        const inFPSC = r.inFPSC && r.inFPSC.toLowerCase().includes('yes') ? true : false;
+        const fpscClass = inFPSC ? '' : 'no';
+        const dotColor = inFPSC ? '#1f9d5a' : '#b34a4a';
         const url = r.url && r.url.startsWith('http') ? r.url : '#';
         const book = r.book || '—';
+        // use topicName as "subtopics" (last column concept) – we put it in a dedicated block
+        const subtopics = r.topicName || '';
+
         html += `
           <div class="card">
-            <div class="card-top">
-              <span class="card-srno">#${r.srno || ''}</span>
-              <span class="card-subject">${r.subject || ''}</span>
+            <div class="card-paper">
+              <span>📄 ${r.subject || 'Subject'}</span>
+              <small>#${r.srno || ''}</small>
+            </div>
+            <div class="card-srno-module">
+              <span class="card-srno">srno ${r.srno || ''}</span>
+              <span class="card-module">${r.Module || '—'}</span>
+            </div>
+            <div class="fpsc-indicator ${fpscClass}">
+              <span class="dot" style="background:${dotColor};"></span>
+              ${inFPSC ? 'In FPSC' : 'Not in FPSC'}
             </div>
             <div>
-              <span class="card-module">${r.Module || '—'}</span>
               ${r.topicNumber ? `<span class="card-topic-num">${r.topicNumber}</span>` : ''}
             </div>
             <div class="card-topic">${r.topicName || '—'}</div>
-            <div class="card-meta">
-              <span class="card-fpsc ${fpscClass}">${inFPSC === 'Yes' ? '✅ In FPSC' : '❌ Not in FPSC'}</span>
+            <div class="card-subtopics">
+              <strong>📌 subtopics / detail</strong><br />
+              ${subtopics || '—'}
+            </div>
+            <div>
               <span class="card-book">📖 ${book}</span>
             </div>
-            ${url !== '#' ? `<div class="card-url"><a href="${url}" target="_blank">online</a></div>` : ''}
+            ${url !== '#' ? `<div class="card-url"><a href="${url}" target="_blank">reference link</a></div>` : ''}
           </div>
         `;
       }
