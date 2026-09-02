@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>CSS · syllabus with study timestamp</title>
+    <title>CSS · syllabus with study dates</title>
     <style>
         * {
             margin: 0;
@@ -144,7 +144,7 @@
             letter-spacing: -0.2px;
             border-bottom: 2px solid #dce5f0;
             padding-bottom: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: baseline;
@@ -175,6 +175,22 @@
             content: "🔗";
             font-size: 0.7rem;
             opacity: 0.5;
+        }
+
+        /* last studied date below subject */
+        .last-studied {
+            font-size: 0.7rem;
+            color: #3d6185;
+            background: #eef3fa;
+            padding: 2px 12px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: 450;
+        }
+        .last-studied span {
+            font-weight: 500;
+            color: #1a4a7a;
         }
 
         .module-group {
@@ -302,54 +318,6 @@
             font-size: 0.55rem;
             opacity: 0.35;
         }
-
-        /* timestamp style */
-        .topic-item .timestamp-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 4px;
-            flex-wrap: wrap;
-        }
-        .topic-item .timestamp-row .ts-label {
-            font-size: 0.7rem;
-            color: #5f7c99;
-        }
-        .topic-item .timestamp-row .ts-value {
-            font-size: 0.7rem;
-            color: #1a5bbf;
-            font-weight: 500;
-            background: #eef3fa;
-            padding: 0 10px;
-            border-radius: 40px;
-            line-height: 1.8;
-            min-width: 80px;
-            display: inline-block;
-            text-align: center;
-        }
-        .topic-item .timestamp-row .ts-btn {
-            background: #eef3fa;
-            border: none;
-            border-radius: 40px;
-            padding: 0 12px;
-            font-size: 0.65rem;
-            font-family: inherit;
-            color: #1a3857;
-            cursor: pointer;
-            line-height: 2;
-            transition: 0.15s;
-        }
-        .topic-item .timestamp-row .ts-btn:hover {
-            background: #d4e2f5;
-        }
-        .topic-item .timestamp-row .ts-btn.reset {
-            color: #7a4646;
-            background: #f3eaea;
-        }
-        .topic-item .timestamp-row .ts-btn.reset:hover {
-            background: #f0dada;
-        }
-
         .empty-state {
             padding: 40px 16px;
             text-align: center;
@@ -414,13 +382,12 @@
     <div class="syllabus" id="syllabusContainer">
         <div class="loading"><span class="spinner"></span> loading…</div>
     </div>
-    <div class="footer">FPSC syllabus · click 📝 to log study time</div>
+    <div class="footer">FPSC syllabus · live from Google Sheets</div>
 </div>
 
 <script>
     (function() {
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac/pub?output=csv';
-        const STORAGE_KEY = 'css_syllabus_timestamps';
 
         const container = document.getElementById('syllabusContainer');
         const searchInput = document.getElementById('searchInput');
@@ -429,39 +396,6 @@
 
         let allRecords = [];
         let filtered = [];
-
-        // ---------- timestamp storage ----------
-        function getTimestamps() {
-            try {
-                const data = localStorage.getItem(STORAGE_KEY);
-                return data ? JSON.parse(data) : {};
-            } catch { return {}; }
-        }
-
-        function setTimestamp(topicId, value) {
-            const ts = getTimestamps();
-            if (value === null) {
-                delete ts[topicId];
-            } else {
-                ts[topicId] = value;
-            }
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(ts));
-        }
-
-        function getTimestamp(topicId) {
-            const ts = getTimestamps();
-            return ts[topicId] || null;
-        }
-
-        function formatTimestamp(iso) {
-            if (!iso) return '—';
-            const d = new Date(iso);
-            return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        }
-
-        function nowISO() {
-            return new Date().toISOString();
-        }
 
         // ---------- CSV parse ----------
         function parseLine(line) {
@@ -495,7 +429,7 @@
                 topicName: h.indexOf('Topic Name / Detail'),
                 inFPSC: h.indexOf('Given in FPSC CSS Syllabus?'),
                 book: h.indexOf('Recommended Book / Source to Study'),
-                url: h.indexOf('topic online_url'),
+                dateRead: h.indexOf('date_read'),
                 subtopics: h.indexOf('Possible Subtopics (FPSC Syllabus Past Papers & Recent Topics)')
             };
             const subtopicsIdx = idx.subtopics !== -1 ? idx.subtopics : idx.topicName;
@@ -512,7 +446,7 @@
                     topicName: c[idx.topicName] || '',
                     inFPSC: c[idx.inFPSC] || '',
                     book: c[idx.book] || '',
-                    url: c[idx.url] || '',
+                    dateRead: c[idx.dateRead] || '',
                     subtopics: c[subtopicsIdx] || ''
                 };
                 if (!isNaN(parseFloat(r.srno)) && r.srno.trim() !== '') rows.push(r);
@@ -520,7 +454,7 @@
             return rows;
         }
 
-        // ---------- Google search ----------
+        // ---------- Google search helper ----------
         function googleSearch(query) {
             const clean = query.trim();
             if (!clean) return;
@@ -531,7 +465,26 @@
         // ---------- split subtopics by comma ----------
         function splitSubtopicsByComma(text) {
             if (!text || text.trim() === '') return [];
-            return text.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            return parts;
+        }
+
+        // ---------- format date nicely ----------
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr.trim() === '') return '';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return dateStr;
+            }
         }
 
         // ---------- render syllabus ----------
@@ -553,12 +506,32 @@
             for (const [subject, items] of Object.entries(groups)) {
                 items.sort((a,b) => parseInt(a.srno) - parseInt(b.srno));
 
+                // Find the most recent date_read for this subject
+                let latestDate = '';
+                for (const item of items) {
+                    if (item.dateRead && item.dateRead.trim() !== '') {
+                        const d = new Date(item.dateRead);
+                        if (!isNaN(d.getTime())) {
+                            if (!latestDate || d > new Date(latestDate)) {
+                                latestDate = item.dateRead;
+                            }
+                        }
+                    }
+                }
+
                 html += `<div class="paper-block">`;
                 const subjectSearch = subject;
                 html += `<div class="paper-title">
                             <span class="subject-link" onclick="googleSearch('${subjectSearch.replace(/'/g, "\\'")}')">📄 ${subject}</span>
                             <span class="marks">${items.length} topics</span>
                         </div>`;
+
+                // Last studied date below subject name
+                if (latestDate) {
+                    html += `<div class="last-studied">📅 Last studied: <span>${formatDate(latestDate)}</span></div>`;
+                } else {
+                    html += `<div class="last-studied" style="opacity:0.5;">📅 Not studied yet</div>`;
+                }
 
                 const moduleMap = {};
                 for (const item of items) {
@@ -573,15 +546,13 @@
                     for (const t of topics) {
                         const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
                         const topicSearch = t.topicName || '';
-                        const topicId = `${t.subject}|${t.Module}|${t.topicNumber}|${t.topicName}`;
-                        const ts = getTimestamp(topicId);
 
                         html += `<div class="topic-item">`;
                         html += `<div class="topic-label">
                                     <span class="topic-link" onclick="googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>
                                 </div>`;
 
-                        // subtopics
+                        // subtopics split by comma -> numbered bullet list, each clickable
                         const subItems = splitSubtopicsByComma(t.subtopics || t.topicName || '');
                         if (subItems.length > 0) {
                             html += `<ul class="subtopic-list">`;
@@ -592,20 +563,11 @@
                             html += `</ul>`;
                         }
 
-                        // book
+                        // book is clickable -> search "css + book"
                         if (t.book && t.book !== '—') {
                             const bookSearch = t.book;
                             html += `<div class="book-ref">📖 <span class="book-link" onclick="googleSearch('${bookSearch.replace(/'/g, "\\'")}')">${t.book}</span></div>`;
                         }
-
-                        // timestamp row
-                        const tsDisplay = ts ? formatTimestamp(ts) : '—';
-                        html += `<div class="timestamp-row">
-                                    <span class="ts-label">📝 studied:</span>
-                                    <span class="ts-value" id="ts-${topicId.replace(/[^a-zA-Z0-9]/g, '_')}">${tsDisplay}</span>
-                                    <button class="ts-btn" onclick="logStudy('${topicId.replace(/'/g, "\\'")}')">log now</button>
-                                    ${ts ? `<button class="ts-btn reset" onclick="clearStudy('${topicId.replace(/'/g, "\\'")}')">✕</button>` : ''}
-                                </div>`;
 
                         html += `</div>`;
                     }
@@ -617,22 +579,6 @@
             container.innerHTML = html;
             countDisplay.textContent = records.length;
         }
-
-        // ---------- study logging functions (global for onclick) ----------
-        window.logStudy = function(topicId) {
-            const now = nowISO();
-            setTimestamp(topicId, now);
-            // re-render to update display
-            applyFilters();
-        };
-
-        window.clearStudy = function(topicId) {
-            setTimestamp(topicId, null);
-            applyFilters();
-        };
-
-        // make googleSearch globally accessible
-        window.googleSearch = googleSearch;
 
         // ---------- filter ----------
         function applyFilters() {
@@ -687,6 +633,9 @@
                 countDisplay.textContent = 'err';
             }
         }
+
+        // make googleSearch globally accessible for onclick
+        window.googleSearch = googleSearch;
 
         searchInput.addEventListener('input', applyFilters);
         subjectSelect.addEventListener('change', applyFilters);
