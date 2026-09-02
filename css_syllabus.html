@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>CSS · syllabus with collapsible sections</title>
+    <title>CSS · syllabus with study dates</title>
     <style>
         * {
             margin: 0;
@@ -145,38 +145,6 @@
         .paper-block:nth-child(even) {
             background: #f8faff;
         }
-
-        /* ----- Collapsible styles ----- */
-        .collapsible {
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .collapsible .icon {
-            font-size: 0.8rem;
-            transition: transform 0.25s ease;
-            display: inline-block;
-            width: 18px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        .collapsible .icon.collapsed {
-            transform: rotate(-90deg);
-        }
-        .collapsible-content {
-            overflow: hidden;
-            transition: max-height 0.3s ease, opacity 0.25s ease;
-            max-height: 0;
-            opacity: 0;
-        }
-        .collapsible-content.open {
-            max-height: 10000px;
-            opacity: 1;
-        }
-
-        /* Subject header */
         .paper-title {
             font-size: 1.1rem;
             font-weight: 700;
@@ -184,16 +152,10 @@
             letter-spacing: -0.2px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
             flex-wrap: wrap;
             gap: 4px 8px;
             padding-bottom: 4px;
-        }
-        .paper-title .title-left {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex: 1;
         }
         .paper-title .marks {
             font-weight: 500;
@@ -203,7 +165,6 @@
             padding: 0 12px;
             border-radius: 40px;
             line-height: 2;
-            white-space: nowrap;
         }
         .paper-title .subject-link {
             color: #0b2b4a;
@@ -222,12 +183,7 @@
             opacity: 0.5;
         }
 
-        /* Subject divider & last studied */
-        .subject-divider {
-            border: none;
-            border-top: 2px solid #dce5f0;
-            margin: 6px 0 10px 0;
-        }
+        /* Last studied - smaller font */
         .last-studied {
             font-size: 0.6rem;
             color: #2a4a6a;
@@ -250,17 +206,27 @@
             margin-left: 4px;
         }
 
-        /* Module header - collapsible */
+        .subject-divider {
+            border: none;
+            border-top: 2px solid #dce5f0;
+            margin: 6px 0 10px 0;
+        }
+
+        .module-group {
+            margin-bottom: 10px;
+        }
+        .module-group:last-child {
+            margin-bottom: 0;
+        }
         .module-head {
             font-weight: 600;
             font-size: 0.85rem;
             color: #1f406a;
             margin-bottom: 4px;
             display: flex;
-            align-items: center;
+            align-items: baseline;
             gap: 6px;
             flex-wrap: wrap;
-            padding: 4px 0;
         }
         .module-head .module-marks {
             font-weight: 400;
@@ -271,14 +237,6 @@
             border-radius: 40px;
             line-height: 1.9;
         }
-        .module-group {
-            margin-bottom: 10px;
-        }
-        .module-group:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Topic item - collapsible */
         .topic-item {
             padding: 6px 0 6px 14px;
             border-left: 3px solid #b8cce0;
@@ -293,9 +251,9 @@
             font-size: 0.85rem;
             color: #0b2b4a;
             display: flex;
-            align-items: center;
-            gap: 6px;
             flex-wrap: wrap;
+            align-items: baseline;
+            gap: 4px 8px;
         }
         .topic-item .topic-label .topic-link {
             color: #0b2b4a;
@@ -313,10 +271,11 @@
             font-size: 0.6rem;
             opacity: 0.4;
         }
-
-        /* Topic content (subtopics + book) */
-        .topic-content {
-            padding-left: 4px;
+        .topic-item .topic-desc {
+            font-size: 0.82rem;
+            color: #1f3d60;
+            line-height: 1.5;
+            margin-top: 2px;
         }
         .subtopic-list {
             margin: 4px 0 2px 6px;
@@ -413,7 +372,6 @@
             font-size: 0.5rem;
             opacity: 0.35;
         }
-
         .empty-state {
             padding: 40px 16px;
             text-align: center;
@@ -467,8 +425,6 @@
             .header h1 { font-size: 1.1rem !important; }
             .count-badge { display: none !important; }
             .subject-divider { border-top: 1px solid #ccc !important; }
-            .collapsible-content { max-height: none !important; opacity: 1 !important; }
-            .collapsible .icon { display: none !important; }
         }
     </style>
 </head>
@@ -666,19 +622,6 @@
             }
         }
 
-        // ---------- Collapsible toggle function ----------
-        function toggleCollapse(element) {
-            const content = element.nextElementSibling;
-            const icon = element.querySelector('.icon');
-            if (content) {
-                content.classList.toggle('open');
-                if (icon) {
-                    icon.classList.toggle('collapsed');
-                }
-            }
-        }
-
-        // ---------- Render with collapsible sections ----------
         function render(records) {
             if (!records || records.length === 0) {
                 container.innerHTML = `<div class="empty-state">✨ No topics match</div>`;
@@ -710,19 +653,11 @@
                 }
 
                 html += `<div class="paper-block">`;
-                
-                // Subject header - collapsible
                 const subjectSearch = subject;
-                html += `<div class="paper-title">`;
-                html += `<div class="title-left collapsible" onclick="toggleCollapse(this)">`;
-                html += `<span class="icon">▶</span>`;
-                html += `<span class="subject-link" onclick="event.stopPropagation(); googleSearch('${subjectSearch.replace(/'/g, "\\'")}')">📄 ${subject}</span>`;
-                html += `</div>`;
-                html += `<span class="marks">${items.length} topics</span>`;
-                html += `</div>`;
-
-                // Subject content (collapsible)
-                html += `<div class="collapsible-content open">`;
+                html += `<div class="paper-title">
+                            <span class="subject-link" onclick="googleSearch('${subjectSearch.replace(/'/g, "\\'")}')">📄 ${subject}</span>
+                            <span class="marks">${items.length} topics</span>
+                        </div>`;
 
                 if (latestDate) {
                     const formatted = formatDateInPKT(latestDate);
@@ -742,31 +677,15 @@
 
                 for (const [mod, topics] of Object.entries(moduleMap)) {
                     html += `<div class="module-group">`;
-                    
-                    // Module header - collapsible
-                    html += `<div class="module-head collapsible" onclick="toggleCollapse(this)">`;
-                    html += `<span class="icon">▶</span>`;
-                    html += `<span>${mod}</span>`;
-                    html += `<span class="module-marks">${topics.length} topics</span>`;
-                    html += `</div>`;
-
-                    // Module content (collapsible)
-                    html += `<div class="collapsible-content open">`;
-
+                    html += `<div class="module-head">${mod}</div>`;
                     for (const t of topics) {
                         const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
                         const topicSearch = t.topicName || '';
 
                         html += `<div class="topic-item">`;
-                        
-                        // Topic label - collapsible
-                        html += `<div class="topic-label collapsible" onclick="toggleCollapse(this)">`;
-                        html += `<span class="icon">▶</span>`;
-                        html += `<span class="topic-link" onclick="event.stopPropagation(); googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>`;
-                        html += `</div>`;
-
-                        // Topic content (collapsible)
-                        html += `<div class="topic-content collapsible-content open">`;
+                        html += `<div class="topic-label">
+                                    <span class="topic-link" onclick="googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>
+                                </div>`;
 
                         const subText = t.subtopics || t.topicName || '';
                         const subItems = smartSplit(subText);
@@ -812,23 +731,17 @@
                             html += `<div class="book-ref">📖 <span class="book-link" onclick="googleSearch('${bookSearch.replace(/'/g, "\\'")}')">${t.book}</span></div>`;
                         }
 
-                        html += `</div>`; // end topic-content
-                        html += `</div>`; // end topic-item
+                        html += `</div>`;
                     }
-
-                    html += `</div>`; // end module-content
-                    html += `</div>`; // end module-group
+                    html += `</div>`;
                 }
-
-                html += `</div>`; // end subject-content
-                html += `</div>`; // end paper-block
+                html += `</div>`;
             }
 
             container.innerHTML = html;
             countDisplay.textContent = records.length;
         }
 
-        // ---------- filter ----------
         function applyFilters() {
             const search = searchInput.value.trim().toLowerCase();
             const subject = subjectSelect.value;
@@ -843,7 +756,6 @@
             render(filtered);
         }
 
-        // ---------- populate subject dropdown ----------
         function updateSubjects(records) {
             const subs = new Set();
             records.forEach(r => { if (r.subject) subs.add(r.subject); });
@@ -859,7 +771,6 @@
             else subjectSelect.value = '';
         }
 
-        // ---------- load ----------
         async function load() {
             try {
                 container.innerHTML = `<div class="loading"><span class="spinner"></span> loading…</div>`;
@@ -882,8 +793,6 @@
             }
         }
 
-        // Make functions globally accessible for onclick
-        window.toggleCollapse = toggleCollapse;
         window.googleSearch = googleSearch;
 
         searchInput.addEventListener('input', applyFilters);
