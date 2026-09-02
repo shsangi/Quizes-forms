@@ -142,14 +142,12 @@
             font-weight: 700;
             color: #0b2b4a;
             letter-spacing: -0.2px;
-            border-bottom: 2px solid #dce5f0;
-            padding-bottom: 8px;
-            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: baseline;
             flex-wrap: wrap;
             gap: 4px 8px;
+            padding-bottom: 4px;
         }
         .paper-title .marks {
             font-weight: 500;
@@ -177,20 +175,34 @@
             opacity: 0.5;
         }
 
-        /* last studied date below subject */
+        /* last studied date below subject - PKT format */
         .last-studied {
-            font-size: 0.7rem;
-            color: #3d6185;
+            font-size: 0.72rem;
+            color: #2a4a6a;
             background: #eef3fa;
-            padding: 2px 12px;
+            padding: 4px 14px;
             border-radius: 40px;
             display: inline-block;
-            margin-bottom: 10px;
+            margin: 4px 0 10px 0;
             font-weight: 450;
+            border: 1px solid #dce5ef;
         }
         .last-studied span {
             font-weight: 500;
             color: #1a4a7a;
+        }
+        .last-studied .pkt-badge {
+            font-weight: 400;
+            color: #5a7a9a;
+            font-size: 0.6rem;
+            margin-left: 4px;
+        }
+
+        /* dividing line */
+        .subject-divider {
+            border: none;
+            border-top: 2px solid #dce5f0;
+            margin: 6px 0 12px 0;
         }
 
         .module-group {
@@ -469,19 +481,31 @@
             return parts;
         }
 
-        // ---------- format date nicely ----------
-        function formatDate(dateStr) {
+        // ---------- format date in PKT time ----------
+        function formatDateInPKT(dateStr) {
             if (!dateStr || dateStr.trim() === '') return '';
             try {
                 const d = new Date(dateStr);
                 if (isNaN(d.getTime())) return dateStr;
-                return d.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+                
+                // Convert to PKT (UTC+5)
+                const pktOffset = 5 * 60; // 5 hours in minutes
+                const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+                const pktDate = new Date(utc + (pktOffset * 60000));
+                
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                
+                const day = days[pktDate.getUTCDay()];
+                const month = months[pktDate.getUTCMonth()];
+                const date = pktDate.getUTCDate();
+                const year = pktDate.getUTCFullYear();
+                let hours = pktDate.getUTCHours();
+                const minutes = String(pktDate.getUTCMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                
+                return `${day}, ${date} ${month}, ${year}, ${hours}:${minutes} ${ampm}`;
             } catch (e) {
                 return dateStr;
             }
@@ -526,12 +550,16 @@
                             <span class="marks">${items.length} topics</span>
                         </div>`;
 
-                // Last studied date below subject name
+                // Last studied date in PKT format below subject
                 if (latestDate) {
-                    html += `<div class="last-studied">📅 Last studied: <span>${formatDate(latestDate)}</span></div>`;
+                    const formatted = formatDateInPKT(latestDate);
+                    html += `<div class="last-studied">📅 Last studied: <span>${formatted}</span> <span class="pkt-badge">(PKT)</span></div>`;
                 } else {
-                    html += `<div class="last-studied" style="opacity:0.5;">📅 Not studied yet</div>`;
+                    html += `<div class="last-studied" style="opacity:0.6;">📅 Not studied yet</div>`;
                 }
+
+                // Dividing line
+                html += `<hr class="subject-divider" />`;
 
                 const moduleMap = {};
                 for (const item of items) {
