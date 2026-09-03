@@ -181,7 +181,14 @@
       font-size: 1.05rem;
       margin-bottom: 0.6rem;
       color: #0a212b;
-      pointer-events: none;
+      cursor: pointer;
+      display: inline-block;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .all-q-text:hover {
+      background: #eaf1f8;
     }
     .all-q-text .locked-badge {
       display: inline-block;
@@ -482,7 +489,7 @@
       transition: 0.2s;
       pointer-events: none;
     }
-    .all-q-item:hover .search-badge { opacity: 1; background: #d4e3f0; }
+    .all-q-text:hover .search-badge { opacity: 1; background: #d4e3f0; }
 
     /* Floating Timer Styles */
     .floating-timer {
@@ -988,7 +995,6 @@
         saveState();
       }, 1000);
       
-      // Show floating timer
       floatingTimer.classList.remove('hidden-timer');
     }
 
@@ -996,13 +1002,11 @@
       const mins = Math.floor(timeRemaining / 60), secs = timeRemaining % 60;
       const timeStr = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
       
-      // Update main timer
       timerDisplay.textContent = timeStr;
       timerDisplay.classList.remove('warning','danger');
       if (timeRemaining < 60) timerDisplay.classList.add('danger');
       else if (timeRemaining < 300) timerDisplay.classList.add('warning');
       
-      // Update floating timer
       floatingTimerDisplay.textContent = timeStr;
       floatingTimerDisplay.classList.remove('warning', 'danger');
       if (timeRemaining < 60) floatingTimerDisplay.classList.add('danger');
@@ -1058,6 +1062,12 @@
       }
     }
 
+    function searchQuestionOnGoogle(questionText, event) {
+      if (event) event.stopPropagation();
+      const encodedQuery = encodeURIComponent(questionText);
+      window.open(`https://www.google.com/search?q=${encodedQuery}`, '_blank');
+    }
+
     function renderAllQuestions() {
       allQuestionsContainer.innerHTML = '';
       const letters = ['A','B','C','D'];
@@ -1079,11 +1089,6 @@
           div.classList.add('locked-item');
         }
         
-        div.addEventListener('click', function(e) {
-          if (e.target.closest('.option-btn')) return;
-          searchQuestionOnGoogle(q.question, e);
-        });
-        
         if (isSubmitted || quizCompleted) {
           if (q.correct !== -1) {
             if (answerStatus[idx] === true) div.classList.add('correct-item');
@@ -1098,6 +1103,13 @@
           badge = ' <span class="locked-badge">🔒 locked</span>';
         }
         qText.innerHTML = `${idx+1}. ${q.question}${badge} <span class="search-badge">🔍 search</span>`;
+        
+        // Add click event only to the question text, not the whole card
+        qText.addEventListener('click', function(e) {
+          e.stopPropagation();
+          searchQuestionOnGoogle(q.question, e);
+        });
+        
         div.appendChild(qText);
         
         const optsDiv = document.createElement('div');
@@ -1452,12 +1464,6 @@
 
     function handleRefreshCancel() {
       refreshModal.classList.remove('active');
-    }
-
-    function searchQuestionOnGoogle(questionText, event) {
-      if (event) event.stopPropagation();
-      const encodedQuery = encodeURIComponent(questionText);
-      window.open(`https://www.google.com/search?q=${encodedQuery}`, '_blank');
     }
 
     // Scroll functions for floating timer buttons
