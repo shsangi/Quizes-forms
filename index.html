@@ -595,6 +595,7 @@
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
     let lockedQuestions = [];
+    let originalQuestions = []; // Store original questions without shuffling
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
@@ -626,6 +627,16 @@
     const allAtOnceView = document.getElementById('allAtOnceView');
     const submittedBanner = document.getElementById('submittedBanner');
 
+    // Shuffle function using Fisher-Yates algorithm
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
     }
@@ -651,7 +662,8 @@
           timeRemaining: timeRemaining,
           quizTitleText: quizTitleText,
           totalQuestions: totalQuestions,
-          lockedQuestions: lockedQuestions
+          lockedQuestions: lockedQuestions,
+          originalQuestions: originalQuestions
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -687,10 +699,27 @@
       refreshIcon.classList.remove('refresh-spin');
     }
 
-    function searchQuestionOnGoogle(questionText, event) {
-      if (event) event.stopPropagation();
-      const encodedQuery = encodeURIComponent(questionText);
-      window.open(`https://www.google.com/search?q=${encodedQuery}`, '_blank');
+    function shuffleQuestionsIfNeeded() {
+      // Check if any question has been attempted
+      const hasAttempted = selectedAllAnswers.some(ans => ans !== null);
+      
+      if (!hasAttempted && originalQuestions.length > 0) {
+        // No attempts yet, shuffle options for each question
+        questions = originalQuestions.map(q => {
+          // Create a copy with shuffled options
+          const shuffledOptions = shuffleArray(q.options);
+          // Find the new index of the correct answer
+          const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
+          return {
+            ...q,
+            options: shuffledOptions,
+            correct: newCorrectIndex
+          };
+        });
+      } else {
+        // Keep original order if any question was attempted
+        questions = originalQuestions.map(q => ({...q}));
+      }
     }
 
     function fetchQuestions(forceRefresh = false) {
@@ -700,6 +729,7 @@
         const saved = loadState();
         if (saved && saved.questions && saved.questions.length > 0) {
           questions = saved.questions;
+          originalQuestions = saved.originalQuestions || saved.questions.map(q => ({...q}));
           quizTitleText = saved.quizTitleText || 'Quiz';
           totalQuestions = saved.totalQuestions || questions.length;
           selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
@@ -738,9 +768,21 @@
           .then(csvText => {
             const parsed = parseCSV(csvText);
             if (parsed.questions.length === 0) throw new Error('No data');
-            questions = parsed.questions;
+            originalQuestions = parsed.questions;
             quizTitleText = parsed.title || 'Quiz';
-            totalQuestions = questions.length;
+            totalQuestions = originalQuestions.length;
+            
+            // Shuffle options for fresh start
+            questions = originalQuestions.map(q => {
+              const shuffledOptions = shuffleArray(q.options);
+              const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
+              return {
+                ...q,
+                options: shuffledOptions,
+                correct: newCorrectIndex
+              };
+            });
+            
             answerStatus = new Array(questions.length).fill(null);
             selectedAllAnswers = new Array(questions.length).fill(null);
             lockedQuestions = new Array(questions.length).fill(false);
@@ -770,9 +812,21 @@
         .then(csvText => {
           const parsed = parseCSV(csvText);
           if (parsed.questions.length === 0) throw new Error('No data');
-          questions = parsed.questions;
+          originalQuestions = parsed.questions;
           quizTitleText = parsed.title || 'Quiz';
-          totalQuestions = questions.length;
+          totalQuestions = originalQuestions.length;
+          
+          // Shuffle options for fresh start
+          questions = originalQuestions.map(q => {
+            const shuffledOptions = shuffleArray(q.options);
+            const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
+            return {
+              ...q,
+              options: shuffledOptions,
+              correct: newCorrectIndex
+            };
+          });
+          
           answerStatus = new Array(questions.length).fill(null);
           selectedAllAnswers = new Array(questions.length).fill(null);
           lockedQuestions = new Array(questions.length).fill(false);
@@ -916,10 +970,8 @@
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
         
-        // FIX: Reapply background colors when restoring from saved state
-        // Check if question was answered previously
+        // Reapply background colors when restoring from saved state
         if (selectedAllAnswers[idx] !== null && q.correct !== -1 && !isSubmitted && !quizCompleted) {
-          // Apply correct/wrong background based on previous answer
           if (selectedAllAnswers[idx] === q.correct) {
             div.classList.add('correct-item');
           } else {
@@ -927,7 +979,6 @@
           }
         }
         
-        // If question is locked, add locked class
         if (lockedQuestions[idx]) {
           div.classList.add('locked-item');
         }
@@ -962,12 +1013,11 @@
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
           
-          // FIX: Reapply selected and correct/wrong states on reload
           if (selectedAllAnswers[idx] === optIdx) {
             btn.classList.add('selected-opt');
           }
           
-          // FIX: Show correct/wrong colors on reload even before submit
+          // Show correct/wrong colors on reload even before submit
           if (selectedAllAnswers[idx] !== null && q.correct !== -1 && !isSubmitted && !quizCompleted) {
             if (optIdx === q.correct) {
               btn.classList.add('correct');
@@ -977,7 +1027,6 @@
             }
           }
           
-          // If question is locked, disable the button and add locked class
           if (lockedQuestions[idx]) {
             btn.disabled = true;
             btn.classList.add('locked-btn');
@@ -1003,21 +1052,17 @@
               const parent = this.closest('.all-q-item');
               const btns = parent.querySelectorAll('.option-btn');
               
-              // Lock this question immediately
               lockedQuestions[idx] = true;
               parent.classList.add('locked-item');
               
-              // Disable all buttons in this question
               btns.forEach(b => {
                 b.disabled = true;
                 b.classList.add('locked-btn');
               });
               
-              // Mark selected
               this.classList.add('selected-opt');
               selectedAllAnswers[idx] = optIdx;
               
-              // Show correct/wrong feedback
               btns.forEach(b => {
                 b.classList.remove('correct', 'wrong');
               });
@@ -1039,7 +1084,6 @@
                 }
               }
               
-              // Update the question text to show locked badge
               const qTextEl = parent.querySelector('.all-q-text');
               const badgeSpan = qTextEl.querySelector('.locked-badge');
               if (!badgeSpan) {
@@ -1274,6 +1318,17 @@
       endQuizBtn.disabled = false;
       correctLegend.style.display = 'none';
       wrongLegend.style.display = 'none';
+      
+      // Reshuffle for fresh start
+      questions = originalQuestions.map(q => {
+        const shuffledOptions = shuffleArray(q.options);
+        const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
+        return {
+          ...q,
+          options: shuffledOptions,
+          correct: newCorrectIndex
+        };
+      });
       
       totalCount.textContent = totalQuestions;
       renderAllQuestions();
