@@ -1,3 +1,6 @@
+Can you make this so that when quiz is new no any single selection made or refreshes or first time loads quizes chices should be shuffled
+So only add shufle otions feature and everything is ok:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -594,9 +597,7 @@
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
-    let lockedQuestions = [];
-    // shuffled order per question: array of arrays of option indices
-    let shuffledOrder = [];
+    let lockedQuestions = []; // track which questions are locked
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
@@ -628,22 +629,6 @@
     const allAtOnceView = document.getElementById('allAtOnceView');
     const submittedBanner = document.getElementById('submittedBanner');
 
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
-    function getShuffledOptions(qIdx) {
-      const q = questions[qIdx];
-      if (!q) return [];
-      const indices = q.options.map((_, i) => i);
-      // shuffle a copy
-      return shuffleArray([...indices]);
-    }
-
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
     }
@@ -669,8 +654,7 @@
           timeRemaining: timeRemaining,
           quizTitleText: quizTitleText,
           totalQuestions: totalQuestions,
-          lockedQuestions: lockedQuestions,
-          shuffledOrder: shuffledOrder
+          lockedQuestions: lockedQuestions
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -724,7 +708,6 @@
           selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
           answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
           lockedQuestions = saved.lockedQuestions || new Array(questions.length).fill(false);
-          shuffledOrder = saved.shuffledOrder || questions.map((_, i) => getShuffledOptions(i));
           isSubmitted = saved.isSubmitted || false;
           quizCompleted = saved.quizCompleted || false;
           quizTimedOut = saved.quizTimedOut || false;
@@ -764,8 +747,6 @@
             answerStatus = new Array(questions.length).fill(null);
             selectedAllAnswers = new Array(questions.length).fill(null);
             lockedQuestions = new Array(questions.length).fill(false);
-            // generate fresh shuffled order for all questions
-            shuffledOrder = questions.map((_, i) => getShuffledOptions(i));
             isSubmitted = false;
             quizCompleted = false;
             quizTimedOut = false;
@@ -798,7 +779,6 @@
           answerStatus = new Array(questions.length).fill(null);
           selectedAllAnswers = new Array(questions.length).fill(null);
           lockedQuestions = new Array(questions.length).fill(false);
-          shuffledOrder = questions.map((_, i) => getShuffledOptions(i));
           isSubmitted = false;
           quizCompleted = false;
           quizTimedOut = false;
@@ -939,6 +919,7 @@
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
         
+        // If question is locked, add locked class
         if (lockedQuestions[idx]) {
           div.classList.add('locked-item');
         }
@@ -966,18 +947,14 @@
         
         const optsDiv = document.createElement('div');
         optsDiv.className = 'all-q-options';
-        
-        // use shuffled order if available, otherwise natural order
-        const order = (shuffledOrder && shuffledOrder[idx]) ? shuffledOrder[idx] : q.options.map((_, i) => i);
-        
-        order.forEach((optIdx) => {
-          const opt = q.options[optIdx] || '(Empty)';
+        q.options.forEach((opt, optIdx) => {
           const btn = document.createElement('button');
           btn.className = 'option-btn';
-          btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt}`;
+          btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt || '(Empty)'}`;
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
           
+          // If question is locked, disable the button and add locked class
           if (lockedQuestions[idx]) {
             btn.disabled = true;
             btn.classList.add('locked-btn');
@@ -999,36 +976,40 @@
               btn.classList.add('no-answer-dot');
             }
           } else if (!lockedQuestions[idx]) {
+            // Only add click listener if not locked
             btn.addEventListener('click', function(e) {
               e.stopPropagation();
               if (isSubmitted || quizCompleted) return;
-              if (lockedQuestions[idx]) return;
+              if (lockedQuestions[idx]) return; // Extra safety
               
               const parent = this.closest('.all-q-item');
               const btns = parent.querySelectorAll('.option-btn');
               
+              // Lock this question immediately
               lockedQuestions[idx] = true;
               parent.classList.add('locked-item');
               
+              // Disable all buttons in this question
               btns.forEach(b => {
                 b.disabled = true;
                 b.classList.add('locked-btn');
               });
               
+              // Mark selected
               this.classList.add('selected-opt');
               selectedAllAnswers[idx] = optIdx;
               
+              // Show correct/wrong feedback
               btns.forEach(b => {
                 b.classList.remove('correct', 'wrong');
               });
               
               if (q.correct !== -1) {
                 btns.forEach((b, i) => {
-                  const bIdx = parseInt(b.dataset.optIdx);
-                  if (bIdx === q.correct) {
+                  if (i === q.correct) {
                     b.classList.add('correct');
                   }
-                  if (bIdx === optIdx && optIdx !== q.correct) {
+                  if (i === optIdx && optIdx !== q.correct) {
                     b.classList.add('wrong');
                   }
                 });
@@ -1040,6 +1021,7 @@
                 }
               }
               
+              // Update the question text to show locked badge
               const qTextEl = parent.querySelector('.all-q-text');
               const badgeSpan = qTextEl.querySelector('.locked-badge');
               if (!badgeSpan) {
@@ -1098,9 +1080,8 @@
           b.disabled = true;
           b.classList.remove('selected-opt');
           if (q.correct !== -1) {
-            const bIdx = parseInt(b.dataset.optIdx);
-            if (bIdx === q.correct) b.classList.add('correct');
-            else if (bIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
+            if (optIdx === q.correct) b.classList.add('correct');
+            else if (optIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
               b.classList.add('wrong');
             }
           }
@@ -1261,8 +1242,6 @@
       selectedAllAnswers = new Array(questions.length).fill(null);
       answerStatus = new Array(questions.length).fill(null);
       lockedQuestions = new Array(questions.length).fill(false);
-      // reshuffle all questions for a fresh start
-      shuffledOrder = questions.map((_, i) => getShuffledOptions(i));
       isSubmitted = false;
       quizCompleted = false;
       quizTimedOut = false;
