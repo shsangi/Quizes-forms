@@ -594,7 +594,7 @@
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
-    let lockedQuestions = []; // track which questions are locked
+    let lockedQuestions = [];
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
@@ -625,6 +625,14 @@
     const brandLogo = document.getElementById('brandLogo');
     const allAtOnceView = document.getElementById('allAtOnceView');
     const submittedBanner = document.getElementById('submittedBanner');
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
 
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
@@ -916,7 +924,6 @@
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
         
-        // If question is locked, add locked class
         if (lockedQuestions[idx]) {
           div.classList.add('locked-item');
         }
@@ -944,21 +951,47 @@
         
         const optsDiv = document.createElement('div');
         optsDiv.className = 'all-q-options';
-        q.options.forEach((opt, optIdx) => {
+        
+        // --- SHUFFLE OPTIONS ---
+        let shuffledIndices = [0, 1, 2, 3];
+        shuffleArray(shuffledIndices);
+        const originalOptions = [...q.options];
+        const correctOriginal = q.correct;
+        // Re-map correct index if needed
+        let newCorrect = -1;
+        if (correctOriginal !== -1) {
+          newCorrect = shuffledIndices.indexOf(correctOriginal);
+        }
+        // Store shuffled options and correct index back into question for grading
+        // We'll keep q.options shuffled, but we need to store the mapping for correct answer
+        // We'll also preserve the original options for display, but use shuffled order.
+        const shuffledOptions = shuffledIndices.map(i => originalOptions[i]);
+        // Temporarily replace options and correct for rendering
+        const originalOptionsCopy = [...q.options];
+        const originalCorrect = q.correct;
+        q.options = shuffledOptions;
+        q.correct = newCorrect;
+        
+        shuffledOptions.forEach((opt, optIdx) => {
           const btn = document.createElement('button');
           btn.className = 'option-btn';
           btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt || '(Empty)'}`;
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
           
-          // If question is locked, disable the button and add locked class
           if (lockedQuestions[idx]) {
             btn.disabled = true;
             btn.classList.add('locked-btn');
           }
           
-          if (selectedAllAnswers[idx] === optIdx) {
-            btn.classList.add('selected-opt');
+          if (selectedAllAnswers[idx] !== null) {
+            // selectedAllAnswers stores the original option index, map to shuffled
+            const originalSelected = selectedAllAnswers[idx];
+            // Find the shuffled index that corresponds to the original selected index
+            const shuffledSelected = shuffledIndices.indexOf(originalSelected);
+            if (optIdx === shuffledSelected) {
+              btn.classList.add('selected-opt');
+            }
           }
           
           if (isSubmitted || quizCompleted) {
@@ -973,30 +1006,27 @@
               btn.classList.add('no-answer-dot');
             }
           } else if (!lockedQuestions[idx]) {
-            // Only add click listener if not locked
             btn.addEventListener('click', function(e) {
               e.stopPropagation();
               if (isSubmitted || quizCompleted) return;
-              if (lockedQuestions[idx]) return; // Extra safety
+              if (lockedQuestions[idx]) return;
               
               const parent = this.closest('.all-q-item');
               const btns = parent.querySelectorAll('.option-btn');
               
-              // Lock this question immediately
               lockedQuestions[idx] = true;
               parent.classList.add('locked-item');
               
-              // Disable all buttons in this question
               btns.forEach(b => {
                 b.disabled = true;
                 b.classList.add('locked-btn');
               });
               
-              // Mark selected
               this.classList.add('selected-opt');
-              selectedAllAnswers[idx] = optIdx;
+              // Store original option index (not shuffled)
+              const originalIdx = shuffledIndices[optIdx];
+              selectedAllAnswers[idx] = originalIdx;
               
-              // Show correct/wrong feedback
               btns.forEach(b => {
                 b.classList.remove('correct', 'wrong');
               });
@@ -1018,7 +1048,6 @@
                 }
               }
               
-              // Update the question text to show locked badge
               const qTextEl = parent.querySelector('.all-q-text');
               const badgeSpan = qTextEl.querySelector('.locked-badge');
               if (!badgeSpan) {
@@ -1033,6 +1062,11 @@
           }
           optsDiv.appendChild(btn);
         });
+        
+        // Restore original options and correct for future grading/display consistency
+        q.options = originalOptionsCopy;
+        q.correct = originalCorrect;
+        
         div.appendChild(optsDiv);
         allQuestionsContainer.appendChild(div);
       });
