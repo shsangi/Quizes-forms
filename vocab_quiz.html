@@ -636,10 +636,6 @@
                 </div>
             ` : '';
 
-            // Show synonyms as tags
-            const synonymHtml = q.synonyms && q.synonyms.length > 0 ? 
-                `<div class="flex flex-wrap gap-1 mt-1">${q.synonyms.map(s => `<span class="synonym-tag">${s}</span>`).join('')}</div>` : '';
-
             quizContainerEl.innerHTML = `
                 <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 md:p-8">
                     <div class="flex justify-between items-center mb-4">
@@ -652,7 +648,6 @@
                     
                     <div class="mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">${q.word}</h2>
-                        ${synonymHtml}
                         <div id="urdu-container" class="hidden mt-2">
                             <span class="text-sm text-gray-500 bg-indigo-50 px-3 py-1 rounded-full">${q.urdu || ''}</span>
                         </div>
