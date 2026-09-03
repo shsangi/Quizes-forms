@@ -118,15 +118,6 @@
             background: #fee2e2;
             color: #991b1b;
         }
-        .synonym-tag {
-            display: inline-block;
-            background: #e0e7ff;
-            color: #3730a3;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            margin: 2px 3px 2px 0;
-        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
@@ -323,6 +314,16 @@
             return null;
         }
 
+        // ============ SHUFFLE FUNCTION ============
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
         function loadData() {
             loadingEl.style.display = 'flex';
             errorEl.classList.add('hidden');
@@ -369,7 +370,6 @@
         // ============ READ SYNONYMS FROM COLUMN J ============
         function parseSynonyms(synonymStr) {
             if (!synonymStr || typeof synonymStr !== 'string') return [];
-            // Split by comma, semicolon, or slash, then trim
             return synonymStr.split(/[,;\/]/).map(s => s.trim()).filter(s => s.length > 0);
         }
 
@@ -392,10 +392,9 @@
             const option4Col = findColumn('option4');
             const answerCol = findColumn('answer');
             
-            // Column J is index 9 (0-based), or find by header
             let synonymCol = null;
             if (sheetHeaders.length > 9) {
-                synonymCol = sheetHeaders[9]; // Column J
+                synonymCol = sheetHeaders[9];
                 console.log("Using Column J for synonyms:", synonymCol);
             } else {
                 synonymCol = findColumn('synonym');
@@ -414,7 +413,7 @@
 
             sheetData.forEach(row => {
                 const word = row[wordCol] || '';
-                const options = [
+                const originalOptions = [
                     row[option1Col] || '',
                     row[option2Col] || '',
                     row[option3Col] || '',
@@ -423,7 +422,9 @@
                 
                 const answer = row[answerCol] || '';
                 
-                // Get synonyms from Column J
+                // Shuffle options
+                const shuffledOptions = shuffleArray(originalOptions);
+                
                 const synonymRaw = synonymCol ? row[synonymCol] || '' : '';
                 const synonyms = parseSynonyms(synonymRaw);
                 
@@ -432,10 +433,10 @@
                 const sentence = sentenceCol ? row[sentenceCol] || '' : '';
                 const refLink = refCol ? row[refCol] || '' : '';
 
-                if (word && options.length > 0 && answer) {
+                if (word && shuffledOptions.length > 0 && answer) {
                     quizQuestions.push({
                         word: word,
-                        options: options,
+                        options: shuffledOptions,
                         answer: answer,
                         synonyms: synonyms,
                         antonym: antonym,
@@ -447,8 +448,7 @@
                 }
             });
             
-            console.log(`Built ${quizQuestions.length} quiz questions from Column B`);
-            console.log(`Synonyms loaded from Column J`);
+            console.log(`Built ${quizQuestions.length} quiz questions with shuffled options`);
         }
 
         function retryLoad() { loadData(); }
@@ -744,7 +744,6 @@
                 const badgeClass = isCorrect ? 'correct-badge' : 'wrong-badge';
                 const badgeText = isCorrect ? '✓ Correct' : '✗ Wrong';
                 
-                // Show synonyms in results too
                 const synText = q.synonyms && q.synonyms.length > 0 ? q.synonyms.join(', ') : '';
                 
                 detailsHtml += `
@@ -810,6 +809,15 @@
         }
 
         function resetQuiz() {
+            // Reshuffle options when restarting
+            quizQuestions = quizQuestions.map(q => {
+                const shuffledOptions = shuffleArray(q.options);
+                return {
+                    ...q,
+                    options: shuffledOptions
+                };
+            });
+            
             quizIndex = 0;
             quizScore = 0;
             quizAnswered = false;
