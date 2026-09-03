@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
   <style>
+    /* ... all styles remain the same ... */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
@@ -357,11 +358,10 @@
     .grid-dot.done-dot { background: #2f7b9e; color: white; }
     .grid-dot.correct-dot { background: #1f8b4c; color: white; }
     .grid-dot.wrong-dot { background: #b33c3c; color: white; }
+    .grid-dot.pending-dot { background: #dce6ef; color: #1d4b61; }
     .grid-dot.no-answer-dot { background: #999; color: white; }
     .grid-dot.timeout { background: #6c757d; color: white; opacity: 0.5; }
     .grid-dot.active-dot { border-color: #0b2a3b; transform: scale(1.1); }
-    /* Keep unattempted dots grey */
-    .grid-dot.pending-dot { background: #dce6ef; color: #1d4b61; }
 
     .result-card {
       text-align: center;
@@ -493,7 +493,6 @@
     }
     .all-q-text:hover .search-badge { opacity: 1; background: #d4e3f0; }
 
-    /* Floating Timer Styles */
     .floating-timer {
       position: fixed;
       bottom: 30px;
@@ -638,7 +637,6 @@
     </div>
     <div class="progress-label" id="progressLabel">Attempted: <span class="attempted" id="attemptedCount">0</span> / <span id="totalCount">0</span></div>
 
-    <!-- All questions view -->
     <div id="allAtOnceView">
       <div id="submittedBanner" style="display:none;" class="submitted-header">
         ✅ Submitted — You can review your answers below. Click "End Quiz" to see your final score.
@@ -650,7 +648,6 @@
       </div>
     </div>
 
-    <!-- overview -->
     <div class="overview-section">
       <div class="overview-header">
         <span>OVERVIEW</span>
@@ -664,7 +661,6 @@
       <div class="grid-dots" id="dotGrid"></div>
     </div>
 
-    <!-- Result card -->
     <div class="result-card" id="resultArea">
       <h2>🏁 Quiz Complete</h2>
       <div class="result-score" id="finalScore">0 / 0</div>
@@ -674,7 +670,6 @@
     </div>
   </div>
 
-  <!-- Confirmation Modal -->
   <div class="modal-overlay" id="refreshModal">
     <div class="modal-box">
       <h3>🔄 Refresh Quiz</h3>
@@ -687,7 +682,6 @@
   </div>
 </div>
 
-<!-- Floating Timer -->
 <div class="floating-timer hidden-timer" id="floatingTimer">
   <span class="timer-icon">⏱️</span>
   <span class="timer-display" id="floatingTimerDisplay">00:00</span>
@@ -723,7 +717,6 @@
     const floatingTimerDisplay = document.getElementById('floatingTimerDisplay');
     const floatingTimer = document.getElementById('floatingTimer');
     const quizTitle = document.getElementById('quizTitle');
-    const quizSubtitle = document.getElementById('quizSubtitle');
     const allQuestionsContainer = document.getElementById('allQuestionsContainer');
     const submitBtn = document.getElementById('submitBtn');
     const endQuizBtn = document.getElementById('endQuizBtn');
@@ -1260,9 +1253,20 @@
         const q = questions[i];
         const selected = selectedAllAnswers[i];
         const isCorrect = (selected !== null && selected === q.correct);
-        if (q.correct === -1) { answerStatus[i] = null; continue; }
-        if (isCorrect) { correctCountLocal++; answerStatus[i] = true; }
-        else { answerStatus[i] = false; }
+        if (q.correct === -1) { 
+          answerStatus[i] = null; 
+          continue; 
+        }
+        if (isCorrect) { 
+          correctCountLocal++; 
+          answerStatus[i] = true; 
+        } else if (selected !== null) {
+          // Only mark as wrong if the user actually selected an answer
+          answerStatus[i] = false;
+        } else {
+          // If no answer was selected, keep it as null (pending)
+          answerStatus[i] = null;
+        }
       }
       score = correctCountLocal;
       
@@ -1281,8 +1285,11 @@
           }
         });
         if (q.correct !== -1) {
-          if (answerStatus[idx] === true) item.classList.add('correct-item');
-          else if (answerStatus[idx] === false) item.classList.add('wrong-item');
+          if (answerStatus[idx] === true) {
+            item.classList.add('correct-item');
+          } else if (answerStatus[idx] === false) {
+            item.classList.add('wrong-item');
+          }
         }
       });
       
@@ -1386,7 +1393,6 @@
         const q = questions[i];
         const hasAnswer = selectedAllAnswers[i] !== null;
         
-        // Only show colors after quiz is submitted or completed
         if (isSubmitted || quizCompleted) {
           if (q && q.correct === -1) {
             dot.classList.add('no-answer-dot');
@@ -1399,7 +1405,6 @@
             dot.classList.add('pending-dot');
           }
         } else {
-          // Before submission: show done (blue) for attempted, pending (grey) for unattempted
           if (hasAnswer) {
             dot.classList.add('done-dot');
           } else {
@@ -1423,11 +1428,19 @@
       let done = 0, pending = 0, correct = 0, wrong = 0;
       const total = questions.length;
       for (let i = 0; i < total; i++) {
-        if (selectedAllAnswers[i] !== null) done++;
-        else pending++;
-        if (isSubmitted || quizCompleted) {
-          if (answerStatus[i] === true) correct++;
-          else if (answerStatus[i] === false) wrong++;
+        if (selectedAllAnswers[i] !== null) {
+          done++;
+          // Only count as correct/wrong if submitted/completed AND answered
+          if (isSubmitted || quizCompleted) {
+            if (answerStatus[i] === true) {
+              correct++;
+            } else if (answerStatus[i] === false) {
+              wrong++;
+            }
+            // If answerStatus is null (unanswered), it's not counted as wrong
+          }
+        } else {
+          pending++;
         }
       }
       doneCount.textContent = done;
