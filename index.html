@@ -484,6 +484,90 @@
     }
     .all-q-item:hover .search-badge { opacity: 1; background: #d4e3f0; }
 
+    /* Floating Timer Styles */
+    .floating-timer {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #0b2a3b;
+      color: white;
+      padding: 14px 20px;
+      border-radius: 60px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 999;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      background: rgba(11, 42, 59, 0.95);
+    }
+    .floating-timer:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+    .floating-timer .timer-icon {
+      font-size: 1.2rem;
+    }
+    .floating-timer .timer-display {
+      font-weight: 700;
+      font-size: 1.2rem;
+      font-variant-numeric: tabular-nums;
+      min-width: 60px;
+      letter-spacing: 0.5px;
+    }
+    .floating-timer .timer-display.warning { color: #ffd93d; }
+    .floating-timer .timer-display.danger { color: #ff6b6b; animation: pulse 1s infinite; }
+    .floating-timer .scroll-top-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .floating-timer .scroll-top-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.1);
+    }
+    .floating-timer .scroll-bottom-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .floating-timer .scroll-bottom-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.1);
+    }
+    .floating-timer .divider {
+      width: 1px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .floating-timer.hidden-timer {
+      display: none;
+    }
+
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
@@ -498,6 +582,19 @@
       .action-bar { flex-direction: column; }
       .btn-primary, .btn-success { width: 100%; justify-content: center; }
       .modal-box { padding: 1.5rem 1.2rem; }
+      .floating-timer {
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 14px;
+        gap: 10px;
+      }
+      .floating-timer .timer-display { font-size: 1rem; min-width: 50px; }
+      .floating-timer .scroll-top-btn,
+      .floating-timer .scroll-bottom-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
@@ -577,6 +674,15 @@
   </div>
 </div>
 
+<!-- Floating Timer -->
+<div class="floating-timer hidden-timer" id="floatingTimer">
+  <span class="timer-icon">⏱️</span>
+  <span class="timer-display" id="floatingTimerDisplay">00:00</span>
+  <div class="divider"></div>
+  <button class="scroll-top-btn" id="scrollTopBtn" title="Scroll to top">⬆</button>
+  <button class="scroll-bottom-btn" id="scrollBottomBtn" title="Scroll to bottom">⬇</button>
+</div>
+
 <script>
   (function() {
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
@@ -595,12 +701,14 @@
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
     let lockedQuestions = [];
-    let originalQuestions = []; // Store original questions without shuffling
+    let originalQuestions = [];
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
     const totalCount = document.getElementById('totalCount');
     const timerDisplay = document.getElementById('timerDisplay');
+    const floatingTimerDisplay = document.getElementById('floatingTimerDisplay');
+    const floatingTimer = document.getElementById('floatingTimer');
     const quizTitle = document.getElementById('quizTitle');
     const quizSubtitle = document.getElementById('quizSubtitle');
     const allQuestionsContainer = document.getElementById('allQuestionsContainer');
@@ -626,8 +734,9 @@
     const brandLogo = document.getElementById('brandLogo');
     const allAtOnceView = document.getElementById('allAtOnceView');
     const submittedBanner = document.getElementById('submittedBanner');
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    const scrollBottomBtn = document.getElementById('scrollBottomBtn');
 
-    // Shuffle function using Fisher-Yates algorithm
     function shuffleArray(array) {
       const shuffled = [...array];
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -691,35 +800,13 @@
       refreshBtn.disabled = true;
       refreshIcon.textContent = '⟳';
       refreshIcon.classList.add('refresh-spin');
+      floatingTimer.classList.add('hidden-timer');
     }
 
     function hideLoading() {
       refreshBtn.disabled = false;
       refreshIcon.textContent = '🔄';
       refreshIcon.classList.remove('refresh-spin');
-    }
-
-    function shuffleQuestionsIfNeeded() {
-      // Check if any question has been attempted
-      const hasAttempted = selectedAllAnswers.some(ans => ans !== null);
-      
-      if (!hasAttempted && originalQuestions.length > 0) {
-        // No attempts yet, shuffle options for each question
-        questions = originalQuestions.map(q => {
-          // Create a copy with shuffled options
-          const shuffledOptions = shuffleArray(q.options);
-          // Find the new index of the correct answer
-          const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
-          return {
-            ...q,
-            options: shuffledOptions,
-            correct: newCorrectIndex
-          };
-        });
-      } else {
-        // Keep original order if any question was attempted
-        questions = originalQuestions.map(q => ({...q}));
-      }
     }
 
     function fetchQuestions(forceRefresh = false) {
@@ -772,7 +859,6 @@
             quizTitleText = parsed.title || 'Quiz';
             totalQuestions = originalQuestions.length;
             
-            // Shuffle options for fresh start
             questions = originalQuestions.map(q => {
               const shuffledOptions = shuffleArray(q.options);
               const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
@@ -816,7 +902,6 @@
           quizTitleText = parsed.title || 'Quiz';
           totalQuestions = originalQuestions.length;
           
-          // Shuffle options for fresh start
           questions = originalQuestions.map(q => {
             const shuffledOptions = shuffleArray(q.options);
             const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
@@ -902,14 +987,26 @@
         if (timeRemaining <= 0) { clearInterval(timerInterval); timerInterval = null; handleTimeout(); }
         saveState();
       }, 1000);
+      
+      // Show floating timer
+      floatingTimer.classList.remove('hidden-timer');
     }
 
     function updateTimerDisplay() {
       const mins = Math.floor(timeRemaining / 60), secs = timeRemaining % 60;
-      timerDisplay.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      const timeStr = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      
+      // Update main timer
+      timerDisplay.textContent = timeStr;
       timerDisplay.classList.remove('warning','danger');
       if (timeRemaining < 60) timerDisplay.classList.add('danger');
       else if (timeRemaining < 300) timerDisplay.classList.add('warning');
+      
+      // Update floating timer
+      floatingTimerDisplay.textContent = timeStr;
+      floatingTimerDisplay.classList.remove('warning', 'danger');
+      if (timeRemaining < 60) floatingTimerDisplay.classList.add('danger');
+      else if (timeRemaining < 300) floatingTimerDisplay.classList.add('warning');
     }
 
     function handleTimeout() {
@@ -970,7 +1067,6 @@
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
         
-        // Reapply background colors when restoring from saved state
         if (selectedAllAnswers[idx] !== null && q.correct !== -1 && !isSubmitted && !quizCompleted) {
           if (selectedAllAnswers[idx] === q.correct) {
             div.classList.add('correct-item');
@@ -1017,7 +1113,6 @@
             btn.classList.add('selected-opt');
           }
           
-          // Show correct/wrong colors on reload even before submit
           if (selectedAllAnswers[idx] !== null && q.correct !== -1 && !isSubmitted && !quizCompleted) {
             if (optIdx === q.correct) {
               btn.classList.add('correct');
@@ -1189,6 +1284,8 @@
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       allAtOnceView.style.display = 'none';
       resultArea.style.display = 'block';
+      floatingTimer.classList.add('hidden-timer');
+      
       const total = questions.length;
       finalScore.textContent = `${score} / ${total}`;
       progressFill.style.width = '100%';
@@ -1319,7 +1416,6 @@
       correctLegend.style.display = 'none';
       wrongLegend.style.display = 'none';
       
-      // Reshuffle for fresh start
       questions = originalQuestions.map(q => {
         const shuffledOptions = shuffleArray(q.options);
         const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
@@ -1358,6 +1454,21 @@
       refreshModal.classList.remove('active');
     }
 
+    function searchQuestionOnGoogle(questionText, event) {
+      if (event) event.stopPropagation();
+      const encodedQuery = encodeURIComponent(questionText);
+      window.open(`https://www.google.com/search?q=${encodedQuery}`, '_blank');
+    }
+
+    // Scroll functions for floating timer buttons
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function scrollToBottom() {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
     refreshModal.addEventListener('click', function(e) {
       if (e.target === this) {
         refreshModal.classList.remove('active');
@@ -1370,6 +1481,8 @@
     refreshBtn.addEventListener('click', handleRefreshClick);
     modalConfirm.addEventListener('click', handleRefreshConfirm);
     modalCancel.addEventListener('click', handleRefreshCancel);
+    scrollTopBtn.addEventListener('click', scrollToTop);
+    scrollBottomBtn.addEventListener('click', scrollToBottom);
 
     fetchQuestions(false);
   })();
