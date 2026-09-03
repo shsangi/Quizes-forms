@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -596,7 +594,7 @@
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
-    let lockedQuestions = []; // track which questions are locked
+    let lockedQuestions = [];
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
@@ -918,6 +916,17 @@
         div.dataset.qIdx = idx;
         div.id = `question-${idx}`;
         
+        // FIX: Reapply background colors when restoring from saved state
+        // Check if question was answered previously
+        if (selectedAllAnswers[idx] !== null && q.correct !== -1 && !isSubmitted && !quizCompleted) {
+          // Apply correct/wrong background based on previous answer
+          if (selectedAllAnswers[idx] === q.correct) {
+            div.classList.add('correct-item');
+          } else {
+            div.classList.add('wrong-item');
+          }
+        }
+        
         // If question is locked, add locked class
         if (lockedQuestions[idx]) {
           div.classList.add('locked-item');
@@ -953,14 +962,25 @@
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
           
+          // FIX: Reapply selected and correct/wrong states on reload
+          if (selectedAllAnswers[idx] === optIdx) {
+            btn.classList.add('selected-opt');
+          }
+          
+          // FIX: Show correct/wrong colors on reload even before submit
+          if (selectedAllAnswers[idx] !== null && q.correct !== -1 && !isSubmitted && !quizCompleted) {
+            if (optIdx === q.correct) {
+              btn.classList.add('correct');
+            }
+            if (optIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
+              btn.classList.add('wrong');
+            }
+          }
+          
           // If question is locked, disable the button and add locked class
           if (lockedQuestions[idx]) {
             btn.disabled = true;
             btn.classList.add('locked-btn');
-          }
-          
-          if (selectedAllAnswers[idx] === optIdx) {
-            btn.classList.add('selected-opt');
           }
           
           if (isSubmitted || quizCompleted) {
@@ -975,11 +995,10 @@
               btn.classList.add('no-answer-dot');
             }
           } else if (!lockedQuestions[idx]) {
-            // Only add click listener if not locked
             btn.addEventListener('click', function(e) {
               e.stopPropagation();
               if (isSubmitted || quizCompleted) return;
-              if (lockedQuestions[idx]) return; // Extra safety
+              if (lockedQuestions[idx]) return;
               
               const parent = this.closest('.all-q-item');
               const btns = parent.querySelectorAll('.option-btn');
