@@ -242,31 +242,45 @@
 
         // ============ SORTING FUNCTION ============
         function sortDataDescending(data, headers) {
-            // Find the first column (index 0)
             const firstCol = headers[0] || 'srno';
-            
-            // Create a copy of the data to sort
             const sortedData = [...data];
             
             sortedData.sort((a, b) => {
-                // Get values from the first column
                 let valA = a[firstCol] !== undefined && a[firstCol] !== null ? String(a[firstCol]).trim() : '';
                 let valB = b[firstCol] !== undefined && b[firstCol] !== null ? String(b[firstCol]).trim() : '';
                 
-                // Try to parse as numbers for numeric sorting
                 const numA = parseFloat(valA);
                 const numB = parseFloat(valB);
                 
                 if (!isNaN(numA) && !isNaN(numB)) {
-                    // Both are numbers - sort descending (larger first)
                     return numB - numA;
                 } else {
-                    // Fallback to string comparison (descending)
                     return valB.localeCompare(valA);
                 }
             });
             
             return sortedData;
+        }
+
+        // ============ IMPROVED COLUMN DETECTION ============
+        function findColumn(keyword) {
+            const lowerKeyword = keyword.toLowerCase();
+            
+            // First try exact match
+            for (let h of sheetHeaders) {
+                if (h.toLowerCase() === lowerKeyword) {
+                    return h;
+                }
+            }
+            
+            // Then try contains match
+            for (let h of sheetHeaders) {
+                if (h.toLowerCase().includes(lowerKeyword)) {
+                    return h;
+                }
+            }
+            
+            return null;
         }
 
         function loadData() {
@@ -313,9 +327,22 @@
             });
         }
 
+        // ============ FIXED: QUIZ FROM COLUMN B ============
         function buildQuizQuestions() {
             quizQuestions = [];
-            const wordCol = findColumn('word');
+            
+            // COLUMN B (index 1) contains the questions
+            // If there's no second column, fallback to finding 'word' column
+            let wordCol = null;
+            if (sheetHeaders.length > 1) {
+                wordCol = sheetHeaders[1]; // Column B is the second column
+                console.log("Using Column B for questions:", wordCol);
+            } else {
+                wordCol = findColumn('word');
+                console.log("Using 'word' column:", wordCol);
+            }
+            
+            // Find other columns
             const option1Col = findColumn('option1');
             const option2Col = findColumn('option2');
             const option3Col = findColumn('option3');
@@ -324,6 +351,7 @@
             
             if (!wordCol || !option1Col || !answerCol) {
                 console.warn('Quiz columns not found. Skipping quiz.');
+                console.log('wordCol:', wordCol, 'option1Col:', option1Col, 'answerCol:', answerCol);
                 return;
             }
 
@@ -338,11 +366,19 @@
                 ].filter(o => o.trim() !== '');
                 
                 const answer = row[answerCol] || '';
-                const synonym = row[findColumn('synonym')] || '';
-                const antonym = row[findColumn('antonym')] || '';
-                const urdu = row[findColumn('urdu meaning')] || '';
-                const sentence = row[findColumn('sentence usage')] || '';
-                const refLink = row[findColumn('ref link')] || '';
+                
+                // Find additional details columns
+                const synonymCol = findColumn('synonym');
+                const antonymCol = findColumn('antonym');
+                const urduCol = findColumn('urdu meaning');
+                const sentenceCol = findColumn('sentence usage');
+                const refCol = findColumn('ref link');
+                
+                const synonym = synonymCol ? row[synonymCol] || '' : '';
+                const antonym = antonymCol ? row[antonymCol] || '' : '';
+                const urdu = urduCol ? row[urduCol] || '' : '';
+                const sentence = sentenceCol ? row[sentenceCol] || '' : '';
+                const refLink = refCol ? row[refCol] || '' : '';
 
                 if (word && options.length > 0 && answer) {
                     quizQuestions.push({
@@ -357,16 +393,8 @@
                     });
                 }
             });
-        }
-
-        function findColumn(keyword) {
-            const lowerKeyword = keyword.toLowerCase();
-            for (let h of sheetHeaders) {
-                if (h.toLowerCase().includes(lowerKeyword)) {
-                    return h;
-                }
-            }
-            return null;
+            
+            console.log(`Built ${quizQuestions.length} quiz questions from Column B`);
         }
 
         function retryLoad() { loadData(); }
@@ -424,7 +452,6 @@
             tableHeadEl.innerHTML = headerHtml;
 
             let bodyHtml = '';
-            // Data is already sorted, just render it
             sheetData.forEach((row, index) => {
                 const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/60';
                 bodyHtml += `<tr class="${rowBg} hover:bg-indigo-50/50 transition-colors">`;
@@ -444,7 +471,6 @@
             const colA = sheetHeaders[0] || 'Item';
             const colB = sheetHeaders.length > 1 ? sheetHeaders[1] : sheetHeaders[0];
             
-            // Data is already sorted, just render it
             sheetData.forEach((row, index) => {
                 const valueA = row[colA] !== undefined && row[colA] !== null ? row[colA] : '';
                 const valueB = row[colB] !== undefined && row[colB] !== null ? row[colB] : '';
@@ -521,6 +547,7 @@
                         <i class="fas fa-book-open text-4xl text-gray-300 mb-4"></i>
                         <h3 class="text-lg font-semibold text-gray-700">No Quiz Questions Found</h3>
                         <p class="text-sm text-gray-500 mt-2">Make sure your sheet has columns: word, option1, option2, option3, option4, answer</p>
+                        <p class="text-xs text-gray-400 mt-2">Column B should contain the questions</p>
                     </div>
                 `;
                 return;
