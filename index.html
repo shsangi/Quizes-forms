@@ -595,7 +595,8 @@
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
     let lockedQuestions = [];
-    let originalOptionOrder = []; // store original order for each question
+    // shuffled order per question: array of arrays of option indices
+    let shuffledOrder = [];
 
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
@@ -627,6 +628,22 @@
     const allAtOnceView = document.getElementById('allAtOnceView');
     const submittedBanner = document.getElementById('submittedBanner');
 
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function getShuffledOptions(qIdx) {
+      const q = questions[qIdx];
+      if (!q) return [];
+      const indices = q.options.map((_, i) => i);
+      // shuffle a copy
+      return shuffleArray([...indices]);
+    }
+
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
     }
@@ -653,7 +670,7 @@
           quizTitleText: quizTitleText,
           totalQuestions: totalQuestions,
           lockedQuestions: lockedQuestions,
-          originalOptionOrder: originalOptionOrder
+          shuffledOrder: shuffledOrder
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -695,15 +712,6 @@
       window.open(`https://www.google.com/search?q=${encodedQuery}`, '_blank');
     }
 
-    // Shuffle function using Fisher-Yates
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
     function fetchQuestions(forceRefresh = false) {
       showLoading();
       
@@ -716,7 +724,7 @@
           selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
           answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
           lockedQuestions = saved.lockedQuestions || new Array(questions.length).fill(false);
-          originalOptionOrder = saved.originalOptionOrder || questions.map(q => q.options.map((_, i) => i));
+          shuffledOrder = saved.shuffledOrder || questions.map((_, i) => getShuffledOptions(i));
           isSubmitted = saved.isSubmitted || false;
           quizCompleted = saved.quizCompleted || false;
           quizTimedOut = saved.quizTimedOut || false;
@@ -756,15 +764,8 @@
             answerStatus = new Array(questions.length).fill(null);
             selectedAllAnswers = new Array(questions.length).fill(null);
             lockedQuestions = new Array(questions.length).fill(false);
-            // Store original order and shuffle options if no attempts
-            originalOptionOrder = questions.map((q, idx) => {
-              const indices = q.options.map((_, i) => i);
-              // shuffle only if no previous attempts (fresh quiz)
-              if (getAttemptedCount() === 0) {
-                shuffleArray(indices);
-              }
-              return indices;
-            });
+            // generate fresh shuffled order for all questions
+            shuffledOrder = questions.map((_, i) => getShuffledOptions(i));
             isSubmitted = false;
             quizCompleted = false;
             quizTimedOut = false;
@@ -797,15 +798,7 @@
           answerStatus = new Array(questions.length).fill(null);
           selectedAllAnswers = new Array(questions.length).fill(null);
           lockedQuestions = new Array(questions.length).fill(false);
-          // Store original order and shuffle options if no attempts
-          originalOptionOrder = questions.map((q, idx) => {
-            const indices = q.options.map((_, i) => i);
-            // shuffle only if no previous attempts (fresh quiz)
-            if (getAttemptedCount() === 0) {
-              shuffleArray(indices);
-            }
-            return indices;
-          });
+          shuffledOrder = questions.map((_, i) => getShuffledOptions(i));
           isSubmitted = false;
           quizCompleted = false;
           quizTimedOut = false;
@@ -974,13 +967,14 @@
         const optsDiv = document.createElement('div');
         optsDiv.className = 'all-q-options';
         
-        // Use the shuffled order if available, else use original
-        const order = originalOptionOrder[idx] || q.options.map((_, i) => i);
+        // use shuffled order if available, otherwise natural order
+        const order = (shuffledOrder && shuffledOrder[idx]) ? shuffledOrder[idx] : q.options.map((_, i) => i);
+        
         order.forEach((optIdx) => {
-          const opt = q.options[optIdx];
+          const opt = q.options[optIdx] || '(Empty)';
           const btn = document.createElement('button');
           btn.className = 'option-btn';
-          btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt || '(Empty)'}`;
+          btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt}`;
           btn.dataset.qIdx = idx;
           btn.dataset.optIdx = optIdx;
           
@@ -1030,11 +1024,11 @@
               
               if (q.correct !== -1) {
                 btns.forEach((b, i) => {
-                  const bOptIdx = parseInt(b.dataset.optIdx);
-                  if (bOptIdx === q.correct) {
+                  const bIdx = parseInt(b.dataset.optIdx);
+                  if (bIdx === q.correct) {
                     b.classList.add('correct');
                   }
-                  if (bOptIdx === optIdx && optIdx !== q.correct) {
+                  if (bIdx === optIdx && optIdx !== q.correct) {
                     b.classList.add('wrong');
                   }
                 });
@@ -1104,8 +1098,9 @@
           b.disabled = true;
           b.classList.remove('selected-opt');
           if (q.correct !== -1) {
-            if (optIdx === q.correct) b.classList.add('correct');
-            else if (optIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
+            const bIdx = parseInt(b.dataset.optIdx);
+            if (bIdx === q.correct) b.classList.add('correct');
+            else if (bIdx === selectedAllAnswers[idx] && selectedAllAnswers[idx] !== q.correct) {
               b.classList.add('wrong');
             }
           }
@@ -1266,14 +1261,8 @@
       selectedAllAnswers = new Array(questions.length).fill(null);
       answerStatus = new Array(questions.length).fill(null);
       lockedQuestions = new Array(questions.length).fill(false);
-      // Reset order - shuffle only if no attempts
-      originalOptionOrder = questions.map((q, idx) => {
-        const indices = q.options.map((_, i) => i);
-        if (getAttemptedCount() === 0) {
-          shuffleArray(indices);
-        }
-        return indices;
-      });
+      // reshuffle all questions for a fresh start
+      shuffledOrder = questions.map((_, i) => getShuffledOptions(i));
       isSubmitted = false;
       quizCompleted = false;
       quizTimedOut = false;
