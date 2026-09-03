@@ -84,36 +84,6 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .detail-item {
-            background: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border-left: 3px solid #818cf8;
-            margin-bottom: 6px;
-        }
-        .detail-item:last-child { margin-bottom: 0; }
-        .detail-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #6b7280;
-            font-weight: 600;
-        }
-        .detail-value {
-            color: #1f2937;
-            font-weight: 500;
-            margin-top: 2px;
-        }
-        .synonym-tag {
-            display: inline-block;
-            background: #eef2ff;
-            color: #4338ca;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin: 2px 4px 2px 0;
-        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
@@ -157,14 +127,14 @@
             </div>
         </div>
 
-        <!-- Quiz View -->
+        <!-- Quiz View (default) -->
         <div id="quiz-view">
             <div id="quiz-container" class="quiz-card">
                 <!-- Quiz content injected here -->
             </div>
         </div>
 
-        <!-- Vocab View -->
+        <!-- Vocab View (formerly Cards) -->
         <div id="vocab-view" class="hidden grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
             <!-- Vocab cards injected here -->
         </div>
@@ -337,8 +307,6 @@
 
                     sheetHeaders = Object.keys(rawData[0]).filter(h => h && h.trim() !== '');
                     
-                    console.log("All column headers:", sheetHeaders);
-                    
                     // Sort data descending by first column (srno)
                     sheetData = sortDataDescending(rawData, sheetHeaders);
 
@@ -359,11 +327,12 @@
             });
         }
 
-        // ============ FIXED: QUIZ FROM COLUMN B WITH ALL DETAILS ============
+        // ============ FIXED: QUIZ FROM COLUMN B ============
         function buildQuizQuestions() {
             quizQuestions = [];
             
             // COLUMN B (index 1) contains the questions
+            // If there's no second column, fallback to finding 'word' column
             let wordCol = null;
             if (sheetHeaders.length > 1) {
                 wordCol = sheetHeaders[1]; // Column B is the second column
@@ -373,24 +342,12 @@
                 console.log("Using 'word' column:", wordCol);
             }
             
-            // Find all columns for quiz details
+            // Find other columns
             const option1Col = findColumn('option1');
             const option2Col = findColumn('option2');
             const option3Col = findColumn('option3');
             const option4Col = findColumn('option4');
             const answerCol = findColumn('answer');
-            
-            // Find all detail columns - including synonyms from Column J
-            const synonymCol = findColumn('synonym');
-            const antonymCol = findColumn('antonym');
-            const urduCol = findColumn('urdu meaning');
-            const sentenceCol = findColumn('sentence usage');
-            const refCol = findColumn('ref link');
-            const meaningCol = findColumn('meaning');
-            const definitionCol = findColumn('definition');
-            
-            console.log("Synonym column found:", synonymCol);
-            console.log("All columns for details:", { synonymCol, antonymCol, urduCol, sentenceCol, refCol });
             
             if (!wordCol || !option1Col || !answerCol) {
                 console.warn('Quiz columns not found. Skipping quiz.');
@@ -410,14 +367,18 @@
                 
                 const answer = row[answerCol] || '';
                 
-                // Get all details from columns
+                // Find additional details columns
+                const synonymCol = findColumn('synonym');
+                const antonymCol = findColumn('antonym');
+                const urduCol = findColumn('urdu meaning');
+                const sentenceCol = findColumn('sentence usage');
+                const refCol = findColumn('ref link');
+                
                 const synonym = synonymCol ? row[synonymCol] || '' : '';
                 const antonym = antonymCol ? row[antonymCol] || '' : '';
                 const urdu = urduCol ? row[urduCol] || '' : '';
                 const sentence = sentenceCol ? row[sentenceCol] || '' : '';
                 const refLink = refCol ? row[refCol] || '' : '';
-                const meaning = meaningCol ? row[meaningCol] || '' : '';
-                const definition = definitionCol ? row[definitionCol] || '' : '';
 
                 if (word && options.length > 0 && answer) {
                     quizQuestions.push({
@@ -428,17 +389,12 @@
                         antonym: antonym,
                         urdu: urdu,
                         sentence: sentence,
-                        refLink: refLink,
-                        meaning: meaning,
-                        definition: definition
+                        refLink: refLink
                     });
                 }
             });
             
             console.log(`Built ${quizQuestions.length} quiz questions from Column B`);
-            if (quizQuestions.length > 0) {
-                console.log("First question details:", quizQuestions[0]);
-            }
         }
 
         function retryLoad() { loadData(); }
@@ -619,11 +575,9 @@
 
             const refLink = q.refLink && q.refLink.trim() !== '' ? q.refLink : '';
             const refHtml = refLink ? `
-                <div class="detail-item">
-                    <div class="detail-label"><i class="fas fa-link mr-1"></i> Reference</div>
-                    <div class="detail-value">
-                        <a href="${refLink.startsWith('http') ? refLink : 'https://' + refLink}" target="_blank" class="url-link">${refLink}</a>
-                    </div>
+                <div class="mt-2 text-xs text-gray-400 flex items-center gap-2">
+                    <i class="fas fa-link"></i>
+                    <a href="${refLink.startsWith('http') ? refLink : 'https://' + refLink}" target="_blank" class="url-link">Reference</a>
                 </div>
             ` : '';
 
@@ -639,7 +593,9 @@
                     
                     <div class="mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">${q.word}</h2>
-                        ${q.urdu ? `<div class="mt-1 text-sm text-gray-500"><span class="bg-indigo-50 px-3 py-1 rounded-full">${q.urdu}</span></div>` : ''}
+                        <div id="urdu-container" class="hidden mt-2">
+                            <span class="text-sm text-gray-500 bg-indigo-50 px-3 py-1 rounded-full">${q.urdu || ''}</span>
+                        </div>
                     </div>
                     
                     <div class="space-y-2.5" id="quiz-options">
@@ -647,45 +603,11 @@
                     </div>
                     
                     <div id="quiz-details" class="mt-4 hidden details-fade">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <h4 class="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
-                                <i class="fas fa-info-circle text-indigo-500"></i> Details
-                            </h4>
-                            <div class="space-y-2">
-                                ${q.synonym ? `
-                                    <div class="detail-item">
-                                        <div class="detail-label"><i class="fas fa-exchange-alt mr-1"></i> Synonyms</div>
-                                        <div class="detail-value">
-                                            ${q.synonym.split(',').map(s => `<span class="synonym-tag">${s.trim()}</span>`).join('')}
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                ${q.antonym ? `
-                                    <div class="detail-item" style="border-left-color: #f87171;">
-                                        <div class="detail-label"><i class="fas fa-arrows-alt-h mr-1"></i> Antonyms</div>
-                                        <div class="detail-value">${q.antonym}</div>
-                                    </div>
-                                ` : ''}
-                                ${q.meaning ? `
-                                    <div class="detail-item" style="border-left-color: #34d399;">
-                                        <div class="detail-label"><i class="fas fa-book mr-1"></i> Meaning</div>
-                                        <div class="detail-value">${q.meaning}</div>
-                                    </div>
-                                ` : ''}
-                                ${q.definition ? `
-                                    <div class="detail-item" style="border-left-color: #60a5fa;">
-                                        <div class="detail-label"><i class="fas fa-file-alt mr-1"></i> Definition</div>
-                                        <div class="detail-value">${q.definition}</div>
-                                    </div>
-                                ` : ''}
-                                ${q.sentence ? `
-                                    <div class="detail-item" style="border-left-color: #fbbf24;">
-                                        <div class="detail-label"><i class="fas fa-quote-right mr-1"></i> Example Sentence</div>
-                                        <div class="detail-value">"${q.sentence}"</div>
-                                    </div>
-                                ` : ''}
-                                ${refHtml}
-                            </div>
+                        <div class="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+                            ${q.synonym ? `<div><span class="font-medium text-gray-500">Synonym:</span> <span class="text-gray-700">${q.synonym}</span></div>` : ''}
+                            ${q.antonym ? `<div><span class="font-medium text-gray-500">Antonym:</span> <span class="text-gray-700">${q.antonym}</span></div>` : ''}
+                            ${q.sentence ? `<div><span class="font-medium text-gray-500">Example:</span> <span class="text-gray-700">"${q.sentence}"</span></div>` : ''}
+                            ${refHtml}
                         </div>
                         <button onclick="nextQuizQuestion()" 
                                 class="mt-4 w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all flex items-center justify-center gap-2">
@@ -707,6 +629,11 @@
             
             if (isCorrect) quizScore++;
             
+            const urduContainer = document.getElementById('urdu-container');
+            if (urduContainer && q.urdu) {
+                urduContainer.classList.remove('hidden');
+            }
+            
             const allOpts = document.querySelectorAll('.quiz-option');
             allOpts.forEach((el, i) => {
                 const opt = q.options[i];
@@ -720,4 +647,62 @@
                     el.classList.add('correct');
                 }
                 el.style.cursor = 'default';
-                el.onclick = null
+                el.onclick = null;
+            });
+            
+            quizAnswered = true;
+            document.getElementById('quiz-details').classList.remove('hidden');
+            document.getElementById('quiz-details').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function nextQuizQuestion() {
+            quizIndex++;
+            renderQuiz();
+        }
+
+        function showQuizResults() {
+            const total = quizQuestions.length;
+            const pct = Math.round((quizScore / total) * 100);
+            let emoji = '😢';
+            let color = 'text-red-600';
+            if (pct >= 90) { emoji = '🎉'; color = 'text-green-600'; }
+            else if (pct >= 70) { emoji = '😊'; color = 'text-blue-600'; }
+            else if (pct >= 50) { emoji = '🤔'; color = 'text-yellow-600'; }
+            
+            quizContainerEl.innerHTML = `
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-8 text-center max-w-lg mx-auto">
+                    <div class="text-5xl mb-4">${emoji}</div>
+                    <h2 class="text-2xl font-bold text-gray-800">Quiz Complete!</h2>
+                    <div class="mt-4">
+                        <span class="text-4xl font-extrabold ${color}">${quizScore}</span>
+                        <span class="text-xl text-gray-400"> / ${total}</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">${pct}% correct</p>
+                    
+                    <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+                        <button onclick="resetQuiz()" 
+                                class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-redo"></i> Restart Quiz
+                        </button>
+                        <button onclick="switchView('vocab')" 
+                                class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-th-large"></i> View Vocab
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetQuiz() {
+            quizIndex = 0;
+            quizScore = 0;
+            renderQuiz();
+        }
+        window.resetQuiz = resetQuiz;
+        window.selectQuizOption = selectQuizOption;
+        window.nextQuizQuestion = nextQuizQuestion;
+
+        loadData();
+    </script>
+</body>
+</html>
