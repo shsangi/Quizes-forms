@@ -84,6 +84,12 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .btn-score {
+            background: #10b981;
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-score:hover { background: #059669; transform: scale(1.02); }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
@@ -266,14 +272,12 @@
         function findColumn(keyword) {
             const lowerKeyword = keyword.toLowerCase();
             
-            // First try exact match
             for (let h of sheetHeaders) {
                 if (h.toLowerCase() === lowerKeyword) {
                     return h;
                 }
             }
             
-            // Then try contains match
             for (let h of sheetHeaders) {
                 if (h.toLowerCase().includes(lowerKeyword)) {
                     return h;
@@ -307,7 +311,6 @@
 
                     sheetHeaders = Object.keys(rawData[0]).filter(h => h && h.trim() !== '');
                     
-                    // Sort data descending by first column (srno)
                     sheetData = sortDataDescending(rawData, sheetHeaders);
 
                     tableCountEl.textContent = sheetData.length + ' rows';
@@ -331,18 +334,15 @@
         function buildQuizQuestions() {
             quizQuestions = [];
             
-            // COLUMN B (index 1) contains the questions
-            // If there's no second column, fallback to finding 'word' column
             let wordCol = null;
             if (sheetHeaders.length > 1) {
-                wordCol = sheetHeaders[1]; // Column B is the second column
+                wordCol = sheetHeaders[1]; // Column B
                 console.log("Using Column B for questions:", wordCol);
             } else {
                 wordCol = findColumn('word');
                 console.log("Using 'word' column:", wordCol);
             }
             
-            // Find other columns
             const option1Col = findColumn('option1');
             const option2Col = findColumn('option2');
             const option3Col = findColumn('option3');
@@ -355,7 +355,6 @@
                 return;
             }
 
-            // Data is already sorted, so quiz questions will be in descending srno order
             sheetData.forEach(row => {
                 const word = row[wordCol] || '';
                 const options = [
@@ -367,7 +366,6 @@
                 
                 const answer = row[answerCol] || '';
                 
-                // Find additional details columns
                 const synonymCol = findColumn('synonym');
                 const antonymCol = findColumn('antonym');
                 const urduCol = findColumn('urdu meaning');
@@ -409,20 +407,21 @@
             currentView = view;
             
             if (view === 'quiz') {
-                quizIndex = 0;
-                quizScore = 0;
-                quizTotal = quizQuestions.length;
-                quizAnswered = false;
-                renderQuiz();
-            }
-            
-            if (view === 'quiz') {
                 quizViewEl.classList.remove('hidden');
                 vocabViewEl.classList.add('hidden');
                 tableViewEl.classList.add('hidden');
                 btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
                 btnVocab.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
                 btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
+                // Only reset if coming from another view
+                if (quizQuestions.length > 0 && (quizIndex === 0 || quizIndex >= quizQuestions.length)) {
+                    quizIndex = 0;
+                    quizScore = 0;
+                    quizAnswered = false;
+                    renderQuiz();
+                } else {
+                    renderQuiz();
+                }
             } else if (view === 'vocab') {
                 vocabViewEl.classList.remove('hidden');
                 quizViewEl.classList.add('hidden');
@@ -609,10 +608,16 @@
                             ${q.sentence ? `<div><span class="font-medium text-gray-500">Example:</span> <span class="text-gray-700">"${q.sentence}"</span></div>` : ''}
                             ${refHtml}
                         </div>
-                        <button onclick="nextQuizQuestion()" 
-                                class="mt-4 w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-arrow-right"></i> Next Question
-                        </button>
+                        <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                            <button onclick="nextQuizQuestion()" 
+                                    class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-arrow-right"></i> Next Question
+                            </button>
+                            <button onclick="showQuizResults()" 
+                                    class="flex-1 py-3 btn-score font-medium rounded-lg transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-chart-bar"></i> View Score & Results
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -669,15 +674,35 @@
             else if (pct >= 70) { emoji = '😊'; color = 'text-blue-600'; }
             else if (pct >= 50) { emoji = '🤔'; color = 'text-yellow-600'; }
             
-            quizContainerEl.innerHTML = `
-                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-8 text-center max-w-lg mx-auto">
-                    <div class="text-5xl mb-4">${emoji}</div>
-                    <h2 class="text-2xl font-bold text-gray-800">Quiz Complete!</h2>
-                    <div class="mt-4">
-                        <span class="text-4xl font-extrabold ${color}">${quizScore}</span>
-                        <span class="text-xl text-gray-400"> / ${total}</span>
+            // Build detailed results list
+            let detailsHtml = '';
+            quizQuestions.forEach((q, i) => {
+                const userAnswer = ''; // We don't track individual answers, but we show correct answer
+                const correct = q.answer;
+                detailsHtml += `
+                    <div class="flex justify-between items-center border-b border-gray-100 py-2 text-sm">
+                        <span class="font-medium text-gray-700">${i+1}. ${q.word}</span>
+                        <span class="text-green-600 font-medium">✓ ${correct}</span>
                     </div>
-                    <p class="text-sm text-gray-500 mt-2">${pct}% correct</p>
+                `;
+            });
+
+            quizContainerEl.innerHTML = `
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-8 max-w-2xl mx-auto">
+                    <div class="text-center">
+                        <div class="text-5xl mb-4">${emoji}</div>
+                        <h2 class="text-2xl font-bold text-gray-800">Quiz Complete!</h2>
+                        <div class="mt-4">
+                            <span class="text-4xl font-extrabold ${color}">${quizScore}</span>
+                            <span class="text-xl text-gray-400"> / ${total}</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">${pct}% correct</p>
+                    </div>
+                    
+                    <div class="mt-6 max-h-60 overflow-y-auto border rounded-lg p-3 bg-gray-50">
+                        <h4 class="font-semibold text-gray-600 text-sm mb-2">📋 Answer Key</h4>
+                        ${detailsHtml}
+                    </div>
                     
                     <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
                         <button onclick="resetQuiz()" 
@@ -696,11 +721,13 @@
         function resetQuiz() {
             quizIndex = 0;
             quizScore = 0;
+            quizAnswered = false;
             renderQuiz();
         }
         window.resetQuiz = resetQuiz;
         window.selectQuizOption = selectQuizOption;
         window.nextQuizQuestion = nextQuizQuestion;
+        window.showQuizResults = showQuizResults;
 
         loadData();
     </script>
