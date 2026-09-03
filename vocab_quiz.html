@@ -23,8 +23,6 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
-        .card-field { transition: background 0.15s; padding: 6px 10px; margin: 0 -10px; border-radius: 6px; }
-        .card-field:hover { background: #f8fafc; }
         .heading-gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .heading-gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .heading-gradient-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
@@ -90,6 +88,36 @@
             transition: all 0.2s;
         }
         .btn-score:hover { background: #059669; transform: scale(1.02); }
+        
+        .result-item {
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+        .result-item:hover {
+            background: #f8fafc;
+            transform: translateX(4px);
+        }
+        .result-item.correct-result {
+            border-left-color: #22c55e;
+        }
+        .result-item.wrong-result {
+            border-left-color: #ef4444;
+        }
+        .result-badge {
+            font-size: 0.7rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .result-badge.correct-badge {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .result-badge.wrong-badge {
+            background: #fee2e2;
+            color: #991b1b;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
@@ -171,6 +199,7 @@
         let quizAnswered = false;
         let quizScore = 0;
         let quizTotal = 0;
+        let userAnswers = []; // Track user's answers
 
         const loadingEl = document.getElementById('loading');
         const errorEl = document.getElementById('error');
@@ -246,7 +275,6 @@
         }
         window.searchGoogle = searchGoogle;
 
-        // ============ SORTING FUNCTION ============
         function sortDataDescending(data, headers) {
             const firstCol = headers[0] || 'srno';
             const sortedData = [...data];
@@ -268,7 +296,6 @@
             return sortedData;
         }
 
-        // ============ IMPROVED COLUMN DETECTION ============
         function findColumn(keyword) {
             const lowerKeyword = keyword.toLowerCase();
             
@@ -330,13 +357,13 @@
             });
         }
 
-        // ============ FIXED: QUIZ FROM COLUMN B ============
         function buildQuizQuestions() {
             quizQuestions = [];
+            userAnswers = [];
             
             let wordCol = null;
             if (sheetHeaders.length > 1) {
-                wordCol = sheetHeaders[1]; // Column B
+                wordCol = sheetHeaders[1];
                 console.log("Using Column B for questions:", wordCol);
             } else {
                 wordCol = findColumn('word');
@@ -351,7 +378,6 @@
             
             if (!wordCol || !option1Col || !answerCol) {
                 console.warn('Quiz columns not found. Skipping quiz.');
-                console.log('wordCol:', wordCol, 'option1Col:', option1Col, 'answerCol:', answerCol);
                 return;
             }
 
@@ -389,6 +415,7 @@
                         sentence: sentence,
                         refLink: refLink
                     });
+                    userAnswers.push(null); // Initialize with null
                 }
             });
             
@@ -413,11 +440,11 @@
                 btnQuiz.className = "px-5 py-2 text-sm font-medium rounded-lg tab-active transition-all flex items-center gap-2";
                 btnVocab.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
                 btnTable.className = "px-5 py-2 text-sm font-medium rounded-lg tab-inactive transition-all flex items-center gap-2";
-                // Only reset if coming from another view
                 if (quizQuestions.length > 0 && (quizIndex === 0 || quizIndex >= quizQuestions.length)) {
                     quizIndex = 0;
                     quizScore = 0;
                     quizAnswered = false;
+                    userAnswers = userAnswers.map(() => null);
                     renderQuiz();
                 } else {
                     renderQuiz();
@@ -632,6 +659,12 @@
             const selected = q.options[idx];
             const isCorrect = selected === q.answer;
             
+            // Store user's answer
+            userAnswers[quizIndex] = {
+                selected: selected,
+                isCorrect: isCorrect
+            };
+            
             if (isCorrect) quizScore++;
             
             const urduContainer = document.getElementById('urdu-container');
@@ -674,21 +707,47 @@
             else if (pct >= 70) { emoji = '😊'; color = 'text-blue-600'; }
             else if (pct >= 50) { emoji = '🤔'; color = 'text-yellow-600'; }
             
-            // Build detailed results list
+            // Build detailed results with user answers
             let detailsHtml = '';
             quizQuestions.forEach((q, i) => {
-                const userAnswer = ''; // We don't track individual answers, but we show correct answer
-                const correct = q.answer;
+                const userAnswer = userAnswers[i];
+                const isCorrect = userAnswer ? userAnswer.isCorrect : false;
+                const selectedText = userAnswer ? userAnswer.selected : 'Not answered';
+                const resultClass = isCorrect ? 'correct-result' : 'wrong-result';
+                const badgeClass = isCorrect ? 'correct-badge' : 'wrong-badge';
+                const badgeText = isCorrect ? '✓ Correct' : '✗ Wrong';
+                
                 detailsHtml += `
-                    <div class="flex justify-between items-center border-b border-gray-100 py-2 text-sm">
-                        <span class="font-medium text-gray-700">${i+1}. ${q.word}</span>
-                        <span class="text-green-600 font-medium">✓ ${correct}</span>
+                    <div class="result-item ${resultClass} bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-sm font-bold text-gray-600">Q${i+1}.</span>
+                                    <span class="text-base font-semibold text-gray-800">${q.word}</span>
+                                    <span class="result-badge ${badgeClass}">${badgeText}</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mt-2">
+                                    <div>
+                                        <span class="text-gray-500">Your answer:</span>
+                                        <span class="font-medium ${isCorrect ? 'text-green-700' : 'text-red-700'}">${selectedText}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Correct answer:</span>
+                                        <span class="font-medium text-green-700">${q.answer}</span>
+                                    </div>
+                                </div>
+                                ${q.synonym ? `<div class="text-sm text-gray-500 mt-1"><span class="font-medium">Synonym:</span> ${q.synonym}</div>` : ''}
+                            </div>
+                            <div class="text-2xl ml-2">
+                                ${isCorrect ? '✅' : '❌'}
+                            </div>
+                        </div>
                     </div>
                 `;
             });
 
             quizContainerEl.innerHTML = `
-                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-8 max-w-2xl mx-auto">
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 md:p-8 max-w-3xl mx-auto">
                     <div class="text-center">
                         <div class="text-5xl mb-4">${emoji}</div>
                         <h2 class="text-2xl font-bold text-gray-800">Quiz Complete!</h2>
@@ -699,8 +758,10 @@
                         <p class="text-sm text-gray-500 mt-2">${pct}% correct</p>
                     </div>
                     
-                    <div class="mt-6 max-h-60 overflow-y-auto border rounded-lg p-3 bg-gray-50">
-                        <h4 class="font-semibold text-gray-600 text-sm mb-2">📋 Answer Key</h4>
+                    <div class="mt-6 max-h-96 overflow-y-auto pr-2">
+                        <h4 class="font-semibold text-gray-700 text-sm mb-3 flex items-center gap-2">
+                            <i class="fas fa-list-check text-indigo-500"></i> Detailed Results
+                        </h4>
                         ${detailsHtml}
                     </div>
                     
@@ -722,6 +783,7 @@
             quizIndex = 0;
             quizScore = 0;
             quizAnswered = false;
+            userAnswers = userAnswers.map(() => null);
             renderQuiz();
         }
         window.resetQuiz = resetQuiz;
