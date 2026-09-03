@@ -360,6 +360,8 @@
     .grid-dot.no-answer-dot { background: #999; color: white; }
     .grid-dot.timeout { background: #6c757d; color: white; opacity: 0.5; }
     .grid-dot.active-dot { border-color: #0b2a3b; transform: scale(1.1); }
+    /* Keep unattempted dots grey */
+    .grid-dot.pending-dot { background: #dce6ef; color: #1d4b61; }
 
     .result-card {
       text-align: center;
@@ -575,7 +577,6 @@
       display: none !important;
     }
 
-    /* Timer visibility states */
     .floating-timer.visible-timer {
       display: flex !important;
     }
@@ -749,13 +750,11 @@
     const scrollTopBtn = document.getElementById('scrollTopBtn');
     const scrollBottomBtn = document.getElementById('scrollBottomBtn');
 
-    // Function to show floating timer
     function showFloatingTimer() {
       floatingTimer.classList.remove('hidden-timer');
       floatingTimer.classList.add('visible-timer');
     }
 
-    // Function to hide floating timer
     function hideFloatingTimer() {
       floatingTimer.classList.add('hidden-timer');
       floatingTimer.classList.remove('visible-timer');
@@ -831,7 +830,6 @@
       refreshBtn.disabled = false;
       refreshIcon.textContent = '🔄';
       refreshIcon.classList.remove('refresh-spin');
-      // Show floating timer if quiz is active
       if (!quizCompleted && !isSubmitted && questions.length > 0) {
         showFloatingTimer();
       }
@@ -861,7 +859,6 @@
           updateTimerDisplay();
           hideLoading();
           
-          // Show floating timer if quiz is active
           if (!quizCompleted && questions.length > 0) {
             showFloatingTimer();
           }
@@ -1023,7 +1020,6 @@
         saveState();
       }, 1000);
       
-      // Ensure floating timer is visible
       showFloatingTimer();
     }
 
@@ -1067,7 +1063,6 @@
       if (!quizCompleted && !isSubmitted) {
         startTimer();
       }
-      // Ensure floating timer is visible
       showFloatingTimer();
       saveState();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1391,13 +1386,25 @@
         const q = questions[i];
         const hasAnswer = selectedAllAnswers[i] !== null;
         
+        // Only show colors after quiz is submitted or completed
         if (isSubmitted || quizCompleted) {
-          if (q && q.correct === -1) dot.classList.add('no-answer-dot');
-          else if (answerStatus[i] === true) dot.classList.add('correct-dot');
-          else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
-          else if (q && q.correct !== -1) dot.classList.add('timeout');
+          if (q && q.correct === -1) {
+            dot.classList.add('no-answer-dot');
+          } else if (answerStatus[i] === true) {
+            dot.classList.add('correct-dot');
+          } else if (answerStatus[i] === false) {
+            dot.classList.add('wrong-dot');
+          } else {
+            // Unattempted questions stay grey
+            dot.classList.add('pending-dot');
+          }
         } else {
-          if (hasAnswer) dot.classList.add('done-dot');
+          // Before submission: show done (blue) for attempted, pending (grey) for unattempted
+          if (hasAnswer) {
+            dot.classList.add('done-dot');
+          } else {
+            dot.classList.add('pending-dot');
+          }
         }
         
         if (activeIndex !== undefined && i === activeIndex) {
@@ -1497,7 +1504,6 @@
       refreshModal.classList.remove('active');
     }
 
-    // Scroll functions for floating timer buttons
     function scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
