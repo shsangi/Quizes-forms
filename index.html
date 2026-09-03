@@ -595,16 +595,37 @@
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
     let lockedQuestions = [];
-    // Store shuffle mapping per question so that once a question is attempted, its order is fixed
-    let shuffleMappings = [];
+    let originalOptionOrder = []; // store original order for each question
 
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
+    const progressFill = document.getElementById('progressFill');
+    const attemptedCount = document.getElementById('attemptedCount');
+    const totalCount = document.getElementById('totalCount');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const quizTitle = document.getElementById('quizTitle');
+    const quizSubtitle = document.getElementById('quizSubtitle');
+    const allQuestionsContainer = document.getElementById('allQuestionsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const endQuizBtn = document.getElementById('endQuizBtn');
+    const dotGrid = document.getElementById('dotGrid');
+    const resultArea = document.getElementById('resultArea');
+    const finalScore = document.getElementById('finalScore');
+    const resultMessage = document.getElementById('resultMessage');
+    const resultDetails = document.getElementById('resultDetails');
+    const restartFromResult = document.getElementById('restartFromResult');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const refreshIcon = document.getElementById('refreshIcon');
+    const refreshModal = document.getElementById('refreshModal');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalConfirm = document.getElementById('modalConfirm');
+    const doneCount = document.getElementById('doneCount');
+    const pendingCount = document.getElementById('pendingCount');
+    const correctCount = document.getElementById('correctCount');
+    const wrongCount = document.getElementById('wrongCount');
+    const correctLegend = document.getElementById('correctLegend');
+    const wrongLegend = document.getElementById('wrongLegend');
+    const brandLogo = document.getElementById('brandLogo');
+    const allAtOnceView = document.getElementById('allAtOnceView');
+    const submittedBanner = document.getElementById('submittedBanner');
 
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
@@ -632,7 +653,7 @@
           quizTitleText: quizTitleText,
           totalQuestions: totalQuestions,
           lockedQuestions: lockedQuestions,
-          shuffleMappings: shuffleMappings
+          originalOptionOrder: originalOptionOrder
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -674,6 +695,15 @@
       window.open(`https://www.google.com/search?q=${encodedQuery}`, '_blank');
     }
 
+    // Shuffle function using Fisher-Yates
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
     function fetchQuestions(forceRefresh = false) {
       showLoading();
       
@@ -686,11 +716,7 @@
           selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
           answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
           lockedQuestions = saved.lockedQuestions || new Array(questions.length).fill(false);
-          shuffleMappings = saved.shuffleMappings || [];
-          // If shuffleMappings is missing or wrong size, regenerate
-          if (shuffleMappings.length !== questions.length) {
-            shuffleMappings = questions.map(() => null);
-          }
+          originalOptionOrder = saved.originalOptionOrder || questions.map(q => q.options.map((_, i) => i));
           isSubmitted = saved.isSubmitted || false;
           quizCompleted = saved.quizCompleted || false;
           quizTimedOut = saved.quizTimedOut || false;
@@ -730,7 +756,15 @@
             answerStatus = new Array(questions.length).fill(null);
             selectedAllAnswers = new Array(questions.length).fill(null);
             lockedQuestions = new Array(questions.length).fill(false);
-            shuffleMappings = questions.map(() => null);
+            // Store original order and shuffle options if no attempts
+            originalOptionOrder = questions.map((q, idx) => {
+              const indices = q.options.map((_, i) => i);
+              // shuffle only if no previous attempts (fresh quiz)
+              if (getAttemptedCount() === 0) {
+                shuffleArray(indices);
+              }
+              return indices;
+            });
             isSubmitted = false;
             quizCompleted = false;
             quizTimedOut = false;
@@ -763,7 +797,15 @@
           answerStatus = new Array(questions.length).fill(null);
           selectedAllAnswers = new Array(questions.length).fill(null);
           lockedQuestions = new Array(questions.length).fill(false);
-          shuffleMappings = questions.map(() => null);
+          // Store original order and shuffle options if no attempts
+          originalOptionOrder = questions.map((q, idx) => {
+            const indices = q.options.map((_, i) => i);
+            // shuffle only if no previous attempts (fresh quiz)
+            if (getAttemptedCount() === 0) {
+              shuffleArray(indices);
+            }
+            return indices;
+          });
           isSubmitted = false;
           quizCompleted = false;
           quizTimedOut = false;
@@ -932,54 +974,10 @@
         const optsDiv = document.createElement('div');
         optsDiv.className = 'all-q-options';
         
-        // Determine shuffle mapping for this question
-        let mapping = shuffleMappings[idx];
-        const originalOptions = [...q.options];
-        const correctOriginal = q.correct;
-        let shuffledIndices;
-        
-        if (mapping) {
-          // Use existing mapping
-          shuffledIndices = mapping;
-        } else {
-          // Generate new shuffle only if question not attempted
-          if (selectedAllAnswers[idx] === null) {
-            shuffledIndices = [0, 1, 2, 3];
-            shuffleArray(shuffledIndices);
-            shuffleMappings[idx] = shuffledIndices;
-          } else {
-            // If already attempted, use identity mapping (no shuffle)
-            shuffledIndices = [0, 1, 2, 3];
-            shuffleMappings[idx] = shuffledIndices;
-          }
-          // Save mapping
-          saveState();
-        }
-        
-        // If question is attempted, ensure we use the stored mapping (which might be identity if attempted)
-        // But if mapping was generated earlier, use it.
-        // However, if the question is attempted and mapping is null (should not happen), use identity.
-        if (!shuffleMappings[idx]) {
-          shuffledIndices = [0, 1, 2, 3];
-          shuffleMappings[idx] = shuffledIndices;
-        } else {
-          shuffledIndices = shuffleMappings[idx];
-        }
-        
-        // Re-map correct index
-        let newCorrect = -1;
-        if (correctOriginal !== -1) {
-          newCorrect = shuffledIndices.indexOf(correctOriginal);
-        }
-        const shuffledOptions = shuffledIndices.map(i => originalOptions[i]);
-        
-        // Temporarily replace options and correct for rendering
-        const originalOptionsCopy = [...q.options];
-        const originalCorrect = q.correct;
-        q.options = shuffledOptions;
-        q.correct = newCorrect;
-        
-        shuffledOptions.forEach((opt, optIdx) => {
+        // Use the shuffled order if available, else use original
+        const order = originalOptionOrder[idx] || q.options.map((_, i) => i);
+        order.forEach((optIdx) => {
+          const opt = q.options[optIdx];
           const btn = document.createElement('button');
           btn.className = 'option-btn';
           btn.innerHTML = `<span class="letter">${letters[optIdx]}</span> ${opt || '(Empty)'}`;
@@ -991,12 +989,8 @@
             btn.classList.add('locked-btn');
           }
           
-          if (selectedAllAnswers[idx] !== null) {
-            const originalSelected = selectedAllAnswers[idx];
-            const shuffledSelected = shuffledIndices.indexOf(originalSelected);
-            if (optIdx === shuffledSelected) {
-              btn.classList.add('selected-opt');
-            }
+          if (selectedAllAnswers[idx] === optIdx) {
+            btn.classList.add('selected-opt');
           }
           
           if (isSubmitted || quizCompleted) {
@@ -1028,9 +1022,7 @@
               });
               
               this.classList.add('selected-opt');
-              // Store original option index (not shuffled)
-              const originalIdx = shuffledIndices[optIdx];
-              selectedAllAnswers[idx] = originalIdx;
+              selectedAllAnswers[idx] = optIdx;
               
               btns.forEach(b => {
                 b.classList.remove('correct', 'wrong');
@@ -1038,10 +1030,11 @@
               
               if (q.correct !== -1) {
                 btns.forEach((b, i) => {
-                  if (i === q.correct) {
+                  const bOptIdx = parseInt(b.dataset.optIdx);
+                  if (bOptIdx === q.correct) {
                     b.classList.add('correct');
                   }
-                  if (i === optIdx && optIdx !== q.correct) {
+                  if (bOptIdx === optIdx && optIdx !== q.correct) {
                     b.classList.add('wrong');
                   }
                 });
@@ -1067,11 +1060,6 @@
           }
           optsDiv.appendChild(btn);
         });
-        
-        // Restore original options and correct for future grading/display consistency
-        q.options = originalOptionsCopy;
-        q.correct = originalCorrect;
-        
         div.appendChild(optsDiv);
         allQuestionsContainer.appendChild(div);
       });
@@ -1278,7 +1266,14 @@
       selectedAllAnswers = new Array(questions.length).fill(null);
       answerStatus = new Array(questions.length).fill(null);
       lockedQuestions = new Array(questions.length).fill(false);
-      shuffleMappings = questions.map(() => null);
+      // Reset order - shuffle only if no attempts
+      originalOptionOrder = questions.map((q, idx) => {
+        const indices = q.options.map((_, i) => i);
+        if (getAttemptedCount() === 0) {
+          shuffleArray(indices);
+        }
+        return indices;
+      });
       isSubmitted = false;
       quizCompleted = false;
       quizTimedOut = false;
