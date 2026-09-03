@@ -595,36 +595,8 @@
     let quizTitleText = 'Quiz';
     let selectedAllAnswers = [];
     let lockedQuestions = [];
-
-    const progressFill = document.getElementById('progressFill');
-    const attemptedCount = document.getElementById('attemptedCount');
-    const totalCount = document.getElementById('totalCount');
-    const timerDisplay = document.getElementById('timerDisplay');
-    const quizTitle = document.getElementById('quizTitle');
-    const quizSubtitle = document.getElementById('quizSubtitle');
-    const allQuestionsContainer = document.getElementById('allQuestionsContainer');
-    const submitBtn = document.getElementById('submitBtn');
-    const endQuizBtn = document.getElementById('endQuizBtn');
-    const dotGrid = document.getElementById('dotGrid');
-    const resultArea = document.getElementById('resultArea');
-    const finalScore = document.getElementById('finalScore');
-    const resultMessage = document.getElementById('resultMessage');
-    const resultDetails = document.getElementById('resultDetails');
-    const restartFromResult = document.getElementById('restartFromResult');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const refreshIcon = document.getElementById('refreshIcon');
-    const refreshModal = document.getElementById('refreshModal');
-    const modalCancel = document.getElementById('modalCancel');
-    const modalConfirm = document.getElementById('modalConfirm');
-    const doneCount = document.getElementById('doneCount');
-    const pendingCount = document.getElementById('pendingCount');
-    const correctCount = document.getElementById('correctCount');
-    const wrongCount = document.getElementById('wrongCount');
-    const correctLegend = document.getElementById('correctLegend');
-    const wrongLegend = document.getElementById('wrongLegend');
-    const brandLogo = document.getElementById('brandLogo');
-    const allAtOnceView = document.getElementById('allAtOnceView');
-    const submittedBanner = document.getElementById('submittedBanner');
+    // Store shuffle mapping per question so that once a question is attempted, its order is fixed
+    let shuffleMappings = [];
 
     function shuffleArray(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
@@ -659,7 +631,8 @@
           timeRemaining: timeRemaining,
           quizTitleText: quizTitleText,
           totalQuestions: totalQuestions,
-          lockedQuestions: lockedQuestions
+          lockedQuestions: lockedQuestions,
+          shuffleMappings: shuffleMappings
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.warn('Save failed', e); }
@@ -713,6 +686,11 @@
           selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
           answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
           lockedQuestions = saved.lockedQuestions || new Array(questions.length).fill(false);
+          shuffleMappings = saved.shuffleMappings || [];
+          // If shuffleMappings is missing or wrong size, regenerate
+          if (shuffleMappings.length !== questions.length) {
+            shuffleMappings = questions.map(() => null);
+          }
           isSubmitted = saved.isSubmitted || false;
           quizCompleted = saved.quizCompleted || false;
           quizTimedOut = saved.quizTimedOut || false;
@@ -752,6 +730,7 @@
             answerStatus = new Array(questions.length).fill(null);
             selectedAllAnswers = new Array(questions.length).fill(null);
             lockedQuestions = new Array(questions.length).fill(false);
+            shuffleMappings = questions.map(() => null);
             isSubmitted = false;
             quizCompleted = false;
             quizTimedOut = false;
@@ -784,6 +763,7 @@
           answerStatus = new Array(questions.length).fill(null);
           selectedAllAnswers = new Array(questions.length).fill(null);
           lockedQuestions = new Array(questions.length).fill(false);
+          shuffleMappings = questions.map(() => null);
           isSubmitted = false;
           quizCompleted = false;
           quizTimedOut = false;
@@ -952,20 +932,47 @@
         const optsDiv = document.createElement('div');
         optsDiv.className = 'all-q-options';
         
-        // --- SHUFFLE OPTIONS ---
-        let shuffledIndices = [0, 1, 2, 3];
-        shuffleArray(shuffledIndices);
+        // Determine shuffle mapping for this question
+        let mapping = shuffleMappings[idx];
         const originalOptions = [...q.options];
         const correctOriginal = q.correct;
-        // Re-map correct index if needed
+        let shuffledIndices;
+        
+        if (mapping) {
+          // Use existing mapping
+          shuffledIndices = mapping;
+        } else {
+          // Generate new shuffle only if question not attempted
+          if (selectedAllAnswers[idx] === null) {
+            shuffledIndices = [0, 1, 2, 3];
+            shuffleArray(shuffledIndices);
+            shuffleMappings[idx] = shuffledIndices;
+          } else {
+            // If already attempted, use identity mapping (no shuffle)
+            shuffledIndices = [0, 1, 2, 3];
+            shuffleMappings[idx] = shuffledIndices;
+          }
+          // Save mapping
+          saveState();
+        }
+        
+        // If question is attempted, ensure we use the stored mapping (which might be identity if attempted)
+        // But if mapping was generated earlier, use it.
+        // However, if the question is attempted and mapping is null (should not happen), use identity.
+        if (!shuffleMappings[idx]) {
+          shuffledIndices = [0, 1, 2, 3];
+          shuffleMappings[idx] = shuffledIndices;
+        } else {
+          shuffledIndices = shuffleMappings[idx];
+        }
+        
+        // Re-map correct index
         let newCorrect = -1;
         if (correctOriginal !== -1) {
           newCorrect = shuffledIndices.indexOf(correctOriginal);
         }
-        // Store shuffled options and correct index back into question for grading
-        // We'll keep q.options shuffled, but we need to store the mapping for correct answer
-        // We'll also preserve the original options for display, but use shuffled order.
         const shuffledOptions = shuffledIndices.map(i => originalOptions[i]);
+        
         // Temporarily replace options and correct for rendering
         const originalOptionsCopy = [...q.options];
         const originalCorrect = q.correct;
@@ -985,9 +992,7 @@
           }
           
           if (selectedAllAnswers[idx] !== null) {
-            // selectedAllAnswers stores the original option index, map to shuffled
             const originalSelected = selectedAllAnswers[idx];
-            // Find the shuffled index that corresponds to the original selected index
             const shuffledSelected = shuffledIndices.indexOf(originalSelected);
             if (optIdx === shuffledSelected) {
               btn.classList.add('selected-opt');
@@ -1273,6 +1278,7 @@
       selectedAllAnswers = new Array(questions.length).fill(null);
       answerStatus = new Array(questions.length).fill(null);
       lockedQuestions = new Array(questions.length).fill(false);
+      shuffleMappings = questions.map(() => null);
       isSubmitted = false;
       quizCompleted = false;
       quizTimedOut = false;
