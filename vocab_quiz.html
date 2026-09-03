@@ -118,6 +118,15 @@
             background: #fee2e2;
             color: #991b1b;
         }
+        .synonym-tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin: 2px 3px 2px 0;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-4 md:p-6">
@@ -199,7 +208,7 @@
         let quizAnswered = false;
         let quizScore = 0;
         let quizTotal = 0;
-        let userAnswers = []; // Track user's answers
+        let userAnswers = [];
 
         const loadingEl = document.getElementById('loading');
         const errorEl = document.getElementById('error');
@@ -357,6 +366,13 @@
             });
         }
 
+        // ============ READ SYNONYMS FROM COLUMN J ============
+        function parseSynonyms(synonymStr) {
+            if (!synonymStr || typeof synonymStr !== 'string') return [];
+            // Split by comma, semicolon, or slash, then trim
+            return synonymStr.split(/[,;\/]/).map(s => s.trim()).filter(s => s.length > 0);
+        }
+
         function buildQuizQuestions() {
             quizQuestions = [];
             userAnswers = [];
@@ -376,6 +392,21 @@
             const option4Col = findColumn('option4');
             const answerCol = findColumn('answer');
             
+            // Column J is index 9 (0-based), or find by header
+            let synonymCol = null;
+            if (sheetHeaders.length > 9) {
+                synonymCol = sheetHeaders[9]; // Column J
+                console.log("Using Column J for synonyms:", synonymCol);
+            } else {
+                synonymCol = findColumn('synonym');
+                console.log("Using 'synonym' column:", synonymCol);
+            }
+            
+            const antonymCol = findColumn('antonym');
+            const urduCol = findColumn('urdu meaning');
+            const sentenceCol = findColumn('sentence usage');
+            const refCol = findColumn('ref link');
+            
             if (!wordCol || !option1Col || !answerCol) {
                 console.warn('Quiz columns not found. Skipping quiz.');
                 return;
@@ -392,13 +423,10 @@
                 
                 const answer = row[answerCol] || '';
                 
-                const synonymCol = findColumn('synonym');
-                const antonymCol = findColumn('antonym');
-                const urduCol = findColumn('urdu meaning');
-                const sentenceCol = findColumn('sentence usage');
-                const refCol = findColumn('ref link');
+                // Get synonyms from Column J
+                const synonymRaw = synonymCol ? row[synonymCol] || '' : '';
+                const synonyms = parseSynonyms(synonymRaw);
                 
-                const synonym = synonymCol ? row[synonymCol] || '' : '';
                 const antonym = antonymCol ? row[antonymCol] || '' : '';
                 const urdu = urduCol ? row[urduCol] || '' : '';
                 const sentence = sentenceCol ? row[sentenceCol] || '' : '';
@@ -409,17 +437,18 @@
                         word: word,
                         options: options,
                         answer: answer,
-                        synonym: synonym,
+                        synonyms: synonyms,
                         antonym: antonym,
                         urdu: urdu,
                         sentence: sentence,
                         refLink: refLink
                     });
-                    userAnswers.push(null); // Initialize with null
+                    userAnswers.push(null);
                 }
             });
             
             console.log(`Built ${quizQuestions.length} quiz questions from Column B`);
+            console.log(`Synonyms loaded from Column J`);
         }
 
         function retryLoad() { loadData(); }
@@ -607,6 +636,10 @@
                 </div>
             ` : '';
 
+            // Show synonyms as tags
+            const synonymHtml = q.synonyms && q.synonyms.length > 0 ? 
+                `<div class="flex flex-wrap gap-1 mt-1">${q.synonyms.map(s => `<span class="synonym-tag">${s}</span>`).join('')}</div>` : '';
+
             quizContainerEl.innerHTML = `
                 <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 p-6 md:p-8">
                     <div class="flex justify-between items-center mb-4">
@@ -619,6 +652,7 @@
                     
                     <div class="mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">${q.word}</h2>
+                        ${synonymHtml}
                         <div id="urdu-container" class="hidden mt-2">
                             <span class="text-sm text-gray-500 bg-indigo-50 px-3 py-1 rounded-full">${q.urdu || ''}</span>
                         </div>
@@ -630,7 +664,7 @@
                     
                     <div id="quiz-details" class="mt-4 hidden details-fade">
                         <div class="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
-                            ${q.synonym ? `<div><span class="font-medium text-gray-500">Synonym:</span> <span class="text-gray-700">${q.synonym}</span></div>` : ''}
+                            ${q.synonyms && q.synonyms.length > 0 ? `<div><span class="font-medium text-gray-500">Synonyms:</span> <span class="text-gray-700">${q.synonyms.join(', ')}</span></div>` : ''}
                             ${q.antonym ? `<div><span class="font-medium text-gray-500">Antonym:</span> <span class="text-gray-700">${q.antonym}</span></div>` : ''}
                             ${q.sentence ? `<div><span class="font-medium text-gray-500">Example:</span> <span class="text-gray-700">"${q.sentence}"</span></div>` : ''}
                             ${refHtml}
@@ -659,7 +693,6 @@
             const selected = q.options[idx];
             const isCorrect = selected === q.answer;
             
-            // Store user's answer
             userAnswers[quizIndex] = {
                 selected: selected,
                 isCorrect: isCorrect
@@ -707,7 +740,6 @@
             else if (pct >= 70) { emoji = '😊'; color = 'text-blue-600'; }
             else if (pct >= 50) { emoji = '🤔'; color = 'text-yellow-600'; }
             
-            // Build detailed results with user answers
             let detailsHtml = '';
             quizQuestions.forEach((q, i) => {
                 const userAnswer = userAnswers[i];
@@ -717,11 +749,14 @@
                 const badgeClass = isCorrect ? 'correct-badge' : 'wrong-badge';
                 const badgeText = isCorrect ? '✓ Correct' : '✗ Wrong';
                 
+                // Show synonyms in results too
+                const synText = q.synonyms && q.synonyms.length > 0 ? q.synonyms.join(', ') : '';
+                
                 detailsHtml += `
                     <div class="result-item ${resultClass} bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
                                     <span class="text-sm font-bold text-gray-600">Q${i+1}.</span>
                                     <span class="text-base font-semibold text-gray-800">${q.word}</span>
                                     <span class="result-badge ${badgeClass}">${badgeText}</span>
@@ -736,7 +771,7 @@
                                         <span class="font-medium text-green-700">${q.answer}</span>
                                     </div>
                                 </div>
-                                ${q.synonym ? `<div class="text-sm text-gray-500 mt-1"><span class="font-medium">Synonym:</span> ${q.synonym}</div>` : ''}
+                                ${synText ? `<div class="text-sm text-gray-500 mt-1"><span class="font-medium">Synonyms:</span> ${synText}</div>` : ''}
                             </div>
                             <div class="text-2xl ml-2">
                                 ${isCorrect ? '✅' : '❌'}
