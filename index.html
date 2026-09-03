@@ -572,7 +572,12 @@
     }
 
     .floating-timer.hidden-timer {
-      display: none;
+      display: none !important;
+    }
+
+    /* Timer visibility states */
+    .floating-timer.visible-timer {
+      display: flex !important;
     }
 
     @media (max-width: 550px) {
@@ -744,6 +749,18 @@
     const scrollTopBtn = document.getElementById('scrollTopBtn');
     const scrollBottomBtn = document.getElementById('scrollBottomBtn');
 
+    // Function to show floating timer
+    function showFloatingTimer() {
+      floatingTimer.classList.remove('hidden-timer');
+      floatingTimer.classList.add('visible-timer');
+    }
+
+    // Function to hide floating timer
+    function hideFloatingTimer() {
+      floatingTimer.classList.add('hidden-timer');
+      floatingTimer.classList.remove('visible-timer');
+    }
+
     function shuffleArray(array) {
       const shuffled = [...array];
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -807,13 +824,17 @@
       refreshBtn.disabled = true;
       refreshIcon.textContent = '⟳';
       refreshIcon.classList.add('refresh-spin');
-      floatingTimer.classList.add('hidden-timer');
+      hideFloatingTimer();
     }
 
     function hideLoading() {
       refreshBtn.disabled = false;
       refreshIcon.textContent = '🔄';
       refreshIcon.classList.remove('refresh-spin');
+      // Show floating timer if quiz is active
+      if (!quizCompleted && !isSubmitted && questions.length > 0) {
+        showFloatingTimer();
+      }
     }
 
     function fetchQuestions(forceRefresh = false) {
@@ -839,6 +860,11 @@
           totalCount.textContent = totalQuestions;
           updateTimerDisplay();
           hideLoading();
+          
+          // Show floating timer if quiz is active
+          if (!quizCompleted && questions.length > 0) {
+            showFloatingTimer();
+          }
           
           if (quizCompleted) {
             renderAllQuestions();
@@ -889,6 +915,7 @@
             hideLoading();
             startQuiz();
             refreshModal.classList.remove('active');
+            showFloatingTimer();
           })
           .catch(err => {
             console.error(err);
@@ -932,6 +959,7 @@
           totalCount.textContent = totalQuestions;
           hideLoading();
           startQuiz();
+          showFloatingTimer();
         })
         .catch(err => {
           console.error(err);
@@ -995,7 +1023,8 @@
         saveState();
       }, 1000);
       
-      floatingTimer.classList.remove('hidden-timer');
+      // Ensure floating timer is visible
+      showFloatingTimer();
     }
 
     function updateTimerDisplay() {
@@ -1038,6 +1067,8 @@
       if (!quizCompleted && !isSubmitted) {
         startTimer();
       }
+      // Ensure floating timer is visible
+      showFloatingTimer();
       saveState();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1104,7 +1135,6 @@
         }
         qText.innerHTML = `${idx+1}. ${q.question}${badge} <span class="search-badge">🔍 search</span>`;
         
-        // Add click event only to the question text, not the whole card
         qText.addEventListener('click', function(e) {
           e.stopPropagation();
           searchQuestionOnGoogle(q.question, e);
@@ -1296,7 +1326,7 @@
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       allAtOnceView.style.display = 'none';
       resultArea.style.display = 'block';
-      floatingTimer.classList.add('hidden-timer');
+      hideFloatingTimer();
       
       const total = questions.length;
       finalScore.textContent = `${score} / ${total}`;
@@ -1447,6 +1477,7 @@
       if (!quizCompleted && !isSubmitted) {
         startTimer();
       }
+      showFloatingTimer();
       saveState();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
