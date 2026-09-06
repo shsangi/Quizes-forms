@@ -95,6 +95,21 @@
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
+    /* timer line - kept as requested */
+    .timer-line {
+      text-align: center;
+      padding: 0.2rem 0 0.8rem 0;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #1f4d66;
+      letter-spacing: 0.3px;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-line .timer { font-weight: 600; color: #0b2a3b; }
+    .timer-line .timer.warning { color: #856404; }
+    .timer-line .timer.danger { color: #b33c3c; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
     .progress-block {
       background: #e6edf5;
       height: 8px;
@@ -428,6 +443,9 @@
     </div>
   </div>
 
+  <!-- timer line - always visible, no floating timer -->
+  <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
+
   <div id="quizContent">
     <div class="progress-block">
       <div class="progress-fill" id="progressFill" style="width:0%;"></div>
@@ -497,6 +515,8 @@
     let originalQuestions = [];
     let totalQuestions = 0;
     let quizTitleText = 'Quiz';
+    let timerInterval = null;
+    let timeRemaining = 0;
 
     const questionCard = document.getElementById('questionCard');
     const prevBtn = document.getElementById('prevBtn');
@@ -525,6 +545,7 @@
     const submittedBanner = document.getElementById('submittedBanner');
     const quizTitle = document.getElementById('quizTitle');
     const brandLogo = document.getElementById('brandLogo');
+    const timerDisplay = document.getElementById('timerDisplay');
 
     function shuffleArray(arr) {
       const a = [...arr];
@@ -551,7 +572,7 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
-          score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions, currentIndex
+          score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions, currentIndex, timeRemaining
         }));
       } catch(e) {}
     }
@@ -583,6 +604,35 @@
       refreshIcon.classList.remove('refresh-spin');
     }
 
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          // auto-submit when time runs out
+          if (!quizCompleted && !isSubmitted) {
+            gradeQuiz();
+            quizCompleted = true;
+            endQuizBtn.disabled = true;
+            showResult();
+          }
+        }
+        saveState();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timeRemaining / 60), secs = timeRemaining % 60;
+      const timeStr = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      timerDisplay.textContent = timeStr;
+      timerDisplay.classList.remove('warning','danger');
+      if (timeRemaining < 60) timerDisplay.classList.add('danger');
+      else if (timeRemaining < 300) timerDisplay.classList.add('warning');
+    }
+
     function fetchQuestions(forceRefresh = false) {
       showLoading();
       if (!forceRefresh) {
@@ -599,10 +649,13 @@
           quizCompleted = saved.quizCompleted || false;
           score = saved.score || 0;
           currentIndex = saved.currentIndex || 0;
+          timeRemaining = saved.timeRemaining || (totalQuestions * 60);
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
           hideLoading();
           if (quizCompleted) { showResult(); return; }
+          updateTimerDisplay();
+          startTimer();
           renderQuestion();
           renderDots();
           updateOverview();
@@ -628,10 +681,13 @@
           answerStatus = new Array(questions.length).fill(null);
           lockedQuestions = new Array(questions.length).fill(false);
           isSubmitted = false; quizCompleted = false; score = 0; currentIndex = 0;
+          timeRemaining = totalQuestions * 60;
           clearState();
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
           hideLoading();
+          updateTimerDisplay();
+          startTimer();
           renderQuestion();
           renderDots();
           updateOverview();
@@ -689,7 +745,8 @@
       const q = questions[currentIndex];
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
-      let html = `<div class="q-text">${idx+1}. ${q.question} <span class="badge">${idx+1}/${totalQuestions}</span></div><div class="options-list">`;
+      // removed the extra badge from question text as requested
+      let html = `<div class="q-text">${idx+1}. ${q.question}</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
         let cls = 'option-btn';
         if (selectedAllAnswers[idx] === oi) cls += ' selected-opt';
@@ -713,10 +770,8 @@
             const optIdx = parseInt(this.dataset.optidx);
             const qIdx = currentIndex;
             if (lockedQuestions[qIdx] || isSubmitted || quizCompleted) return;
-            // lock question
             lockedQuestions[qIdx] = true;
             selectedAllAnswers[qIdx] = optIdx;
-            // re-render to show correct/wrong
             const qData = questions[qIdx];
             const btns = questionCard.querySelectorAll('.option-btn');
             btns.forEach(b => {
@@ -728,7 +783,6 @@
               if (oi === optIdx && optIdx !== qData.correct) b.classList.add('wrong');
               if (oi === optIdx) b.classList.add('selected-opt');
             });
-            // update dots and progress
             renderDots();
             updateProgress();
             updateOverview();
@@ -737,7 +791,6 @@
         });
       }
 
-      // if submitted or completed, disable all
       if (isSubmitted || quizCompleted) {
         questionCard.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
       }
@@ -835,6 +888,7 @@
       }
       score = correctLocal;
       isSubmitted = true;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       submittedBanner.style.display = 'block';
       endQuizBtn.textContent = '🏁 End Quiz';
       renderQuestion();
@@ -847,12 +901,14 @@
       if (quizCompleted) return;
       if (!isSubmitted) gradeQuiz();
       quizCompleted = true;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       endQuizBtn.disabled = true;
       showResult();
     }
 
     function showResult() {
       quizCompleted = true;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       document.getElementById('singleQuestionView').style.display = 'none';
       resultArea.style.display = 'block';
       finalScore.textContent = `${score} / ${totalQuestions}`;
@@ -897,6 +953,8 @@
       answerStatus = new Array(questions.length).fill(null);
       lockedQuestions = new Array(questions.length).fill(false);
       isSubmitted = false; quizCompleted = false; score = 0; currentIndex = 0;
+      timeRemaining = totalQuestions * 60;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       resultArea.style.display = 'none';
       document.getElementById('singleQuestionView').style.display = 'block';
       submittedBanner.style.display = 'none';
@@ -908,6 +966,8 @@
         const newCorrect = shuffled.indexOf(q.options[q.correct]);
         return { ...q, options: shuffled, correct: newCorrect };
       });
+      updateTimerDisplay();
+      startTimer();
       renderQuestion();
       renderDots();
       updateOverview();
@@ -917,6 +977,7 @@
     function handleRefreshClick() { refreshModal.classList.add('active'); }
     function handleRefreshConfirm() {
       if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       fetchQuestions(true);
     }
     function handleRefreshCancel() { refreshModal.classList.remove('active'); }
