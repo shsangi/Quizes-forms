@@ -95,18 +95,27 @@
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    .timer-line {
-      text-align: center;
+    /* timer + question line */
+    .top-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 0.2rem 0 0.8rem 0;
       font-weight: 500;
       font-size: 0.95rem;
       color: #1f4d66;
       letter-spacing: 0.3px;
       font-variant-numeric: tabular-nums;
+      flex-wrap: wrap;
+      gap: 0.3rem 0.8rem;
     }
-    .timer-line .timer { font-weight: 600; color: #0b2a3b; }
-    .timer-line .timer.warning { color: #856404; }
-    .timer-line .timer.danger { color: #b33c3c; animation: pulse 1s infinite; }
+    .top-info .question-label {
+      font-weight: 600;
+      color: #0b2a3b;
+    }
+    .top-info .timer { font-weight: 600; color: #0b2a3b; }
+    .top-info .timer.warning { color: #856404; }
+    .top-info .timer.danger { color: #b33c3c; animation: pulse 1s infinite; }
     @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
 
     .progress-block {
@@ -207,6 +216,15 @@
     }
     .options-list .option-btn:disabled { cursor: default; opacity: 0.8; }
     .options-list .option-btn:disabled:hover { transform: none; }
+
+    /* tick/cross icons on options */
+    .options-list .option-btn .icon-indicator {
+      margin-left: auto;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .options-list .option-btn.correct .icon-indicator::after { content: " ✓"; color: #1f8b4c; }
+    .options-list .option-btn.wrong .icon-indicator::after { content: " ✗"; color: #b33c3c; }
 
     .action-bar {
       display: flex;
@@ -409,6 +427,7 @@
       .action-bar { flex-direction: column; align-items: stretch; }
       .action-bar .left-buttons { justify-content: center; }
       .btn-primary, .btn-success { width: 100%; justify-content: center; }
+      .top-info { font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -431,14 +450,17 @@
     </div>
   </div>
 
-  <!-- timer line - kept as requested -->
-  <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
+  <!-- timer + question label in one line -->
+  <div class="top-info">
+    <span class="question-label" id="questionLabel">Question 1 of 0</span>
+    <span>⏱️ <span class="timer" id="timerDisplay">00:00</span></span>
+  </div>
 
   <div id="quizContent">
     <div class="progress-block">
       <div class="progress-fill" id="progressFill" style="width:0%;"></div>
     </div>
-    <div class="progress-label" id="progressLabel">Question <span class="attempted" id="currentQNum">1</span> of <span id="totalCount">0</span></div>
+    <div class="progress-label" id="progressLabel">Attempted: <span class="attempted" id="attemptedCount">0</span> / <span id="totalCount">0</span></div>
 
     <div id="singleQuestionView">
       <div id="submittedBanner" style="display:none;" class="submitted-header">✅ Submitted — You can review. Click "End Quiz" for final score.</div>
@@ -511,8 +533,9 @@
     const nextBtn = document.getElementById('nextBtn');
     const endQuizBtn = document.getElementById('endQuizBtn');
     const progressFill = document.getElementById('progressFill');
-    const currentQNum = document.getElementById('currentQNum');
+    const attemptedCount = document.getElementById('attemptedCount');
     const totalCount = document.getElementById('totalCount');
+    const questionLabel = document.getElementById('questionLabel');
     const dotGrid = document.getElementById('dotGrid');
     const resultArea = document.getElementById('resultArea');
     const finalScore = document.getElementById('finalScore');
@@ -732,18 +755,30 @@
       const q = questions[currentIndex];
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
+      
+      // update question label
+      questionLabel.textContent = `Question ${idx+1} of ${totalQuestions}`;
+      
       let html = `<div class="q-text">${idx+1}. ${q.question}</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
         let cls = 'option-btn';
+        let iconSpan = '<span class="icon-indicator"></span>';
         if (selectedAllAnswers[idx] === oi) cls += ' selected-opt';
         if (isSubmitted || quizCompleted) {
-          if (q.correct !== -1 && oi === q.correct) cls += ' correct';
-          if (selectedAllAnswers[idx] === oi && selectedAllAnswers[idx] !== q.correct) cls += ' wrong';
+          if (q.correct !== -1 && oi === q.correct) {
+            cls += ' correct';
+            if (selectedAllAnswers[idx] === oi) iconSpan = '<span class="icon-indicator">✓</span>';
+            else iconSpan = '<span class="icon-indicator">✓</span>';
+          }
+          if (selectedAllAnswers[idx] === oi && selectedAllAnswers[idx] !== q.correct) {
+            cls += ' wrong';
+            iconSpan = '<span class="icon-indicator">✗</span>';
+          }
         }
         if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) cls += ' locked-btn';
         const disabled = lockedQuestions[idx] || isSubmitted || quizCompleted ? 'disabled' : '';
         html += `<button class="${cls}" data-optidx="${oi}" ${disabled}>
-          <span class="letter">${letters[oi]}</span> ${opt || '(Empty)'}
+          <span class="letter">${letters[oi]}</span> ${opt || '(Empty)'} ${iconSpan}
         </button>`;
       });
       html += '</div>';
@@ -765,8 +800,15 @@
               b.classList.add('locked-btn');
               b.classList.remove('correct', 'wrong', 'selected-opt');
               const oi = parseInt(b.dataset.optidx);
-              if (qData.correct !== -1 && oi === qData.correct) b.classList.add('correct');
-              if (oi === optIdx && optIdx !== qData.correct) b.classList.add('wrong');
+              const iconSpan = b.querySelector('.icon-indicator');
+              if (qData.correct !== -1 && oi === qData.correct) {
+                b.classList.add('correct');
+                if (iconSpan) iconSpan.textContent = '✓';
+              }
+              if (oi === optIdx && optIdx !== qData.correct) {
+                b.classList.add('wrong');
+                if (iconSpan) iconSpan.textContent = '✗';
+              }
               if (oi === optIdx) b.classList.add('selected-opt');
             });
             renderDots();
@@ -797,9 +839,9 @@
 
     function updateProgress() {
       const answered = getAttemptedCount();
+      attemptedCount.textContent = answered;
       const pct = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
       progressFill.style.width = `${pct}%`;
-      currentQNum.textContent = currentIndex + 1;
       totalCount.textContent = totalQuestions;
     }
 
