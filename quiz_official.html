@@ -260,13 +260,14 @@
             color: white;
         }
         .options-list .option-btn.invalid {
-            background: #fce4ec;
-            border-color: #e91e63;
-            box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.15);
+            background: #fce4ec !important;
+            border-color: #e91e63 !important;
+            box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.15) !important;
+            color: #880e4f;
         }
         .options-list .option-btn.invalid .letter {
-            background: #e91e63;
-            color: white;
+            background: #e91e63 !important;
+            color: white !important;
         }
         .options-list .option-btn.selected-opt {
             border-color: #2f7b9e;
@@ -511,6 +512,7 @@
         }
         .result-details .detail-item.invalid-detail {
             border-left: 6px solid #e91e63;
+            background: #fce4ec;
         }
         .result-details .detail-q {
             font-weight: 600;
@@ -1187,12 +1189,11 @@
                 // Add feedback message if question is locked
                 if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) {
                     if (isInvalidQuestion) {
-                        html += `<div style="margin-top:1rem;padding:0.8rem;border-radius:12px;background:#fce4ec;border:1px solid #e91e63;font-weight:600;color:#e91e63;">
+                        html += `<div style="margin-top:1rem;padding:0.8rem;border-radius:12px;background:#fce4ec;border:1px solid #e91e63;font-weight:600;color:#880e4f;">
                             ⚠️ This question has no matching correct answer in the database. Please check the data.
                         </div>`;
                     } else {
                         const isCorrect = selectedAllAnswers[idx] === q.correct;
-                        const feedbackClass = isCorrect ? 'correct' : 'wrong';
                         const feedbackIcon = isCorrect ? '✅' : '❌';
                         const feedbackMsg = isCorrect ?
                             'Correct! Great job!' :
@@ -1351,24 +1352,20 @@
                 pendingCount.textContent = pending;
                 invalidCount.textContent = invalid;
 
+                if (invalid > 0) {
+                    invalidLegend.style.display = 'inline-flex';
+                } else {
+                    invalidLegend.style.display = 'none';
+                }
+
                 if (isSubmitted || quizCompleted) {
                     correctLegend.style.display = 'inline-flex';
                     wrongLegend.style.display = 'inline-flex';
-                    if (invalid > 0) {
-                        invalidLegend.style.display = 'inline-flex';
-                    } else {
-                        invalidLegend.style.display = 'none';
-                    }
                     correctCount.textContent = correct;
                     wrongCount.textContent = wrong;
                 } else {
                     correctLegend.style.display = 'none';
                     wrongLegend.style.display = 'none';
-                    if (invalid > 0) {
-                        invalidLegend.style.display = 'inline-flex';
-                    } else {
-                        invalidLegend.style.display = 'none';
-                    }
                 }
             }
 
@@ -1424,6 +1421,9 @@
                 const attempted = getAttemptedCount();
                 let msg = (score === totalQuestions) ? '🌟 Perfect!' : (score >= totalQuestions * 0.7 ?
                     '👏 Great job!' : '💪 Keep practicing!');
+                if (parseInt(invalidCount.textContent) > 0) {
+                    msg += ' ⚠️ Some questions have invalid data.';
+                }
                 resultMessage.textContent = msg;
                 resultDetails.innerHTML = '';
                 questions.forEach((q, idx) => {
