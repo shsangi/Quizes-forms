@@ -525,10 +525,10 @@
 
   <div class="modal-overlay" id="refreshModal">
     <div class="modal-box">
-      <h3>🔄 Select Year</h3>
-      <p>Choose a year to load questions from column C, or select "All Years".</p>
+      <h3>🔄 Select Category</h3>
+      <p>Choose a category from column C to load questions, or select "All Categories".</p>
       <select class="year-select" id="modalYearSelect">
-        <option value="all">All Years</option>
+        <option value="all">All Categories</option>
       </select>
       <div class="modal-actions">
         <button class="btn-secondary" id="modalCancel">Cancel</button>
@@ -555,8 +555,8 @@
     let quizTitleText = 'Quiz';
     let timerInterval = null;
     let timeRemaining = 0;
-    let allYears = [];
-    let currentYear = 'all';
+    let allCategories = [];
+    let currentCategory = 'all';
 
     const questionCard = document.getElementById('questionCard');
     const prevBtn = document.getElementById('prevBtn');
@@ -616,7 +616,7 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
           score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions, currentIndex, timeRemaining,
-          currentYear, allYears
+          currentCategory, allCategories
         }));
       } catch(e) {}
     }
@@ -691,22 +691,22 @@
       document.querySelector('.quiz-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function populateYearDropdown(years) {
-      allYears = years;
+    function populateCategoryDropdown(categories) {
+      allCategories = categories;
       const currentVal = modalYearSelect.value;
-      modalYearSelect.innerHTML = '<option value="all">All Years</option>';
-      years.forEach(year => {
+      modalYearSelect.innerHTML = '<option value="all">All Categories</option>';
+      categories.forEach(cat => {
         const opt = document.createElement('option');
-        opt.value = year;
-        opt.textContent = year || 'Uncategorized';
+        opt.value = cat;
+        opt.textContent = cat || 'Uncategorized';
         modalYearSelect.appendChild(opt);
       });
-      if (currentVal && years.includes(currentVal)) modalYearSelect.value = currentVal;
+      if (currentVal && categories.includes(currentVal)) modalYearSelect.value = currentVal;
       else modalYearSelect.value = 'all';
       
       // Update badge
-      if (currentYear && currentYear !== 'all') {
-        yearBadge.textContent = '📅 ' + currentYear;
+      if (currentCategory && currentCategory !== 'all') {
+        yearBadge.textContent = '📂 ' + currentCategory;
         yearBadge.style.display = 'inline-block';
       } else {
         yearBadge.textContent = '';
@@ -714,14 +714,14 @@
       }
     }
 
-    function filterQuestionsByYear(year) {
-      if (year === 'all') return originalQuestions;
-      return originalQuestions.filter(q => q.year === year);
+    function filterQuestionsByCategory(category) {
+      if (category === 'all') return originalQuestions;
+      return originalQuestions.filter(q => q.category === category);
     }
 
-    function fetchQuestions(forceRefresh = false, year = null) {
+    function fetchQuestions(forceRefresh = false, category = null) {
       showLoading();
-      if (year !== null) currentYear = year;
+      if (category !== null) currentCategory = category;
       
       if (!forceRefresh) {
         const saved = loadState();
@@ -738,11 +738,11 @@
           score = saved.score || 0;
           currentIndex = saved.currentIndex || 0;
           timeRemaining = saved.timeRemaining || (totalQuestions * 60);
-          currentYear = saved.currentYear || 'all';
-          allYears = saved.allYears || [];
+          currentCategory = saved.currentCategory || 'all';
+          allCategories = saved.allCategories || [];
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
-          populateYearDropdown(allYears);
+          populateCategoryDropdown(allCategories);
           hideLoading();
           if (quizCompleted) { 
             showResult(); 
@@ -765,26 +765,26 @@
           const parsed = parseCSV(csvText);
           if (parsed.questions.length === 0) throw new Error('No data');
           
-          // Store all questions with years
+          // Store all questions with categories
           originalQuestions = parsed.questions;
           quizTitleText = parsed.title || 'Quiz';
           
-          // Extract unique years from column C (index 2)
-          const years = [...new Set(originalQuestions.map(q => q.year || '').filter(y => y))];
-          populateYearDropdown(years);
+          // Extract unique categories from column C (index 2)
+          const categories = [...new Set(originalQuestions.map(q => q.category || '').filter(c => c && c.trim()))];
+          populateCategoryDropdown(categories);
           
-          // Apply year filter
+          // Apply category filter
           let filtered = originalQuestions;
-          const targetYear = year || currentYear || 'all';
-          if (targetYear !== 'all') {
-            filtered = originalQuestions.filter(q => q.year === targetYear);
+          const targetCategory = category || currentCategory || 'all';
+          if (targetCategory !== 'all') {
+            filtered = originalQuestions.filter(q => q.category === targetCategory);
           }
           
-          // If no questions in selected year, fallback to all
+          // If no questions in selected category, fallback to all
           if (filtered.length === 0) {
             filtered = originalQuestions;
             modalYearSelect.value = 'all';
-            currentYear = 'all';
+            currentCategory = 'all';
             yearBadge.textContent = '';
             yearBadge.style.display = 'none';
           }
@@ -839,14 +839,14 @@
         const correctAns = cols[9]?.trim() || '';
         let correctIdx = -1;
         if (correctAns) { for (let j=0; j<opts.length; j++) { if (opts[j] === correctAns) { correctIdx = j; break; } } }
-        // Column C is index 2 (year)
-        const year = cols[2]?.trim() || '';
+        // Column C is index 2 (category/year)
+        const category = cols[2]?.trim() || '';
         result.push({ 
           question: q, 
           options: opts, 
           correct: correctIdx, 
           correctText: correctAns,
-          year: year
+          category: category
         });
       }
       return { questions: result, title };
@@ -1143,24 +1143,24 @@
     }
 
     function handleRefreshClick() {
-      // Populate modal dropdown with current years
-      modalYearSelect.innerHTML = '<option value="all">All Years</option>';
-      allYears.forEach(year => {
+      // Populate modal dropdown with current categories
+      modalYearSelect.innerHTML = '<option value="all">All Categories</option>';
+      allCategories.forEach(cat => {
         const opt = document.createElement('option');
-        opt.value = year;
-        opt.textContent = year || 'Uncategorized';
+        opt.value = cat;
+        opt.textContent = cat || 'Uncategorized';
         modalYearSelect.appendChild(opt);
       });
-      modalYearSelect.value = currentYear || 'all';
+      modalYearSelect.value = currentCategory || 'all';
       refreshModal.classList.add('active');
     }
     
     function handleRefreshConfirm() {
-      const selectedYear = modalYearSelect.value;
+      const selectedCategory = modalYearSelect.value;
       if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       resetToQuizView();
-      fetchQuestions(true, selectedYear);
+      fetchQuestions(true, selectedCategory);
     }
     
     function handleRefreshCancel() { refreshModal.classList.remove('active'); }
