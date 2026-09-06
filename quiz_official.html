@@ -153,14 +153,6 @@
       margin-bottom: 1.2rem;
       color: #0a212b;
       line-height: 1.4;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 6px;
-      transition: background 0.15s;
-      display: inline-block;
-    }
-    .question-card .q-text:hover {
-      background: #eaf1f8;
     }
     .options-list {
       display: flex;
@@ -417,23 +409,6 @@
     }
     .modal-actions .btn-secondary:hover { background: #c8d4df; }
 
-    .filter-select {
-      padding: 0.5rem 1rem;
-      border-radius: 40px;
-      border: 1.5px solid #dce6ef;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: #1d3847;
-      background: white;
-      cursor: pointer;
-      min-width: 140px;
-      margin-top: 0.5rem;
-      transition: 0.15s;
-    }
-    .filter-select:hover { border-color: #6fa6c7; }
-    .filter-select:focus { outline: none; border-color: #2f7b9e; }
-
     @media (max-width: 550px) {
       .quiz-wrapper { padding: 1.4rem 0.8rem; }
       .brand-logo { width: 36px; height: 36px; }
@@ -517,11 +492,10 @@
   <div class="modal-overlay" id="refreshModal">
     <div class="modal-box">
       <h3>🔄 Refresh Quiz</h3>
-      <p>Select a category to load questions (or choose "All Questions"):</p>
-      <select class="filter-select" id="categoryFilter"></select>
-      <div style="margin-top: 1.2rem; display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
+      <p>All progress will be reset. Reload latest questions from spreadsheet?</p>
+      <div class="modal-actions">
         <button class="btn-secondary" id="modalCancel">Cancel</button>
-        <button class="btn-primary" id="modalConfirm">Load Category</button>
+        <button class="btn-primary" id="modalConfirm">Yes, Refresh</button>
       </div>
     </div>
   </div>
@@ -544,8 +518,6 @@
     let quizTitleText = 'Quiz';
     let timerInterval = null;
     let timeRemaining = 0;
-    let allQuestionsData = [];
-    let categories = [];
 
     const questionCard = document.getElementById('questionCard');
     const prevBtn = document.getElementById('prevBtn');
@@ -565,7 +537,6 @@
     const refreshModal = document.getElementById('refreshModal');
     const modalCancel = document.getElementById('modalCancel');
     const modalConfirm = document.getElementById('modalConfirm');
-    const categoryFilter = document.getElementById('categoryFilter');
     const doneCount = document.getElementById('doneCount');
     const pendingCount = document.getElementById('pendingCount');
     const correctCount = document.getElementById('correctCount');
@@ -662,13 +633,7 @@
       else if (timeRemaining < 300) timerDisplay.classList.add('warning');
     }
 
-    function searchQuestionOnGoogle(questionText, event) {
-      if (event) event.stopPropagation();
-      const encoded = encodeURIComponent(questionText);
-      window.open(`https://www.google.com/search?q=${encoded}`, '_blank');
-    }
-
-    function fetchQuestions(forceRefresh = false, category = null) {
+    function fetchQuestions(forceRefresh = false) {
       showLoading();
       if (!forceRefresh) {
         const saved = loadState();
@@ -704,30 +669,7 @@
         .then(csvText => {
           const parsed = parseCSV(csvText);
           if (parsed.questions.length === 0) throw new Error('No data');
-          
-          allQuestionsData = parsed.questions;
-          categories = parsed.categories || [];
-          
-          // Populate category dropdown
-          categoryFilter.innerHTML = '<option value="all">All Questions</option>';
-          categories.forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = cat;
-            opt.textContent = cat;
-            categoryFilter.appendChild(opt);
-          });
-          
-          let filteredQuestions = allQuestionsData;
-          if (category && category !== 'all') {
-            filteredQuestions = allQuestionsData.filter(q => q.category === category);
-          }
-          
-          if (filteredQuestions.length === 0) {
-            alert('No questions found for this category. Showing all questions.');
-            filteredQuestions = allQuestionsData;
-          }
-          
-          originalQuestions = filteredQuestions;
+          originalQuestions = parsed.questions;
           quizTitleText = parsed.title || 'Quiz';
           totalQuestions = originalQuestions.length;
           questions = originalQuestions.map(q => {
@@ -761,26 +703,23 @@
 
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim() !== '');
-      if (lines.length < 2) return { questions: [], title: 'Quiz', categories: [] };
+      if (lines.length < 2) return { questions: [], title: 'Quiz' };
       let title = 'Quiz';
       const first = parseCSVLine(lines[0]);
       if (first.length > 2 && first[2]) title = first[2].trim() || 'Quiz';
       const result = [];
-      const categoriesSet = new Set();
       for (let i = 1; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 6) continue;
         const q = cols[4]?.trim() || '';
         if (!q) continue;
-        const category = cols[2]?.trim() || '';
-        if (category) categoriesSet.add(category);
         const opts = [ cols[5]?.trim() || '', cols[6]?.trim() || '', cols[7]?.trim() || '', cols[8]?.trim() || '' ];
         const correctAns = cols[9]?.trim() || '';
         let correctIdx = -1;
         if (correctAns) { for (let j=0; j<opts.length; j++) { if (opts[j] === correctAns) { correctIdx = j; break; } } }
-        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns, category: category });
+        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns });
       }
-      return { questions: result, title, categories: Array.from(categoriesSet) };
+      return { questions: result, title };
     }
 
     function parseCSVLine(line) {
@@ -807,7 +746,7 @@
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
       
-      let html = `<div class="q-text" data-question="${q.question}">${idx+1}. ${q.question}</div><div class="options-list">`;
+      let html = `<div class="q-text">${idx+1}. ${q.question}</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
         let cls = 'option-btn';
         let iconSpan = '<span class="icon-indicator"></span>';
@@ -830,15 +769,6 @@
       });
       html += '</div>';
       questionCard.innerHTML = html;
-
-      // Add click listener to question text for Google search
-      const qTextEl = questionCard.querySelector('.q-text');
-      if (qTextEl) {
-        qTextEl.addEventListener('click', function(e) {
-          const questionText = this.dataset.question || this.textContent.replace(/^\d+\.\s*/, '');
-          searchQuestionOnGoogle(questionText, e);
-        });
-      }
 
       if (!isSubmitted && !quizCompleted) {
         questionCard.querySelectorAll('.option-btn:not(.locked-btn)').forEach(btn => {
@@ -1058,27 +988,12 @@
       saveState();
     }
 
-    function handleRefreshClick() {
-      // Load categories into dropdown before showing
-      if (allQuestionsData.length > 0) {
-        categoryFilter.innerHTML = '<option value="all">All Questions</option>';
-        categories.forEach(cat => {
-          const opt = document.createElement('option');
-          opt.value = cat;
-          opt.textContent = cat;
-          categoryFilter.appendChild(opt);
-        });
-      }
-      refreshModal.classList.add('active');
-    }
-
+    function handleRefreshClick() { refreshModal.classList.add('active'); }
     function handleRefreshConfirm() {
-      const selectedCategory = categoryFilter.value;
       if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      fetchQuestions(true, selectedCategory);
+      fetchQuestions(true);
     }
-
     function handleRefreshCancel() { refreshModal.classList.remove('active'); }
 
     prevBtn.addEventListener('click', function() {
