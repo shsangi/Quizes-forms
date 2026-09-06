@@ -868,19 +868,21 @@
             function startTimer() {
                 if (timerInterval) clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
-                    timeRemaining--;
-                    updateTimerDisplay();
-                    if (timeRemaining <= 0) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                        if (!quizCompleted && !isSubmitted) {
-                            gradeQuiz();
-                            quizCompleted = true;
-                            endQuizBtn.disabled = true;
-                            showResult();
+                    if (!quizCompleted && !isSubmitted) {
+                        timeRemaining--;
+                        updateTimerDisplay();
+                        if (timeRemaining <= 0) {
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                            if (!quizCompleted && !isSubmitted) {
+                                gradeQuiz();
+                                quizCompleted = true;
+                                endQuizBtn.disabled = true;
+                                showResult();
+                            }
                         }
+                        saveState();
                     }
-                    saveState();
                 }, 1000);
             }
 
@@ -954,12 +956,12 @@
                         totalCount.textContent = totalQuestions;
                         populateCategoryDropdown(allCategories);
                         hideLoading();
+                        updateTimerDisplay();
                         if (quizCompleted) {
                             showResult();
                             return;
                         }
                         resetToQuizView();
-                        updateTimerDisplay();
                         startTimer();
                         renderQuestion();
                         renderDots();
@@ -1205,9 +1207,8 @@
                     dot.className = 'grid-dot';
                     dot.textContent = i + 1;
                     const hasAns = selectedAllAnswers[i] !== null;
-                    
+
                     if (isSubmitted || quizCompleted) {
-                        // On score screen, use answerStatus
                         if (answerStatus[i] === true) {
                             dot.classList.add('correct-dot');
                         } else if (answerStatus[i] === false) {
@@ -1218,7 +1219,6 @@
                             dot.classList.add('pending-dot');
                         }
                     } else {
-                        // During quiz, show based on selection
                         if (hasAns) {
                             const q = questions[i];
                             if (q && selectedAllAnswers[i] === q.correct) {
@@ -1230,7 +1230,7 @@
                             dot.classList.add('pending-dot');
                         }
                     }
-                    
+
                     if (activeIdx !== undefined && i === activeIdx) dot.classList.add('active-dot');
                     dot.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -1270,8 +1270,7 @@
                 pendingCount.textContent = pending;
                 correctCount.textContent = correct;
                 wrongCount.textContent = wrong;
-                
-                // Always show correct/wrong legends
+
                 correctLegend.style.display = 'inline-flex';
                 wrongLegend.style.display = 'inline-flex';
             }
@@ -1368,9 +1367,9 @@
                     div.appendChild(ansDiv);
                     resultDetails.appendChild(div);
                 });
-                // Update overview with correct/wrong counts for result screen
                 updateOverview();
                 renderDots();
+                updateProgress();
                 saveState();
                 scrollToTop();
             }
