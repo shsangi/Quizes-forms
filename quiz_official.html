@@ -108,10 +108,6 @@
       flex-wrap: wrap;
       gap: 0.3rem 0.8rem;
     }
-    .top-info .question-label {
-      font-weight: 600;
-      color: #0b2a3b;
-    }
     .top-info .timer { font-weight: 600; color: #0b2a3b; }
     .top-info .timer.warning { color: #856404; }
     .top-info .timer.danger { color: #b33c3c; animation: pulse 1s infinite; }
@@ -447,7 +443,7 @@
   </div>
 
   <div class="top-info">
-    <span class="question-label" id="questionLabel">Question 1 of 0</span>
+    <span></span>
     <span>⏱️ <span class="timer" id="timerDisplay">00:00</span></span>
   </div>
 
@@ -530,7 +526,6 @@
     const progressFill = document.getElementById('progressFill');
     const attemptedCount = document.getElementById('attemptedCount');
     const totalCount = document.getElementById('totalCount');
-    const questionLabel = document.getElementById('questionLabel');
     const dotGrid = document.getElementById('dotGrid');
     const resultArea = document.getElementById('resultArea');
     const finalScore = document.getElementById('finalScore');
@@ -750,9 +745,6 @@
       const q = questions[currentIndex];
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
-      
-      // Update the question label
-      questionLabel.textContent = `Question ${idx+1} of ${totalQuestions}`;
       
       let html = `<div class="q-text">${idx+1}. ${q.question}</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
