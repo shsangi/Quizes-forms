@@ -95,7 +95,7 @@
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* timer + question line */
+    /* timer + question label in one line */
     .top-info {
       display: flex;
       justify-content: space-between;
@@ -131,17 +131,6 @@
       background: linear-gradient(90deg, #2f7b9e, #4ba3c7);
       border-radius: 20px;
       transition: width 0.35s ease;
-    }
-    .progress-label {
-      text-align: center;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #1f4d66;
-      margin-bottom: 0.8rem;
-    }
-    .progress-label .attempted {
-      color: #0b2a3b;
-      font-weight: 700;
     }
 
     .question-card {
@@ -217,7 +206,6 @@
     .options-list .option-btn:disabled { cursor: default; opacity: 0.8; }
     .options-list .option-btn:disabled:hover { transform: none; }
 
-    /* tick/cross icons on options */
     .options-list .option-btn .icon-indicator {
       margin-left: auto;
       font-size: 1.1rem;
@@ -460,7 +448,6 @@
     <div class="progress-block">
       <div class="progress-fill" id="progressFill" style="width:0%;"></div>
     </div>
-    <div class="progress-label" id="progressLabel">Attempted: <span class="attempted" id="attemptedCount">0</span> / <span id="totalCount">0</span></div>
 
     <div id="singleQuestionView">
       <div id="submittedBanner" style="display:none;" class="submitted-header">✅ Submitted — You can review. Click "End Quiz" for final score.</div>
@@ -533,8 +520,6 @@
     const nextBtn = document.getElementById('nextBtn');
     const endQuizBtn = document.getElementById('endQuizBtn');
     const progressFill = document.getElementById('progressFill');
-    const attemptedCount = document.getElementById('attemptedCount');
-    const totalCount = document.getElementById('totalCount');
     const questionLabel = document.getElementById('questionLabel');
     const dotGrid = document.getElementById('dotGrid');
     const resultArea = document.getElementById('resultArea');
@@ -569,6 +554,14 @@
 
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
+    }
+
+    function getCorrectCount() {
+      let correct = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (answerStatus[i] === true) correct++;
+      }
+      return correct;
     }
 
     function loadLogo() {
@@ -661,7 +654,6 @@
           currentIndex = saved.currentIndex || 0;
           timeRemaining = saved.timeRemaining || (totalQuestions * 60);
           quizTitle.textContent = quizTitleText;
-          totalCount.textContent = totalQuestions;
           hideLoading();
           if (quizCompleted) { showResult(); return; }
           updateTimerDisplay();
@@ -694,7 +686,6 @@
           timeRemaining = totalQuestions * 60;
           clearState();
           quizTitle.textContent = quizTitleText;
-          totalCount.textContent = totalQuestions;
           hideLoading();
           updateTimerDisplay();
           startTimer();
@@ -756,8 +747,9 @@
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
       
-      // update question label
-      questionLabel.textContent = `Question ${idx+1} of ${totalQuestions}`;
+      // Update question label with correct count
+      const correct = getCorrectCount();
+      questionLabel.textContent = `Question ${idx+1} of ${totalQuestions}  •  ✅ ${correct}/${totalQuestions}`;
       
       let html = `<div class="q-text">${idx+1}. ${q.question}</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
@@ -812,9 +804,11 @@
               if (oi === optIdx) b.classList.add('selected-opt');
             });
             renderDots();
-            updateProgress();
             updateOverview();
             saveState();
+            // Update question label with new correct count
+            const correct = getCorrectCount();
+            questionLabel.textContent = `Question ${currentIndex+1} of ${totalQuestions}  •  ✅ ${correct}/${totalQuestions}`;
           });
         });
       }
@@ -823,7 +817,6 @@
         questionCard.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
       }
 
-      updateProgress();
       prevBtn.disabled = currentIndex === 0 || quizCompleted;
       nextBtn.disabled = currentIndex === totalQuestions - 1 || quizCompleted;
       endQuizBtn.disabled = quizCompleted;
@@ -835,14 +828,11 @@
         endQuizBtn.textContent = '🏁 End Quiz';
       }
       if (quizCompleted) { endQuizBtn.disabled = true; }
-    }
-
-    function updateProgress() {
+      
+      // Update progress
       const answered = getAttemptedCount();
-      attemptedCount.textContent = answered;
       const pct = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
       progressFill.style.width = `${pct}%`;
-      totalCount.textContent = totalQuestions;
     }
 
     function renderDots(activeIdx) {
@@ -867,7 +857,6 @@
           currentIndex = i;
           renderQuestion();
           renderDots(currentIndex);
-          updateProgress();
         });
         dotGrid.appendChild(dot);
       }
@@ -940,7 +929,6 @@
       document.getElementById('singleQuestionView').style.display = 'none';
       resultArea.style.display = 'block';
       finalScore.textContent = `${score} / ${totalQuestions}`;
-      const attempted = getAttemptedCount();
       let msg = (score === totalQuestions) ? '🌟 Perfect!' : (score >= totalQuestions*0.7 ? '👏 Great job!' : '💪 Keep practicing!');
       resultMessage.textContent = msg;
       resultDetails.innerHTML = '';
@@ -1011,10 +999,10 @@
     function handleRefreshCancel() { refreshModal.classList.remove('active'); }
 
     prevBtn.addEventListener('click', function() {
-      if (currentIndex > 0) { currentIndex--; renderQuestion(); renderDots(currentIndex); updateProgress(); }
+      if (currentIndex > 0) { currentIndex--; renderQuestion(); renderDots(currentIndex); }
     });
     nextBtn.addEventListener('click', function() {
-      if (currentIndex < totalQuestions - 1) { currentIndex++; renderQuestion(); renderDots(currentIndex); updateProgress(); }
+      if (currentIndex < totalQuestions - 1) { currentIndex++; renderQuestion(); renderDots(currentIndex); }
     });
     endQuizBtn.addEventListener('click', handleEndQuiz);
     restartFromResult.addEventListener('click', restartQuiz);
