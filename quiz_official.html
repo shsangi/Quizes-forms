@@ -259,12 +259,12 @@
             background: #b33c3c;
             color: white;
         }
-        .options-list .option-btn.invalid {
+        .options-list .option-btn.mismatch {
             background: #fce4ec;
             border-color: #e91e63;
             box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.15);
         }
-        .options-list .option-btn.invalid .letter {
+        .options-list .option-btn.mismatch .letter {
             background: #e91e63;
             color: white;
         }
@@ -403,7 +403,7 @@
         .legend-dot.wrong-dot {
             background: #b33c3c;
         }
-        .legend-dot.invalid-dot {
+        .legend-dot.mismatch-dot {
             background: #e91e63;
         }
 
@@ -446,7 +446,7 @@
             background: #b33c3c;
             color: white;
         }
-        .grid-dot.invalid-dot {
+        .grid-dot.mismatch-dot {
             background: #e91e63;
             color: white;
         }
@@ -509,7 +509,7 @@
         .result-details .detail-item.wrong-detail {
             border-left: 6px solid #b33c3c;
         }
-        .result-details .detail-item.invalid-detail {
+        .result-details .detail-item.mismatch-detail {
             border-left: 6px solid #e91e63;
         }
         .result-details .detail-q {
@@ -535,7 +535,7 @@
             color: #b33c3c;
             font-weight: 600;
         }
-        .result-details .detail-answer .invalid-ans {
+        .result-details .detail-answer .mismatch-ans {
             color: #e91e63;
             font-weight: 600;
         }
@@ -733,7 +733,7 @@
                         <span class="legend-item"><span class="legend-dot pending-dot"></span> Pending <span class="count" id="pendingCount">0</span></span>
                         <span class="legend-item" id="correctLegend" style="display:none;"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
                         <span class="legend-item" id="wrongLegend" style="display:none;"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
-                        <span class="legend-item" id="invalidLegend" style="display:none;"><span class="legend-dot invalid-dot"></span> Invalid <span class="count" id="invalidCount">0</span></span>
+                        <span class="legend-item" id="mismatchLegend" style="display:none;"><span class="legend-dot mismatch-dot"></span> Mismatch <span class="count" id="mismatchCount">0</span></span>
                     </div>
                 </div>
                 <div class="grid-dots" id="dotGrid"></div>
@@ -783,6 +783,7 @@
             let timeRemaining = 0;
             let allCategories = [];
             let currentCategory = 'all';
+            let mismatchQuestions = [];
 
             const questionCard = document.getElementById('questionCard');
             const prevBtn = document.getElementById('prevBtn');
@@ -806,10 +807,10 @@
             const pendingCount = document.getElementById('pendingCount');
             const correctCount = document.getElementById('correctCount');
             const wrongCount = document.getElementById('wrongCount');
-            const invalidCount = document.getElementById('invalidCount');
+            const mismatchCount = document.getElementById('mismatchCount');
             const correctLegend = document.getElementById('correctLegend');
             const wrongLegend = document.getElementById('wrongLegend');
-            const invalidLegend = document.getElementById('invalidLegend');
+            const mismatchLegend = document.getElementById('mismatchLegend');
             const submittedBanner = document.getElementById('submittedBanner');
             const quizTitle = document.getElementById('quizTitle');
             const brandLogo = document.getElementById('brandLogo');
@@ -856,7 +857,8 @@
                         currentIndex,
                         timeRemaining,
                         currentCategory,
-                        allCategories
+                        allCategories,
+                        mismatchQuestions
                     }));
                 } catch (e) {}
             }
@@ -928,7 +930,7 @@
                 endQuizBtn.disabled = false;
                 correctLegend.style.display = 'none';
                 wrongLegend.style.display = 'none';
-                invalidLegend.style.display = 'none';
+                mismatchLegend.style.display = 'none';
             }
 
             function scrollToTop() {
@@ -949,7 +951,6 @@
                 if (currentVal && categories.includes(currentVal)) modalYearSelect.value = currentVal;
                 else modalYearSelect.value = 'all';
 
-                // Update badge
                 if (currentCategory && currentCategory !== 'all') {
                     yearBadge.textContent = '📂 ' + currentCategory;
                     yearBadge.style.display = 'inline-block';
@@ -962,6 +963,17 @@
             function filterQuestionsByCategory(category) {
                 if (category === 'all') return originalQuestions;
                 return originalQuestions.filter(q => q.category === category);
+            }
+
+            function detectMismatches() {
+                mismatchQuestions = [];
+                for (let i = 0; i < questions.length; i++) {
+                    const q = questions[i];
+                    const selected = selectedAllAnswers[i];
+                    if (selected !== null && q.correct !== -1 && selected !== q.correct) {
+                        mismatchQuestions.push(i);
+                    }
+                }
             }
 
             function fetchQuestions(forceRefresh = false, category = null) {
@@ -985,6 +997,7 @@
                         timeRemaining = saved.timeRemaining || (totalQuestions * 60);
                         currentCategory = saved.currentCategory || 'all';
                         allCategories = saved.allCategories || [];
+                        mismatchQuestions = saved.mismatchQuestions || [];
                         quizTitle.textContent = quizTitleText;
                         totalCount.textContent = totalQuestions;
                         populateCategoryDropdown(allCategories);
@@ -1010,23 +1023,19 @@
                         const parsed = parseCSV(csvText);
                         if (parsed.questions.length === 0) throw new Error('No data');
 
-                        // Store all questions with categories
                         originalQuestions = parsed.questions;
                         quizTitleText = parsed.title || 'Quiz';
 
-                        // Extract unique categories from column C (index 2)
                         const categories = [...new Set(originalQuestions.map(q => q.category || '').filter(c => c &&
                             c.trim()))];
                         populateCategoryDropdown(categories);
 
-                        // Apply category filter
                         let filtered = originalQuestions;
                         const targetCategory = category || currentCategory || 'all';
                         if (targetCategory !== 'all') {
                             filtered = originalQuestions.filter(q => q.category === targetCategory);
                         }
 
-                        // If no questions in selected category, fallback to all
                         if (filtered.length === 0) {
                             filtered = originalQuestions;
                             modalYearSelect.value = 'all';
@@ -1035,14 +1044,9 @@
                             yearBadge.style.display = 'none';
                         }
 
-                        // Shuffle and build questions
                         questions = filtered.map(q => {
                             const shuffled = shuffleArray(q.options);
-                            let newCorrect = shuffled.indexOf(q.options[q.correct]);
-                            // If correct answer not found in options, mark as invalid
-                            if (newCorrect === -1 && q.correct >= 0 && q.correct < q.options.length) {
-                                newCorrect = q.correct; // Keep original index if it exists
-                            }
+                            const newCorrect = shuffled.indexOf(q.options[q.correct]);
                             return { ...q, options: shuffled, correct: newCorrect };
                         });
 
@@ -1050,6 +1054,7 @@
                         selectedAllAnswers = new Array(questions.length).fill(null);
                         answerStatus = new Array(questions.length).fill(null);
                         lockedQuestions = new Array(questions.length).fill(false);
+                        mismatchQuestions = [];
                         isSubmitted = false;
                         quizCompleted = false;
                         score = 0;
@@ -1099,15 +1104,13 @@
                             if (opts[j] === correctAns) { correctIdx = j; break; }
                         }
                     }
-                    // Column C is index 2 (category/year)
                     const category = cols[2]?.trim() || '';
                     result.push({
                         question: q,
                         options: opts,
                         correct: correctIdx,
                         correctText: correctAns,
-                        category: category,
-                        isInvalid: correctIdx === -1 && correctAns !== ''
+                        category: category
                     });
                 }
                 return { questions: result, title };
@@ -1141,7 +1144,7 @@
                 const q = questions[currentIndex];
                 const idx = currentIndex;
                 const letters = ['A', 'B', 'C', 'D'];
-                const isInvalidQuestion = q.correct === -1;
+                const isMismatch = mismatchQuestions.includes(idx);
 
                 let html =
                     `<div class="q-text" data-question="${encodeURIComponent(q.question)}">${idx+1}. ${q.question}</div><div class="options-list">`;
@@ -1149,32 +1152,25 @@
                     let cls = 'option-btn';
                     let iconSpan = '<span class="icon-indicator"></span>';
 
-                    // Check if this option is the selected one
                     if (selectedAllAnswers[idx] === oi) {
                         cls += ' selected-opt';
                     }
 
-                    // Show correct/wrong based on stored state
                     if (lockedQuestions[idx] || isSubmitted || quizCompleted) {
-                        if (isInvalidQuestion) {
-                            // Invalid question - show all options in pink
-                            cls += ' invalid';
+                        if (q.correct !== -1 && oi === q.correct) {
+                            cls += ' correct';
+                            iconSpan = '<span class="icon-indicator">✓</span>';
+                        }
+                        if (selectedAllAnswers[idx] === oi && selectedAllAnswers[idx] !== q.correct) {
+                            cls += ' wrong';
+                            iconSpan = '<span class="icon-indicator">✗</span>';
+                        }
+                        if (isMismatch && selectedAllAnswers[idx] === oi) {
+                            cls += ' mismatch';
                             iconSpan = '<span class="icon-indicator">⚠️</span>';
-                        } else {
-                            // Show correct answer in green with checkmark
-                            if (q.correct !== -1 && oi === q.correct) {
-                                cls += ' correct';
-                                iconSpan = '<span class="icon-indicator">✓</span>';
-                            }
-                            // Show user's wrong answer in red with X
-                            if (selectedAllAnswers[idx] === oi && selectedAllAnswers[idx] !== q.correct) {
-                                cls += ' wrong';
-                                iconSpan = '<span class="icon-indicator">✗</span>';
-                            }
                         }
                     }
 
-                    // Add locked class if question is locked
                     if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) cls += ' locked-btn';
 
                     const disabled = lockedQuestions[idx] || isSubmitted || quizCompleted ? 'disabled' : '';
@@ -1184,28 +1180,26 @@
                 });
                 html += '</div>';
 
-                // Add feedback message if question is locked
                 if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) {
-                    if (isInvalidQuestion) {
-                        html += `<div style="margin-top:1rem;padding:0.8rem;border-radius:12px;background:#fce4ec;border:1px solid #e91e63;font-weight:600;color:#e91e63;">
-                            ⚠️ This question has no matching correct answer in the database. Please check the data.
-                        </div>`;
-                    } else {
-                        const isCorrect = selectedAllAnswers[idx] === q.correct;
-                        const feedbackClass = isCorrect ? 'correct' : 'wrong';
-                        const feedbackIcon = isCorrect ? '✅' : '❌';
-                        const feedbackMsg = isCorrect ?
-                            'Correct! Great job!' :
-                            `Incorrect. The correct answer is: ${q.options[q.correct] || 'Not available'}`;
-                        html += `<div style="margin-top:1rem;padding:0.8rem;border-radius:12px;background:${isCorrect ? '#d8eddf' : '#f5dddd'};border:1px solid ${isCorrect ? '#1f8b4c' : '#b33c3c'};font-weight:600;color:${isCorrect ? '#1f8b4c' : '#b33c3c'};">
-                            ${feedbackIcon} ${feedbackMsg}
-                        </div>`;
-                    }
+                    const isCorrect = selectedAllAnswers[idx] === q.correct;
+                    const feedbackClass = isCorrect ? 'correct' : 'wrong';
+                    const feedbackIcon = isCorrect ? '✅' : '❌';
+                    const feedbackMsg = isCorrect ?
+                        'Correct! Great job!' :
+                        `Incorrect. The correct answer is: ${q.options[q.correct] || 'Not available'}`;
+                    html += `<div style="margin-top:1rem;padding:0.8rem;border-radius:12px;background:${isCorrect ? '#d8eddf' : '#f5dddd'};border:1px solid ${isCorrect ? '#1f8b4c' : '#b33c3c'};font-weight:600;color:${isCorrect ? '#1f8b4c' : '#b33c3c'};">
+                        ${feedbackIcon} ${feedbackMsg}
+                    </div>`;
+                }
+
+                if (isMismatch && lockedQuestions[idx]) {
+                    html += `<div style="margin-top:0.5rem;padding:0.8rem;border-radius:12px;background:#fce4ec;border:1px solid #e91e63;font-weight:600;color:#e91e63;">
+                        ⚠️ This answer doesn't match the available choices in the database.
+                    </div>`;
                 }
 
                 questionCard.innerHTML = html;
 
-                // Click on question text to search Google
                 const qTextEl = questionCard.querySelector('.q-text');
                 if (qTextEl) {
                     qTextEl.addEventListener('click', function(e) {
@@ -1218,7 +1212,6 @@
                     });
                 }
 
-                // Only attach click listeners if not locked and not submitted
                 if (!isSubmitted && !quizCompleted) {
                     questionCard.querySelectorAll('.option-btn:not(.locked-btn)').forEach(btn => {
                         btn.addEventListener('click', function(e) {
@@ -1227,14 +1220,23 @@
                             const qIdx = currentIndex;
                             if (lockedQuestions[qIdx] || isSubmitted || quizCompleted) return;
 
-                            // Lock this question and store the answer
                             lockedQuestions[qIdx] = true;
                             selectedAllAnswers[qIdx] = optIdx;
 
-                            // Immediately re-render to show correct/wrong
-                            renderQuestion();
+                            // Check if this is a mismatch
+                            const qData = questions[qIdx];
+                            if (qData.correct !== -1 && optIdx !== qData.correct) {
+                                if (!mismatchQuestions.includes(qIdx)) {
+                                    mismatchQuestions.push(qIdx);
+                                }
+                            } else {
+                                const index = mismatchQuestions.indexOf(qIdx);
+                                if (index > -1) {
+                                    mismatchQuestions.splice(index, 1);
+                                }
+                            }
 
-                            // Update overview and dots
+                            renderQuestion();
                             renderDots(currentIndex);
                             updateProgress();
                             updateOverview();
@@ -1276,26 +1278,20 @@
                     dot.className = 'grid-dot';
                     dot.textContent = i + 1;
                     const hasAns = selectedAllAnswers[i] !== null;
-                    const q = questions[i];
-                    const isInvalid = q && q.correct === -1;
+                    const isMismatch = mismatchQuestions.includes(i);
 
                     if (isSubmitted || quizCompleted) {
-                        if (isInvalid) {
-                            dot.classList.add('invalid-dot');
-                        } else if (answerStatus[i] === true) {
-                            dot.classList.add('correct-dot');
-                        } else if (answerStatus[i] === false) {
-                            dot.classList.add('wrong-dot');
-                        } else if (hasAns) {
-                            dot.classList.add('done-dot');
-                        } else {
-                            dot.classList.add('pending-dot');
-                        }
+                        if (answerStatus[i] === true) dot.classList.add('correct-dot');
+                        else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
+                        else if (isMismatch) dot.classList.add('mismatch-dot');
+                        else if (hasAns) dot.classList.add('done-dot');
+                        else dot.classList.add('pending-dot');
                     } else {
-                        if (hasAns) {
-                            if (isInvalid) {
-                                dot.classList.add('invalid-dot');
-                            } else if (q && selectedAllAnswers[i] === q.correct) {
+                        if (isMismatch) {
+                            dot.classList.add('mismatch-dot');
+                        } else if (hasAns) {
+                            const q = questions[i];
+                            if (q && selectedAllAnswers[i] === q.correct) {
                                 dot.classList.add('correct-dot');
                             } else {
                                 dot.classList.add('wrong-dot');
@@ -1321,22 +1317,18 @@
                     pending = 0,
                     correct = 0,
                     wrong = 0,
-                    invalid = 0;
+                    mismatch = 0;
                 for (let i = 0; i < totalQuestions; i++) {
-                    const q = questions[i];
-                    const isInvalid = q && q.correct === -1;
-                    if (isInvalid) {
-                        invalid++;
-                        done++;
-                        continue;
-                    }
+                    const isMismatch = mismatchQuestions.includes(i);
                     if (selectedAllAnswers[i] !== null) {
                         done++;
-                        if (isSubmitted || quizCompleted) {
+                        if (isMismatch) {
+                            mismatch++;
+                        } else if (isSubmitted || quizCompleted) {
                             if (answerStatus[i] === true) correct++;
                             else if (answerStatus[i] === false) wrong++;
                         } else {
-                            // Check if the answer is correct
+                            const q = questions[i];
                             if (q && selectedAllAnswers[i] === q.correct) {
                                 correct++;
                             } else {
@@ -1349,40 +1341,30 @@
                 }
                 doneCount.textContent = done;
                 pendingCount.textContent = pending;
-                invalidCount.textContent = invalid;
-
-                if (isSubmitted || quizCompleted) {
+                if (isSubmitted || quizCompleted || mismatch > 0) {
                     correctLegend.style.display = 'inline-flex';
                     wrongLegend.style.display = 'inline-flex';
-                    if (invalid > 0) {
-                        invalidLegend.style.display = 'inline-flex';
+                    if (mismatch > 0) {
+                        mismatchLegend.style.display = 'inline-flex';
+                        mismatchCount.textContent = mismatch;
                     } else {
-                        invalidLegend.style.display = 'none';
+                        mismatchLegend.style.display = 'none';
                     }
                     correctCount.textContent = correct;
                     wrongCount.textContent = wrong;
                 } else {
                     correctLegend.style.display = 'none';
                     wrongLegend.style.display = 'none';
-                    if (invalid > 0) {
-                        invalidLegend.style.display = 'inline-flex';
-                    } else {
-                        invalidLegend.style.display = 'none';
-                    }
+                    mismatchLegend.style.display = 'none';
                 }
             }
 
             function gradeQuiz() {
                 let correctLocal = 0;
-                let invalidLocal = 0;
                 for (let i = 0; i < questions.length; i++) {
                     const q = questions[i];
                     const selected = selectedAllAnswers[i];
-                    if (q.correct === -1) {
-                        answerStatus[i] = null;
-                        invalidLocal++;
-                        continue;
-                    }
+                    if (q.correct === -1) { answerStatus[i] = null; continue; }
                     if (selected !== null && selected === q.correct) {
                         answerStatus[i] = true;
                         correctLocal++;
@@ -1424,25 +1406,21 @@
                 const attempted = getAttemptedCount();
                 let msg = (score === totalQuestions) ? '🌟 Perfect!' : (score >= totalQuestions * 0.7 ?
                     '👏 Great job!' : '💪 Keep practicing!');
+                if (mismatchQuestions.length > 0) {
+                    msg += ` ⚠️ ${mismatchQuestions.length} question(s) have answer mismatches.`;
+                }
                 resultMessage.textContent = msg;
                 resultDetails.innerHTML = '';
                 questions.forEach((q, idx) => {
                     const div = document.createElement('div');
                     div.className = 'detail-item';
-                    const isInvalid = q.correct === -1;
                     const isCorrect = answerStatus[idx] === true;
                     const isWrong = answerStatus[idx] === false;
-
-                    if (isInvalid) {
-                        div.classList.add('invalid-detail');
-                    } else if (isCorrect) {
-                        div.classList.add('correct-detail');
-                    } else if (isWrong) {
-                        div.classList.add('wrong-detail');
-                    } else {
-                        div.style.borderLeft = '6px solid #999';
-                    }
-
+                    const isMismatch = mismatchQuestions.includes(idx);
+                    if (isCorrect) div.classList.add('correct-detail');
+                    else if (isWrong) div.classList.add('wrong-detail');
+                    else if (isMismatch) div.classList.add('mismatch-detail');
+                    else div.style.borderLeft = '6px solid #999';
                     const qText = document.createElement('div');
                     qText.className = 'detail-q';
                     qText.textContent = `${idx+1}. ${q.question}`;
@@ -1457,19 +1435,17 @@
                         }
                     });
                     div.appendChild(qText);
-
                     const ansDiv = document.createElement('div');
                     ansDiv.className = 'detail-answer';
                     const userAns = (selectedAllAnswers[idx] !== null && q.options[selectedAllAnswers[idx]]) ? q
                         .options[selectedAllAnswers[idx]] : 'Not answered';
                     const correctAns = (q.correct !== -1 && q.options[q.correct]) ? q.options[q.correct] :
                         'Not available';
-
-                    if (isInvalid) {
+                    if (isMismatch) {
                         ansDiv.innerHTML =
-                            `<span style="color:#e91e63;">⚠️ Invalid question - correct answer not found in options</span>`;
+                            `⚠️ Mismatch: Your answer <span class="mismatch-ans">${userAns}</span> doesn't match available choices. Correct: <span class="correct-ans">${correctAns}</span>`;
                     } else if (q.correct === -1) {
-                        ansDiv.innerHTML = `<span style="color:#999;">⚠️ No correct answer in database.</span>`;
+                        ansDiv.innerHTML = `<span style="color:#999;">⚠️ No correct answer.</span>`;
                     } else if (isCorrect) {
                         ansDiv.innerHTML =
                             `✅ Your answer: <span style="color:#1f8b4c;">${userAns}</span> (Correct)`;
@@ -1492,6 +1468,7 @@
                 selectedAllAnswers = new Array(questions.length).fill(null);
                 answerStatus = new Array(questions.length).fill(null);
                 lockedQuestions = new Array(questions.length).fill(false);
+                mismatchQuestions = [];
                 isSubmitted = false;
                 quizCompleted = false;
                 score = 0;
@@ -1506,15 +1483,11 @@
                 endQuizBtn.disabled = false;
                 correctLegend.style.display = 'none';
                 wrongLegend.style.display = 'none';
-                invalidLegend.style.display = 'none';
-                // Reshuffle current questions
+                mismatchLegend.style.display = 'none';
                 const currentQuestions = questions;
                 questions = currentQuestions.map(q => {
                     const shuffled = shuffleArray(q.options);
-                    let newCorrect = shuffled.indexOf(q.options[q.correct]);
-                    if (newCorrect === -1 && q.correct >= 0 && q.correct < q.options.length) {
-                        newCorrect = q.correct;
-                    }
+                    const newCorrect = shuffled.indexOf(q.options[q.correct]);
                     return { ...q, options: shuffled, correct: newCorrect };
                 });
                 updateTimerDisplay();
@@ -1527,7 +1500,6 @@
             }
 
             function handleRefreshClick() {
-                // Populate modal dropdown with current categories
                 modalYearSelect.innerHTML = '<option value="all">All Categories</option>';
                 allCategories.forEach(cat => {
                     const opt = document.createElement('option');
