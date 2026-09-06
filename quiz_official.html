@@ -71,7 +71,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      position: relative;
+      flex-wrap: wrap;
     }
     .btn-icon {
       background: transparent;
@@ -97,42 +97,19 @@
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
     .category-dropdown {
-      position: absolute;
-      top: 45px;
-      right: 0;
+      padding: 0.4rem 0.8rem;
+      border-radius: 30px;
+      border: 1.5px solid #dce6ef;
       background: white;
-      border: 1px solid #dce6ef;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-      padding: 0.5rem 0;
-      min-width: 200px;
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 100;
-      display: none;
-    }
-    .category-dropdown.active { display: block; }
-    .category-dropdown .cat-item {
-      padding: 0.6rem 1.2rem;
-      cursor: pointer;
-      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
       color: #1f4d66;
-      transition: 0.1s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      outline: none;
+      cursor: pointer;
+      max-width: 140px;
     }
-    .category-dropdown .cat-item:hover { background: #eaf1f8; }
-    .category-dropdown .cat-item .badge {
-      background: #2f7b9e;
-      color: white;
-      border-radius: 20px;
-      padding: 0.1rem 0.6rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    .category-dropdown .cat-item.all-cat { font-weight: 600; color: #0b2a3b; border-bottom: 1px solid #e2eaf2; }
-    .category-dropdown .cat-item .check-mark { color: #1f8b4c; font-weight: 700; }
+    .category-dropdown:focus { border-color: #2f7b9e; }
 
     .top-info {
       display: flex;
@@ -193,20 +170,11 @@
       color: #0a212b;
       line-height: 1.4;
       cursor: pointer;
-      transition: 0.1s;
-      display: inline-block;
+      transition: color 0.15s;
     }
-    .question-card .q-text:hover { color: #1b5a7a; text-decoration: underline; }
-    .question-card .q-text .search-icon { font-size: 0.9rem; margin-left: 0.4rem; opacity: 0.6; }
-    .question-card .q-category {
-      font-size: 0.7rem;
-      color: #6c8a9e;
-      background: #eef4f9;
-      padding: 0.1rem 0.6rem;
-      border-radius: 20px;
-      display: inline-block;
-      margin-left: 0.6rem;
-      font-weight: 500;
+    .question-card .q-text:hover {
+      color: #1b5a7a;
+      text-decoration: underline;
     }
     .options-list {
       display: flex;
@@ -475,7 +443,7 @@
       .action-bar .left-buttons { justify-content: center; }
       .btn-primary, .btn-success { width: 100%; justify-content: center; }
       .top-info { font-size: 0.85rem; }
-      .category-dropdown { right: -40px; min-width: 180px; }
+      .category-dropdown { max-width: 100px; font-size: 0.75rem; }
     }
   </style>
 </head>
@@ -492,13 +460,12 @@
       </div>
     </div>
     <div class="top-actions">
+      <select class="category-dropdown" id="categoryDropdown">
+        <option value="all">All Categories</option>
+      </select>
       <button class="btn-icon" id="refreshBtn" title="Refresh Quiz">
         <span id="refreshIcon">🔄</span>
       </button>
-      <div class="category-dropdown" id="categoryDropdown">
-        <div class="cat-item all-cat" data-category="all">📚 All Questions <span class="badge" id="allCount">0</span></div>
-        <div id="categoryList"></div>
-      </div>
     </div>
   </div>
 
@@ -550,11 +517,16 @@
 
   <div class="modal-overlay" id="refreshModal">
     <div class="modal-box">
-      <h3>🔄 Refresh Quiz</h3>
-      <p>All progress will be reset. Reload latest questions from spreadsheet?</p>
+      <h3>🔄 Refresh &amp; Filter</h3>
+      <p>Select a category to load questions from column C, or choose "All Categories".</p>
+      <div style="margin: 1rem 0;">
+        <select class="category-dropdown" id="modalCategoryDropdown" style="width:100%; max-width:100%; padding:0.6rem;">
+          <option value="all">All Categories</option>
+        </select>
+      </div>
       <div class="modal-actions">
         <button class="btn-secondary" id="modalCancel">Cancel</button>
-        <button class="btn-primary" id="modalConfirm">Yes, Refresh</button>
+        <button class="btn-primary" id="modalConfirm">Load &amp; Refresh</button>
       </div>
     </div>
   </div>
@@ -579,7 +551,6 @@
     let timeRemaining = 0;
     let allCategories = [];
     let currentCategory = 'all';
-    let allRawQuestions = [];
 
     const questionCard = document.getElementById('questionCard');
     const prevBtn = document.getElementById('prevBtn');
@@ -611,8 +582,7 @@
     const timerDisplay = document.getElementById('timerDisplay');
     const singleQuestionView = document.getElementById('singleQuestionView');
     const categoryDropdown = document.getElementById('categoryDropdown');
-    const categoryList = document.getElementById('categoryList');
-    const allCount = document.getElementById('allCount');
+    const modalCategoryDropdown = document.getElementById('modalCategoryDropdown');
 
     function shuffleArray(arr) {
       const a = [...arr];
@@ -640,7 +610,7 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
           score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions, currentIndex, timeRemaining,
-          currentCategory, allRawQuestions, allCategories
+          currentCategory, allCategories
         }));
       } catch(e) {}
     }
@@ -710,102 +680,41 @@
       wrongLegend.style.display = 'none';
     }
 
-    function searchGoogle(query) {
-      if (!query) return;
-      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-      window.open(searchUrl, '_blank');
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.querySelector('.quiz-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function buildCategoryDropdown() {
-      categoryList.innerHTML = '';
-      const cats = [...allCategories].sort();
-      cats.forEach(cat => {
-        const div = document.createElement('div');
-        div.className = 'cat-item';
-        div.dataset.category = cat;
-        const count = allRawQuestions.filter(q => q.category === cat).length;
-        div.innerHTML = `<span>📂 ${cat}</span> <span class="badge">${count}</span>`;
-        if (currentCategory === cat) {
-          div.innerHTML += ' <span class="check-mark">✓</span>';
-        }
-        div.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const catName = this.dataset.category;
-          if (catName !== currentCategory) {
-            loadCategory(catName);
-          }
-          categoryDropdown.classList.remove('active');
+    function populateCategoryDropdowns(categories) {
+      allCategories = categories;
+      [categoryDropdown, modalCategoryDropdown].forEach(dd => {
+        const currentVal = dd.value;
+        dd.innerHTML = '<option value="all">All Categories</option>';
+        categories.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat;
+          opt.textContent = cat || 'Uncategorized';
+          dd.appendChild(opt);
         });
-        categoryList.appendChild(div);
+        if (currentVal && categories.includes(currentVal)) dd.value = currentVal;
+        else dd.value = 'all';
       });
-      // Update all count
-      allCount.textContent = allRawQuestions.length;
     }
 
-    function loadCategory(category) {
-      currentCategory = category;
-      let filtered = [];
-      if (category === 'all') {
-        filtered = allRawQuestions.map(q => ({...q}));
-      } else {
-        filtered = allRawQuestions.filter(q => q.category === category).map(q => ({...q}));
-      }
-      if (filtered.length === 0) {
-        questionCard.innerHTML = '<div style="padding:2rem;text-align:center;color:#6c8a9e;">No questions in this category</div>';
-        return;
-      }
-      // Shuffle and reset
-      originalQuestions = filtered;
-      totalQuestions = originalQuestions.length;
-      questions = originalQuestions.map(q => {
-        const shuffled = shuffleArray(q.options);
-        const newCorrect = shuffled.indexOf(q.options[q.correct]);
-        return { ...q, options: shuffled, correct: newCorrect };
-      });
-      selectedAllAnswers = new Array(questions.length).fill(null);
-      answerStatus = new Array(questions.length).fill(null);
-      lockedQuestions = new Array(questions.length).fill(false);
-      isSubmitted = false; quizCompleted = false; score = 0; currentIndex = 0;
-      timeRemaining = totalQuestions * 60;
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      clearState();
-      quizTitle.textContent = quizTitleText + (category !== 'all' ? ` · ${category}` : '');
-      totalCount.textContent = totalQuestions;
-      resetToQuizView();
-      updateTimerDisplay();
-      startTimer();
-      renderQuestion();
-      renderDots();
-      updateOverview();
-      saveState();
-      // Update dropdown checkmarks
-      document.querySelectorAll('.cat-item').forEach(el => {
-        const check = el.querySelector('.check-mark');
-        if (check) check.remove();
-        if (el.dataset.category === category) {
-          el.innerHTML += ' <span class="check-mark">✓</span>';
-        }
-      });
-      // Update "All" checkmark
-      const allItem = document.querySelector('.cat-item.all-cat');
-      if (allItem) {
-        const check = allItem.querySelector('.check-mark');
-        if (check) check.remove();
-        if (category === 'all') {
-          allItem.innerHTML += ' <span class="check-mark">✓</span>';
-        }
-      }
+    function filterQuestionsByCategory(category) {
+      if (category === 'all') return originalQuestions;
+      return originalQuestions.filter(q => q.category === category);
     }
 
-    function fetchQuestions(forceRefresh = false) {
+    function fetchQuestions(forceRefresh = false, category = null) {
       showLoading();
+      if (category !== null) currentCategory = category;
+      
       if (!forceRefresh) {
         const saved = loadState();
         if (saved && saved.questions.length > 0) {
           questions = saved.questions;
           originalQuestions = saved.originalQuestions || saved.questions.map(q => ({...q}));
-          allRawQuestions = saved.allRawQuestions || originalQuestions.map(q => ({...q}));
-          allCategories = saved.allCategories || [];
           quizTitleText = saved.quizTitleText || 'Quiz';
           totalQuestions = saved.totalQuestions || questions.length;
           selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
@@ -817,10 +726,12 @@
           currentIndex = saved.currentIndex || 0;
           timeRemaining = saved.timeRemaining || (totalQuestions * 60);
           currentCategory = saved.currentCategory || 'all';
-          quizTitle.textContent = quizTitleText + (currentCategory !== 'all' ? ` · ${currentCategory}` : '');
+          allCategories = saved.allCategories || [];
+          quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
+          populateCategoryDropdowns(allCategories);
+          if (categoryDropdown.value !== currentCategory) categoryDropdown.value = currentCategory;
           hideLoading();
-          buildCategoryDropdown();
           if (quizCompleted) { 
             showResult(); 
             return; 
@@ -841,37 +752,46 @@
         .then(csvText => {
           const parsed = parseCSV(csvText);
           if (parsed.questions.length === 0) throw new Error('No data');
-          allRawQuestions = parsed.questions;
-          // Extract categories from column C (index 2)
-          const cats = new Set();
-          allRawQuestions.forEach(q => { if (q.category && q.category.trim()) cats.add(q.category.trim()); });
-          allCategories = [...cats].sort();
+          
+          // Store all questions with categories
+          originalQuestions = parsed.questions;
           quizTitleText = parsed.title || 'Quiz';
-          // Filter questions that contain "2024" in column C
-          const filtered = allRawQuestions.filter(q => q.category && q.category.includes('2024'));
-          if (filtered.length > 0) {
-            originalQuestions = filtered;
-          } else {
-            // If no 2024, use all questions
-            originalQuestions = allRawQuestions;
+          
+          // Extract unique categories
+          const cats = [...new Set(originalQuestions.map(q => q.category || '').filter(c => c))];
+          populateCategoryDropdowns(cats);
+          
+          // Apply category filter
+          let filtered = originalQuestions;
+          const targetCategory = category || currentCategory || 'all';
+          if (targetCategory !== 'all') {
+            filtered = originalQuestions.filter(q => q.category === targetCategory);
           }
-          totalQuestions = originalQuestions.length;
-          questions = originalQuestions.map(q => {
+          
+          // If no questions in selected category, fallback to all
+          if (filtered.length === 0) {
+            filtered = originalQuestions;
+            categoryDropdown.value = 'all';
+            currentCategory = 'all';
+          }
+          
+          // Shuffle and build questions
+          questions = filtered.map(q => {
             const shuffled = shuffleArray(q.options);
             const newCorrect = shuffled.indexOf(q.options[q.correct]);
             return { ...q, options: shuffled, correct: newCorrect };
           });
+          
+          totalQuestions = questions.length;
           selectedAllAnswers = new Array(questions.length).fill(null);
           answerStatus = new Array(questions.length).fill(null);
           lockedQuestions = new Array(questions.length).fill(false);
           isSubmitted = false; quizCompleted = false; score = 0; currentIndex = 0;
           timeRemaining = totalQuestions * 60;
-          currentCategory = 'all';
           clearState();
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
           hideLoading();
-          buildCategoryDropdown();
           resetToQuizView();
           updateTimerDisplay();
           startTimer();
@@ -879,7 +799,7 @@
           renderDots();
           updateOverview();
           if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
-          saveState();
+          scrollToTop();
         })
         .catch(err => {
           console.error(err);
@@ -898,15 +818,22 @@
       const result = [];
       for (let i = 1; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
-        if (cols.length < 6) continue;
+        if (cols.length < 10) continue;
         const q = cols[4]?.trim() || '';
         if (!q) continue;
         const opts = [ cols[5]?.trim() || '', cols[6]?.trim() || '', cols[7]?.trim() || '', cols[8]?.trim() || '' ];
         const correctAns = cols[9]?.trim() || '';
         let correctIdx = -1;
         if (correctAns) { for (let j=0; j<opts.length; j++) { if (opts[j] === correctAns) { correctIdx = j; break; } } }
-        const category = cols[2]?.trim() || 'Uncategorized';
-        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns, category });
+        // Column C is index 2
+        const category = cols[2]?.trim() || '';
+        result.push({ 
+          question: q, 
+          options: opts, 
+          correct: correctIdx, 
+          correctText: correctAns,
+          category: category
+        });
       }
       return { questions: result, title };
     }
@@ -935,9 +862,7 @@
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
       
-      let html = `<div class="q-text" data-question="${q.question.replace(/"/g, '&quot;')}">${idx+1}. ${q.question} <span class="search-icon">🔍</span>`;
-      if (q.category) html += `<span class="q-category">${q.category}</span>`;
-      html += `</div><div class="options-list">`;
+      let html = `<div class="q-text" data-question="${encodeURIComponent(q.question)}">${idx+1}. ${q.question}</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
         let cls = 'option-btn';
         let iconSpan = '<span class="icon-indicator"></span>';
@@ -961,13 +886,15 @@
       html += '</div>';
       questionCard.innerHTML = html;
 
-      // Add click handler for question text (Google search)
+      // Click on question text to search Google
       const qTextEl = questionCard.querySelector('.q-text');
       if (qTextEl) {
         qTextEl.addEventListener('click', function(e) {
           e.stopPropagation();
-          const questionText = this.dataset.question || this.textContent.replace(/🔍\s*$/, '').trim();
-          searchGoogle(questionText);
+          const questionText = decodeURIComponent(this.dataset.question);
+          if (questionText) {
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(questionText)}`, '_blank');
+          }
         });
       }
 
@@ -1142,10 +1069,13 @@
         const qText = document.createElement('div');
         qText.className = 'detail-q';
         qText.textContent = `${idx+1}. ${q.question}`;
-        qText.dataset.question = q.question;
+        qText.style.cursor = 'pointer';
         qText.addEventListener('click', function(e) {
           e.stopPropagation();
-          searchGoogle(this.dataset.question);
+          const questionText = this.textContent.replace(/^\d+\.\s*/, '');
+          if (questionText) {
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(questionText)}`, '_blank');
+          }
         });
         div.appendChild(qText);
         const ansDiv = document.createElement('div');
@@ -1165,6 +1095,7 @@
         resultDetails.appendChild(div);
       });
       saveState();
+      scrollToTop();
     }
 
     function restartQuiz() {
@@ -1181,7 +1112,9 @@
       endQuizBtn.textContent = '🏁 End Quiz';
       endQuizBtn.disabled = false;
       correctLegend.style.display = 'none'; wrongLegend.style.display = 'none';
-      questions = originalQuestions.map(q => {
+      // Reshuffle current questions
+      const currentQuestions = questions;
+      questions = currentQuestions.map(q => {
         const shuffled = shuffleArray(q.options);
         const newCorrect = shuffled.indexOf(q.options[q.correct]);
         return { ...q, options: shuffled, correct: newCorrect };
@@ -1192,27 +1125,33 @@
       renderDots();
       updateOverview();
       saveState();
+      scrollToTop();
     }
 
-    function handleRefreshClick() { 
-      // Toggle dropdown
-      categoryDropdown.classList.toggle('active');
-      buildCategoryDropdown();
+    function handleRefreshClick() {
+      // Populate modal dropdown with current categories
+      modalCategoryDropdown.innerHTML = categoryDropdown.innerHTML;
+      modalCategoryDropdown.value = categoryDropdown.value || 'all';
+      refreshModal.classList.add('active');
     }
-
+    
     function handleRefreshConfirm() {
+      const selectedCategory = modalCategoryDropdown.value;
       if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       resetToQuizView();
-      fetchQuestions(true);
+      fetchQuestions(true, selectedCategory);
     }
-
+    
     function handleRefreshCancel() { refreshModal.classList.remove('active'); }
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.top-actions')) {
-        categoryDropdown.classList.remove('active');
+    // Category dropdown change handler
+    categoryDropdown.addEventListener('change', function() {
+      const selected = this.value;
+      if (selected !== currentCategory) {
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        resetToQuizView();
+        fetchQuestions(true, selected);
       }
     });
 
