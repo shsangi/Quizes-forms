@@ -742,7 +742,7 @@
     <script>
         (function() {
             const CSV_URL =
-            'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
+                'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
             const STORAGE_KEY = 'selfLearnersOneByOne';
             let questions = [];
             let currentIndex = 0;
@@ -1111,7 +1111,7 @@
                 const letters = ['A', 'B', 'C', 'D'];
 
                 let html =
-                `<div class="q-text" data-question="${encodeURIComponent(q.question)}">${idx+1}. ${q.question}</div><div class="options-list">`;
+                    `<div class="q-text" data-question="${encodeURIComponent(q.question)}">${idx+1}. ${q.question}</div><div class="options-list">`;
                 q.options.forEach((opt, oi) => {
                     let cls = 'option-btn';
                     let iconSpan = '<span class="icon-indicator"></span>';
@@ -1121,36 +1121,43 @@
                         cls += ' selected-opt';
                     }
 
-                    // If submitted or completed, show correct/wrong
-                    if (isSubmitted || quizCompleted) {
+                    // Show correct/wrong based on stored state
+                    if (lockedQuestions[idx] || isSubmitted || quizCompleted) {
+                        // Show correct answer in green with checkmark
                         if (q.correct !== -1 && oi === q.correct) {
                             cls += ' correct';
                             iconSpan = '<span class="icon-indicator">✓</span>';
                         }
+                        // Show user's wrong answer in red with X
                         if (selectedAllAnswers[idx] === oi && selectedAllAnswers[idx] !== q.correct) {
                             cls += ' wrong';
                             iconSpan = '<span class="icon-indicator">✗</span>';
                         }
-                    } else {
-                        // Even before submission, show if the user selected this (for locked questions)
-                        if (lockedQuestions[idx] && selectedAllAnswers[idx] === oi) {
-                            if (q.correct !== -1 && oi === q.correct) {
-                                cls += ' correct';
-                                iconSpan = '<span class="icon-indicator">✓</span>';
-                            } else if (selectedAllAnswers[idx] !== q.correct) {
-                                cls += ' wrong';
-                                iconSpan = '<span class="icon-indicator">✗</span>';
-                            }
-                        }
                     }
 
+                    // Add locked class if question is locked
                     if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) cls += ' locked-btn';
+
                     const disabled = lockedQuestions[idx] || isSubmitted || quizCompleted ? 'disabled' : '';
                     html += `<button class="${cls}" data-optidx="${oi}" ${disabled}>
-              <span class="letter">${letters[oi]}</span> ${opt || '(Empty)'} ${iconSpan}
-            </button>`;
+                        <span class="letter">${letters[oi]}</span> ${opt || '(Empty)'} ${iconSpan}
+                    </button>`;
                 });
                 html += '</div>';
+
+                // Add feedback message if question is locked
+                if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) {
+                    const isCorrect = selectedAllAnswers[idx] === q.correct;
+                    const feedbackClass = isCorrect ? 'correct' : 'wrong';
+                    const feedbackIcon = isCorrect ? '✅' : '❌';
+                    const feedbackMsg = isCorrect ?
+                        'Correct! Great job!' :
+                        `Incorrect. The correct answer is: ${q.options[q.correct] || 'Not available'}`;
+                    html += `<div style="margin-top:1rem;padding:0.8rem;border-radius:12px;background:${isCorrect ? '#d8eddf' : '#f5dddd'};border:1px solid ${isCorrect ? '#1f8b4c' : '#b33c3c'};font-weight:600;color:${isCorrect ? '#1f8b4c' : '#b33c3c'};">
+                        ${feedbackIcon} ${feedbackMsg}
+                    </div>`;
+                }
+
                 questionCard.innerHTML = html;
 
                 // Click on question text to search Google
@@ -1161,7 +1168,7 @@
                         const questionText = decodeURIComponent(this.dataset.question);
                         if (questionText) {
                             window.open(`https://www.google.com/search?q=${encodeURIComponent(questionText)}`,
-                            '_blank');
+                                '_blank');
                         }
                     });
                 }
@@ -1179,30 +1186,11 @@
                             lockedQuestions[qIdx] = true;
                             selectedAllAnswers[qIdx] = optIdx;
 
-                            // Update the UI for all options
-                            const qData = questions[qIdx];
-                            const btns = questionCard.querySelectorAll('.option-btn');
-                            btns.forEach(b => {
-                                b.disabled = true;
-                                b.classList.add('locked-btn');
-                                b.classList.remove('correct', 'wrong', 'selected-opt');
-                                const oi = parseInt(b.dataset.optidx);
-                                const iconSpan = b.querySelector('.icon-indicator');
+                            // Immediately re-render to show correct/wrong
+                            renderQuestion();
 
-                                // Show correct answer
-                                if (qData.correct !== -1 && oi === qData.correct) {
-                                    b.classList.add('correct');
-                                    if (iconSpan) iconSpan.textContent = '✓';
-                                }
-                                // Show wrong if this was the user's selection
-                                if (oi === optIdx && optIdx !== qData.correct) {
-                                    b.classList.add('wrong');
-                                    if (iconSpan) iconSpan.textContent = '✗';
-                                }
-                                if (oi === optIdx) b.classList.add('selected-opt');
-                            });
-
-                            renderDots();
+                            // Update overview and dots
+                            renderDots(currentIndex);
                             updateProgress();
                             updateOverview();
                             saveState();
@@ -1249,8 +1237,17 @@
                         else if (hasAns) dot.classList.add('done-dot');
                         else dot.classList.add('pending-dot');
                     } else {
-                        if (hasAns) dot.classList.add('done-dot');
-                        else dot.classList.add('pending-dot');
+                        if (hasAns) {
+                            // Check if the answer is correct or wrong based on stored state
+                            const q = questions[i];
+                            if (q && selectedAllAnswers[i] === q.correct) {
+                                dot.classList.add('correct-dot');
+                            } else {
+                                dot.classList.add('wrong-dot');
+                            }
+                        } else {
+                            dot.classList.add('pending-dot');
+                        }
                     }
                     if (activeIdx !== undefined && i === activeIdx) dot.classList.add('active-dot');
                     dot.addEventListener('click', function(e) {
@@ -1275,6 +1272,14 @@
                         if (isSubmitted || quizCompleted) {
                             if (answerStatus[i] === true) correct++;
                             else if (answerStatus[i] === false) wrong++;
+                        } else {
+                            // Check if the answer is correct
+                            const q = questions[i];
+                            if (q && selectedAllAnswers[i] === q.correct) {
+                                correct++;
+                            } else {
+                                wrong++;
+                            }
                         }
                     } else {
                         pending++;
