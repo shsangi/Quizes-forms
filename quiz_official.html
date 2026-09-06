@@ -708,8 +708,8 @@
                     <div class="legend" id="legendContainer">
                         <span class="legend-item"><span class="legend-dot done-dot"></span> Done <span class="count" id="doneCount">0</span></span>
                         <span class="legend-item"><span class="legend-dot pending-dot"></span> Pending <span class="count" id="pendingCount">0</span></span>
-                        <span class="legend-item" id="correctLegend" style="display:none;"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
-                        <span class="legend-item" id="wrongLegend" style="display:none;"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
+                        <span class="legend-item" id="correctLegend"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
+                        <span class="legend-item" id="wrongLegend"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
                     </div>
                 </div>
                 <div class="grid-dots" id="dotGrid"></div>
@@ -900,11 +900,6 @@
                 submittedBanner.style.display = 'none';
                 endQuizBtn.textContent = '🏁 End Quiz';
                 endQuizBtn.disabled = false;
-                // Keep correct/wrong legends visible if quiz is completed
-                if (!quizCompleted) {
-                    correctLegend.style.display = 'none';
-                    wrongLegend.style.display = 'none';
-                }
             }
 
             function scrollToTop() {
@@ -925,7 +920,6 @@
                 if (currentVal && categories.includes(currentVal)) modalYearSelect.value = currentVal;
                 else modalYearSelect.value = 'all';
 
-                // Update badge
                 if (currentCategory && currentCategory !== 'all') {
                     yearBadge.textContent = '📂 ' + currentCategory;
                     yearBadge.style.display = 'inline-block';
@@ -1211,12 +1205,20 @@
                     dot.className = 'grid-dot';
                     dot.textContent = i + 1;
                     const hasAns = selectedAllAnswers[i] !== null;
+                    
                     if (isSubmitted || quizCompleted) {
-                        if (answerStatus[i] === true) dot.classList.add('correct-dot');
-                        else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
-                        else if (hasAns) dot.classList.add('done-dot');
-                        else dot.classList.add('pending-dot');
+                        // On score screen, use answerStatus
+                        if (answerStatus[i] === true) {
+                            dot.classList.add('correct-dot');
+                        } else if (answerStatus[i] === false) {
+                            dot.classList.add('wrong-dot');
+                        } else if (hasAns) {
+                            dot.classList.add('done-dot');
+                        } else {
+                            dot.classList.add('pending-dot');
+                        }
                     } else {
+                        // During quiz, show based on selection
                         if (hasAns) {
                             const q = questions[i];
                             if (q && selectedAllAnswers[i] === q.correct) {
@@ -1228,6 +1230,7 @@
                             dot.classList.add('pending-dot');
                         }
                     }
+                    
                     if (activeIdx !== undefined && i === activeIdx) dot.classList.add('active-dot');
                     dot.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -1268,14 +1271,9 @@
                 correctCount.textContent = correct;
                 wrongCount.textContent = wrong;
                 
-                // Always show correct/wrong legends if there are answers or quiz is completed
-                if (done > 0 || isSubmitted || quizCompleted) {
-                    correctLegend.style.display = 'inline-flex';
-                    wrongLegend.style.display = 'inline-flex';
-                } else {
-                    correctLegend.style.display = 'none';
-                    wrongLegend.style.display = 'none';
-                }
+                // Always show correct/wrong legends
+                correctLegend.style.display = 'inline-flex';
+                wrongLegend.style.display = 'inline-flex';
             }
 
             function gradeQuiz() {
@@ -1372,6 +1370,7 @@
                 });
                 // Update overview with correct/wrong counts for result screen
                 updateOverview();
+                renderDots();
                 saveState();
                 scrollToTop();
             }
@@ -1393,8 +1392,6 @@
                 submittedBanner.style.display = 'none';
                 endQuizBtn.textContent = '🏁 End Quiz';
                 endQuizBtn.disabled = false;
-                correctLegend.style.display = 'none';
-                wrongLegend.style.display = 'none';
                 const currentQuestions = questions;
                 questions = currentQuestions.map(q => {
                     const shuffled = shuffleArray(q.options);
