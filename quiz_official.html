@@ -759,7 +759,6 @@
             let timeRemaining = 0;
             let allCategories = [];
             let currentCategory = 'all';
-            let isInitialLoad = true;
 
             const questionCard = document.getElementById('questionCard');
             const prevBtn = document.getElementById('prevBtn');
@@ -901,8 +900,11 @@
                 submittedBanner.style.display = 'none';
                 endQuizBtn.textContent = '🏁 End Quiz';
                 endQuizBtn.disabled = false;
-                correctLegend.style.display = 'none';
-                wrongLegend.style.display = 'none';
+                // Keep correct/wrong legends visible if quiz is completed
+                if (!quizCompleted) {
+                    correctLegend.style.display = 'none';
+                    wrongLegend.style.display = 'none';
+                }
             }
 
             function scrollToTop() {
@@ -931,11 +933,6 @@
                     yearBadge.textContent = '';
                     yearBadge.style.display = 'none';
                 }
-            }
-
-            function filterQuestionsByCategory(category) {
-                if (category === 'all') return originalQuestions;
-                return originalQuestions.filter(q => q.category === category);
             }
 
             function fetchQuestions(forceRefresh = false, category = null) {
@@ -984,23 +981,19 @@
                         const parsed = parseCSV(csvText);
                         if (parsed.questions.length === 0) throw new Error('No data');
 
-                        // Store all questions with categories
                         originalQuestions = parsed.questions;
                         quizTitleText = parsed.title || 'Quiz';
 
-                        // Extract unique categories from column C (index 2)
                         const categories = [...new Set(originalQuestions.map(q => q.category || '').filter(c => c &&
                             c.trim()))];
                         populateCategoryDropdown(categories);
 
-                        // Apply category filter
                         let filtered = originalQuestions;
                         const targetCategory = category || currentCategory || 'all';
                         if (targetCategory !== 'all') {
                             filtered = originalQuestions.filter(q => q.category === targetCategory);
                         }
 
-                        // If no questions in selected category, fallback to all
                         if (filtered.length === 0) {
                             filtered = originalQuestions;
                             modalYearSelect.value = 'all';
@@ -1009,7 +1002,6 @@
                             yearBadge.style.display = 'none';
                         }
 
-                        // Shuffle and build questions
                         questions = filtered.map(q => {
                             const shuffled = shuffleArray(q.options);
                             const newCorrect = shuffled.indexOf(q.options[q.correct]);
@@ -1069,7 +1061,6 @@
                             if (opts[j] === correctAns) { correctIdx = j; break; }
                         }
                     }
-                    // Column C is index 2 (category/year)
                     const category = cols[2]?.trim() || '';
                     result.push({
                         question: q,
@@ -1117,26 +1108,21 @@
                     let cls = 'option-btn';
                     let iconSpan = '<span class="icon-indicator"></span>';
 
-                    // Check if this option is the selected one
                     if (selectedAllAnswers[idx] === oi) {
                         cls += ' selected-opt';
                     }
 
-                    // Show correct/wrong based on stored state
                     if (lockedQuestions[idx] || isSubmitted || quizCompleted) {
-                        // Show correct answer in green with checkmark
                         if (q.correct !== -1 && oi === q.correct) {
                             cls += ' correct';
                             iconSpan = '<span class="icon-indicator">✓</span>';
                         }
-                        // Show user's wrong answer in red with X
                         if (selectedAllAnswers[idx] === oi && selectedAllAnswers[idx] !== q.correct) {
                             cls += ' wrong';
                             iconSpan = '<span class="icon-indicator">✗</span>';
                         }
                     }
 
-                    // Add locked class if question is locked
                     if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) cls += ' locked-btn';
 
                     const disabled = lockedQuestions[idx] || isSubmitted || quizCompleted ? 'disabled' : '';
@@ -1146,7 +1132,6 @@
                 });
                 html += '</div>';
 
-                // Add feedback message if question is locked
                 if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) {
                     const isCorrect = selectedAllAnswers[idx] === q.correct;
                     const feedbackIcon = isCorrect ? '✅' : '❌';
@@ -1160,7 +1145,6 @@
 
                 questionCard.innerHTML = html;
 
-                // Click on question text to search Google
                 const qTextEl = questionCard.querySelector('.q-text');
                 if (qTextEl) {
                     qTextEl.addEventListener('click', function(e) {
@@ -1173,7 +1157,6 @@
                     });
                 }
 
-                // Only attach click listeners if not locked and not submitted
                 if (!isSubmitted && !quizCompleted) {
                     questionCard.querySelectorAll('.option-btn:not(.locked-btn)').forEach(btn => {
                         btn.addEventListener('click', function(e) {
@@ -1182,14 +1165,10 @@
                             const qIdx = currentIndex;
                             if (lockedQuestions[qIdx] || isSubmitted || quizCompleted) return;
 
-                            // Lock this question and store the answer
                             lockedQuestions[qIdx] = true;
                             selectedAllAnswers[qIdx] = optIdx;
 
-                            // Immediately re-render to show correct/wrong
                             renderQuestion();
-
-                            // Update overview and dots
                             renderDots(currentIndex);
                             updateProgress();
                             updateOverview();
@@ -1239,7 +1218,6 @@
                         else dot.classList.add('pending-dot');
                     } else {
                         if (hasAns) {
-                            // Check if the answer is correct or wrong based on stored state
                             const q = questions[i];
                             if (q && selectedAllAnswers[i] === q.correct) {
                                 dot.classList.add('correct-dot');
@@ -1274,7 +1252,6 @@
                             if (answerStatus[i] === true) correct++;
                             else if (answerStatus[i] === false) wrong++;
                         } else {
-                            // Check if the answer is correct
                             const q = questions[i];
                             if (q && selectedAllAnswers[i] === q.correct) {
                                 correct++;
@@ -1288,11 +1265,13 @@
                 }
                 doneCount.textContent = done;
                 pendingCount.textContent = pending;
-                if (isSubmitted || quizCompleted) {
+                correctCount.textContent = correct;
+                wrongCount.textContent = wrong;
+                
+                // Always show correct/wrong legends if there are answers or quiz is completed
+                if (done > 0 || isSubmitted || quizCompleted) {
                     correctLegend.style.display = 'inline-flex';
                     wrongLegend.style.display = 'inline-flex';
-                    correctCount.textContent = correct;
-                    wrongCount.textContent = wrong;
                 } else {
                     correctLegend.style.display = 'none';
                     wrongLegend.style.display = 'none';
@@ -1391,6 +1370,8 @@
                     div.appendChild(ansDiv);
                     resultDetails.appendChild(div);
                 });
+                // Update overview with correct/wrong counts for result screen
+                updateOverview();
                 saveState();
                 scrollToTop();
             }
@@ -1414,7 +1395,6 @@
                 endQuizBtn.disabled = false;
                 correctLegend.style.display = 'none';
                 wrongLegend.style.display = 'none';
-                // Reshuffle current questions
                 const currentQuestions = questions;
                 questions = currentQuestions.map(q => {
                     const shuffled = shuffleArray(q.options);
@@ -1431,7 +1411,6 @@
             }
 
             function handleRefreshClick() {
-                // Populate modal dropdown with current categories
                 modalYearSelect.innerHTML = '<option value="all">All Categories</option>';
                 allCategories.forEach(cat => {
                     const opt = document.createElement('option');
