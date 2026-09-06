@@ -95,7 +95,6 @@
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* timer + question label in one line */
     .top-info {
       display: flex;
       justify-content: space-between;
@@ -131,6 +130,17 @@
       background: linear-gradient(90deg, #2f7b9e, #4ba3c7);
       border-radius: 20px;
       transition: width 0.35s ease;
+    }
+    .progress-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1f4d66;
+      margin-bottom: 0.8rem;
+    }
+    .progress-label .attempted {
+      color: #0b2a3b;
+      font-weight: 700;
     }
 
     .question-card {
@@ -211,8 +221,6 @@
       font-size: 1.1rem;
       font-weight: 600;
     }
-    .options-list .option-btn.correct .icon-indicator::after { content: " ✓"; color: #1f8b4c; }
-    .options-list .option-btn.wrong .icon-indicator::after { content: " ✗"; color: #b33c3c; }
 
     .action-bar {
       display: flex;
@@ -438,7 +446,6 @@
     </div>
   </div>
 
-  <!-- timer + question label in one line -->
   <div class="top-info">
     <span class="question-label" id="questionLabel">Question 1 of 0</span>
     <span>⏱️ <span class="timer" id="timerDisplay">00:00</span></span>
@@ -448,6 +455,7 @@
     <div class="progress-block">
       <div class="progress-fill" id="progressFill" style="width:0%;"></div>
     </div>
+    <div class="progress-label" id="progressLabel">Attempted: <span class="attempted" id="attemptedCount">0</span> / <span id="totalCount">0</span></div>
 
     <div id="singleQuestionView">
       <div id="submittedBanner" style="display:none;" class="submitted-header">✅ Submitted — You can review. Click "End Quiz" for final score.</div>
@@ -520,6 +528,8 @@
     const nextBtn = document.getElementById('nextBtn');
     const endQuizBtn = document.getElementById('endQuizBtn');
     const progressFill = document.getElementById('progressFill');
+    const attemptedCount = document.getElementById('attemptedCount');
+    const totalCount = document.getElementById('totalCount');
     const questionLabel = document.getElementById('questionLabel');
     const dotGrid = document.getElementById('dotGrid');
     const resultArea = document.getElementById('resultArea');
@@ -554,14 +564,6 @@
 
     function getAttemptedCount() {
       return selectedAllAnswers.filter(a => a !== null).length;
-    }
-
-    function getCorrectCount() {
-      let correct = 0;
-      for (let i = 0; i < questions.length; i++) {
-        if (answerStatus[i] === true) correct++;
-      }
-      return correct;
     }
 
     function loadLogo() {
@@ -654,6 +656,7 @@
           currentIndex = saved.currentIndex || 0;
           timeRemaining = saved.timeRemaining || (totalQuestions * 60);
           quizTitle.textContent = quizTitleText;
+          totalCount.textContent = totalQuestions;
           hideLoading();
           if (quizCompleted) { showResult(); return; }
           updateTimerDisplay();
@@ -686,6 +689,7 @@
           timeRemaining = totalQuestions * 60;
           clearState();
           quizTitle.textContent = quizTitleText;
+          totalCount.textContent = totalQuestions;
           hideLoading();
           updateTimerDisplay();
           startTimer();
@@ -747,9 +751,8 @@
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
       
-      // Update question label with correct count
-      const correct = getCorrectCount();
-      questionLabel.textContent = `Question ${idx+1} of ${totalQuestions}  •  ✅ ${correct}/${totalQuestions}`;
+      // Update the question label
+      questionLabel.textContent = `Question ${idx+1} of ${totalQuestions}`;
       
       let html = `<div class="q-text">${idx+1}. ${q.question}</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
@@ -759,8 +762,7 @@
         if (isSubmitted || quizCompleted) {
           if (q.correct !== -1 && oi === q.correct) {
             cls += ' correct';
-            if (selectedAllAnswers[idx] === oi) iconSpan = '<span class="icon-indicator">✓</span>';
-            else iconSpan = '<span class="icon-indicator">✓</span>';
+            iconSpan = '<span class="icon-indicator">✓</span>';
           }
           if (selectedAllAnswers[idx] === oi && selectedAllAnswers[idx] !== q.correct) {
             cls += ' wrong';
@@ -804,11 +806,9 @@
               if (oi === optIdx) b.classList.add('selected-opt');
             });
             renderDots();
+            updateProgress();
             updateOverview();
             saveState();
-            // Update question label with new correct count
-            const correct = getCorrectCount();
-            questionLabel.textContent = `Question ${currentIndex+1} of ${totalQuestions}  •  ✅ ${correct}/${totalQuestions}`;
           });
         });
       }
@@ -817,6 +817,7 @@
         questionCard.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
       }
 
+      updateProgress();
       prevBtn.disabled = currentIndex === 0 || quizCompleted;
       nextBtn.disabled = currentIndex === totalQuestions - 1 || quizCompleted;
       endQuizBtn.disabled = quizCompleted;
@@ -828,11 +829,14 @@
         endQuizBtn.textContent = '🏁 End Quiz';
       }
       if (quizCompleted) { endQuizBtn.disabled = true; }
-      
-      // Update progress
+    }
+
+    function updateProgress() {
       const answered = getAttemptedCount();
+      attemptedCount.textContent = answered;
       const pct = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
       progressFill.style.width = `${pct}%`;
+      totalCount.textContent = totalQuestions;
     }
 
     function renderDots(activeIdx) {
@@ -857,6 +861,7 @@
           currentIndex = i;
           renderQuestion();
           renderDots(currentIndex);
+          updateProgress();
         });
         dotGrid.appendChild(dot);
       }
@@ -929,6 +934,7 @@
       document.getElementById('singleQuestionView').style.display = 'none';
       resultArea.style.display = 'block';
       finalScore.textContent = `${score} / ${totalQuestions}`;
+      const attempted = getAttemptedCount();
       let msg = (score === totalQuestions) ? '🌟 Perfect!' : (score >= totalQuestions*0.7 ? '👏 Great job!' : '💪 Keep practicing!');
       resultMessage.textContent = msg;
       resultDetails.innerHTML = '';
@@ -999,10 +1005,10 @@
     function handleRefreshCancel() { refreshModal.classList.remove('active'); }
 
     prevBtn.addEventListener('click', function() {
-      if (currentIndex > 0) { currentIndex--; renderQuestion(); renderDots(currentIndex); }
+      if (currentIndex > 0) { currentIndex--; renderQuestion(); renderDots(currentIndex); updateProgress(); }
     });
     nextBtn.addEventListener('click', function() {
-      if (currentIndex < totalQuestions - 1) { currentIndex++; renderQuestion(); renderDots(currentIndex); }
+      if (currentIndex < totalQuestions - 1) { currentIndex++; renderQuestion(); renderDots(currentIndex); updateProgress(); }
     });
     endQuizBtn.addEventListener('click', handleEndQuiz);
     restartFromResult.addEventListener('click', restartQuiz);
