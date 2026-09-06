@@ -443,7 +443,7 @@
   </div>
 
   <div class="top-info">
-    <span></span>
+    <span id="attemptedDisplay">Attempted: <span class="attempted" id="attemptedCount">0</span> / <span id="totalCount">0</span></span>
     <span>⏱️ <span class="timer" id="timerDisplay">00:00</span></span>
   </div>
 
@@ -451,7 +451,6 @@
     <div class="progress-block">
       <div class="progress-fill" id="progressFill" style="width:0%;"></div>
     </div>
-    <div class="progress-label" id="progressLabel">Attempted: <span class="attempted" id="attemptedCount">0</span> / <span id="totalCount">0</span></div>
 
     <div id="singleQuestionView">
       <div id="submittedBanner" style="display:none;" class="submitted-header">✅ Submitted — You can review. Click "End Quiz" for final score.</div>
@@ -547,6 +546,7 @@
     const quizTitle = document.getElementById('quizTitle');
     const brandLogo = document.getElementById('brandLogo');
     const timerDisplay = document.getElementById('timerDisplay');
+    const singleQuestionView = document.getElementById('singleQuestionView');
 
     function shuffleArray(arr) {
       const a = [...arr];
@@ -633,6 +633,17 @@
       else if (timeRemaining < 300) timerDisplay.classList.add('warning');
     }
 
+    function resetToQuizView() {
+      // Hide result, show question view
+      resultArea.style.display = 'none';
+      singleQuestionView.style.display = 'block';
+      submittedBanner.style.display = 'none';
+      endQuizBtn.textContent = '🏁 End Quiz';
+      endQuizBtn.disabled = false;
+      correctLegend.style.display = 'none';
+      wrongLegend.style.display = 'none';
+    }
+
     function fetchQuestions(forceRefresh = false) {
       showLoading();
       if (!forceRefresh) {
@@ -653,7 +664,11 @@
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
           hideLoading();
-          if (quizCompleted) { showResult(); return; }
+          if (quizCompleted) { 
+            showResult(); 
+            return; 
+          }
+          resetToQuizView();
           updateTimerDisplay();
           startTimer();
           renderQuestion();
@@ -686,6 +701,7 @@
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
           hideLoading();
+          resetToQuizView();
           updateTimerDisplay();
           startTimer();
           renderQuestion();
@@ -923,7 +939,7 @@
     function showResult() {
       quizCompleted = true;
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      document.getElementById('singleQuestionView').style.display = 'none';
+      singleQuestionView.style.display = 'none';
       resultArea.style.display = 'block';
       finalScore.textContent = `${score} / ${totalQuestions}`;
       const attempted = getAttemptedCount();
@@ -970,7 +986,7 @@
       timeRemaining = totalQuestions * 60;
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       resultArea.style.display = 'none';
-      document.getElementById('singleQuestionView').style.display = 'block';
+      singleQuestionView.style.display = 'block';
       submittedBanner.style.display = 'none';
       endQuizBtn.textContent = '🏁 End Quiz';
       endQuizBtn.disabled = false;
@@ -992,6 +1008,8 @@
     function handleRefreshConfirm() {
       if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      // Reset to quiz view before fetching
+      resetToQuizView();
       fetchQuestions(true);
     }
     function handleRefreshCancel() { refreshModal.classList.remove('active'); }
