@@ -71,6 +71,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      position: relative;
     }
     .btn-icon {
       background: transparent;
@@ -94,6 +95,44 @@
       animation: spin 1s linear infinite;
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .category-dropdown {
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: white;
+      border: 1px solid #dce6ef;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      padding: 0.5rem 0;
+      min-width: 200px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    .category-dropdown.active { display: block; }
+    .category-dropdown .cat-item {
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #1f4d66;
+      transition: 0.1s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .category-dropdown .cat-item:hover { background: #eaf1f8; }
+    .category-dropdown .cat-item .badge {
+      background: #2f7b9e;
+      color: white;
+      border-radius: 20px;
+      padding: 0.1rem 0.6rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .category-dropdown .cat-item.all-cat { font-weight: 600; color: #0b2a3b; border-bottom: 1px solid #e2eaf2; }
+    .category-dropdown .cat-item .check-mark { color: #1f8b4c; font-weight: 700; }
 
     .top-info {
       display: flex;
@@ -153,6 +192,21 @@
       margin-bottom: 1.2rem;
       color: #0a212b;
       line-height: 1.4;
+      cursor: pointer;
+      transition: 0.1s;
+      display: inline-block;
+    }
+    .question-card .q-text:hover { color: #1b5a7a; text-decoration: underline; }
+    .question-card .q-text .search-icon { font-size: 0.9rem; margin-left: 0.4rem; opacity: 0.6; }
+    .question-card .q-category {
+      font-size: 0.7rem;
+      color: #6c8a9e;
+      background: #eef4f9;
+      padding: 0.1rem 0.6rem;
+      border-radius: 20px;
+      display: inline-block;
+      margin-left: 0.6rem;
+      font-weight: 500;
     }
     .options-list {
       display: flex;
@@ -348,7 +402,8 @@
     }
     .result-details .detail-item.correct-detail { border-left: 6px solid #1f8b4c; }
     .result-details .detail-item.wrong-detail { border-left: 6px solid #b33c3c; }
-    .result-details .detail-q { font-weight: 600; font-size: 0.95rem; color: #0a212b; margin-bottom: 0.2rem; }
+    .result-details .detail-q { font-weight: 600; font-size: 0.95rem; color: #0a212b; margin-bottom: 0.2rem; cursor: pointer; }
+    .result-details .detail-q:hover { color: #1b5a7a; text-decoration: underline; }
     .result-details .detail-answer { font-size: 0.9rem; color: #1f4d66; }
     .result-details .detail-answer .correct-ans { color: #1f8b4c; font-weight: 600; }
     .result-details .detail-answer .wrong-ans { color: #b33c3c; font-weight: 600; }
@@ -420,6 +475,7 @@
       .action-bar .left-buttons { justify-content: center; }
       .btn-primary, .btn-success { width: 100%; justify-content: center; }
       .top-info { font-size: 0.85rem; }
+      .category-dropdown { right: -40px; min-width: 180px; }
     }
   </style>
 </head>
@@ -439,6 +495,10 @@
       <button class="btn-icon" id="refreshBtn" title="Refresh Quiz">
         <span id="refreshIcon">🔄</span>
       </button>
+      <div class="category-dropdown" id="categoryDropdown">
+        <div class="cat-item all-cat" data-category="all">📚 All Questions <span class="badge" id="allCount">0</span></div>
+        <div id="categoryList"></div>
+      </div>
     </div>
   </div>
 
@@ -517,6 +577,9 @@
     let quizTitleText = 'Quiz';
     let timerInterval = null;
     let timeRemaining = 0;
+    let allCategories = [];
+    let currentCategory = 'all';
+    let allRawQuestions = [];
 
     const questionCard = document.getElementById('questionCard');
     const prevBtn = document.getElementById('prevBtn');
@@ -547,6 +610,9 @@
     const brandLogo = document.getElementById('brandLogo');
     const timerDisplay = document.getElementById('timerDisplay');
     const singleQuestionView = document.getElementById('singleQuestionView');
+    const categoryDropdown = document.getElementById('categoryDropdown');
+    const categoryList = document.getElementById('categoryList');
+    const allCount = document.getElementById('allCount');
 
     function shuffleArray(arr) {
       const a = [...arr];
@@ -573,7 +639,8 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
-          score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions, currentIndex, timeRemaining
+          score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions, currentIndex, timeRemaining,
+          currentCategory, allRawQuestions, allCategories
         }));
       } catch(e) {}
     }
@@ -634,7 +701,6 @@
     }
 
     function resetToQuizView() {
-      // Hide result, show question view
       resultArea.style.display = 'none';
       singleQuestionView.style.display = 'block';
       submittedBanner.style.display = 'none';
@@ -644,6 +710,93 @@
       wrongLegend.style.display = 'none';
     }
 
+    function searchGoogle(query) {
+      if (!query) return;
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      window.open(searchUrl, '_blank');
+    }
+
+    function buildCategoryDropdown() {
+      categoryList.innerHTML = '';
+      const cats = [...allCategories].sort();
+      cats.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'cat-item';
+        div.dataset.category = cat;
+        const count = allRawQuestions.filter(q => q.category === cat).length;
+        div.innerHTML = `<span>📂 ${cat}</span> <span class="badge">${count}</span>`;
+        if (currentCategory === cat) {
+          div.innerHTML += ' <span class="check-mark">✓</span>';
+        }
+        div.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const catName = this.dataset.category;
+          if (catName !== currentCategory) {
+            loadCategory(catName);
+          }
+          categoryDropdown.classList.remove('active');
+        });
+        categoryList.appendChild(div);
+      });
+      // Update all count
+      allCount.textContent = allRawQuestions.length;
+    }
+
+    function loadCategory(category) {
+      currentCategory = category;
+      let filtered = [];
+      if (category === 'all') {
+        filtered = allRawQuestions.map(q => ({...q}));
+      } else {
+        filtered = allRawQuestions.filter(q => q.category === category).map(q => ({...q}));
+      }
+      if (filtered.length === 0) {
+        questionCard.innerHTML = '<div style="padding:2rem;text-align:center;color:#6c8a9e;">No questions in this category</div>';
+        return;
+      }
+      // Shuffle and reset
+      originalQuestions = filtered;
+      totalQuestions = originalQuestions.length;
+      questions = originalQuestions.map(q => {
+        const shuffled = shuffleArray(q.options);
+        const newCorrect = shuffled.indexOf(q.options[q.correct]);
+        return { ...q, options: shuffled, correct: newCorrect };
+      });
+      selectedAllAnswers = new Array(questions.length).fill(null);
+      answerStatus = new Array(questions.length).fill(null);
+      lockedQuestions = new Array(questions.length).fill(false);
+      isSubmitted = false; quizCompleted = false; score = 0; currentIndex = 0;
+      timeRemaining = totalQuestions * 60;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      clearState();
+      quizTitle.textContent = quizTitleText + (category !== 'all' ? ` · ${category}` : '');
+      totalCount.textContent = totalQuestions;
+      resetToQuizView();
+      updateTimerDisplay();
+      startTimer();
+      renderQuestion();
+      renderDots();
+      updateOverview();
+      saveState();
+      // Update dropdown checkmarks
+      document.querySelectorAll('.cat-item').forEach(el => {
+        const check = el.querySelector('.check-mark');
+        if (check) check.remove();
+        if (el.dataset.category === category) {
+          el.innerHTML += ' <span class="check-mark">✓</span>';
+        }
+      });
+      // Update "All" checkmark
+      const allItem = document.querySelector('.cat-item.all-cat');
+      if (allItem) {
+        const check = allItem.querySelector('.check-mark');
+        if (check) check.remove();
+        if (category === 'all') {
+          allItem.innerHTML += ' <span class="check-mark">✓</span>';
+        }
+      }
+    }
+
     function fetchQuestions(forceRefresh = false) {
       showLoading();
       if (!forceRefresh) {
@@ -651,6 +804,8 @@
         if (saved && saved.questions.length > 0) {
           questions = saved.questions;
           originalQuestions = saved.originalQuestions || saved.questions.map(q => ({...q}));
+          allRawQuestions = saved.allRawQuestions || originalQuestions.map(q => ({...q}));
+          allCategories = saved.allCategories || [];
           quizTitleText = saved.quizTitleText || 'Quiz';
           totalQuestions = saved.totalQuestions || questions.length;
           selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
@@ -661,9 +816,11 @@
           score = saved.score || 0;
           currentIndex = saved.currentIndex || 0;
           timeRemaining = saved.timeRemaining || (totalQuestions * 60);
-          quizTitle.textContent = quizTitleText;
+          currentCategory = saved.currentCategory || 'all';
+          quizTitle.textContent = quizTitleText + (currentCategory !== 'all' ? ` · ${currentCategory}` : '');
           totalCount.textContent = totalQuestions;
           hideLoading();
+          buildCategoryDropdown();
           if (quizCompleted) { 
             showResult(); 
             return; 
@@ -684,8 +841,20 @@
         .then(csvText => {
           const parsed = parseCSV(csvText);
           if (parsed.questions.length === 0) throw new Error('No data');
-          originalQuestions = parsed.questions;
+          allRawQuestions = parsed.questions;
+          // Extract categories from column C (index 2)
+          const cats = new Set();
+          allRawQuestions.forEach(q => { if (q.category && q.category.trim()) cats.add(q.category.trim()); });
+          allCategories = [...cats].sort();
           quizTitleText = parsed.title || 'Quiz';
+          // Filter questions that contain "2024" in column C
+          const filtered = allRawQuestions.filter(q => q.category && q.category.includes('2024'));
+          if (filtered.length > 0) {
+            originalQuestions = filtered;
+          } else {
+            // If no 2024, use all questions
+            originalQuestions = allRawQuestions;
+          }
           totalQuestions = originalQuestions.length;
           questions = originalQuestions.map(q => {
             const shuffled = shuffleArray(q.options);
@@ -697,10 +866,12 @@
           lockedQuestions = new Array(questions.length).fill(false);
           isSubmitted = false; quizCompleted = false; score = 0; currentIndex = 0;
           timeRemaining = totalQuestions * 60;
+          currentCategory = 'all';
           clearState();
           quizTitle.textContent = quizTitleText;
           totalCount.textContent = totalQuestions;
           hideLoading();
+          buildCategoryDropdown();
           resetToQuizView();
           updateTimerDisplay();
           startTimer();
@@ -708,6 +879,7 @@
           renderDots();
           updateOverview();
           if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
+          saveState();
         })
         .catch(err => {
           console.error(err);
@@ -733,7 +905,8 @@
         const correctAns = cols[9]?.trim() || '';
         let correctIdx = -1;
         if (correctAns) { for (let j=0; j<opts.length; j++) { if (opts[j] === correctAns) { correctIdx = j; break; } } }
-        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns });
+        const category = cols[2]?.trim() || 'Uncategorized';
+        result.push({ question: q, options: opts, correct: correctIdx, correctText: correctAns, category });
       }
       return { questions: result, title };
     }
@@ -762,7 +935,9 @@
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
       
-      let html = `<div class="q-text">${idx+1}. ${q.question}</div><div class="options-list">`;
+      let html = `<div class="q-text" data-question="${q.question.replace(/"/g, '&quot;')}">${idx+1}. ${q.question} <span class="search-icon">🔍</span>`;
+      if (q.category) html += `<span class="q-category">${q.category}</span>`;
+      html += `</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
         let cls = 'option-btn';
         let iconSpan = '<span class="icon-indicator"></span>';
@@ -785,6 +960,16 @@
       });
       html += '</div>';
       questionCard.innerHTML = html;
+
+      // Add click handler for question text (Google search)
+      const qTextEl = questionCard.querySelector('.q-text');
+      if (qTextEl) {
+        qTextEl.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const questionText = this.dataset.question || this.textContent.replace(/🔍\s*$/, '').trim();
+          searchGoogle(questionText);
+        });
+      }
 
       if (!isSubmitted && !quizCompleted) {
         questionCard.querySelectorAll('.option-btn:not(.locked-btn)').forEach(btn => {
@@ -957,6 +1142,11 @@
         const qText = document.createElement('div');
         qText.className = 'detail-q';
         qText.textContent = `${idx+1}. ${q.question}`;
+        qText.dataset.question = q.question;
+        qText.addEventListener('click', function(e) {
+          e.stopPropagation();
+          searchGoogle(this.dataset.question);
+        });
         div.appendChild(qText);
         const ansDiv = document.createElement('div');
         ansDiv.className = 'detail-answer';
@@ -1004,15 +1194,27 @@
       saveState();
     }
 
-    function handleRefreshClick() { refreshModal.classList.add('active'); }
+    function handleRefreshClick() { 
+      // Toggle dropdown
+      categoryDropdown.classList.toggle('active');
+      buildCategoryDropdown();
+    }
+
     function handleRefreshConfirm() {
       if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      // Reset to quiz view before fetching
       resetToQuizView();
       fetchQuestions(true);
     }
+
     function handleRefreshCancel() { refreshModal.classList.remove('active'); }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.top-actions')) {
+        categoryDropdown.classList.remove('active');
+      }
+    });
 
     prevBtn.addEventListener('click', function() {
       if (currentIndex > 0) { currentIndex--; renderQuestion(); renderDots(currentIndex); updateProgress(); }
