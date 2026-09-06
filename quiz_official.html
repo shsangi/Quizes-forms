@@ -95,7 +95,6 @@
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* timer line - kept as requested */
     .timer-line {
       text-align: center;
       padding: 0.2rem 0 0.8rem 0;
@@ -150,17 +149,6 @@
       margin-bottom: 1.2rem;
       color: #0a212b;
       line-height: 1.4;
-    }
-    .question-card .q-text .badge {
-      display: inline-block;
-      background: #dce6ef;
-      color: #1f4d66;
-      font-size: 0.65rem;
-      font-weight: 600;
-      padding: 0.1rem 0.7rem;
-      border-radius: 30px;
-      margin-left: 0.5rem;
-      vertical-align: middle;
     }
     .options-list {
       display: flex;
@@ -443,7 +431,7 @@
     </div>
   </div>
 
-  <!-- timer line - always visible, no floating timer -->
+  <!-- timer line - kept as requested -->
   <div class="timer-line">⏱️ <span class="timer" id="timerDisplay">00:00</span></div>
 
   <div id="quizContent">
@@ -457,7 +445,7 @@
       <div id="questionCard" class="question-card"></div>
       <div class="action-bar">
         <div class="left-buttons">
-          <button class="btn-primary" id="prevBtn">◀ Previous</button>
+          <button class="btn-primary" id="prevBtn">◀ Back</button>
           <button class="btn-primary" id="nextBtn">Next ▶</button>
         </div>
         <div>
@@ -612,7 +600,6 @@
         if (timeRemaining <= 0) {
           clearInterval(timerInterval);
           timerInterval = null;
-          // auto-submit when time runs out
           if (!quizCompleted && !isSubmitted) {
             gradeQuiz();
             quizCompleted = true;
@@ -745,7 +732,6 @@
       const q = questions[currentIndex];
       const idx = currentIndex;
       const letters = ['A','B','C','D'];
-      // removed the extra badge from question text as requested
       let html = `<div class="q-text">${idx+1}. ${q.question}</div><div class="options-list">`;
       q.options.forEach((opt, oi) => {
         let cls = 'option-btn';
