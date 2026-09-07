@@ -394,6 +394,21 @@
         .legend-dot.wrong-dot {
             background: #b33c3c;
         }
+        .legend-dot.issue-dot {
+            background: #ff1493;
+            animation: pulse-pink 1s infinite;
+        }
+        @keyframes pulse-pink {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
 
         .grid-dots {
             display: flex;
@@ -417,6 +432,7 @@
             cursor: pointer;
             border: 2px solid transparent;
             font-family: inherit;
+            position: relative;
         }
         .grid-dot:hover {
             transform: scale(1.08);
@@ -445,6 +461,24 @@
         .grid-dot.active-dot {
             border-color: #0b2a3b;
             transform: scale(1.1);
+        }
+        .grid-dot.issue-dot {
+            background: #ff1493 !important;
+            color: white !important;
+            border-color: #ff1493;
+            animation: pulse-pink 1.5s infinite;
+            box-shadow: 0 0 8px rgba(255, 20, 147, 0.6);
+        }
+        .grid-dot.issue-dot::after {
+            content: '⚠';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 10px;
+            background: white;
+            border-radius: 50%;
+            padding: 0 2px;
+            line-height: 14px;
         }
 
         .result-card {
@@ -493,6 +527,10 @@
         .result-details .detail-item.wrong-detail {
             border-left: 6px solid #b33c3c;
         }
+        .result-details .detail-item.issue-detail {
+            border-left: 6px solid #ff1493;
+            background: #fff0f5;
+        }
         .result-details .detail-q {
             font-weight: 600;
             font-size: 0.95rem;
@@ -514,6 +552,10 @@
         }
         .result-details .detail-answer .wrong-ans {
             color: #b33c3c;
+            font-weight: 600;
+        }
+        .result-details .detail-answer .issue-ans {
+            color: #ff1493;
             font-weight: 600;
         }
 
@@ -708,8 +750,9 @@
                     <div class="legend" id="legendContainer">
                         <span class="legend-item"><span class="legend-dot done-dot"></span> Done <span class="count" id="doneCount">0</span></span>
                         <span class="legend-item"><span class="legend-dot pending-dot"></span> Pending <span class="count" id="pendingCount">0</span></span>
-                        <span class="legend-item" id="correctLegend"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
-                        <span class="legend-item" id="wrongLegend"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
+                        <span class="legend-item"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
+                        <span class="legend-item"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
+                        <span class="legend-item"><span class="legend-dot issue-dot"></span> Issues <span class="count" id="issueCount">0</span></span>
                     </div>
                 </div>
                 <div class="grid-dots" id="dotGrid"></div>
@@ -759,6 +802,7 @@
             let timeRemaining = 0;
             let allCategories = [];
             let currentCategory = 'all';
+            let issueQuestions = [];
 
             const questionCard = document.getElementById('questionCard');
             const prevBtn = document.getElementById('prevBtn');
@@ -782,6 +826,7 @@
             const pendingCount = document.getElementById('pendingCount');
             const correctCount = document.getElementById('correctCount');
             const wrongCount = document.getElementById('wrongCount');
+            const issueCount = document.getElementById('issueCount');
             const correctLegend = document.getElementById('correctLegend');
             const wrongLegend = document.getElementById('wrongLegend');
             const submittedBanner = document.getElementById('submittedBanner');
@@ -803,6 +848,28 @@
 
             function getAttemptedCount() {
                 return selectedAllAnswers.filter(a => a !== null).length;
+            }
+
+            function checkForIssues() {
+                issueQuestions = [];
+                for (let i = 0; i < questions.length; i++) {
+                    const q = questions[i];
+                    const selected = selectedAllAnswers[i];
+                    // Check if the selected answer exists in the options
+                    if (selected !== null && q.correct !== -1) {
+                        // If the selected option index is valid but doesn't match the correct answer
+                        if (selected !== q.correct) {
+                            // Check if the selected option text matches the correct text (case insensitive)
+                            const selectedText = q.options[selected]?.trim().toLowerCase() || '';
+                            const correctText = q.options[q.correct]?.trim().toLowerCase() || '';
+                            // If they don't match, it's an issue
+                            if (selectedText !== correctText) {
+                                issueQuestions.push(i);
+                            }
+                        }
+                    }
+                }
+                return issueQuestions;
             }
 
             function loadLogo() {
@@ -830,7 +897,8 @@
                         currentIndex,
                         timeRemaining,
                         currentCategory,
-                        allCategories
+                        allCategories,
+                        issueQuestions
                     }));
                 } catch (e) {}
             }
@@ -952,6 +1020,7 @@
                         timeRemaining = saved.timeRemaining || (totalQuestions * 60);
                         currentCategory = saved.currentCategory || 'all';
                         allCategories = saved.allCategories || [];
+                        issueQuestions = saved.issueQuestions || [];
                         quizTitle.textContent = quizTitleText;
                         totalCount.textContent = totalQuestions;
                         populateCategoryDropdown(allCategories);
@@ -1013,6 +1082,7 @@
                         score = 0;
                         currentIndex = 0;
                         timeRemaining = totalQuestions * 60;
+                        issueQuestions = [];
                         clearState();
                         quizTitle.textContent = quizTitleText;
                         totalCount.textContent = totalQuestions;
@@ -1202,24 +1272,39 @@
 
             function renderDots(activeIdx) {
                 dotGrid.innerHTML = '';
+                // Check for issues
+                checkForIssues();
+                
                 for (let i = 0; i < totalQuestions; i++) {
                     const dot = document.createElement('button');
                     dot.className = 'grid-dot';
                     dot.textContent = i + 1;
                     const hasAns = selectedAllAnswers[i] !== null;
 
+                    // Check if this question has an issue
+                    const hasIssue = issueQuestions.includes(i);
+
                     if (isSubmitted || quizCompleted) {
-                        if (answerStatus[i] === true) {
+                        if (answerStatus[i] === true && !hasIssue) {
                             dot.classList.add('correct-dot');
                         } else if (answerStatus[i] === false) {
                             dot.classList.add('wrong-dot');
+                            // If it's wrong but also an issue, show issue pink
+                            if (hasIssue) {
+                                dot.classList.add('issue-dot');
+                                dot.classList.remove('wrong-dot');
+                            }
+                        } else if (hasAns && hasIssue) {
+                            dot.classList.add('issue-dot');
                         } else if (hasAns) {
                             dot.classList.add('done-dot');
                         } else {
                             dot.classList.add('pending-dot');
                         }
                     } else {
-                        if (hasAns) {
+                        if (hasAns && hasIssue) {
+                            dot.classList.add('issue-dot');
+                        } else if (hasAns) {
                             const q = questions[i];
                             if (q && selectedAllAnswers[i] === q.correct) {
                                 dot.classList.add('correct-dot');
@@ -1247,7 +1332,11 @@
                 let done = 0,
                     pending = 0,
                     correct = 0,
-                    wrong = 0;
+                    wrong = 0,
+                    issues = 0;
+                checkForIssues();
+                issues = issueQuestions.length;
+                
                 for (let i = 0; i < totalQuestions; i++) {
                     if (selectedAllAnswers[i] !== null) {
                         done++;
@@ -1270,9 +1359,7 @@
                 pendingCount.textContent = pending;
                 correctCount.textContent = correct;
                 wrongCount.textContent = wrong;
-
-                correctLegend.style.display = 'inline-flex';
-                wrongLegend.style.display = 'inline-flex';
+                issueCount.textContent = issues;
             }
 
             function gradeQuiz() {
@@ -1296,6 +1383,7 @@
                     timerInterval = null; }
                 submittedBanner.style.display = 'block';
                 endQuizBtn.textContent = '🏁 End Quiz';
+                checkForIssues();
                 renderQuestion();
                 renderDots();
                 updateOverview();
@@ -1322,6 +1410,13 @@
                 const attempted = getAttemptedCount();
                 let msg = (score === totalQuestions) ? '🌟 Perfect!' : (score >= totalQuestions * 0.7 ?
                     '👏 Great job!' : '💪 Keep practicing!');
+                
+                // Check for issues
+                checkForIssues();
+                if (issueQuestions.length > 0) {
+                    msg += ` ⚠️ ${issueQuestions.length} issue(s) detected (pink dots)`;
+                }
+                
                 resultMessage.textContent = msg;
                 resultDetails.innerHTML = '';
                 questions.forEach((q, idx) => {
@@ -1329,16 +1424,29 @@
                     div.className = 'detail-item';
                     const isCorrect = answerStatus[idx] === true;
                     const isWrong = answerStatus[idx] === false;
-                    if (isCorrect) div.classList.add('correct-detail');
-                    else if (isWrong) div.classList.add('wrong-detail');
-                    else div.style.borderLeft = '6px solid #999';
+                    const hasIssue = issueQuestions.includes(idx);
+                    
+                    if (hasIssue) {
+                        div.classList.add('issue-detail');
+                    } else if (isCorrect) {
+                        div.classList.add('correct-detail');
+                    } else if (isWrong) {
+                        div.classList.add('wrong-detail');
+                    } else {
+                        div.style.borderLeft = '6px solid #999';
+                    }
+                    
                     const qText = document.createElement('div');
                     qText.className = 'detail-q';
                     qText.textContent = `${idx+1}. ${q.question}`;
+                    if (hasIssue) {
+                        qText.textContent += ' ⚠️ ISSUE';
+                        qText.style.color = '#ff1493';
+                    }
                     qText.style.cursor = 'pointer';
                     qText.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        const questionText = this.textContent.replace(/^\d+\.\s*/, '');
+                        const questionText = this.textContent.replace(/^\d+\.\s*/, '').replace(/⚠️ ISSUE$/, '');
                         if (questionText) {
                             window.open(
                                 `https://www.google.com/search?q=${encodeURIComponent(questionText)}`,
@@ -1346,14 +1454,23 @@
                         }
                     });
                     div.appendChild(qText);
+                    
                     const ansDiv = document.createElement('div');
                     ansDiv.className = 'detail-answer';
                     const userAns = (selectedAllAnswers[idx] !== null && q.options[selectedAllAnswers[idx]]) ? q
                         .options[selectedAllAnswers[idx]] : 'Not answered';
                     const correctAns = (q.correct !== -1 && q.options[q.correct]) ? q.options[q.correct] :
                         'Not available';
+                        
                     if (q.correct === -1) {
                         ansDiv.innerHTML = `<span style="color:#999;">⚠️ No correct answer.</span>`;
+                    } else if (hasIssue) {
+                        ansDiv.innerHTML = `
+                            ⚠️ <span style="color:#ff1493;">ISSUE DETECTED</span><br>
+                            Your answer: <span style="color:#b33c3c;">${userAns}</span><br>
+                            Correct: <span class="correct-ans">${correctAns}</span>
+                            <div style="margin-top:4px;font-size:0.8rem;color:#ff1493;">The selected option does not match the correct answer from the sheet.</div>
+                        `;
                     } else if (isCorrect) {
                         ansDiv.innerHTML =
                             `✅ Your answer: <span style="color:#1f8b4c;">${userAns}</span> (Correct)`;
@@ -1384,6 +1501,7 @@
                 score = 0;
                 currentIndex = 0;
                 timeRemaining = totalQuestions * 60;
+                issueQuestions = [];
                 if (timerInterval) { clearInterval(timerInterval);
                     timerInterval = null; }
                 resultArea.style.display = 'none';
