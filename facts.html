@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>CSS Facts · Data Viewer</title>
+    <title>CSS Facts · Card View</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
@@ -15,22 +15,19 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #f1f5f9;
-            padding: 2rem 1.5rem;
+            background: #eef2f7;
+            padding: 1.5rem 1rem;
             color: #0f172a;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
         .container {
-            max-width: 1400px;
-            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
             background: white;
             border-radius: 28px;
-            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.12);
-            padding: 2rem 1.8rem 2.2rem;
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.10);
+            padding: 1.8rem 1.5rem 2rem;
         }
 
         /* Header */
@@ -39,214 +36,261 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
         }
 
         .header h1 {
             font-weight: 700;
-            font-size: 1.7rem;
-            letter-spacing: -0.02em;
+            font-size: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: #0b2a3e;
         }
 
         .header h1 i {
             background: #e7eef6;
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: 50px;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: #1e4a6b;
         }
 
-        .stats {
+        .stats-badge {
             background: #eaf1f8;
-            padding: 0.5rem 1.4rem;
+            padding: 0.4rem 1.2rem;
             border-radius: 60px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
             color: #1f3a4e;
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
-        /* Toolbar */
+        .stats-badge i {
+            font-size: 0.8rem;
+        }
+
+        /* Toolbar - compact search + categories */
         .toolbar {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
+            gap: 0.8rem 1.2rem;
             margin-bottom: 1.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #e8eef4;
         }
 
+        /* Small search */
         .search-wrapper {
             display: flex;
             align-items: center;
             background: #f1f6fa;
-            border-radius: 60px;
-            padding: 0.2rem 0.2rem 0.2rem 1.2rem;
-            flex: 1 1 280px;
+            border-radius: 40px;
+            padding: 0.15rem 0.15rem 0.15rem 1rem;
             border: 1px solid #dce6ef;
             transition: 0.2s;
+            flex: 0 1 220px;
+            min-width: 140px;
         }
 
         .search-wrapper:focus-within {
             border-color: #3b7c9e;
             background: white;
-            box-shadow: 0 4px 14px rgba(28, 78, 110, 0.08);
+            box-shadow: 0 2px 10px rgba(28, 78, 110, 0.06);
         }
 
         .search-wrapper i {
-            color: #647b8e;
+            color: #7a93a8;
+            font-size: 0.8rem;
         }
 
         .search-wrapper input {
             border: none;
             background: transparent;
-            padding: 0.7rem 1rem;
+            padding: 0.45rem 0.7rem;
             width: 100%;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             outline: none;
             color: #1a2f40;
         }
 
         .search-wrapper input::placeholder {
-            color: #8fa3b5;
-        }
-
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group select {
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            border: 1px solid #d3dfe9;
-            background: white;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #1f3f55;
-            cursor: pointer;
-            outline: none;
-            transition: 0.15s;
-        }
-
-        .filter-group select:hover {
-            border-color: #9bb3c9;
-        }
-
-        .filter-group .clear-btn {
-            background: transparent;
-            border: 1px solid #d3dfe9;
-            padding: 0.4rem 1.2rem;
-            border-radius: 40px;
+            color: #9aafc0;
             font-size: 0.8rem;
+        }
+
+        /* Category chips */
+        .category-chips {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.78rem;
             font-weight: 500;
-            color: #395f79;
+            background: #edf3f9;
+            color: #1f4a66;
             cursor: pointer;
             transition: 0.15s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .filter-group .clear-btn:hover {
-            background: #e2ebf3;
-            border-color: #a7bccf;
-        }
-
-        /* Table */
-        .table-wrap {
-            overflow-x: auto;
-            border-radius: 20px;
-            border: 1px solid #eef4f8;
-            background: #ffffff;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.93rem;
-            min-width: 550px;
-        }
-
-        th {
-            text-align: left;
-            padding: 1rem 1.2rem;
-            font-weight: 600;
-            font-size: 0.75rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: #3d5b71;
-            background: #f8fcff;
-            border-bottom: 1px solid #e3ecf3;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-
-        th i {
-            margin-right: 8px;
-            opacity: 0.7;
-        }
-
-        td {
-            padding: 0.9rem 1.2rem;
-            border-bottom: 1px solid #edf3f8;
-            vertical-align: middle;
-            line-height: 1.5;
-            color: #1a3143;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: #f5faff;
-        }
-
-        .category-tag {
-            display: inline-block;
-            background: #e2ebf5;
-            padding: 0.2rem 0.9rem;
-            border-radius: 40px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            color: #1a4a66;
+            border: 1px solid transparent;
             white-space: nowrap;
         }
 
-        .category-tag i {
-            margin-right: 5px;
-            font-size: 0.65rem;
+        .chip:hover {
+            background: #dde8f2;
         }
 
-        .sno {
-            font-weight: 500;
+        .chip.active {
+            background: #1f4a66;
+            color: white;
+            border-color: #1f4a66;
+        }
+
+        .chip i {
+            font-size: 0.7rem;
+        }
+
+        .chip .count {
+            background: rgba(0,0,0,0.08);
+            padding: 0 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .chip.active .count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .chip-all {
+            background: #e8edf3;
+        }
+
+        .chip-all.active {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .reset-chip {
+            background: transparent;
+            border: 1px solid #d3dfe9;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.75rem;
+            color: #4f6f89;
+        }
+
+        .reset-chip:hover {
+            background: #e2ebf3;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: #f0f8ff;  /* sky blue base */
+            border-radius: 16px;
+            padding: 1.2rem 1.2rem 1rem;
+            border: 1px solid #dce8f2;
+            transition: 0.15s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Alternate grey-ish cards */
+        .card:nth-child(6n+1),
+        .card:nth-child(6n+2),
+        .card:nth-child(6n+3) {
+            background: #f0f8ff; /* sky blue */
+        }
+
+        .card:nth-child(6n+4),
+        .card:nth-child(6n+5),
+        .card:nth-child(6n+6) {
+            background: #f3f5f7; /* light grey */
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            border-color: #b8cfdf;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-sno {
+            font-weight: 600;
             color: #4b6a82;
-            width: 50px;
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.5);
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
         }
 
-        .empty-row td {
-            padding: 3rem 1.2rem;
+        .card-category {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #1f5a7a;
+            background: rgba(255,255,255,0.6);
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            border: 1px solid rgba(100,150,190,0.2);
+        }
+
+        .card-fact {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #1a3143;
+            flex: 1;
+            padding: 0.3rem 0 0.2rem;
+        }
+
+        .card-footer {
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            color: #7a96ad;
+            border-top: 1px solid rgba(0,0,0,0.04);
+            padding-top: 0.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
             text-align: center;
-            font-size: 1rem;
-            color: #5b7c94;
-            background: #fafdff;
+            padding: 3rem 1rem;
+            color: #6b8ba3;
+            background: #f8fcff;
+            border-radius: 20px;
         }
 
-        .empty-row i {
-            font-size: 1.8rem;
-            opacity: 0.5;
-            margin-bottom: 10px;
+        .empty-state i {
+            font-size: 2rem;
+            opacity: 0.4;
+            margin-bottom: 0.8rem;
             display: block;
         }
 
@@ -254,77 +298,64 @@
             margin-top: 1.8rem;
             display: flex;
             justify-content: flex-end;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #6b8ba3;
-            gap: 20px;
+            gap: 16px;
             flex-wrap: wrap;
             border-top: 1px solid #eef4f9;
-            padding-top: 1.4rem;
-        }
-
-        .footer-note i {
-            margin-right: 5px;
+            padding-top: 1.2rem;
         }
 
         @media (max-width: 650px) {
-            body { padding: 1rem 0.6rem; }
-            .container { padding: 1.2rem 0.6rem; }
+            body { padding: 0.8rem 0.5rem; }
+            .container { padding: 1rem 0.8rem; }
             .header h1 { font-size: 1.2rem; }
-            .stats { font-size: 0.75rem; padding: 0.3rem 0.9rem; }
-            td, th { padding: 0.7rem 0.6rem; }
-            .filter-group select { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+            .search-wrapper { flex: 1 1 100%; min-width: 100px; }
+            .category-chips { gap: 0.4rem; }
+            .chip { font-size: 0.7rem; padding: 0.2rem 0.7rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .card { padding: 1rem; }
         }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- Header -->
     <div class="header">
-        <h1><i class="fas fa-layer-group"></i> CSS Fact Explorer</h1>
-        <div class="stats">
+        <h1><i class="fas fa-layer-group"></i> CSS Facts</h1>
+        <div class="stats-badge">
             <i class="fas fa-list-ul"></i>
             <span id="countDisplay">0</span> entries
         </div>
     </div>
 
+    <!-- Toolbar: small search + category chips -->
     <div class="toolbar">
         <div class="search-wrapper">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Search facts..." />
+            <input type="text" id="searchInput" placeholder="Search..." />
         </div>
-        <div class="filter-group">
-            <select id="categoryFilter">
-                <option value="">All Categories</option>
-            </select>
-            <button class="clear-btn" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+
+        <div class="category-chips" id="categoryChips">
+            <!-- Chips injected by JS -->
         </div>
     </div>
 
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th><i class="fas fa-hashtag"></i> #</th>
-                    <th><i class="fas fa-folder-open"></i> Category</th>
-                    <th><i class="fas fa-info-circle"></i> Fact</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr class="empty-row"><td colspan="3"><i class="fas fa-spinner fa-spin"></i> Loading data...</td></tr>
-            </tbody>
-        </table>
+    <!-- Cards Grid -->
+    <div class="cards-grid" id="cardsGrid">
+        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
     </div>
 
     <div class="footer-note">
-        <span><i class="fas fa-database"></i> Data from Google Sheet</span>
-        <span><i class="fas fa-edit"></i> Paste your CSV below</span>
+        <span><i class="fas fa-database"></i> Data from CSV</span>
+        <span><i class="fas fa-edit"></i> Paste your data below</span>
     </div>
 </div>
 
 <script>
     (function() {
         // ──────────────────────────────────────────────────────────────
-        // 1. PASTE YOUR CSV DATA HERE (as a string)
-        //    Copy from your Google Sheet → File → Download → .csv
+        // 1. PASTE YOUR CSV DATA HERE
         // ──────────────────────────────────────────────────────────────
         const CSV_DATA = `Sr.No,Category,Fact
 1,Geography & Places,"The highest peak of the Himalayas in Pakistan is Nanga Parbat."
@@ -404,7 +435,7 @@
 75,History & Politics,"Indonesia boasts the largest Muslim population in the world."
 76,History & Politics,"The first biography of the Holy Prophet (PBUH) was written by Ibn-e-Hisham."
 77,History & Politics,"Ghulam Mohammad was the first finance minister of Pakistan."
-78,History & Politics,"Quaid-e-Azam resigned from the Indian National Congress due to the Non-Cooperation Movement."
+78,History &Politics,"Quaid-e-Azam resigned from the Indian National Congress due to the Non-Cooperation Movement."
 79,History & Politics,"Chubarji in Lahore was built by Zeb-un-Nisa."
 80,History & Politics,"George VI was the last Emperor of India."
 81,History & Politics,"Jordan expelled the PLO in 1970."
@@ -525,15 +556,13 @@
 196,Science & General Knowledge,"The first photograph was taken in 1826."`;
 
         // ──────────────────────────────────────────────────────────────
-        // 2. CSV parser (handles quoted fields)
+        // 2. CSV Parser
         // ──────────────────────────────────────────────────────────────
         function parseCSV(csvText) {
             const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
             if (lines.length === 0) return [];
 
-            const headers = lines[0].split(',').map(h => h.trim());
             const data = [];
-
             for (let i = 1; i < lines.length; i++) {
                 const row = [];
                 let field = '';
@@ -574,29 +603,28 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        // 3. App state
+        // 3. App State
         // ──────────────────────────────────────────────────────────────
         let allData = [];
         let filteredData = [];
-        let currentCategory = '';
+        let selectedCategory = ''; // '' means "All"
         let searchTerm = '';
 
-        const tbody = document.getElementById('tableBody');
+        const cardsGrid = document.getElementById('cardsGrid');
+        const categoryChips = document.getElementById('categoryChips');
         const searchInput = document.getElementById('searchInput');
-        const categoryFilter = document.getElementById('categoryFilter');
-        const resetBtn = document.getElementById('resetBtn');
         const countDisplay = document.getElementById('countDisplay');
 
         // ──────────────────────────────────────────────────────────────
-        // 4. Render
+        // 4. Render Cards
         // ──────────────────────────────────────────────────────────────
         function render() {
             const search = searchTerm.toLowerCase().trim();
             let result = allData;
 
             // Category filter
-            if (currentCategory) {
-                result = result.filter(item => item.category === currentCategory);
+            if (selectedCategory) {
+                result = result.filter(item => item.category === selectedCategory);
             }
 
             // Search filter
@@ -609,69 +637,114 @@
             }
 
             filteredData = result;
-
-            // Update count
             countDisplay.textContent = filteredData.length;
 
-            // Render rows
+            // Render cards
             if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr class="empty-row"><td colspan="3"><i class="fas fa-search-minus"></i> No facts match your filter</td></tr>`;
+                cardsGrid.innerHTML = `<div class="empty-state"><i class="fas fa-search-minus"></i> No facts match your filter</div>`;
                 return;
             }
 
             let html = '';
             filteredData.forEach(item => {
-                html += `<tr>
-                    <td class="sno">${item.srno}</td>
-                    <td><span class="category-tag"><i class="fas fa-tag"></i> ${item.category}</span></td>
-                    <td class="fact-text">${item.fact}</td>
-                </tr>`;
+                html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-sno">#${item.srno}</span>
+                            <span class="card-category"><i class="fas fa-tag" style="font-size:0.6rem;"></i> ${item.category}</span>
+                        </div>
+                        <div class="card-fact">${item.fact}</div>
+                        <div class="card-footer">
+                            <i class="fas fa-bookmark" style="opacity:0.5;"></i>
+                        </div>
+                    </div>
+                `;
             });
-            tbody.innerHTML = html;
+            cardsGrid.innerHTML = html;
         }
 
         // ──────────────────────────────────────────────────────────────
-        // 5. Load data & populate filter dropdown
+        // 5. Build Category Chips
+        // ──────────────────────────────────────────────────────────────
+        function buildChips() {
+            const categories = [...new Set(allData.map(item => item.category))].sort();
+
+            let html = `
+                <div class="chip chip-all ${selectedCategory === '' ? 'active' : ''}" data-category="">
+                    <i class="fas fa-th-list"></i> All
+                    <span class="count">${allData.length}</span>
+                </div>
+            `;
+
+            categories.forEach(cat => {
+                const count = allData.filter(item => item.category === cat).length;
+                const active = selectedCategory === cat ? 'active' : '';
+                html += `
+                    <div class="chip ${active}" data-category="${cat.replace(/"/g, '&quot;')}">
+                        <i class="fas fa-tag"></i> ${cat}
+                        <span class="count">${count}</span>
+                    </div>
+                `;
+            });
+
+            // Reset button as chip
+            html += `
+                <div class="chip reset-chip" id="resetChip">
+                    <i class="fas fa-undo-alt"></i> Reset
+                </div>
+            `;
+
+            categoryChips.innerHTML = html;
+
+            // Add click listeners to chips
+            document.querySelectorAll('.chip[data-category]').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const cat = this.dataset.category;
+                    selectedCategory = cat;
+                    searchTerm = ''; // clear search when clicking category
+                    searchInput.value = '';
+                    buildChips(); // rebuild to update active state
+                    render();
+                });
+            });
+
+            // Reset chip
+            const resetChip = document.getElementById('resetChip');
+            if (resetChip) {
+                resetChip.addEventListener('click', function() {
+                    selectedCategory = '';
+                    searchTerm = '';
+                    searchInput.value = '';
+                    buildChips();
+                    render();
+                });
+            }
+        }
+
+        // ──────────────────────────────────────────────────────────────
+        // 6. Load Data
         // ──────────────────────────────────────────────────────────────
         function loadData() {
             allData = parseCSV(CSV_DATA);
-
-            // Populate category dropdown
-            const categories = [...new Set(allData.map(item => item.category))].sort();
-            categoryFilter.innerHTML = '<option value="">All Categories</option>';
-            categories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                categoryFilter.appendChild(opt);
-            });
-
+            buildChips();
             render();
         }
 
         // ──────────────────────────────────────────────────────────────
-        // 6. Event listeners
+        // 7. Event Listeners
         // ──────────────────────────────────────────────────────────────
-        searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', function(e) {
             searchTerm = e.target.value;
-            render();
-        });
-
-        categoryFilter.addEventListener('change', (e) => {
-            currentCategory = e.target.value;
-            render();
-        });
-
-        resetBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            categoryFilter.value = '';
-            searchTerm = '';
-            currentCategory = '';
+            // If user types in search, clear category selection
+            if (searchTerm.trim() !== '') {
+                selectedCategory = '';
+                buildChips(); // update chip active states
+            }
             render();
         });
 
         // ──────────────────────────────────────────────────────────────
-        // 7. Start
+        // 8. Start
         // ──────────────────────────────────────────────────────────────
         loadData();
     })();
