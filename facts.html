@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · search on Google</title>
+    <title>Fact · click to search</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* minimal card – simple text with Google link at end */
+        /* minimal card – clickable fact text */
         .card-fact {
             background: white;
             border-radius: 0.5rem;
@@ -18,6 +18,7 @@
             min-height: 40px;
             display: flex;
             align-items: center;
+            cursor: default;
         }
         .card-fact:hover {
             background: #fafbfc;
@@ -26,7 +27,7 @@
             display: none;
         }
 
-        /* fact text: srno. fact  →  Google link */
+        /* fact text: srno. fact — fact is blue and clickable */
         .fact-line {
             font-size: 0.92rem;
             color: #1f2937;
@@ -43,24 +44,26 @@
             color: #4b5563;
         }
         .fact-line .fact-text {
+            color: #2563eb;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-color: #93c5fd;
+            transition: color 0.1s, text-decoration-color 0.1s;
             flex: 0 1 auto;
         }
-        .fact-line .google-link {
-            font-size: 0.65rem;
-            color: #3b82f6;
-            text-decoration: none;
-            background: #eff6ff;
-            padding: 0.05rem 0.5rem;
-            border-radius: 30px;
-            border: 1px solid #bfdbfe;
-            transition: background 0.1s, color 0.1s;
-            white-space: nowrap;
-            margin-left: 0.2rem;
-            flex-shrink: 0;
+        .fact-line .fact-text:hover {
+            color: #1d4ed8;
+            text-decoration-color: #3b82f6;
         }
-        .fact-line .google-link:hover {
-            background: #dbeafe;
-            color: #2563eb;
+
+        /* small Google hint (optional, subtle) */
+        .fact-line .google-hint {
+            font-size: 0.55rem;
+            color: #9ca3af;
+            margin-left: 0.15rem;
+            user-select: none;
+            flex-shrink: 0;
         }
 
         /* ----- control bar (one line) ----- */
@@ -157,10 +160,8 @@
                 flex: 2 1 120px;
                 min-width: 80px;
             }
-            .fact-line .google-link {
-                font-size: 0.6rem;
-                padding: 0.05rem 0.4rem;
-                margin-left: 0.1rem;
+            .fact-line .fact-text {
+                font-size: 0.85rem;
             }
         }
 
@@ -212,7 +213,7 @@
     </div>
 
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
-        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno. fact  →  search on Google</span>
+        <span class="bg-white/50 px-2 py-0.5 rounded-full">click blue text → search on Google</span>
     </div>
 </div>
 
@@ -308,9 +309,11 @@
             }
         }
 
-        // Build Google search URL
-        function getGoogleSearchUrl(query) {
-            return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        // Google search
+        function searchOnGoogle(query) {
+            if (!query || query === '—') return;
+            const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
         }
 
         function renderCards(rows) {
@@ -355,20 +358,29 @@
 
                 categorySet.add(displayCategory);
 
-                // card: "srno. fact  🔍 Google"
+                // card: "srno. fact" — fact is blue, clickable
                 const card = document.createElement('div');
                 card.className = 'card-fact';
 
                 const srnoDisplay = displaySrno !== '—' ? `${displaySrno}.` : '—';
-                const googleUrl = getGoogleSearchUrl(displayFact);
 
                 card.innerHTML = `
                     <div class="fact-line">
                         <span class="srno">${srnoDisplay}</span>
-                        <span class="fact-text">${displayFact}</span>
-                        <a href="${googleUrl}" target="_blank" rel="noopener noreferrer" class="google-link">🔍 Google</a>
+                        <span class="fact-text" data-fact="${displayFact.replace(/"/g, '&quot;')}">${displayFact}</span>
+                        <span class="google-hint">↗</span>
                     </div>
                 `;
+
+                // attach click listener to fact text
+                const factEl = card.querySelector('.fact-text');
+                factEl.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const factText = this.getAttribute('data-fact') || this.textContent;
+                    if (factText && factText !== '—') {
+                        searchOnGoogle(factText);
+                    }
+                });
 
                 container.appendChild(card);
 
