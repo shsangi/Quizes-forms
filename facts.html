@@ -3,97 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · search + filter</title>
+    <title>Fact · compact cards</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* tiny category tag – bottom of card */
-        .cat-tag {
-            font-size: 0.6rem;
-            letter-spacing: 0.02em;
-            opacity: 0.7;
-            margin-top: 0.35rem;
-            border-top: 1px solid #eef2f6;
-            padding-top: 0.35rem;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #4b5563;
-            background: transparent;
-        }
-        .srno-badge {
-            font-weight: 500;
-            background: #f0f2f5;
-            padding: 0.1rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.55rem;
-            color: #1f2937;
-            letter-spacing: 0.01em;
-        }
-        .fact-text {
-            font-size: 1rem;
-            line-height: 1.5;
-            word-break: break-word;
-        }
+        /* card – size adapts to content, no extra padding when short text */
         .card-fact {
             display: flex;
             flex-direction: column;
-            transition: box-shadow 0.15s ease, opacity 0.2s;
-        }
-        .card-fact .body {
-            flex: 1;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #edf2f7;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: box-shadow 0.12s ease;
+            height: auto;          /* fits content */
+            min-height: 60px;      /* just enough for one-liners */
         }
         .card-fact:hover {
-            box-shadow: 0 8px 18px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
         }
+        /* srno + fact on same line, with small srno */
+        .fact-line {
+            display: flex;
+            align-items: baseline;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            line-height: 1.5;
+        }
+        .srno-inline {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 0.05rem 0.5rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+            border: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        .fact-text-inline {
+            font-size: 0.95rem;
+            color: #1f2937;
+            word-break: break-word;
+            flex: 1;
+        }
+        /* category tag – tiny, at bottom */
+        .cat-tag {
+            font-size: 0.55rem;
+            letter-spacing: 0.02em;
+            opacity: 0.6;
+            margin-top: 0.35rem;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 0.3rem;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            color: #6b7280;
+            background: transparent;
+        }
+        .cat-tag span {
+            background: #f8fafc;
+            padding: 0.05rem 0.6rem;
+            border-radius: 30px;
+            border: 1px solid #edf2f7;
+        }
+
+        /* hide / show */
         .card-fact.hidden-card {
             display: none;
         }
 
-        /* ----- one-line control bar: record count, search, dropdown ----- */
+        /* ----- one-line control bar ----- */
         .control-bar {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 0.5rem 0.75rem;
+            gap: 0.4rem 0.7rem;
             background: white;
-            padding: 0.4rem 1rem;
+            padding: 0.3rem 1rem;
             border-radius: 40px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.02), 0 0 0 1px rgba(0,0,0,0.02);
             border: 1px solid #f0f2f5;
             width: 100%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
         .control-bar .count-badge {
             font-size: 0.7rem;
             font-weight: 450;
             color: #374151;
             background: #f3f4f6;
-            padding: 0.15rem 0.7rem;
+            padding: 0.1rem 0.7rem;
             border-radius: 30px;
             white-space: nowrap;
-            letter-spacing: 0.01em;
             border: 1px solid #e5e7eb;
         }
         .control-bar .search-wrap {
-            flex: 1 1 180px;
-            min-width: 120px;
+            flex: 1 1 160px;
+            min-width: 100px;
             position: relative;
         }
         .control-bar .search-wrap input {
             width: 100%;
-            padding: 0.25rem 1.8rem 0.25rem 0.8rem;
+            padding: 0.2rem 1.8rem 0.2rem 0.8rem;
             font-size: 0.75rem;
             border: 1px solid #e5e7eb;
             border-radius: 30px;
             background: #fafbfc;
-            transition: border 0.15s, box-shadow 0.1s;
+            transition: border 0.15s;
             outline: none;
             height: 28px;
         }
         .control-bar .search-wrap input:focus {
             border-color: #9ca3af;
             background: white;
-            box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.12);
+            box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.1);
         }
         .control-bar .search-wrap .clear-btn {
             position: absolute;
@@ -104,20 +127,18 @@
             color: #9ca3af;
             cursor: pointer;
             line-height: 1;
-            padding: 0 2px;
-            transition: color 0.1s;
         }
         .control-bar .search-wrap .clear-btn:hover {
             color: #4b5563;
         }
         .control-bar .category-dropdown {
             flex: 0 0 auto;
-            min-width: 100px;
+            min-width: 95px;
             max-width: 140px;
         }
         .control-bar .category-dropdown select {
             width: 100%;
-            padding: 0.2rem 1.6rem 0.2rem 0.7rem;
+            padding: 0.15rem 1.6rem 0.15rem 0.7rem;
             font-size: 0.7rem;
             border: 1px solid #e5e7eb;
             border-radius: 30px;
@@ -127,53 +148,59 @@
             -webkit-appearance: none;
             height: 28px;
             cursor: pointer;
-            transition: border 0.15s;
             outline: none;
         }
         .control-bar .category-dropdown select:focus {
             border-color: #9ca3af;
             background-color: white;
-            box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.12);
         }
-        /* small screens: allow wrap but keep compact */
         @media (max-width: 480px) {
             .control-bar {
                 border-radius: 24px;
-                padding: 0.4rem 0.8rem;
-                gap: 0.35rem 0.5rem;
+                padding: 0.3rem 0.7rem;
+                gap: 0.3rem 0.4rem;
             }
             .control-bar .category-dropdown {
-                min-width: 80px;
+                min-width: 75px;
                 flex: 1 0 auto;
             }
             .control-bar .search-wrap {
-                flex: 2 1 140px;
-                min-width: 100px;
+                flex: 2 1 120px;
+                min-width: 80px;
             }
         }
 
-        /* no results message */
+        /* no results */
         #no-results-msg {
             grid-column: 1 / -1;
+        }
+        /* grid: cards fit content */
+        #cards-container {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+        @media (min-width: 640px) {
+            #cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+        @media (min-width: 1024px) {
+            #cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- header with one-line control bar: count + search + dropdown -->
+    <!-- control bar: count + search + dropdown -->
     <div class="mb-5">
         <div class="control-bar">
-            <!-- record count -->
             <span id="recordCount" class="count-badge">0 facts</span>
-
-            <!-- search input with clear -->
             <div class="search-wrap">
-                <input id="searchInput" type="text" placeholder="Search category or fact …" autocomplete="off" />
+                <input id="searchInput" type="text" placeholder="Search …" autocomplete="off" />
                 <span id="clearSearch" class="clear-btn">✕</span>
             </div>
-
-            <!-- category dropdown -->
             <div class="category-dropdown">
                 <select id="categorySelect">
                     <option value="all">All categories</option>
@@ -182,15 +209,14 @@
         </div>
     </div>
 
-    <!-- loading state -->
+    <!-- loading -->
     <div id="loading" class="text-center text-gray-500 text-sm py-10">⏳ loading facts ...</div>
 
     <!-- card grid -->
-    <div id="cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-fr">
+    <div id="cards-container" class="grid gap-4 auto-rows-auto">
         <!-- cards injected here -->
     </div>
 
-    <!-- tiny footnote (doesn't affect cards) -->
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
         <span class="bg-white/50 px-2 py-0.5 rounded-full">srno · category · fact</span>
     </div>
@@ -201,7 +227,6 @@
 
 <script>
     (function() {
-        // ----- CONFIG -----
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1703040365';
 
         const container = document.getElementById('cards-container');
@@ -211,13 +236,9 @@
         const categorySelect = document.getElementById('categorySelect');
         const recordCount = document.getElementById('recordCount');
 
-        // store all card data
-        let allCards = []; // { element, srno, category, fact }
-
-        // unique categories (for dropdown)
+        let allCards = [];
         let categorySet = new Set();
 
-        // ----- helpers -----
         function getHeaderKey(row, ...candidates) {
             const keys = Object.keys(row);
             for (let cand of candidates) {
@@ -227,26 +248,22 @@
             return null;
         }
 
-        // ----- filtering: search + category -----
         function filterCards() {
             const searchQuery = searchInput.value.trim().toLowerCase();
             const selectedCategory = categorySelect.value;
 
             let visibleCount = 0;
-            let visibleCategories = new Set();
 
             allCards.forEach(item => {
                 const el = item.element;
                 const cat = (item.category || '').toLowerCase();
                 const fact = (item.fact || '').toLowerCase();
 
-                // category filter
                 let categoryMatch = true;
                 if (selectedCategory !== 'all') {
                     categoryMatch = (cat === selectedCategory.toLowerCase());
                 }
 
-                // search filter (category + fact)
                 let searchMatch = true;
                 if (searchQuery) {
                     searchMatch = cat.includes(searchQuery) || fact.includes(searchQuery);
@@ -256,16 +273,13 @@
                 if (visible) {
                     el.classList.remove('hidden-card');
                     visibleCount++;
-                    if (item.category) visibleCategories.add(item.category);
                 } else {
                     el.classList.add('hidden-card');
                 }
             });
 
-            // update record count
             recordCount.textContent = `${visibleCount} fact${visibleCount !== 1 ? 's' : ''}`;
 
-            // show/hide no-results message
             const existingMsg = document.getElementById('no-results-msg');
             if (visibleCount === 0 && (searchQuery || selectedCategory !== 'all')) {
                 if (!existingMsg) {
@@ -280,15 +294,11 @@
             }
         }
 
-        // ----- rebuild category dropdown (preserve selection if possible) -----
         function rebuildCategoryDropdown(selectedValue) {
             const currentVal = selectedValue || categorySelect.value || 'all';
-            // preserve if 'all' or a category that exists
             const categories = Array.from(categorySet).sort();
-            // keep 'all' always
             const options = ['all', ...categories];
 
-            // rebuild
             categorySelect.innerHTML = '';
             options.forEach(cat => {
                 const opt = document.createElement('option');
@@ -297,7 +307,6 @@
                 categorySelect.appendChild(opt);
             });
 
-            // try to restore selection
             if (options.includes(currentVal)) {
                 categorySelect.value = currentVal;
             } else {
@@ -305,7 +314,6 @@
             }
         }
 
-        // ----- render cards from rows -----
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
@@ -318,7 +326,6 @@
                 return;
             }
 
-            // detect headers
             const sample = rows[0];
             const srnoKey = getHeaderKey(sample, 'srno', 's.no', 'sno', 'sr no', 'serial');
             const catKey = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
@@ -347,24 +354,19 @@
                 const displayCategory = category;
                 const displayFact = fact;
 
-                // collect category for dropdown
                 categorySet.add(displayCategory);
 
-                // build card
+                // card: srno + fact on same line, category tiny at bottom
                 const card = document.createElement('div');
-                card.className = 'card-fact bg-white rounded-xl border border-gray-200/70 p-5 shadow-sm hover:border-gray-300/80';
+                card.className = 'card-fact';
 
                 card.innerHTML = `
-                    <div class="body">
-                        <div class="fact-text text-gray-800 leading-relaxed">
-                            ${displayFact}
-                        </div>
+                    <div class="fact-line">
+                        <span class="srno-inline">#${displaySrno}</span>
+                        <span class="fact-text-inline">${displayFact}</span>
                     </div>
                     <div class="cat-tag">
-                        <span class="flex items-center gap-1.5">
-                            <span class="srno-badge">#${displaySrno}</span>
-                        </span>
-                        <span class="text-[0.55rem] uppercase tracking-wide text-gray-400 bg-gray-100/60 px-2 py-0.5 rounded-full">${displayCategory}</span>
+                        <span>${displayCategory}</span>
                     </div>
                 `;
 
@@ -378,18 +380,12 @@
                 });
             });
 
-            // rebuild dropdown with categories
             rebuildCategoryDropdown('all');
-
-            // remove old no-results message
             const oldMsg = document.getElementById('no-results-msg');
             if (oldMsg) oldMsg.remove();
-
-            // apply filters (if search has value or dropdown not 'all')
             filterCards();
         }
 
-        // ----- fetch data -----
         async function fetchFacts() {
             try {
                 const response = await fetch(CSV_URL);
@@ -404,31 +400,28 @@
                         const rows = results.data.filter(row => {
                             return Object.values(row).some(v => v && v.trim() !== '');
                         });
-
                         loadingEl.style.display = 'none';
                         renderCards(rows);
                     },
                     error: function(err) {
                         console.error('PapaParse error:', err);
-                        loadingEl.innerHTML = `<p class="text-red-400 text-sm">⚠️ parsing error – check CSV</p>`;
+                        loadingEl.innerHTML = `<p class="text-red-400 text-sm">⚠️ parsing error</p>`;
                     }
                 });
             } catch (error) {
                 console.error('Fetch error:', error);
-                loadingEl.innerHTML = `<p class="text-red-400 text-sm">⚠️ failed to load sheet. make sure CSV is published.</p>`;
+                loadingEl.innerHTML = `<p class="text-red-400 text-sm">⚠️ failed to load sheet</p>`;
             }
         }
 
-        // ----- event listeners -----
+        // events
         searchInput.addEventListener('input', filterCards);
         categorySelect.addEventListener('change', filterCards);
-
         clearBtn.addEventListener('click', function() {
             searchInput.value = '';
             filterCards();
             searchInput.focus();
         });
-
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 this.value = '';
@@ -437,7 +430,6 @@
             }
         });
 
-        // start
         fetchFacts();
     })();
 </script>
