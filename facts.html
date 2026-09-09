@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · searchable</title>
+    <title>Fact · search + filter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* tiny category tag – stays at bottom, minimal space */
+        /* tiny category tag – bottom of card */
         .cat-tag {
             font-size: 0.6rem;
             letter-spacing: 0.02em;
@@ -46,46 +46,139 @@
         .card-fact:hover {
             box-shadow: 0 8px 18px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02);
         }
-        /* hide / show via class (faster than removing DOM) */
         .card-fact.hidden-card {
             display: none;
         }
-        /* search input style */
-        #searchInput {
+
+        /* ----- one-line control bar: record count, search, dropdown ----- */
+        .control-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem 0.75rem;
+            background: white;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02), 0 0 0 1px rgba(0,0,0,0.02);
+            border: 1px solid #f0f2f5;
+            width: 100%;
+        }
+        .control-bar .count-badge {
+            font-size: 0.7rem;
+            font-weight: 450;
+            color: #374151;
+            background: #f3f4f6;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+            border: 1px solid #e5e7eb;
+        }
+        .control-bar .search-wrap {
+            flex: 1 1 180px;
+            min-width: 120px;
+            position: relative;
+        }
+        .control-bar .search-wrap input {
+            width: 100%;
+            padding: 0.25rem 1.8rem 0.25rem 0.8rem;
+            font-size: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 30px;
+            background: #fafbfc;
             transition: border 0.15s, box-shadow 0.1s;
+            outline: none;
+            height: 28px;
         }
-        #searchInput:focus {
+        .control-bar .search-wrap input:focus {
             border-color: #9ca3af;
-            box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.15);
+            background: white;
+            box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.12);
         }
-        .clear-btn {
+        .control-bar .search-wrap .clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.6rem;
+            color: #9ca3af;
             cursor: pointer;
-            user-select: none;
-            transition: opacity 0.1s;
+            line-height: 1;
+            padding: 0 2px;
+            transition: color 0.1s;
         }
-        .clear-btn:hover {
-            opacity: 0.7;
+        .control-bar .search-wrap .clear-btn:hover {
+            color: #4b5563;
+        }
+        .control-bar .category-dropdown {
+            flex: 0 0 auto;
+            min-width: 100px;
+            max-width: 140px;
+        }
+        .control-bar .category-dropdown select {
+            width: 100%;
+            padding: 0.2rem 1.6rem 0.2rem 0.7rem;
+            font-size: 0.7rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 30px;
+            background: #fafbfc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E") no-repeat right 8px center;
+            background-size: 8px 6px;
+            appearance: none;
+            -webkit-appearance: none;
+            height: 28px;
+            cursor: pointer;
+            transition: border 0.15s;
+            outline: none;
+        }
+        .control-bar .category-dropdown select:focus {
+            border-color: #9ca3af;
+            background-color: white;
+            box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.12);
+        }
+        /* small screens: allow wrap but keep compact */
+        @media (max-width: 480px) {
+            .control-bar {
+                border-radius: 24px;
+                padding: 0.4rem 0.8rem;
+                gap: 0.35rem 0.5rem;
+            }
+            .control-bar .category-dropdown {
+                min-width: 80px;
+                flex: 1 0 auto;
+            }
+            .control-bar .search-wrap {
+                flex: 2 1 140px;
+                min-width: 100px;
+            }
+        }
+
+        /* no results message */
+        #no-results-msg {
+            grid-column: 1 / -1;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- header with search bar (replaces srno/catgory badges) -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-        <h1 class="text-xl sm:text-2xl font-medium text-gray-800 tracking-tight">📋 Facts</h1>
-        
-        <!-- search input with clear button -->
-        <div class="relative w-full sm:w-72 md:w-80">
-            <input 
-                id="searchInput" 
-                type="text" 
-                placeholder="Search category or fact ..." 
-                class="w-full pl-4 pr-9 py-1.5 bg-white border border-gray-300 rounded-full text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition"
-                autocomplete="off"
-            />
-            <!-- clear button (X) -->
-            <span id="clearSearch" class="clear-btn absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-light" style="line-height:1;">✕</span>
+    <!-- header with one-line control bar: count + search + dropdown -->
+    <div class="mb-5">
+        <div class="control-bar">
+            <!-- record count -->
+            <span id="recordCount" class="count-badge">0 facts</span>
+
+            <!-- search input with clear -->
+            <div class="search-wrap">
+                <input id="searchInput" type="text" placeholder="Search category or fact …" autocomplete="off" />
+                <span id="clearSearch" class="clear-btn">✕</span>
+            </div>
+
+            <!-- category dropdown -->
+            <div class="category-dropdown">
+                <select id="categorySelect">
+                    <option value="all">All categories</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -115,9 +208,14 @@
         const loadingEl = document.getElementById('loading');
         const searchInput = document.getElementById('searchInput');
         const clearBtn = document.getElementById('clearSearch');
+        const categorySelect = document.getElementById('categorySelect');
+        const recordCount = document.getElementById('recordCount');
 
-        // store all card elements and their searchable text
-        let allCards = []; // array of { element, srno, category, fact }
+        // store all card data
+        let allCards = []; // { element, srno, category, fact }
+
+        // unique categories (for dropdown)
+        let categorySet = new Set();
 
         // ----- helpers -----
         function getHeaderKey(row, ...candidates) {
@@ -129,38 +227,52 @@
             return null;
         }
 
-        // ----- filtering -----
-        function filterCards(query) {
-            const q = query.trim().toLowerCase();
+        // ----- filtering: search + category -----
+        function filterCards() {
+            const searchQuery = searchInput.value.trim().toLowerCase();
+            const selectedCategory = categorySelect.value;
+
             let visibleCount = 0;
+            let visibleCategories = new Set();
 
             allCards.forEach(item => {
                 const el = item.element;
-                if (!q) {
-                    el.classList.remove('hidden-card');
-                    visibleCount++;
-                    return;
-                }
-                // search in category + fact (case-insensitive)
                 const cat = (item.category || '').toLowerCase();
                 const fact = (item.fact || '').toLowerCase();
-                const match = cat.includes(q) || fact.includes(q);
-                if (match) {
+
+                // category filter
+                let categoryMatch = true;
+                if (selectedCategory !== 'all') {
+                    categoryMatch = (cat === selectedCategory.toLowerCase());
+                }
+
+                // search filter (category + fact)
+                let searchMatch = true;
+                if (searchQuery) {
+                    searchMatch = cat.includes(searchQuery) || fact.includes(searchQuery);
+                }
+
+                const visible = categoryMatch && searchMatch;
+                if (visible) {
                     el.classList.remove('hidden-card');
                     visibleCount++;
+                    if (item.category) visibleCategories.add(item.category);
                 } else {
                     el.classList.add('hidden-card');
                 }
             });
 
-            // show empty message if no results (optional)
+            // update record count
+            recordCount.textContent = `${visibleCount} fact${visibleCount !== 1 ? 's' : ''}`;
+
+            // show/hide no-results message
             const existingMsg = document.getElementById('no-results-msg');
-            if (visibleCount === 0 && q) {
+            if (visibleCount === 0 && (searchQuery || selectedCategory !== 'all')) {
                 if (!existingMsg) {
                     const msg = document.createElement('div');
                     msg.id = 'no-results-msg';
                     msg.className = 'col-span-full text-center text-gray-400 text-sm py-12';
-                    msg.innerText = '🔍 no facts match your search';
+                    msg.innerText = '🔍 no facts match your filters';
                     container.appendChild(msg);
                 }
             } else {
@@ -168,23 +280,50 @@
             }
         }
 
+        // ----- rebuild category dropdown (preserve selection if possible) -----
+        function rebuildCategoryDropdown(selectedValue) {
+            const currentVal = selectedValue || categorySelect.value || 'all';
+            // preserve if 'all' or a category that exists
+            const categories = Array.from(categorySet).sort();
+            // keep 'all' always
+            const options = ['all', ...categories];
+
+            // rebuild
+            categorySelect.innerHTML = '';
+            options.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat === 'all' ? 'All categories' : cat;
+                categorySelect.appendChild(opt);
+            });
+
+            // try to restore selection
+            if (options.includes(currentVal)) {
+                categorySelect.value = currentVal;
+            } else {
+                categorySelect.value = 'all';
+            }
+        }
+
         // ----- render cards from rows -----
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
+            categorySet = new Set();
 
             if (rows.length === 0) {
                 container.innerHTML = `<div class="col-span-full text-center text-gray-400 text-sm py-12">✨ no facts found</div>`;
+                recordCount.textContent = '0 facts';
+                rebuildCategoryDropdown('all');
                 return;
             }
 
-            // detect header keys
+            // detect headers
             const sample = rows[0];
             const srnoKey = getHeaderKey(sample, 'srno', 's.no', 'sno', 'sr no', 'serial');
             const catKey = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
             const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
 
-            // fallback fact key
             let fallbackFactKey = null;
             if (!factKey) {
                 const keys = Object.keys(sample);
@@ -201,14 +340,17 @@
                     if (fallback) fact = fallback.trim();
                 }
 
-                // if category is empty, derive from fact? keep as 'uncategorized'
                 if (!category) category = 'uncategorized';
+                if (!fact) fact = '—';
 
                 const displaySrno = srno || '—';
                 const displayCategory = category;
-                const displayFact = fact || '—';
+                const displayFact = fact;
 
-                // build card element
+                // collect category for dropdown
+                categorySet.add(displayCategory);
+
+                // build card
                 const card = document.createElement('div');
                 card.className = 'card-fact bg-white rounded-xl border border-gray-200/70 p-5 shadow-sm hover:border-gray-300/80';
 
@@ -228,7 +370,6 @@
 
                 container.appendChild(card);
 
-                // store reference for filtering
                 allCards.push({
                     element: card,
                     srno: displaySrno,
@@ -237,14 +378,15 @@
                 });
             });
 
-            // remove any leftover no-results message
+            // rebuild dropdown with categories
+            rebuildCategoryDropdown('all');
+
+            // remove old no-results message
             const oldMsg = document.getElementById('no-results-msg');
             if (oldMsg) oldMsg.remove();
 
-            // apply any pending search (if input has value)
-            if (searchInput.value.trim() !== '') {
-                filterCards(searchInput.value);
-            }
+            // apply filters (if search has value or dropdown not 'all')
+            filterCards();
         }
 
         // ----- fetch data -----
@@ -277,22 +419,20 @@
             }
         }
 
-        // ----- event listeners for search -----
-        searchInput.addEventListener('input', function(e) {
-            filterCards(this.value);
-        });
+        // ----- event listeners -----
+        searchInput.addEventListener('input', filterCards);
+        categorySelect.addEventListener('change', filterCards);
 
         clearBtn.addEventListener('click', function() {
             searchInput.value = '';
-            filterCards('');
+            filterCards();
             searchInput.focus();
         });
 
-        // also clear on escape key (nice UX)
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 this.value = '';
-                filterCards('');
+                filterCards();
                 this.blur();
             }
         });
