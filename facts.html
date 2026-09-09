@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · srno + category</title>
-    <!-- Tailwind via CDN + minimal custom touch -->
+    <title>Fact · searchable</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* small category tag – sits at bottom, doesn't steal space */
+        /* tiny category tag – stays at bottom, minimal space */
         .cat-tag {
-            font-size: 0.6rem;     /* tiny */
+            font-size: 0.6rem;
             letter-spacing: 0.02em;
-            opacity: 0.65;
-            margin-top: 0.25rem;
-            border-top: 1px solid #e9edf2;
+            opacity: 0.7;
+            margin-top: 0.35rem;
+            border-top: 1px solid #eef2f6;
             padding-top: 0.35rem;
             width: 100%;
             display: flex;
@@ -29,34 +28,65 @@
             border-radius: 20px;
             font-size: 0.55rem;
             color: #1f2937;
+            letter-spacing: 0.01em;
         }
         .fact-text {
             font-size: 1rem;
             line-height: 1.5;
             word-break: break-word;
         }
-        /* card uses flex column to push category to bottom */
         .card-fact {
             display: flex;
             flex-direction: column;
-            transition: box-shadow 0.15s ease;
+            transition: box-shadow 0.15s ease, opacity 0.2s;
         }
         .card-fact .body {
             flex: 1;
         }
-        /* tiny extra polish */
         .card-fact:hover {
             box-shadow: 0 8px 18px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02);
+        }
+        /* hide / show via class (faster than removing DOM) */
+        .card-fact.hidden-card {
+            display: none;
+        }
+        /* search input style */
+        #searchInput {
+            transition: border 0.15s, box-shadow 0.1s;
+        }
+        #searchInput:focus {
+            border-color: #9ca3af;
+            box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.15);
+        }
+        .clear-btn {
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.1s;
+        }
+        .clear-btn:hover {
+            opacity: 0.7;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- header minimal -->
-    <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
+    <!-- header with search bar (replaces srno/catgory badges) -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <h1 class="text-xl sm:text-2xl font-medium text-gray-800 tracking-tight">📋 Facts</h1>
-        <span class="text-xs text-gray-400 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">srno · category</span>
+        
+        <!-- search input with clear button -->
+        <div class="relative w-full sm:w-72 md:w-80">
+            <input 
+                id="searchInput" 
+                type="text" 
+                placeholder="Search category or fact ..." 
+                class="w-full pl-4 pr-9 py-1.5 bg-white border border-gray-300 rounded-full text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition"
+                autocomplete="off"
+            />
+            <!-- clear button (X) -->
+            <span id="clearSearch" class="clear-btn absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-light" style="line-height:1;">✕</span>
+        </div>
     </div>
 
     <!-- loading state -->
@@ -66,9 +96,14 @@
     <div id="cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-fr">
         <!-- cards injected here -->
     </div>
+
+    <!-- tiny footnote (doesn't affect cards) -->
+    <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
+        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno · category · fact</span>
+    </div>
 </div>
 
-<!-- PapaParse for CSV -->
+<!-- PapaParse -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <script>
@@ -76,14 +111,16 @@
         // ----- CONFIG -----
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1703040365';
 
-        // expected columns: A=srno, B=catgory, C=fact
-        // but we read dynamically; we'll map by header names (case-insensitive)
         const container = document.getElementById('cards-container');
         const loadingEl = document.getElementById('loading');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearch');
+
+        // store all card elements and their searchable text
+        let allCards = []; // array of { element, srno, category, fact }
 
         // ----- helpers -----
         function getHeaderKey(row, ...candidates) {
-            // return first candidate that exists as a key in row (case-insensitive)
             const keys = Object.keys(row);
             for (let cand of candidates) {
                 const found = keys.find(k => k.trim().toLowerCase() === cand.toLowerCase());
@@ -92,7 +129,125 @@
             return null;
         }
 
-        // ----- fetch & render -----
+        // ----- filtering -----
+        function filterCards(query) {
+            const q = query.trim().toLowerCase();
+            let visibleCount = 0;
+
+            allCards.forEach(item => {
+                const el = item.element;
+                if (!q) {
+                    el.classList.remove('hidden-card');
+                    visibleCount++;
+                    return;
+                }
+                // search in category + fact (case-insensitive)
+                const cat = (item.category || '').toLowerCase();
+                const fact = (item.fact || '').toLowerCase();
+                const match = cat.includes(q) || fact.includes(q);
+                if (match) {
+                    el.classList.remove('hidden-card');
+                    visibleCount++;
+                } else {
+                    el.classList.add('hidden-card');
+                }
+            });
+
+            // show empty message if no results (optional)
+            const existingMsg = document.getElementById('no-results-msg');
+            if (visibleCount === 0 && q) {
+                if (!existingMsg) {
+                    const msg = document.createElement('div');
+                    msg.id = 'no-results-msg';
+                    msg.className = 'col-span-full text-center text-gray-400 text-sm py-12';
+                    msg.innerText = '🔍 no facts match your search';
+                    container.appendChild(msg);
+                }
+            } else {
+                if (existingMsg) existingMsg.remove();
+            }
+        }
+
+        // ----- render cards from rows -----
+        function renderCards(rows) {
+            container.innerHTML = '';
+            allCards = [];
+
+            if (rows.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-gray-400 text-sm py-12">✨ no facts found</div>`;
+                return;
+            }
+
+            // detect header keys
+            const sample = rows[0];
+            const srnoKey = getHeaderKey(sample, 'srno', 's.no', 'sno', 'sr no', 'serial');
+            const catKey = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
+            const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
+
+            // fallback fact key
+            let fallbackFactKey = null;
+            if (!factKey) {
+                const keys = Object.keys(sample);
+                if (keys.length >= 3) fallbackFactKey = keys[2];
+            }
+
+            rows.forEach((row) => {
+                const srno = srnoKey ? (row[srnoKey] || '').trim() : '';
+                let category = catKey ? (row[catKey] || '').trim() : '';
+                let fact = factKey ? (row[factKey] || '').trim() : '';
+                if (!fact && fallbackFactKey) fact = (row[fallbackFactKey] || '').trim();
+                if (!fact) {
+                    const fallback = Object.values(row).find(v => v && v.trim() !== '');
+                    if (fallback) fact = fallback.trim();
+                }
+
+                // if category is empty, derive from fact? keep as 'uncategorized'
+                if (!category) category = 'uncategorized';
+
+                const displaySrno = srno || '—';
+                const displayCategory = category;
+                const displayFact = fact || '—';
+
+                // build card element
+                const card = document.createElement('div');
+                card.className = 'card-fact bg-white rounded-xl border border-gray-200/70 p-5 shadow-sm hover:border-gray-300/80';
+
+                card.innerHTML = `
+                    <div class="body">
+                        <div class="fact-text text-gray-800 leading-relaxed">
+                            ${displayFact}
+                        </div>
+                    </div>
+                    <div class="cat-tag">
+                        <span class="flex items-center gap-1.5">
+                            <span class="srno-badge">#${displaySrno}</span>
+                        </span>
+                        <span class="text-[0.55rem] uppercase tracking-wide text-gray-400 bg-gray-100/60 px-2 py-0.5 rounded-full">${displayCategory}</span>
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+                // store reference for filtering
+                allCards.push({
+                    element: card,
+                    srno: displaySrno,
+                    category: displayCategory,
+                    fact: displayFact,
+                });
+            });
+
+            // remove any leftover no-results message
+            const oldMsg = document.getElementById('no-results-msg');
+            if (oldMsg) oldMsg.remove();
+
+            // apply any pending search (if input has value)
+            if (searchInput.value.trim() !== '') {
+                filterCards(searchInput.value);
+            }
+        }
+
+        // ----- fetch data -----
         async function fetchFacts() {
             try {
                 const response = await fetch(CSV_URL);
@@ -102,73 +257,14 @@
                 Papa.parse(csvText, {
                     header: true,
                     skipEmptyLines: true,
-                    trimHeaders: false,   // keep original casing, we handle later
+                    trimHeaders: false,
                     complete: function(results) {
                         const rows = results.data.filter(row => {
-                            // filter out completely empty rows
                             return Object.values(row).some(v => v && v.trim() !== '');
                         });
 
                         loadingEl.style.display = 'none';
-                        container.innerHTML = '';
-
-                        if (rows.length === 0) {
-                            container.innerHTML = `<div class="col-span-full text-center text-gray-400 text-sm py-12">✨ no facts found</div>`;
-                            return;
-                        }
-
-                        // detect header keys (case-insensitive)
-                        const sample = rows[0];
-                        const srnoKey = getHeaderKey(sample, 'srno', 's.no', 'sno', 'sr no', 'serial');
-                        const catKey = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
-                        const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
-
-                        // if no factKey found, fallback: use third column? but we'll warn
-                        let fallbackFactKey = null;
-                        if (!factKey) {
-                            // get all keys and pick third if exists (C column)
-                            const keys = Object.keys(sample);
-                            if (keys.length >= 3) fallbackFactKey = keys[2];
-                        }
-
-                        // render each row as card
-                        rows.forEach((row, idx) => {
-                            // extract values using detected keys
-                            const srno = srnoKey ? (row[srnoKey] || '').trim() : '';
-                            const category = catKey ? (row[catKey] || '').trim() : '';
-                            let fact = factKey ? (row[factKey] || '').trim() : '';
-                            if (!fact && fallbackFactKey) fact = (row[fallbackFactKey] || '').trim();
-                            // if still empty, use any value from row that is not srno/cat
-                            if (!fact) {
-                                const fallback = Object.values(row).find(v => v && v.trim() !== '');
-                                if (fallback) fact = fallback.trim();
-                            }
-
-                            // fallback display
-                            const displaySrno = srno || '—';
-                            const displayCategory = category || 'uncategorized';
-                            const displayFact = fact || '—';
-
-                            // build card
-                            const card = document.createElement('div');
-                            card.className = 'card-fact bg-white rounded-xl border border-gray-200/70 p-5 shadow-sm hover:border-gray-300/80';
-
-                            card.innerHTML = `
-                                <div class="body">
-                                    <div class="fact-text text-gray-800 leading-relaxed">
-                                        ${displayFact}
-                                    </div>
-                                </div>
-                                <div class="cat-tag">
-                                    <span class="flex items-center gap-1.5">
-                                        <span class="srno-badge">#${displaySrno}</span>
-                                    </span>
-                                    <span class="text-[0.55rem] uppercase tracking-wide text-gray-400 bg-gray-100/60 px-2 py-0.5 rounded-full">${displayCategory}</span>
-                                </div>
-                            `;
-
-                            container.appendChild(card);
-                        });
+                        renderCards(rows);
                     },
                     error: function(err) {
                         console.error('PapaParse error:', err);
@@ -181,14 +277,29 @@
             }
         }
 
-        // kick off
+        // ----- event listeners for search -----
+        searchInput.addEventListener('input', function(e) {
+            filterCards(this.value);
+        });
+
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            filterCards('');
+            searchInput.focus();
+        });
+
+        // also clear on escape key (nice UX)
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                filterCards('');
+                this.blur();
+            }
+        });
+
+        // start
         fetchFacts();
     })();
 </script>
-
-<!-- footnote: category at bottom, srno shown small -->
-<div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
-    <span class="bg-white/50 px-2 py-0.5 rounded-full">srno · category · fact</span>
-</div>
 </body>
 </html>
