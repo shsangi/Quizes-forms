@@ -96,37 +96,6 @@
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    .category-selector {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: #f0f4f9;
-      padding: 0.2rem 0.8rem 0.2rem 1rem;
-      border-radius: 40px;
-      border: 1px solid #dce6ef;
-    }
-    .category-selector label {
-      font-weight: 500;
-      font-size: 0.8rem;
-      color: #1f4d66;
-    }
-    .category-selector select {
-      background: white;
-      border: 1px solid #d0dde8;
-      border-radius: 30px;
-      padding: 0.35rem 1.2rem 0.35rem 1rem;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      font-size: 0.85rem;
-      color: #0b2a3b;
-      outline: none;
-      cursor: pointer;
-      transition: 0.15s;
-      min-width: 110px;
-    }
-    .category-selector select:hover { border-color: #6fa6c7; }
-    .category-selector select:focus { border-color: #2f7b9e; box-shadow: 0 0 0 3px rgba(47,123,158,0.15); }
-
     .timer-line {
       text-align: center;
       padding: 0.2rem 0 0.8rem 0;
@@ -665,14 +634,6 @@
         height: 30px;
         font-size: 0.9rem;
       }
-      .category-selector {
-        padding: 0.2rem 0.6rem 0.2rem 0.8rem;
-      }
-      .category-selector select {
-        padding: 0.25rem 0.8rem 0.25rem 0.6rem;
-        font-size: 0.75rem;
-        min-width: 80px;
-      }
       .modal-selector select { font-size: 0.9rem; }
     }
   </style>
@@ -682,20 +643,14 @@
   <div class="top-bar">
     <div class="brand">
       <img class="brand-logo" id="brandLogo" 
-           src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
-           alt="Self Learners Logo" style="display:block !important; width:48px; height:48px; border-radius:12px; object-fit:contain; background:#f0f4f9; padding:4px; flex-shrink:0;">
+           src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ECSS%3C/text%3E%3C/svg%3E"
+           alt="CSS Test Logo" style="display:block !important; width:48px; height:48px; border-radius:12px; object-fit:contain; background:#f0f4f9; padding:4px; flex-shrink:0;">
       <div class="brand-title">
-        <h1 id="quizTitle">Loading...</h1>
+        <h1 id="quizTitle">CSS Test</h1>
         <span class="subtitle" id="quizSubtitle">Self Learners</span>
       </div>
     </div>
     <div class="top-actions">
-      <div class="category-selector">
-        <label for="categoryFilter">📂</label>
-        <select id="categoryFilter">
-          <option value="all">All</option>
-        </select>
-      </div>
       <button class="btn-icon" id="refreshBtn" title="Refresh Quiz from spreadsheet">
         <span id="refreshIcon">🔄</span>
       </button>
@@ -743,7 +698,7 @@
     </div>
   </div>
 
-  <!-- Refresh Modal with Category Dropdown -->
+  <!-- Refresh Modal with Category Dropdown (only filter here) -->
   <div class="modal-overlay" id="refreshModal">
     <div class="modal-box">
       <h3>🔄 Refresh Quiz</h3>
@@ -787,7 +742,7 @@
     let timerInterval = null;
     let timeRemaining = 0;
     let totalQuestions = 0;
-    let quizTitleText = 'Quiz';
+    let quizTitleText = 'CSS Test';
     let selectedAllAnswers = [];
     let lockedQuestions = [];
     let originalQuestions = [];
@@ -826,7 +781,6 @@
     const submittedBanner = document.getElementById('submittedBanner');
     const scrollTopBtn = document.getElementById('scrollTopBtn');
     const scrollBottomBtn = document.getElementById('scrollBottomBtn');
-    const categoryFilter = document.getElementById('categoryFilter');
     const modalCategoryFilter = document.getElementById('modalCategoryFilter');
     const refreshModalMessage = document.getElementById('refreshModalMessage');
 
@@ -920,7 +874,7 @@
     }
 
     function populateCategoryFilter(cats, selectEl) {
-      const target = selectEl || categoryFilter;
+      const target = selectEl || modalCategoryFilter;
       target.innerHTML = '<option value="all">All</option>';
       cats.forEach(cat => {
         const opt = document.createElement('option');
@@ -982,7 +936,7 @@
           currentCategory = saved.currentCategory || 'all';
           populateCategoryFilter(categories);
           populateCategoryFilter(categories, modalCategoryFilter);
-          quizTitleText = saved.quizTitleText || 'Quiz';
+          quizTitleText = saved.quizTitleText || 'CSS Test';
           filteredQuestions = saved.filteredQuestions || allQuestions.map(q => ({...q}));
           questions = filteredQuestions;
           totalQuestions = saved.totalQuestions || questions.length;
@@ -1028,13 +982,11 @@
           if (parsed.questions.length === 0) throw new Error('No data');
           allQuestions = parsed.questions;
           categories = parsed.categories || [];
-          quizTitleText = parsed.title || 'Quiz';
+          quizTitleText = parsed.title || 'CSS Test';
           
-          // Use selected category if provided, else 'all'
           currentCategory = selectedCategory || 'all';
           populateCategoryFilter(categories);
           populateCategoryFilter(categories, modalCategoryFilter);
-          categoryFilter.value = currentCategory;
           modalCategoryFilter.value = currentCategory;
           
           filterQuestionsByCategory(currentCategory);
@@ -1053,12 +1005,12 @@
 
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim() !== '');
-      if (lines.length < 2) return { questions: [], title: 'Quiz', categories: [] };
-      let title = 'Quiz';
+      if (lines.length < 2) return { questions: [], title: 'CSS Test', categories: [] };
+      let title = 'CSS Test';
       const categoriesSet = new Set();
       if (lines.length > 0) {
         const firstRow = parseCSVLine(lines[0]);
-        if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'Quiz';
+        if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'CSS Test';
       }
       const result = [];
       const startRow = Math.min(1, lines.length - 1);
@@ -1594,7 +1546,6 @@
 
     function handleRefreshClick() {
       refreshModalMessage.textContent = 'Progress will be reset.';
-      // Sync modal dropdown with current category
       modalCategoryFilter.value = currentCategory;
       refreshModal.classList.add('active');
     }
@@ -1604,7 +1555,6 @@
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
-      // Force refresh with selected category
       fetchQuestions(true, selectedCategory);
     }
 
@@ -1619,17 +1569,6 @@
     function scrollToBottom() {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
-
-    // Category filter change (top bar)
-    categoryFilter.addEventListener('change', function() {
-      const selected = this.value;
-      currentCategory = selected;
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      clearState();
-      filterQuestionsByCategory(selected);
-      saveState();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
 
     refreshModal.addEventListener('click', function(e) {
       if (e.target === this) {
@@ -1646,6 +1585,8 @@
     scrollTopBtn.addEventListener('click', scrollToTop);
     scrollBottomBtn.addEventListener('click', scrollToBottom);
 
+    // Set initial title
+    quizTitle.textContent = 'CSS Test';
     fetchQuestions(false);
   })();
 </script>
