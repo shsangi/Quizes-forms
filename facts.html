@@ -3,49 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sheet to Website</title>
-    <!-- Include Tailwind CSS for quick, clean styling -->
+    <title>Sheet Data as Cards</title>
+    <!-- Include Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include PapaParse to parse CSV data easily -->
+    <!-- Include PapaParse to easily read the CSV file -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
-<body class="bg-gray-50 p-6">
+<body class="bg-gray-100 min-h-screen p-8">
 
-    <div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="px-6 py-4 bg-blue-600 text-white font-bold text-lg">
-            My Spreadsheet Data
-        </div>
-        <div class="overflow-x-auto">
-            <table id="csv-table" class="min-w-full divide-y divide-gray-200">
-                <!-- Data will be injected here dynamically -->
-            </table>
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">My Sheet Cards</h1>
+        
+        <!-- Container where cards will be injected -->
+        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loading state -->
+            <p class="col-span-full text-center text-gray-500">Loading data from Google Sheets...</p>
         </div>
     </div>
 
     <script>
+        // Your published workbook CSV URL
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTX16x-Eeh1mguy6se1B25x0hkRIzIme4pX71KlxpML_vZAD34mtlITIqFs8MCAVycXFFft82j1RZDc/pub?output=csv";
 
         Papa.parse(csvUrl, {
             download: true,
-            header: false, // Set to true if your first row contains column headers
+            header: true, // Treats the first row of your sheet as column headers (titles)
+            skipEmptyLines: true,
             complete: function(results) {
                 const data = results.data;
-                const table = document.getElementById('csv-table');
+                const container = document.getElementById('cards-container');
                 let html = '';
 
-                data.forEach((row, rowIndex) => {
-                    html += `<tr class="${rowIndex === 0 ? 'bg-gray-100 font-semibold text-gray-700' : 'hover:bg-gray-50 text-gray-600'}">`;
-                    row.forEach(cell => {
-                        if (rowIndex === 0) {
-                            html += `<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">${cell}</th>`;
-                        } else {
-                            html += `<td class="px-6 py-4 whitespace-nowrap text-sm border-t border-gray-200">${cell}</td>`;
-                        }
-                    });
-                    html += `</tr>`;
+                if (data.length === 0) {
+                    container.innerHTML = `<p class="col-span-full text-center text-gray-500">No data found in the sheet.</p>`;
+                    return;
+                }
+
+                // Loop through each row of data and create a card
+                data.forEach(row => {
+                    html += `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col justify-between">
+                            <div class="space-y-3">
+                    `;
+
+                    // Loop through each column (header and value) in the row
+                    for (const [key, value] of Object.entries(row)) {
+                        if (!key) continue; // Skip empty headers
+                        
+                        // Customize how specific columns look if needed (e.g., if you have an 'Image' or 'Title' column)
+                        html += `
+                            <div>
+                                <span class="text-xs font-semibold tracking-wider text-indigo-600 uppercase">${key}</span>
+                                <p class="text-gray-800 text-base font-medium mt-0.5">${value || '-'}</p>
+                            </div>
+                        `;
+                    }
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
                 });
 
-                table.innerHTML = html;
+                container.innerHTML = html;
+            },
+            error: function(error) {
+                document.getElementById('cards-container').innerHTML = `<p class="col-span-full text-center text-red-500">Failed to load sheet data. Make sure the sheet is published to the web as CSV.</p>`;
+                console.error(error);
             }
         });
     </script>
