@@ -6,14 +6,14 @@
     <title>Fact · click to search</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* minimal card – fact text is clickable, no icon */
+        /* minimal card – clickable fact text */
         .card-fact {
             background: white;
             border-radius: 0.5rem;
             border: 1px solid #edf2f7;
             padding: 0.55rem 0.9rem;
             box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-            transition: background 0.1s, box-shadow 0.1s;
+            transition: background 0.1s, border-color 0.1s;
             height: auto;
             min-height: 40px;
             display: flex;
@@ -21,43 +21,40 @@
             cursor: pointer;
         }
         .card-fact:hover {
-            background: #f8fafc;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            background: #f7f9fc;
+            border-color: #d1d9e6;
         }
         .card-fact:active {
-            background: #f1f5f9;
+            background: #eef2f7;
         }
         .card-fact.hidden-card {
             display: none;
         }
 
-        /* fact text: srno. fact  →  whole card clickable */
+        /* simple fact text: srno. fact */
         .fact-line {
             font-size: 0.92rem;
             color: #1f2937;
             line-height: 1.5;
             word-break: break-word;
             width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            gap: 0.15rem 0.3rem;
+            pointer-events: none; /* so click goes to card */
         }
         .fact-line .srno {
             font-weight: 500;
             color: #4b5563;
         }
-        .fact-line .fact-text {
-            flex: 0 1 auto;
-            color: #1f2937;
-            border-bottom: 1px dotted transparent;
-            transition: border-color 0.15s;
-        }
-        .card-fact:hover .fact-text {
-            border-bottom-color: #3b82f6;
+
+        /* search hint – subtle */
+        .search-hint {
+            font-size: 0.55rem;
+            color: #9ca3af;
+            margin-left: 0.4rem;
+            opacity: 0.5;
+            pointer-events: none;
         }
 
-        /* ----- control bar (one line) – count + dropdown ----- */
+        /* ----- control bar (one line) ----- */
         .control-bar {
             display: flex;
             flex-wrap: wrap;
@@ -79,6 +76,40 @@
             border-radius: 30px;
             white-space: nowrap;
             border: 1px solid #e5e7eb;
+        }
+        .control-bar .search-wrap {
+            flex: 1 1 160px;
+            min-width: 100px;
+            position: relative;
+        }
+        .control-bar .search-wrap input {
+            width: 100%;
+            padding: 0.2rem 1.8rem 0.2rem 0.8rem;
+            font-size: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 30px;
+            background: #fafbfc;
+            transition: border 0.15s;
+            outline: none;
+            height: 28px;
+        }
+        .control-bar .search-wrap input:focus {
+            border-color: #9ca3af;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.1);
+        }
+        .control-bar .search-wrap .clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.6rem;
+            color: #9ca3af;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .control-bar .search-wrap .clear-btn:hover {
+            color: #4b5563;
         }
         .control-bar .category-dropdown {
             flex: 0 0 auto;
@@ -103,12 +134,6 @@
             border-color: #9ca3af;
             background-color: white;
         }
-        .control-bar .filter-label {
-            font-size: 0.65rem;
-            color: #6b7280;
-            font-weight: 450;
-            margin-right: -0.2rem;
-        }
         @media (max-width: 480px) {
             .control-bar {
                 border-radius: 24px;
@@ -119,12 +144,13 @@
                 min-width: 75px;
                 flex: 1 0 auto;
             }
-            .control-bar .filter-label {
-                font-size: 0.6rem;
+            .control-bar .search-wrap {
+                flex: 2 1 120px;
+                min-width: 80px;
             }
         }
 
-        /* grid: cards fit content */
+        /* grid */
         #cards-container {
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         }
@@ -135,24 +161,26 @@
         }
         @media (min-width: 1024px) {
             #cards-container {
-                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
         }
 
         #no-results-msg {
             grid-column: 1 / -1;
-            cursor: default;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- control bar: count + dropdown (no search) -->
+    <!-- control bar -->
     <div class="mb-4">
         <div class="control-bar">
             <span id="recordCount" class="count-badge">0 facts</span>
-            <span class="filter-label">Category:</span>
+            <div class="search-wrap">
+                <input id="searchInput" type="text" placeholder="Search …" autocomplete="off" />
+                <span id="clearSearch" class="clear-btn">✕</span>
+            </div>
             <div class="category-dropdown">
                 <select id="categorySelect">
                     <option value="all">All categories</option>
@@ -170,7 +198,7 @@
     </div>
 
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
-        <span class="bg-white/50 px-2 py-0.5 rounded-full">click any fact to search on Google</span>
+        <span class="bg-white/50 px-2 py-0.5 rounded-full">click any fact → Google search</span>
     </div>
 </div>
 
@@ -183,6 +211,8 @@
 
         const container = document.getElementById('cards-container');
         const loadingEl = document.getElementById('loading');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearch');
         const categorySelect = document.getElementById('categorySelect');
         const recordCount = document.getElementById('recordCount');
 
@@ -198,7 +228,15 @@
             return null;
         }
 
+        // ----- Google search -----
+        function searchGoogle(query) {
+            if (!query || query.trim() === '') return;
+            const encoded = encodeURIComponent(query.trim());
+            window.open(`https://www.google.com/search?q=${encoded}`, '_blank');
+        }
+
         function filterCards() {
+            const searchQuery = searchInput.value.trim().toLowerCase();
             const selectedCategory = categorySelect.value;
 
             let visibleCount = 0;
@@ -206,13 +244,19 @@
             allCards.forEach(item => {
                 const el = item.element;
                 const cat = (item.category || '').toLowerCase();
+                const fact = (item.fact || '').toLowerCase();
 
                 let categoryMatch = true;
                 if (selectedCategory !== 'all') {
                     categoryMatch = (cat === selectedCategory.toLowerCase());
                 }
 
-                const visible = categoryMatch;
+                let searchMatch = true;
+                if (searchQuery) {
+                    searchMatch = cat.includes(searchQuery) || fact.includes(searchQuery);
+                }
+
+                const visible = categoryMatch && searchMatch;
                 if (visible) {
                     el.classList.remove('hidden-card');
                     visibleCount++;
@@ -224,12 +268,12 @@
             recordCount.textContent = `${visibleCount} fact${visibleCount !== 1 ? 's' : ''}`;
 
             const existingMsg = document.getElementById('no-results-msg');
-            if (visibleCount === 0 && selectedCategory !== 'all') {
+            if (visibleCount === 0 && (searchQuery || selectedCategory !== 'all')) {
                 if (!existingMsg) {
                     const msg = document.createElement('div');
                     msg.id = 'no-results-msg';
                     msg.className = 'col-span-full text-center text-gray-400 text-sm py-12';
-                    msg.innerText = '📂 no facts in this category';
+                    msg.innerText = '🔍 no facts match your filters';
                     container.appendChild(msg);
                 }
             } else {
@@ -255,17 +299,6 @@
             } else {
                 categorySelect.value = 'all';
             }
-        }
-
-        // Build Google search URL
-        function getGoogleSearchUrl(query) {
-            return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        }
-
-        // Click handler: open Google search for the fact
-        function handleCardClick(factText, event) {
-            const url = getGoogleSearchUrl(factText);
-            window.open(url, '_blank');
         }
 
         function renderCards(rows) {
@@ -310,23 +343,39 @@
 
                 categorySet.add(displayCategory);
 
-                // card: clickable — whole card opens Google search for the fact
+                // card: clickable — opens Google search with the fact text
                 const card = document.createElement('div');
                 card.className = 'card-fact';
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', `Search Google for: ${displayFact}`);
 
-                const srnoDisplay = displaySrno !== '—' ? `${displaySrno}.` : '—';
+                // click handler
+                card.addEventListener('click', function(e) {
+                    searchGoogle(displayFact);
+                });
+                // keyboard support (Enter/Space)
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        searchGoogle(displayFact);
+                    }
+                });
+
+                let factText = '';
+                if (displaySrno !== '—') {
+                    factText = `<span class="srno">${displaySrno}.</span> `;
+                } else {
+                    factText = `<span class="srno">—</span> `;
+                }
+                factText += displayFact;
+                factText += ` <span class="search-hint">🔍</span>`;
 
                 card.innerHTML = `
                     <div class="fact-line">
-                        <span class="srno">${srnoDisplay}</span>
-                        <span class="fact-text">${displayFact}</span>
+                        ${factText}
                     </div>
                 `;
-
-                // Click on card opens Google search for the fact text
-                card.addEventListener('click', function(e) {
-                    handleCardClick(displayFact, e);
-                });
 
                 container.appendChild(card);
 
@@ -373,7 +422,20 @@
         }
 
         // events
+        searchInput.addEventListener('input', filterCards);
         categorySelect.addEventListener('change', filterCards);
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            filterCards();
+            searchInput.focus();
+        });
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                filterCards();
+                this.blur();
+            }
+        });
 
         fetchFacts();
     })();
