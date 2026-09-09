@@ -3,31 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · compact cards</title>
+    <title>Fact · srno. fact [category]</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* card – size adapts to content, no extra padding when short text */
+        /* card – fits content, one-line fact display */
         .card-fact {
             display: flex;
             flex-direction: column;
             background: white;
             border-radius: 0.75rem;
             border: 1px solid #edf2f7;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 0.9rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
             transition: box-shadow 0.12s ease;
-            height: auto;          /* fits content */
-            min-height: 60px;      /* just enough for one-liners */
+            height: auto;
+            min-height: 44px;
         }
         .card-fact:hover {
             box-shadow: 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
         }
-        /* srno + fact on same line, with small srno */
+
+        /* one line: srno. fact [category] */
         .fact-line {
             display: flex;
             align-items: baseline;
-            gap: 0.3rem;
             flex-wrap: wrap;
+            gap: 0.2rem 0.3rem;
             line-height: 1.5;
         }
         .srno-inline {
@@ -35,38 +36,28 @@
             font-weight: 500;
             color: #6b7280;
             background: #f3f4f6;
-            padding: 0.05rem 0.5rem;
+            padding: 0.05rem 0.45rem;
             border-radius: 30px;
             white-space: nowrap;
-            letter-spacing: 0.01em;
             border: 1px solid #e5e7eb;
             flex-shrink: 0;
         }
         .fact-text-inline {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #1f2937;
             word-break: break-word;
             flex: 1;
         }
-        /* category tag – tiny, at bottom */
-        .cat-tag {
-            font-size: 0.55rem;
-            letter-spacing: 0.02em;
-            opacity: 0.6;
-            margin-top: 0.35rem;
-            border-top: 1px solid #f0f2f5;
-            padding-top: 0.3rem;
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
+        .category-bracket {
+            font-size: 0.65rem;
             color: #6b7280;
-            background: transparent;
-        }
-        .cat-tag span {
             background: #f8fafc;
-            padding: 0.05rem 0.6rem;
+            padding: 0.05rem 0.5rem;
             border-radius: 30px;
             border: 1px solid #edf2f7;
+            white-space: nowrap;
+            flex-shrink: 0;
+            letter-spacing: 0.01em;
         }
 
         /* hide / show */
@@ -74,7 +65,7 @@
             display: none;
         }
 
-        /* ----- one-line control bar ----- */
+        /* ----- control bar (one line) ----- */
         .control-bar {
             display: flex;
             flex-wrap: wrap;
@@ -174,7 +165,6 @@
         #no-results-msg {
             grid-column: 1 / -1;
         }
-        /* grid: cards fit content */
         #cards-container {
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         }
@@ -213,12 +203,12 @@
     <div id="loading" class="text-center text-gray-500 text-sm py-10">⏳ loading facts ...</div>
 
     <!-- card grid -->
-    <div id="cards-container" class="grid gap-4 auto-rows-auto">
+    <div id="cards-container" class="grid gap-3 auto-rows-auto">
         <!-- cards injected here -->
     </div>
 
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
-        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno · category · fact</span>
+        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno. fact [category]</span>
     </div>
 </div>
 
@@ -356,7 +346,7 @@
 
                 categorySet.add(displayCategory);
 
-                // card: srno + fact on same line, category tiny at bottom
+                // card: srno. fact [category] on one line
                 const card = document.createElement('div');
                 card.className = 'card-fact';
 
@@ -364,9 +354,7 @@
                     <div class="fact-line">
                         <span class="srno-inline">#${displaySrno}</span>
                         <span class="fact-text-inline">${displayFact}</span>
-                    </div>
-                    <div class="cat-tag">
-                        <span>${displayCategory}</span>
+                        <span class="category-bracket">[${displayCategory}]</span>
                     </div>
                 `;
 
