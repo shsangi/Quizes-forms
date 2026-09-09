@@ -3,67 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · srno. fact [category]</title>
+    <title>Fact · simple text</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* card – compact, fits content */
+        /* minimal card – just simple text, no extra decoration */
         .card-fact {
-            display: flex;
-            flex-direction: column;
             background: white;
-            border-radius: 0.75rem;
+            border-radius: 0.5rem;
             border: 1px solid #edf2f7;
-            padding: 0.6rem 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            transition: box-shadow 0.12s ease;
+            padding: 0.55rem 0.9rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            transition: background 0.1s;
             height: auto;
-            min-height: 50px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
         }
         .card-fact:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
+            background: #fafbfc;
         }
-        /* single line: srno. fact [category] */
-        .fact-line {
-            display: flex;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 0.15rem 0.3rem;
-            line-height: 1.6;
-            font-size: 0.95rem;
-            color: #1f2937;
-        }
-        .srno-inline {
-            font-size: 0.6rem;
-            font-weight: 500;
-            color: #6b7280;
-            background: #f3f4f6;
-            padding: 0.05rem 0.5rem;
-            border-radius: 30px;
-            border: 1px solid #e5e7eb;
-            flex-shrink: 0;
-            letter-spacing: 0.01em;
-        }
-        .fact-text {
-            word-break: break-word;
-            flex: 1;
-        }
-        .category-bracket {
-            font-size: 0.65rem;
-            color: #6b7280;
-            background: #f8fafc;
-            padding: 0.05rem 0.6rem;
-            border-radius: 30px;
-            border: 1px solid #edf2f5;
-            white-space: nowrap;
-            flex-shrink: 0;
-            margin-left: 0.1rem;
-        }
-        /* hide / show */
         .card-fact.hidden-card {
             display: none;
         }
 
-        /* ----- one-line control bar ----- */
+        /* simple fact text: srno. fact [category] */
+        .fact-line {
+            font-size: 0.92rem;
+            color: #1f2937;
+            line-height: 1.5;
+            word-break: break-word;
+            width: 100%;
+        }
+        .fact-line .srno {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .fact-line .category-bracket {
+            color: #6b7280;
+            font-size: 0.78rem;
+            background: #f3f4f6;
+            padding: 0.05rem 0.45rem;
+            border-radius: 20px;
+            margin-left: 0.2rem;
+            white-space: nowrap;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* ----- control bar (one line) ----- */
         .control-bar {
             display: flex;
             flex-wrap: wrap;
@@ -159,10 +145,7 @@
             }
         }
 
-        /* no results */
-        #no-results-msg {
-            grid-column: 1 / -1;
-        }
+        /* grid: cards fit content */
         #cards-container {
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         }
@@ -173,16 +156,20 @@
         }
         @media (min-width: 1024px) {
             #cards-container {
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
+        }
+
+        #no-results-msg {
+            grid-column: 1 / -1;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- control bar -->
-    <div class="mb-5">
+    <!-- control bar: count + search + dropdown -->
+    <div class="mb-4">
         <div class="control-bar">
             <span id="recordCount" class="count-badge">0 facts</span>
             <div class="search-wrap">
@@ -200,13 +187,13 @@
     <!-- loading -->
     <div id="loading" class="text-center text-gray-500 text-sm py-10">⏳ loading facts ...</div>
 
-    <!-- cards -->
-    <div id="cards-container" class="grid gap-4 auto-rows-auto">
-        <!-- cards injected -->
+    <!-- card grid -->
+    <div id="cards-container" class="grid gap-3 auto-rows-auto">
+        <!-- cards injected here -->
     </div>
 
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
-        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno · fact [category]</span>
+        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno. fact [category]</span>
     </div>
 </div>
 
@@ -344,15 +331,24 @@
 
                 categorySet.add(displayCategory);
 
-                // card: srno. fact [category]  (category at end)
+                // card: simple text — "srno. fact [category]"
                 const card = document.createElement('div');
                 card.className = 'card-fact';
 
+                // Build the text: srno. fact [category]
+                // If srno is '—' we skip the dot? but keep consistent.
+                let factText = '';
+                if (displaySrno !== '—') {
+                    factText = `<span class="srno">${displaySrno}.</span> `;
+                } else {
+                    factText = `<span class="srno">—</span> `;
+                }
+                factText += displayFact;
+                factText += ` <span class="category-bracket">[${displayCategory}]</span>`;
+
                 card.innerHTML = `
                     <div class="fact-line">
-                        <span class="srno-inline">#${displaySrno}</span>
-                        <span class="fact-text">${displayFact}</span>
-                        <span class="category-bracket">[${displayCategory}]</span>
+                        ${factText}
                     </div>
                 `;
 
