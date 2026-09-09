@@ -463,8 +463,8 @@
     .modal-overlay.active { display: flex; }
     .modal-box {
       background: white;
-      max-width: 440px;
-      width: 90%;
+      max-width: 480px;
+      width: 92%;
       border-radius: 1.5rem;
       padding: 2rem 1.8rem 1.8rem;
       text-align: center;
@@ -484,8 +484,36 @@
       color: #1f4d66;
       font-size: 0.95rem;
       line-height: 1.5;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
     }
+    .modal-selector {
+      margin: 0.8rem 0 1.5rem;
+      text-align: left;
+    }
+    .modal-selector label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #0b2a3b;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .modal-selector select {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      border: 1.5px solid #dce6ef;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      background: white;
+      color: #0b2a3b;
+      outline: none;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .modal-selector select:hover { border-color: #6fa6c7; }
+    .modal-selector select:focus { border-color: #2f7b9e; box-shadow: 0 0 0 3px rgba(47,123,158,0.15); }
+
     .modal-actions {
       display: flex;
       gap: 0.8rem;
@@ -645,6 +673,7 @@
         font-size: 0.75rem;
         min-width: 80px;
       }
+      .modal-selector select { font-size: 0.9rem; }
     }
   </style>
 </head>
@@ -714,10 +743,17 @@
     </div>
   </div>
 
+  <!-- Refresh Modal with Category Dropdown -->
   <div class="modal-overlay" id="refreshModal">
     <div class="modal-box">
       <h3>🔄 Refresh Quiz</h3>
       <p id="refreshModalMessage">Progress will be reset.</p>
+      <div class="modal-selector">
+        <label for="modalCategoryFilter">📂 Select Category</label>
+        <select id="modalCategoryFilter">
+          <option value="all">All</option>
+        </select>
+      </div>
       <div class="modal-actions">
         <button class="btn-secondary" id="modalCancel">Cancel</button>
         <button class="btn-primary" id="modalConfirm">Yes, Refresh</button>
@@ -740,9 +776,9 @@
     const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
     const STORAGE_KEY = 'selfLearnersQuizData';
 
-    let allQuestions = [];        // full dataset with category
-    let filteredQuestions = [];   // currently displayed
-    let questions = [];          // alias to filteredQuestions
+    let allQuestions = [];
+    let filteredQuestions = [];
+    let questions = [];
     let score = 0;
     let quizCompleted = false;
     let quizTimedOut = false;
@@ -791,6 +827,7 @@
     const scrollTopBtn = document.getElementById('scrollTopBtn');
     const scrollBottomBtn = document.getElementById('scrollBottomBtn');
     const categoryFilter = document.getElementById('categoryFilter');
+    const modalCategoryFilter = document.getElementById('modalCategoryFilter');
     const refreshModalMessage = document.getElementById('refreshModalMessage');
 
     function showFloatingTimer() {
@@ -882,15 +919,16 @@
       }
     }
 
-    function populateCategoryFilter(cats) {
-      categoryFilter.innerHTML = '<option value="all">All</option>';
+    function populateCategoryFilter(cats, selectEl) {
+      const target = selectEl || categoryFilter;
+      target.innerHTML = '<option value="all">All</option>';
       cats.forEach(cat => {
         const opt = document.createElement('option');
         opt.value = cat;
         opt.textContent = cat;
-        categoryFilter.appendChild(opt);
+        target.appendChild(opt);
       });
-      categoryFilter.value = currentCategory;
+      target.value = currentCategory;
     }
 
     function filterQuestionsByCategory(category) {
@@ -899,7 +937,6 @@
       } else {
         filteredQuestions = allQuestions.filter(q => q.category === category).map(q => ({...q}));
       }
-      // re-shuffle options for filtered
       filteredQuestions = filteredQuestions.map(q => {
         const shuffledOptions = shuffleArray(q.options);
         const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
@@ -934,7 +971,7 @@
       saveState();
     }
 
-    function fetchQuestions(forceRefresh = false) {
+    function fetchQuestions(forceRefresh = false, selectedCategory = null) {
       showLoading();
       
       if (!forceRefresh) {
@@ -944,6 +981,7 @@
           categories = saved.categories || [];
           currentCategory = saved.currentCategory || 'all';
           populateCategoryFilter(categories);
+          populateCategoryFilter(categories, modalCategoryFilter);
           quizTitleText = saved.quizTitleText || 'Quiz';
           filteredQuestions = saved.filteredQuestions || allQuestions.map(q => ({...q}));
           questions = filteredQuestions;
@@ -980,36 +1018,10 @@
         }
       }
 
-      if (forceRefresh) {
-        clearState();
-        const fetchUrl = CSV_URL + '&_t=' + Date.now();
-        fetch(fetchUrl)
-          .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
-          .then(csvText => {
-            const parsed = parseCSV(csvText);
-            if (parsed.questions.length === 0) throw new Error('No data');
-            allQuestions = parsed.questions;
-            categories = parsed.categories || [];
-            quizTitleText = parsed.title || 'Quiz';
-            currentCategory = 'all';
-            populateCategoryFilter(categories);
-            categoryFilter.value = 'all';
-            filterQuestionsByCategory('all');
-            hideLoading();
-            refreshModal.classList.remove('active');
-            showFloatingTimer();
-          })
-          .catch(err => {
-            console.error(err);
-            allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Please try again.</div>`;
-            quizTitle.textContent = 'Error';
-            hideLoading();
-            refreshModal.classList.remove('active');
-          });
-        return;
-      }
-
-      fetch(CSV_URL)
+      // Force refresh or no saved state
+      clearState();
+      const fetchUrl = CSV_URL + '&_t=' + Date.now();
+      fetch(fetchUrl)
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
         .then(csvText => {
           const parsed = parseCSV(csvText);
@@ -1017,18 +1029,25 @@
           allQuestions = parsed.questions;
           categories = parsed.categories || [];
           quizTitleText = parsed.title || 'Quiz';
-          currentCategory = 'all';
+          
+          // Use selected category if provided, else 'all'
+          currentCategory = selectedCategory || 'all';
           populateCategoryFilter(categories);
-          categoryFilter.value = 'all';
-          filterQuestionsByCategory('all');
+          populateCategoryFilter(categories, modalCategoryFilter);
+          categoryFilter.value = currentCategory;
+          modalCategoryFilter.value = currentCategory;
+          
+          filterQuestionsByCategory(currentCategory);
           hideLoading();
+          refreshModal.classList.remove('active');
           showFloatingTimer();
         })
         .catch(err => {
           console.error(err);
-          allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Check CSV link or reload.</div>`;
+          allQuestionsContainer.innerHTML = `<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load questions. Please try again.</div>`;
           quizTitle.textContent = 'Error';
           hideLoading();
+          refreshModal.classList.remove('active');
         });
     }
 
@@ -1548,7 +1567,6 @@
       correctLegend.style.display = 'none';
       wrongLegend.style.display = 'none';
       
-      // Re-shuffle options for filtered questions
       filteredQuestions = filteredQuestions.map(q => {
         const shuffledOptions = shuffleArray(q.options);
         const newCorrectIndex = shuffledOptions.indexOf(q.options[q.correct]);
@@ -1576,14 +1594,18 @@
 
     function handleRefreshClick() {
       refreshModalMessage.textContent = 'Progress will be reset.';
+      // Sync modal dropdown with current category
+      modalCategoryFilter.value = currentCategory;
       refreshModal.classList.add('active');
     }
 
     function handleRefreshConfirm() {
+      const selectedCategory = modalCategoryFilter.value;
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       resultArea.style.display = 'none';
       allAtOnceView.style.display = 'block';
-      fetchQuestions(true);
+      // Force refresh with selected category
+      fetchQuestions(true, selectedCategory);
     }
 
     function handleRefreshCancel() {
@@ -1598,7 +1620,7 @@
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    // Category filter change
+    // Category filter change (top bar)
     categoryFilter.addEventListener('change', function() {
       const selected = this.value;
       currentCategory = selected;
