@@ -6,7 +6,7 @@
     <title>Fact · click to search</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* minimal card – fact text is clickable */
+        /* minimal card – fact text is clickable, no icon */
         .card-fact {
             background: white;
             border-radius: 0.5rem;
@@ -50,28 +50,14 @@
         .fact-line .fact-text {
             flex: 0 1 auto;
             color: #1f2937;
-            text-decoration: none;
-            border-bottom: 1px dotted #d1d5db;
+            border-bottom: 1px dotted transparent;
             transition: border-color 0.15s;
         }
         .card-fact:hover .fact-text {
             border-bottom-color: #3b82f6;
         }
-        /* small indicator */
-        .search-hint {
-            font-size: 0.55rem;
-            color: #9ca3af;
-            margin-left: 0.3rem;
-            opacity: 0.6;
-            flex-shrink: 0;
-            transition: opacity 0.15s;
-        }
-        .card-fact:hover .search-hint {
-            opacity: 1;
-            color: #3b82f6;
-        }
 
-        /* ----- control bar (one line) – no search input, only count + dropdown ----- */
+        /* ----- control bar (one line) – count + dropdown ----- */
         .control-bar {
             display: flex;
             flex-wrap: wrap;
@@ -278,8 +264,6 @@
 
         // Click handler: open Google search for the fact
         function handleCardClick(factText, event) {
-            // If the click is on the dropdown or other controls inside? but there are none inside card.
-            // Just open the search.
             const url = getGoogleSearchUrl(factText);
             window.open(url, '_blank');
         }
@@ -336,13 +320,11 @@
                     <div class="fact-line">
                         <span class="srno">${srnoDisplay}</span>
                         <span class="fact-text">${displayFact}</span>
-                        <span class="search-hint">🔍</span>
                     </div>
                 `;
 
                 // Click on card opens Google search for the fact text
                 card.addEventListener('click', function(e) {
-                    // Prevent if user clicks on link inside? There's no link.
                     handleCardClick(displayFact, e);
                 });
 
