@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · simple text</title>
+    <title>Fact · search on Google</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* minimal card – simple text only */
+        /* minimal card – simple text with Google link at end */
         .card-fact {
             background: white;
             border-radius: 0.5rem;
@@ -26,17 +26,41 @@
             display: none;
         }
 
-        /* simple fact text: srno. fact */
+        /* fact text: srno. fact  →  Google link */
         .fact-line {
             font-size: 0.92rem;
             color: #1f2937;
             line-height: 1.5;
             word-break: break-word;
             width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.15rem 0.3rem;
         }
         .fact-line .srno {
             font-weight: 500;
             color: #4b5563;
+        }
+        .fact-line .fact-text {
+            flex: 0 1 auto;
+        }
+        .fact-line .google-link {
+            font-size: 0.65rem;
+            color: #3b82f6;
+            text-decoration: none;
+            background: #eff6ff;
+            padding: 0.05rem 0.5rem;
+            border-radius: 30px;
+            border: 1px solid #bfdbfe;
+            transition: background 0.1s, color 0.1s;
+            white-space: nowrap;
+            margin-left: 0.2rem;
+            flex-shrink: 0;
+        }
+        .fact-line .google-link:hover {
+            background: #dbeafe;
+            color: #2563eb;
         }
 
         /* ----- control bar (one line) ----- */
@@ -133,6 +157,11 @@
                 flex: 2 1 120px;
                 min-width: 80px;
             }
+            .fact-line .google-link {
+                font-size: 0.6rem;
+                padding: 0.05rem 0.4rem;
+                margin-left: 0.1rem;
+            }
         }
 
         /* grid: cards fit content */
@@ -146,7 +175,7 @@
         }
         @media (min-width: 1024px) {
             #cards-container {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             }
         }
 
@@ -183,7 +212,7 @@
     </div>
 
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
-        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno. fact</span>
+        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno. fact  →  search on Google</span>
     </div>
 </div>
 
@@ -279,6 +308,11 @@
             }
         }
 
+        // Build Google search URL
+        function getGoogleSearchUrl(query) {
+            return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        }
+
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
@@ -321,21 +355,18 @@
 
                 categorySet.add(displayCategory);
 
-                // card: simple text — "srno. fact" (category removed from display)
+                // card: "srno. fact  🔍 Google"
                 const card = document.createElement('div');
                 card.className = 'card-fact';
 
-                let factText = '';
-                if (displaySrno !== '—') {
-                    factText = `<span class="srno">${displaySrno}.</span> `;
-                } else {
-                    factText = `<span class="srno">—</span> `;
-                }
-                factText += displayFact;
+                const srnoDisplay = displaySrno !== '—' ? `${displaySrno}.` : '—';
+                const googleUrl = getGoogleSearchUrl(displayFact);
 
                 card.innerHTML = `
                     <div class="fact-line">
-                        ${factText}
+                        <span class="srno">${srnoDisplay}</span>
+                        <span class="fact-text">${displayFact}</span>
+                        <a href="${googleUrl}" target="_blank" rel="noopener noreferrer" class="google-link">🔍 Google</a>
                     </div>
                 `;
 
@@ -344,7 +375,7 @@
                 allCards.push({
                     element: card,
                     srno: displaySrno,
-                    category: displayCategory,  // kept for filtering
+                    category: displayCategory,
                     fact: displayFact,
                 });
             });
