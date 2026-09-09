@@ -3,76 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sheet Data as Cards</title>
-    <!-- Include Tailwind CSS for styling -->
+    <title>Google Sheet to Cards</title>
+    <!-- Google Fonts & Tailwind CSS for quick styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include PapaParse to easily read the CSV file -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen p-8">
+<body class="bg-gray-100 min-h-screen p-6">
 
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">My Sheet Cards</h1>
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Sheet Data Cards</h1>
         
-        <!-- Container where cards will be injected -->
+        <!-- Loading State -->
+        <div id="loading" class="text-center text-gray-600 text-lg">Loading data from Google Sheets...</div>
+
+        <!-- Cards Container -->
         <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Loading state -->
-            <p class="col-span-full text-center text-gray-500">Loading data from Google Sheets...</p>
+            <!-- Dynamic Cards will inject here -->
         </div>
     </div>
 
+    <!-- PapaParse for easy CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
     <script>
-        // Your published workbook CSV URL
-        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTX16x-Eeh1mguy6se1B25x0hkRIzIme4pX71KlxpML_vZAD34mtlITIqFs8MCAVycXFFft82j1RZDc/pub?output=csv";
+        // Replace this URL with your Google Sheet CSV export link
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1703040365';
 
-        Papa.parse(csvUrl, {
-            download: true,
-            header: true, // Treats the first row of your sheet as column headers (titles)
-            skipEmptyLines: true,
-            complete: function(results) {
-                const data = results.data;
-                const container = document.getElementById('cards-container');
-                let html = '';
+        async function fetchSheetData() {
+            try {
+                const response = await fetch(CSV_URL);
+                const csvText = await response.text();
 
-                if (data.length === 0) {
-                    container.innerHTML = `<p class="col-span-full text-center text-gray-500">No data found in the sheet.</p>`;
-                    return;
-                }
-
-                // Loop through each row of data and create a card
-                data.forEach(row => {
-                    html += `
-                        <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col justify-between">
-                            <div class="space-y-3">
-                    `;
-
-                    // Loop through each column (header and value) in the row
-                    for (const [key, value] of Object.entries(row)) {
-                        if (!key) continue; // Skip empty headers
-                        
-                        // Customize how specific columns look if needed (e.g., if you have an 'Image' or 'Title' column)
-                        html += `
-                            <div>
-                                <span class="text-xs font-semibold tracking-wider text-indigo-600 uppercase">${key}</span>
-                                <p class="text-gray-800 text-base font-medium mt-0.5">${value || '-'}</p>
-                            </div>
-                        `;
+                // Parse CSV using PapaParse library
+                Papa.parse(csvText, {
+                    header: true, // Treats the first row as column headers
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        displayCards(results.data);
                     }
-
-                    html += `
-                            </div>
-                        </div>
-                    `;
                 });
-
-                container.innerHTML = html;
-            },
-            error: function(error) {
-                document.getElementById('cards-container').innerHTML = `<p class="col-span-full text-center text-red-500">Failed to load sheet data. Make sure the sheet is published to the web as CSV.</p>`;
-                console.error(error);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('loading').innerHTML = '<p class="text-red-500">Failed to load data. Make sure the sheet is published to the web as CSV.</p>';
             }
-        });
-    </script>
+        }
 
+        function displayCards(data) {
+            const container = document.getElementById('cards-container');
+            const loading = document.getElementById('loading');
+            
+            loading.style.display = 'none'; // Hide loader
+            container.innerHTML = ''; // Clear container
+
+            if (data.length === 0) {
+                container.innerHTML = '<p class="text-center col-span-3 text-gray-500">No data found in the sheet.</p>';
+                return;
+            }
+
+            data.forEach((row, index) => {
+                // Create card element
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200 flex flex-col justify-between';
+
+                let cardContent = `<div class="space-y-3">`;
+                
+                // Dynamically loop through columns of each row
+                for (const [key, value] of Object.entries(row)) {
+                    if (!key) continue; // Skip empty header keys
+                    
+                    // Style the first column differently (e.g., as a Title)
+                    if (Object.keys(row)[0] === key) {
+                        cardContent += `<h2 class="text-xl font-semibold text-gray-800 border-b pb-2">${value || 'N/A'}</h2>`;
+                    } else {
+                        cardContent += `
+                            <div class="text-sm text-gray-600">
+                                <span class="font-medium text-gray-700">${key}:</span> 
+                                <span>${value || 'N/A'}</span>
+                            </div>`;
+                    }
+                }
+                
+                cardContent += `</div>`;
+                card.innerHTML = cardContent;
+                container.appendChild(card);
+            });
+        }
+
+        // Run function on load
+        fetchSheetData();
+    </script>
 </body>
 </html>
