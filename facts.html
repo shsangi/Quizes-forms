@@ -6,45 +6,44 @@
     <title>Fact · srno. fact [category]</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* card – fits content, one-line fact display */
+        /* card – compact, fits content */
         .card-fact {
             display: flex;
             flex-direction: column;
             background: white;
             border-radius: 0.75rem;
             border: 1px solid #edf2f7;
-            padding: 0.6rem 0.9rem;
+            padding: 0.6rem 1rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
             transition: box-shadow 0.12s ease;
             height: auto;
-            min-height: 44px;
+            min-height: 50px;
         }
         .card-fact:hover {
             box-shadow: 0 4px 12px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
         }
-
-        /* one line: srno. fact [category] */
+        /* single line: srno. fact [category] */
         .fact-line {
             display: flex;
             align-items: baseline;
             flex-wrap: wrap;
-            gap: 0.2rem 0.3rem;
-            line-height: 1.5;
+            gap: 0.15rem 0.3rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            color: #1f2937;
         }
         .srno-inline {
             font-size: 0.6rem;
             font-weight: 500;
             color: #6b7280;
             background: #f3f4f6;
-            padding: 0.05rem 0.45rem;
+            padding: 0.05rem 0.5rem;
             border-radius: 30px;
-            white-space: nowrap;
             border: 1px solid #e5e7eb;
             flex-shrink: 0;
+            letter-spacing: 0.01em;
         }
-        .fact-text-inline {
-            font-size: 0.9rem;
-            color: #1f2937;
+        .fact-text {
             word-break: break-word;
             flex: 1;
         }
@@ -52,20 +51,19 @@
             font-size: 0.65rem;
             color: #6b7280;
             background: #f8fafc;
-            padding: 0.05rem 0.5rem;
+            padding: 0.05rem 0.6rem;
             border-radius: 30px;
-            border: 1px solid #edf2f7;
+            border: 1px solid #edf2f5;
             white-space: nowrap;
             flex-shrink: 0;
-            letter-spacing: 0.01em;
+            margin-left: 0.1rem;
         }
-
         /* hide / show */
         .card-fact.hidden-card {
             display: none;
         }
 
-        /* ----- control bar (one line) ----- */
+        /* ----- one-line control bar ----- */
         .control-bar {
             display: flex;
             flex-wrap: wrap;
@@ -183,7 +181,7 @@
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- control bar: count + search + dropdown -->
+    <!-- control bar -->
     <div class="mb-5">
         <div class="control-bar">
             <span id="recordCount" class="count-badge">0 facts</span>
@@ -202,13 +200,13 @@
     <!-- loading -->
     <div id="loading" class="text-center text-gray-500 text-sm py-10">⏳ loading facts ...</div>
 
-    <!-- card grid -->
-    <div id="cards-container" class="grid gap-3 auto-rows-auto">
-        <!-- cards injected here -->
+    <!-- cards -->
+    <div id="cards-container" class="grid gap-4 auto-rows-auto">
+        <!-- cards injected -->
     </div>
 
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
-        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno. fact [category]</span>
+        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno · fact [category]</span>
     </div>
 </div>
 
@@ -346,14 +344,14 @@
 
                 categorySet.add(displayCategory);
 
-                // card: srno. fact [category] on one line
+                // card: srno. fact [category]  (category at end)
                 const card = document.createElement('div');
                 card.className = 'card-fact';
 
                 card.innerHTML = `
                     <div class="fact-line">
                         <span class="srno-inline">#${displaySrno}</span>
-                        <span class="fact-text-inline">${displayFact}</span>
+                        <span class="fact-text">${displayFact}</span>
                         <span class="category-bracket">[${displayCategory}]</span>
                     </div>
                 `;
