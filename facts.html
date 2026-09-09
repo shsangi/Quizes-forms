@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CSS Facts · Data Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            padding: 2rem 1.5rem;
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.12);
+            padding: 2rem 1.8rem 2.2rem;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            font-size: 1.7rem;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #0b2a3e;
+        }
+
+        .header h1 i {
+            background: #e7eef6;
+            padding: 10px 14px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            color: #1e4a6b;
+        }
+
+        .stats {
+            background: #eaf1f8;
+            padding: 0.5rem 1.4rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1f3a4e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f1f6fa;
+            border-radius: 60px;
+            padding: 0.2rem 0.2rem 0.2rem 1.2rem;
+            flex: 1 1 280px;
+            border: 1px solid #dce6ef;
+            transition: 0.2s;
+        }
+
+        .search-wrapper:focus-within {
+            border-color: #3b7c9e;
+            background: white;
+            box-shadow: 0 4px 14px rgba(28, 78, 110, 0.08);
+        }
+
+        .search-wrapper i {
+            color: #647b8e;
+        }
+
+        .search-wrapper input {
+            border: none;
+            background: transparent;
+            padding: 0.7rem 1rem;
+            width: 100%;
+            font-size: 0.95rem;
+            outline: none;
+            color: #1a2f40;
+        }
+
+        .search-wrapper input::placeholder {
+            color: #8fa3b5;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group select {
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            border: 1px solid #d3dfe9;
+            background: white;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1f3f55;
+            cursor: pointer;
+            outline: none;
+            transition: 0.15s;
+        }
+
+        .filter-group select:hover {
+            border-color: #9bb3c9;
+        }
+
+        .filter-group .clear-btn {
+            background: transparent;
+            border: 1px solid #d3dfe9;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #395f79;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-group .clear-btn:hover {
+            background: #e2ebf3;
+            border-color: #a7bccf;
+        }
+
+        /* Table */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 20px;
+            border: 1px solid #eef4f8;
+            background: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.93rem;
+            min-width: 550px;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #3d5b71;
+            background: #f8fcff;
+            border-bottom: 1px solid #e3ecf3;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        th i {
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+
+        td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid #edf3f8;
+            vertical-align: middle;
+            line-height: 1.5;
+            color: #1a3143;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f5faff;
+        }
+
+        .category-tag {
+            display: inline-block;
+            background: #e2ebf5;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: #1a4a66;
+            white-space: nowrap;
+        }
+
+        .category-tag i {
+            margin-right: 5px;
+            font-size: 0.65rem;
+        }
+
+        .sno {
+            font-weight: 500;
+            color: #4b6a82;
+            width: 50px;
+        }
+
+        .empty-row td {
+            padding: 3rem 1.2rem;
+            text-align: center;
+            font-size: 1rem;
+            color: #5b7c94;
+            background: #fafdff;
+        }
+
+        .empty-row i {
+            font-size: 1.8rem;
+            opacity: 0.5;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .footer-note {
+            margin-top: 1.8rem;
+            display: flex;
+            justify-content: flex-end;
+            font-size: 0.8rem;
+            color: #6b8ba3;
+            gap: 20px;
+            flex-wrap: wrap;
+            border-top: 1px solid #eef4f9;
+            padding-top: 1.4rem;
+        }
+
+        .footer-note i {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 650px) {
+            body { padding: 1rem 0.6rem; }
+            .container { padding: 1.2rem 0.6rem; }
+            .header h1 { font-size: 1.2rem; }
+            .stats { font-size: 0.75rem; padding: 0.3rem 0.9rem; }
+            td, th { padding: 0.7rem 0.6rem; }
+            .filter-group select { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-layer-group"></i> CSS Fact Explorer</h1>
+        <div class="stats">
+            <i class="fas fa-list-ul"></i>
+            <span id="countDisplay">0</span> entries
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search facts..." />
+        </div>
+        <div class="filter-group">
+            <select id="categoryFilter">
+                <option value="">All Categories</option>
+            </select>
+            <button class="clear-btn" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> #</th>
+                    <th><i class="fas fa-folder-open"></i> Category</th>
+                    <th><i class="fas fa-info-circle"></i> Fact</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr class="empty-row"><td colspan="3"><i class="fas fa-spinner fa-spin"></i> Loading data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        <span><i class="fas fa-database"></i> Data from Google Sheet</span>
+        <span><i class="fas fa-edit"></i> Paste your CSV below</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ──────────────────────────────────────────────────────────────
+        // 1. PASTE YOUR CSV DATA HERE (as a string)
+        //    Copy from your Google Sheet → File → Download → .csv
+        // ──────────────────────────────────────────────────────────────
+        const CSV_DATA = `Sr.No,Category,Fact
+1,Geography & Places,"The highest peak of the Himalayas in Pakistan is Nanga Parbat."
+2,Geography & Places,"The Palk Strait separates India and Sri Lanka (1914)."
+3,Geography & Places,"The highest peak of the Hindu Kush range is Tirich Mir."
+4,Geography & Places,"London is home to India House."
+5,Geography & Places,"The world's longest mountain range is the Andes in South America."
+6,Geography & Places,"Finland has a blue and white flag representing its lakes and snowfields."
+7,Geography & Places,"The famous art gallery housing the Mona Lisa is the Louvre in Paris."
+8,Geography & Places,"The Golden Gate Bridge is located in San Francisco."
+9,Geography & Places,"Siam (Thailand) is the only country in South Asia never colonized by a European power."
+10,Geography & Places,"The largest river in France is the Loire."
+11,Geography & Places,"The old name of Ghana is the Gold Coast."
+12,Geography & Places,"Madagascar has the highest per capita income among SAARC countries."
+13,Geography & Places,"The Karakoram Range separates China from Pakistan."
+14,Geography & Places,"Singapore means ""City of Lions."""
+15,Geography & Places,"Tasmania is the smallest state of Australia."
+16,Geography & Places,"Antarctica has the fewest flowering plants."
+17,Geography & Places,"Portugal lies on the western side of the Iberian Peninsula."
+18,Geography & Places,"Haiti was the first Caribbean country to gain independence."
+19,Geography & Places,"Japan has had a monarchy for the longest."
+20,Geography & Places,"Atacama (Chile) is the highest desert."
+21,Geography & Places,"Reko Dik is located in Balochistan."
+22,Geography & Places,"The highest railway station in Pakistan is Khan Mehtarzai."
+23,Geography & Places,"Grand Canyon is the largest gorge."
+24,Geography & Places,"Greenland is the largest island."
+25,Geography & Places,"Sudan is the second-largest country in Africa by area."
+26,Geography & Places,"Death Valley is located in California."
+27,Geography & Places,"Pamir in Tibet is the highest plateau."
+28,Geography & Places,"Rotterdam (Netherlands) is the largest port in Europe."
+29,Geography & Places,"The Amazon River has the largest river basin and volume of water."
+30,Geography & Places,"Nile is the longest river in the world."
+31,Geography & Places,"Cairo lies on the Nile River"
+32,Geography & Places,"Egypt is called the Gift of the Nile; Khartoum is situated on the banks of the Nile."
+33,Geography & Places,"Victoria River is a source of the Nile."
+34,Geography & Places,"Death Valley desert is in California."
+35,Geography & Places,"Gibson Desert is in Australia."
+36,Geography & Places,"Mount Olympus is in Greece."
+37,Geography & Places,"Arabia is the largest peninsula."
+38,Geography & Places,"Hudson Bay is the largest bay"
+39,Geography & Places,"Gulf of Mexico is the largest gulf."
+40,Geography & Places,"Davis Strait separates Greenland from Baffin Island."
+41,Geography & Places,"Messina Strait separates Italy from Sicily."
+42,Geography & Places,"The Himalayas are the youngest mountain range."
+43,Geography & Places,"Siachen Glacier and Baltoro Glacier are in the Karakoram Range"
+44,Geography & Places,"Le Havre Seaport is in France."
+45,Geography & Places,"Johor Strait separates Malaysia from Singapore."
+46,Geography & Places,"The English Channel separates England from France."
+47,Geography & Places,"Gulf of Sidra is in Libya."
+48,Geography & Places,"Tashkent is the capital of Uzbekistan."
+49,Geography & Places,"Lebanon is known as the ""Land of milk and honey."""
+50,Geography & Places,"China is the largest producer of solar energy and the first country to use pepper."
+51,Geography & Places,"Algeria is the largest country in Africa by area (Nigeria by population)."
+52,Geography & Places,"Guantanamo Bay prison is in Cuba."
+53,Geography & Places,"Kazakhstan is the largest country in Central Asia."
+54,Geography & Places,"La Paz (Bolivia) has the highest capital."
+55,Geography & Places,"Bala Hissar (The elevated fort) is situated in Peshawar."
+56,Geography & Places,"Strait of Babel Mandeb is called the ""Gate of Tears."""
+57,Geography & Places,"Al-Jazeera television network is based in Qatar."
+58,Geography & Places,"Netherlands is situated below sea level."
+59,Geography & Places,"Chile is the largest copper-producing country in the world."
+60,Geography & Places,"The North Atlantic Route is the busiest ocean trade route."
+61,History & Politics,"Alexander Fleming discovered penicillin in 1928."
+62,History & Politics,"Banks were nationalized in Pakistan in 1974."
+63,History & Politics,"Samuel P. Huntington wrote The Clash of Civilizations."
+64,History & Politics,"Qartba Ka Qazi drama was written by Imtiaz Ali Taj."
+65,History & Politics,"Secret agencies: MSS (China), CSIS (Canada), ASIS (Australia), FBS (Russia), BIN (Indonesia)."
+66,History & Politics,"Liaquat Nehru Pact was signed in 1950."
+67,History & Politics,"Pakistan became a member of the United Nations on 30 September 1947 as the 56th member."
+68,History & Politics,"Afghanistan opposed Pakistan's membership in the United Nations."
+69,History & Politics,"Adolf Hitler was born in Austria."
+70,History & Politics,"China became a member of the WTO on 11 December 2001."
+71,History & Politics,"Babar used artillery for the first time in the Battle of Panipat and defeated Rana Sanga of Mewar in the Battle of Khanva (1527)."
+72,History & Politics,"Gulbadan Begum wrote Humayun Nama detailing the qualities of Babar."
+73,History & Politics,"Babar learned the use of artillery from Turkish officers Ustad Ali and Mustafa."
+74,History & Politics,"Humayun's mother was Maham Sultana."
+75,History & Politics,"Indonesia boasts the largest Muslim population in the world."
+76,History & Politics,"The first biography of the Holy Prophet (PBUH) was written by Ibn-e-Hisham."
+77,History & Politics,"Ghulam Mohammad was the first finance minister of Pakistan."
+78,History & Politics,"Quaid-e-Azam resigned from the Indian National Congress due to the Non-Cooperation Movement."
+79,History & Politics,"Chubarji in Lahore was built by Zeb-un-Nisa."
+80,History & Politics,"George VI was the last Emperor of India."
+81,History & Politics,"Jordan expelled the PLO in 1970."
+82,History & Politics,"Alfred Nobel was born in Stockholm"
+83,History & Politics,"The 9th Guru of the Sikh order"
+84,History & Politics,"Lord Wavell presided over the Simla Conference in 1945."
+85,History & Politics,"Lord Linlithgow was the Viceroy who made the August Offer in 1940."
+86,History & Politics,"There are 8 planets in the solar system."
+87,History & Politics,"The first Pakistani to become a judge of the International Court of Justice was Sir Zafarullah Khan (1954)."
+88,History & Politics,"Pakistan was elected as a non-permanent member of the UN Security Council for the seventh time."
+89,History & Politics,"The World Bank supervised the Indus Basin Treaty in 1960 between Pakistan and India."
+90,History & Politics,"India is the world's largest importer of weapons."
+91,History & Politics,"The Constitution of the All India Muslim League was drafted in 1907 by a committee headed by Maulana Muhammad Ali Jouhar."
+92,History & Politics,"Manjho Daro historical site was discovered in 1922."
+93,History & Politics,"The National Anthem duration is 80 seconds."
+94,History & Politics,"Nawab Liaquat Ali Khan led the Objective Resolution in the constitutional assembly on March 12"
+95,History & Politics,"The Arab Spring movement started in Tunisia."
+96,History & Politics,"The Seven-year War (1756–1763) was fought between England and France."
+97,History & Politics,"Swat Valley is situated in the Hindukush mountain range."
+98,History & Politics,"The Bolshevik Revolution is associated with Russia."
+99,History & Politics,"Henry Kissinger was the former US Secretary of State."
+100,History & Politics,"The Glorious Revolution started in 1688."
+101,History & Politics,"The Peking News (China) was the world's first newspaper."
+102,History & Politics,"The Declaration of Human Rights was adopted on December 10"
+103,History & Politics,"The tenure of the National Assembly is 5 years; the Senate consists of 96 members."
+104,History & Politics,"The 18th Amendment abolished Article 58(2-B) of the constitution and removed the President's power to dissolve the National Assembly."
+105,History & Politics,"Under the 1956 Constitution"
+106,History & Politics,"The first constituent assembly of Pakistan was inaugurated on August 10"
+107,History & Politics,"The first Constitution of Pakistan was enforced on March 23"
+108,History & Politics,"Iskander Mirza imposed the first martial law on October 7"
+109,History & Politics,"Mian Abdur Rashid was the first Chief Justice of Pakistan."
+110,History & Politics,"Benazir Bhutto was the first woman Prime Minister of Pakistan."
+111,History & Politics,"Zulfiqar Ali Bhutto was the first and only civil Martial Law Administrator of Pakistan."
+112,History & Politics,"Khilji Dynasty was founded in India in 1290 and ended in 1320."
+113,History & Politics,"Firoz Shah Tughlaq built the biggest network of canals in India."
+114,History & Politics,"Timurlung invaded India in 1398."
+115,History & Politics,"The Arab conquest of Sindh took place in 712 A.D."
+116,History & Politics,"Al Beruni came to India with Mahmud of Ghazni."
+117,History & Politics,"Qutab-ud-Din Aibak died while playing ""Chugan"" (Polo)."
+118,History & Politics,"Vasco da Gama reached India in 1498 via the Cape of Good Hope."
+119,History & Politics,"Bahlol Lodi founded the first Afghan dynasty in India."
+120,History & Politics,"First Battle of Panipat was fought in 1526"
+121,History & Politics,"Napoleon spent his last years on St. Helena."
+122,History & Politics,"The Emergence of Pakistan was written by Mohammad Ali Choudhry."
+123,History & Politics,"Allama Iqbal Open University"
+124,History & Politics,"The first Camp David Accord was signed in 1967 between Israel and Egypt"
+125,History & Politics,"Hazrat Umar (R.A.) introduced both the Police Department and the Jail Department in early Islam."
+126,History & Politics,"Qutub-ud-din Aibak became the first ruler of the Islamic state of India in 1206."
+127,Science & General Knowledge,"The chemical symbol for water is H₂O."
+128,Science & General Knowledge,"Photosynthesis converts light energy into chemical energy."
+129,Science & General Knowledge,"DNA stands for Deoxyribonucleic acid."
+130,Science & General Knowledge,"The speed of light is approximately 299,792 km/s."
+131,Science & General Knowledge,"Newton's third law: action and reaction are equal and opposite."
+132,Science & General Knowledge,"The human body has 206 bones."
+133,Science & General Knowledge,"The largest organ of the human body is the skin."
+134,Science & General Knowledge,"Oxygen makes up about 21% of Earth's atmosphere."
+135,Science & General Knowledge,"The Pacific Ocean is the largest ocean."
+136,Science & General Knowledge,"Sound travels faster in water than in air."
+137,Science & General Knowledge,"The atomic number of carbon is 6."
+138,Science & General Knowledge,"Venus is the hottest planet in our solar system."
+139,Science & General Knowledge,"Jupiter is the largest planet."
+140,Science & General Knowledge,"The Moon is Earth's only natural satellite."
+141,Science & General Knowledge,"Albert Einstein proposed the theory of relativity."
+142,Science & General Knowledge,"The Sun is a yellow dwarf star."
+143,Science & General Knowledge,"Gravity is the force that attracts objects toward each other."
+144,Science & General Knowledge,"The Earth rotates on its axis every 24 hours."
+145,Science & General Knowledge,"Water freezes at 0°C and boils at 100°C."
+146,Science & General Knowledge,"The Milky Way is a barred spiral galaxy."
+147,Science & General Knowledge,"A light-year is the distance light travels in one year."
+148,Science & General Knowledge,"The brain is the most complex organ in the human body."
+149,Science & General Knowledge,"There are 118 known chemical elements."
+150,Science & General Knowledge,"The element gold has the symbol Au."
+151,Science & General Knowledge,"The human heart beats about 100,000 times a day."
+152,Science & General Knowledge,"The Internet was developed from ARPANET."
+153,Science & General Knowledge,"The first computer virus was created in 1986."
+154,Science & General Knowledge,"Silicon is the most common element in the Earth's crust."
+155,Science & General Knowledge,"The Great Wall of China is visible from space? (myth)"
+156,Science & General Knowledge,"The Amazon rainforest produces about 20% of the world's oxygen."
+157,Science & General Knowledge,"A day on Venus is longer than a year on Venus."
+158,Science & General Knowledge,"Sharks have been around for over 400 million years."
+159,Science & General Knowledge,"Bees communicate through dance."
+160,Science & General Knowledge,"The average human body contains 37 trillion cells."
+161,Science & General Knowledge,"The Earth's core is as hot as the Sun's surface."
+162,Science & General Knowledge,"The first cloned mammal was Dolly the sheep (1996)."
+163,Science & General Knowledge,"The tallest mountain in the solar system is Olympus Mons on Mars."
+164,Science & General Knowledge,"The human eye can distinguish about 10 million colors."
+165,Science & General Knowledge,"The electric chair was invented by a dentist."
+166,Science & General Knowledge,"The first email was sent in 1971."
+167,Science & General Knowledge,"The largest mammal on Earth is the blue whale."
+168,Science & General Knowledge,"Ants can lift 50 times their own weight."
+169,Science & General Knowledge,"The Earth has only one moon."
+170,Science & General Knowledge,"Pluto is a dwarf planet."
+171,Science & General Knowledge,"Carbon dioxide is a greenhouse gas."
+172,Science & General Knowledge,"The ozone layer protects Earth from UV radiation."
+173,Science & General Knowledge,"The first successful vaccine was for smallpox."
+174,Science & General Knowledge,"Marie Curie discovered radium and polonium."
+175,Science & General Knowledge,"The formula for glucose is C₆H₁₂O₆."
+176,Science & General Knowledge,"The heart has four chambers."
+177,Science & General Knowledge,"Neptune is the farthest planet from the Sun."
+178,Science & General Knowledge,"The Earth's atmosphere is composed mostly of nitrogen."
+179,Science & General Knowledge,"The Great Barrier Reef is the largest coral reef system."
+180,Science & General Knowledge,"Humans share 60% of their DNA with bananas."
+181,Science & General Knowledge,"The first modern Olympic Games were held in 1896."
+182,Science & General Knowledge,"The Moai statues are on Easter Island."
+183,Science & General Knowledge,"The Mona Lisa has no visible eyebrows."
+184,Science & General Knowledge,"The smallest bird is the bee hummingbird."
+185,Science & General Knowledge,"The fastest land animal is the cheetah."
+186,Science & General Knowledge,"The first telephone call was made by Alexander Graham Bell."
+187,Science & General Knowledge,"The first artificial satellite was Sputnik 1."
+188,Science & General Knowledge,"The deepest point in the ocean is the Mariana Trench."
+189,Science & General Knowledge,"The first airplane flight was in 1903."
+190,Science & General Knowledge,"The Earth is approximately 4.5 billion years old."
+191,Science & General Knowledge,"The human nose can detect about 1 trillion smells."
+192,Science & General Knowledge,"The first successful heart transplant was in 1967."
+193,Science & General Knowledge,"The largest desert is the Antarctic desert."
+194,Science & General Knowledge,"The first recorded vaccine was for smallpox."
+195,Science & General Knowledge,"The periodic table was created by Dmitri Mendeleev."
+196,Science & General Knowledge,"The first photograph was taken in 1826."`;
+
+        // ──────────────────────────────────────────────────────────────
+        // 2. CSV parser (handles quoted fields)
+        // ──────────────────────────────────────────────────────────────
+        function parseCSV(csvText) {
+            const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length === 0) return [];
+
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const row = [];
+                let field = '';
+                let inQuotes = false;
+                let j = 0;
+                const line = lines[i];
+
+                while (j < line.length) {
+                    const ch = line[j];
+                    if (ch === '"') {
+                        if (inQuotes && line[j + 1] === '"') {
+                            field += '"';
+                            j += 2;
+                        } else {
+                            inQuotes = !inQuotes;
+                            j++;
+                        }
+                    } else if (ch === ',' && !inQuotes) {
+                        row.push(field.trim());
+                        field = '';
+                        j++;
+                    } else {
+                        field += ch;
+                        j++;
+                    }
+                }
+                row.push(field.trim());
+
+                if (row.length >= 3) {
+                    data.push({
+                        srno: parseInt(row[0]) || i,
+                        category: row[1] || 'Unknown',
+                        fact: row[2] || ''
+                    });
+                }
+            }
+            return data;
+        }
+
+        // ──────────────────────────────────────────────────────────────
+        // 3. App state
+        // ──────────────────────────────────────────────────────────────
+        let allData = [];
+        let filteredData = [];
+        let currentCategory = '';
+        let searchTerm = '';
+
+        const tbody = document.getElementById('tableBody');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const resetBtn = document.getElementById('resetBtn');
+        const countDisplay = document.getElementById('countDisplay');
+
+        // ──────────────────────────────────────────────────────────────
+        // 4. Render
+        // ──────────────────────────────────────────────────────────────
+        function render() {
+            const search = searchTerm.toLowerCase().trim();
+            let result = allData;
+
+            // Category filter
+            if (currentCategory) {
+                result = result.filter(item => item.category === currentCategory);
+            }
+
+            // Search filter
+            if (search) {
+                result = result.filter(item =>
+                    item.fact.toLowerCase().includes(search) ||
+                    item.category.toLowerCase().includes(search) ||
+                    item.srno.toString().includes(search)
+                );
+            }
+
+            filteredData = result;
+
+            // Update count
+            countDisplay.textContent = filteredData.length;
+
+            // Render rows
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="3"><i class="fas fa-search-minus"></i> No facts match your filter</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            filteredData.forEach(item => {
+                html += `<tr>
+                    <td class="sno">${item.srno}</td>
+                    <td><span class="category-tag"><i class="fas fa-tag"></i> ${item.category}</span></td>
+                    <td class="fact-text">${item.fact}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // ──────────────────────────────────────────────────────────────
+        // 5. Load data & populate filter dropdown
+        // ──────────────────────────────────────────────────────────────
+        function loadData() {
+            allData = parseCSV(CSV_DATA);
+
+            // Populate category dropdown
+            const categories = [...new Set(allData.map(item => item.category))].sort();
+            categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                categoryFilter.appendChild(opt);
+            });
+
+            render();
+        }
+
+        // ──────────────────────────────────────────────────────────────
+        // 6. Event listeners
+        // ──────────────────────────────────────────────────────────────
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            render();
+        });
+
+        categoryFilter.addEventListener('change', (e) => {
+            currentCategory = e.target.value;
+            render();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            categoryFilter.value = '';
+            searchTerm = '';
+            currentCategory = '';
+            render();
+        });
+
+        // ──────────────────────────────────────────────────────────────
+        // 7. Start
+        // ──────────────────────────────────────────────────────────────
+        loadData();
+    })();
+</script>
+</body>
+</html>
