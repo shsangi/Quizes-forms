@@ -646,7 +646,7 @@
            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ECSS%3C/text%3E%3C/svg%3E"
            alt="CSS Test Logo" style="display:block !important; width:48px; height:48px; border-radius:12px; object-fit:contain; background:#f0f4f9; padding:4px; flex-shrink:0;">
       <div class="brand-title">
-        <h1 id="quizTitle">CSS Test</h1>
+        <h1 id="quizTitle">CSS Test (2026)</h1>
         <span class="subtitle" id="quizSubtitle">Self Learners</span>
       </div>
       <div class="brand-actions">
@@ -742,7 +742,7 @@
     let timerInterval = null;
     let timeRemaining = 0;
     let totalQuestions = 0;
-    let quizTitleText = 'CSS Test';
+    let quizTitleText = 'CSS Test (2026)';
     let selectedAllAnswers = [];
     let lockedQuestions = [];
     let originalQuestions = [];
@@ -936,7 +936,7 @@
           currentCategory = saved.currentCategory || 'all';
           populateCategoryFilter(categories);
           populateCategoryFilter(categories, modalCategoryFilter);
-          quizTitleText = saved.quizTitleText || 'CSS Test';
+          quizTitleText = saved.quizTitleText || 'CSS Test (2026)';
           filteredQuestions = saved.filteredQuestions || allQuestions.map(q => ({...q}));
           questions = filteredQuestions;
           totalQuestions = saved.totalQuestions || questions.length;
@@ -982,7 +982,7 @@
           if (parsed.questions.length === 0) throw new Error('No data');
           allQuestions = parsed.questions;
           categories = parsed.categories || [];
-          quizTitleText = parsed.title || 'CSS Test';
+          quizTitleText = parsed.title || 'CSS Test (2026)';
           
           currentCategory = selectedCategory || 'all';
           populateCategoryFilter(categories);
@@ -1005,12 +1005,12 @@
 
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim() !== '');
-      if (lines.length < 2) return { questions: [], title: 'CSS Test', categories: [] };
-      let title = 'CSS Test';
+      if (lines.length < 2) return { questions: [], title: 'CSS Test (2026)', categories: [] };
+      let title = 'CSS Test (2026)';
       const categoriesSet = new Set();
       if (lines.length > 0) {
         const firstRow = parseCSVLine(lines[0]);
-        if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'CSS Test';
+        if (firstRow.length > 2 && firstRow[2]) title = firstRow[2].trim() || 'CSS Test (2026)';
       }
       const result = [];
       const startRow = Math.min(1, lines.length - 1);
@@ -1586,7 +1586,7 @@
     scrollBottomBtn.addEventListener('click', scrollToBottom);
 
     // Set initial title
-    quizTitle.textContent = 'CSS Test';
+    quizTitle.textContent = 'CSS Test (2026)';
     fetchQuestions(false);
   })();
 </script>
