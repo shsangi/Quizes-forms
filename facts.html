@@ -6,7 +6,7 @@
     <title>Fact · simple text</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* minimal card – just simple text, no extra decoration */
+        /* minimal card – simple text only */
         .card-fact {
             background: white;
             border-radius: 0.5rem;
@@ -26,7 +26,7 @@
             display: none;
         }
 
-        /* simple fact text: srno. fact [category] */
+        /* simple fact text: srno. fact */
         .fact-line {
             font-size: 0.92rem;
             color: #1f2937;
@@ -37,16 +37,6 @@
         .fact-line .srno {
             font-weight: 500;
             color: #4b5563;
-        }
-        .fact-line .category-bracket {
-            color: #6b7280;
-            font-size: 0.78rem;
-            background: #f3f4f6;
-            padding: 0.05rem 0.45rem;
-            border-radius: 20px;
-            margin-left: 0.2rem;
-            white-space: nowrap;
-            border: 1px solid #e5e7eb;
         }
 
         /* ----- control bar (one line) ----- */
@@ -193,7 +183,7 @@
     </div>
 
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
-        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno. fact [category]</span>
+        <span class="bg-white/50 px-2 py-0.5 rounded-full">srno. fact</span>
     </div>
 </div>
 
@@ -331,12 +321,10 @@
 
                 categorySet.add(displayCategory);
 
-                // card: simple text — "srno. fact [category]"
+                // card: simple text — "srno. fact" (category removed from display)
                 const card = document.createElement('div');
                 card.className = 'card-fact';
 
-                // Build the text: srno. fact [category]
-                // If srno is '—' we skip the dot? but keep consistent.
                 let factText = '';
                 if (displaySrno !== '—') {
                     factText = `<span class="srno">${displaySrno}.</span> `;
@@ -344,7 +332,6 @@
                     factText = `<span class="srno">—</span> `;
                 }
                 factText += displayFact;
-                factText += ` <span class="category-bracket">[${displayCategory}]</span>`;
 
                 card.innerHTML = `
                     <div class="fact-line">
@@ -357,7 +344,7 @@
                 allCards.push({
                     element: card,
                     srno: displaySrno,
-                    category: displayCategory,
+                    category: displayCategory,  // kept for filtering
                     fact: displayFact,
                 });
             });
