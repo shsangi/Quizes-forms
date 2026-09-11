@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · click to search (desc by srno + verification)</title>
+    <title>Fact · click to search (desc by srno + corner verification)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* minimal card – clickable fact text */
@@ -18,8 +18,9 @@
             min-height: 40px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
             cursor: pointer;
+            position: relative; /* anchor for corner icon */
+            overflow: hidden;
         }
         .card-fact:hover {
             background: #f7f9fc;
@@ -32,19 +33,36 @@
             display: none;
         }
 
-        /* verification icon */
-        .verify-icon {
-            flex-shrink: 0;
-            font-size: 1.05rem;
+        /* ----- tiny corner verification icon (top-right) ----- */
+        .verify-corner {
+            position: absolute;
+            top: 2px;
+            right: 3px;
+            width: 13px;
+            height: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
             line-height: 1;
-            width: 1.4rem;
-            text-align: center;
+            border-radius: 50%;
             pointer-events: none;
             user-select: none;
+            box-shadow: 0 0 0 1.5px white;
         }
-        .verify-icon.true  { color: #2563eb; }   /* blue tick  */
-        .verify-icon.false { color: #dc2626; }   /* red cross  */
-        .verify-icon.unknown { color: #9ca3af; } /* gray ?     */
+        .verify-corner.true {
+            background: #2563eb;
+            color: #ffffff;
+        }
+        .verify-corner.false {
+            background: #dc2626;
+            color: #ffffff;
+        }
+        .verify-corner.unknown {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
 
         /* simple fact text: srno. fact */
         .fact-line {
@@ -52,8 +70,9 @@
             color: #1f2937;
             line-height: 1.5;
             word-break: break-word;
-            flex: 1;
+            width: 100%;
             pointer-events: none; /* so click goes to card */
+            padding-right: 14px;  /* keep text clear of corner icon */
         }
         .fact-line .srno {
             font-weight: 500;
@@ -246,7 +265,6 @@
         }
 
         // ----- interpret ai_ans_true_false value -----
-        // returns 'true', 'false' or 'unknown'
         function interpretVerification(raw) {
             if (raw === undefined || raw === null) return 'unknown';
             const v = String(raw).trim().toLowerCase();
@@ -340,7 +358,7 @@
             return match ? parseFloat(match[0]) : -Infinity;
         }
 
-        // ----- render cards (with descending sort by srno + verification icon) -----
+        // ----- render cards (with descending sort by srno + corner verification icon) -----
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
@@ -358,19 +376,15 @@
             const catKey  = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
             const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
 
-            // *** dedicated key for ai_ans_true_false (column D) ***
+            // dedicated key for ai_ans_true_false (column D)
             let verificationKey = getHeaderKey(sample,
                 'ai_ans_true_false', 'ai answ true false', 'ai_ans_true_false',
                 'aianstruefalse', 'ai answer true false'
             );
-
-            // if header not found, fallback to the 4th column (D) by position
+            // fallback: 4th column (index 3) if not found
             if (!verificationKey) {
                 const keys = Object.keys(sample);
-                if (keys.length >= 4) {
-                    // D column is index 3 (0‑based)
-                    verificationKey = keys[3];
-                }
+                if (keys.length >= 4) verificationKey = keys[3];
             }
 
             let fallbackFactKey = null;
@@ -379,7 +393,6 @@
                 if (keys.length >= 3) fallbackFactKey = keys[2];
             }
 
-            // ---- collect card data with srno number and verification value ----
             const cardDataList = [];
 
             rows.forEach((row) => {
@@ -399,7 +412,6 @@
                 const displayCategory = category;
                 const displayFact = fact;
 
-                // get verification raw value
                 const rawVerification = verificationKey ? (row[verificationKey] || '').trim() : '';
                 const verification = interpretVerification(rawVerification);
 
@@ -415,7 +427,7 @@
                 });
             });
 
-            // ---- sort descending by srnoNum ----
+            // descending by srno
             cardDataList.sort((a, b) => {
                 if (a.srnoNum === -Infinity && b.srnoNum === -Infinity) return 0;
                 if (a.srnoNum === -Infinity) return 1;
@@ -423,24 +435,23 @@
                 return b.srnoNum - a.srnoNum;
             });
 
-            // ---- create cards in sorted order ----
             cardDataList.forEach(item => {
                 const displaySrno = item.srnoRaw;
                 const displayCategory = item.category;
                 const displayFact = item.fact;
                 const verification = item.verification;
 
-                // determine icon and title
-                let iconHtml = '';
+                // ----- tiny corner icon -----
+                let cornerHtml = '';
                 let iconTitle = '';
                 if (verification === 'true') {
-                    iconHtml = '<span class="verify-icon true" title="Verified true">✔</span>';
-                    iconTitle = 'Verified: true';
+                    cornerHtml = '<span class="verify-corner true" title="Verified: true">✔</span>';
+                    iconTitle = 'Verified true';
                 } else if (verification === 'false') {
-                    iconHtml = '<span class="verify-icon false" title="Verified false">✘</span>';
-                    iconTitle = 'Verified: false';
+                    cornerHtml = '<span class="verify-corner false" title="Verified: false">✘</span>';
+                    iconTitle = 'Verified false';
                 } else {
-                    iconHtml = '<span class="verify-icon unknown" title="Unverified / unknown">❓</span>';
+                    cornerHtml = '<span class="verify-corner unknown" title="Unverified">?</span>';
                     iconTitle = 'Unverified';
                 }
 
@@ -460,7 +471,6 @@
                     }
                 });
 
-                // srno part
                 let factText = '';
                 if (displaySrno !== '—') {
                     factText = `<span class="srno">${displaySrno}.</span> `;
@@ -471,7 +481,7 @@
                 factText += ` <span class="search-hint">🔍</span>`;
 
                 card.innerHTML = `
-                    ${iconHtml}
+                    ${cornerHtml}
                     <div class="fact-line">
                         ${factText}
                     </div>
@@ -539,7 +549,6 @@
             }
         });
 
-        // ----- start -----
         fetchFacts();
     })();
 </script>
