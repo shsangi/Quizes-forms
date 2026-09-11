@@ -58,7 +58,7 @@
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(8px);
             padding: 0.8rem 1.2rem;
-            border-radius: 5%;            /* ← 5% rounded corners */
+            border-radius: 5%;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-light);
         }
@@ -83,7 +83,7 @@
         .filter-bar select {
             border: 1px solid var(--border-light);
             background: #ffffff;
-            border-radius: 5%;            /* ← 5% rounded corners */
+            border-radius: 5%;
             padding: 0.45rem 1.8rem 0.45rem 1rem;
             font-size: 0.85rem;
             font-weight: 500;
@@ -108,7 +108,7 @@
             color: var(--primary-700);
             background: var(--accent-light);
             padding: 0.3rem 1.1rem;
-            border-radius: 5%;            /* ← 5% rounded corners */
+            border-radius: 5%;
             white-space: nowrap;
         }
 
@@ -386,7 +386,7 @@
             font-weight: 500;
         }
 
-        /* scrollbar for details */
+        /* scrollbar */
         .extra-details::-webkit-scrollbar,
         .instruction-preview::-webkit-scrollbar {
             width: 5px;
@@ -409,7 +409,7 @@
             .expand-toggle { flex: 1 1 100%; }
         }
 
-        /* skeleton loading placeholders */
+        /* skeleton loading */
         .skeleton-card {
             background: #fff;
             border-radius: var(--radius-card);
@@ -439,21 +439,23 @@
 </head>
 <body>
 <div class="container">
-    <!-- filter/search bar (5% rounded corners) -->
+    <!-- filter bar with new Subject dropdown and updated search hint -->
     <div class="filter-bar">
-        <input type="text" id="searchInput" placeholder="🔍 Search by topic, category, year, Urdu…" autocomplete="off">
+        <input type="text" id="searchInput" placeholder="🔍 Search in past papers…" autocomplete="off">
         <select id="yearFilter">
             <option value="">All years</option>
         </select>
         <select id="categoryFilter">
             <option value="">All categories</option>
         </select>
+        <select id="subjectFilter">
+            <option value="">All subjects</option>
+        </select>
         <span id="statsCount" class="stats">0 essays</span>
     </div>
 
     <!-- cards container -->
     <div id="cardsContainer" class="cards-grid">
-        <!-- loading skeleton -->
         <div class="skeleton-card">
             <div class="skeleton-line short"></div>
             <div class="skeleton-line"></div>
@@ -482,6 +484,7 @@
         const searchInput = document.getElementById("searchInput");
         const yearFilter = document.getElementById("yearFilter");
         const categoryFilter = document.getElementById("categoryFilter");
+        const subjectFilter = document.getElementById("subjectFilter");
         const statsCount = document.getElementById("statsCount");
 
         let allEssays = [];
@@ -543,12 +546,13 @@
             return str.slice(0, maxLength) + '…';
         }
 
-        // ---------- transform raw rows to objects ----------
+        // ---------- transform raw rows: now also capture subject from last column (J) ----------
         function buildEssaysFromRows(rows) {
             if (rows.length < 2) return [];
             const headers = rows[0].map(h => h.trim());
             const dataRows = rows.slice(1);
 
+            // find column indices
             const srnoIdx = headers.findIndex(h => /srno|sr no|sr\./i.test(h));
             const titleIdx = headers.findIndex(h => /title of exam/i.test(h));
             const instructionIdx = headers.findIndex(h => /instruction/i.test(h));
@@ -558,6 +562,12 @@
             const urduIdx = headers.findIndex(h => /urdu_meaning|urdu meaning/i.test(h));
             const linkIdx = headers.findIndex(h => /ans_link|ans link|answer link/i.test(h));
 
+            // Subject is explicitly the last column (J) — we can rely on row length - 1,
+            // but we'll also try to find a header that includes 'subject' as fallback.
+            const subjectHeaderIdx = headers.findIndex(h => /subject/i.test(h));
+            // default to last column index (if there are at least 10 columns)
+            const lastColIdx = headers.length - 1;
+
             const getCol = (row, idx, fallback = '') => {
                 if (idx === -1 || row[idx] === undefined) return fallback;
                 return row[idx].trim();
@@ -566,6 +576,17 @@
             const essays = [];
             dataRows.forEach((row, i) => {
                 if (!row.some(cell => cell.trim() !== '')) return;
+
+                // determine subject: prefer header match, else last column
+                let subject = '';
+                if (subjectHeaderIdx !== -1 && row[subjectHeaderIdx] !== undefined) {
+                    subject = row[subjectHeaderIdx].trim();
+                } else if (row.length > lastColIdx && lastColIdx >= 0) {
+                    subject = row[lastColIdx].trim();
+                }
+                // if subject empty, fallback to 'General'
+                if (!subject) subject = 'General';
+
                 const essay = {
                     srno: getCol(row, srnoIdx, String(i + 1)),
                     examTitle: getCol(row, titleIdx, 'FPSC Competitive Examination'),
@@ -575,6 +596,7 @@
                     topic: getCol(row, topicIdx, 'Untitled essay'),
                     urduMeaning: getCol(row, urduIdx, ''),
                     answerLink: getCol(row, linkIdx, '#'),
+                    subject: subject,
                 };
                 if (essay.topic && essay.topic !== 'Untitled essay') {
                     essays.push(essay);
@@ -602,6 +624,7 @@
                 const safeLink = escapeHtml(essay.answerLink);
                 const safeExamTitle = escapeHtml(essay.examTitle);
                 const safeInstruction = escapeHtml(essay.instruction);
+                const safeSubject = escapeHtml(essay.subject);
 
                 const expandId = `extra-${idx}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
@@ -634,6 +657,10 @@
                                 <div class="detail-item">
                                     <span class="detail-label">Category</span>
                                     <span class="detail-value">${safeCategory}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Subject</span>
+                                    <span class="detail-value">${safeSubject}</span>
                                 </div>
                                 <div class="detail-item">
                                     <span class="detail-label">Year</span>
@@ -682,20 +709,23 @@
             statsCount.textContent = `${essays.length} essay${essays.length !== 1 ? 's' : ''}`;
         }
 
-        // ---------- filter logic ----------
+        // ---------- filter logic: now includes subject filter ----------
         function applyFilters() {
             const searchTerm = searchInput.value.trim().toLowerCase();
             const selectedYear = yearFilter.value;
             const selectedCategory = categoryFilter.value;
+            const selectedSubject = subjectFilter.value;
 
             filteredEssays = allEssays.filter(essay => {
                 if (selectedYear && essay.year !== selectedYear) return false;
                 if (selectedCategory && essay.category !== selectedCategory) return false;
+                if (selectedSubject && essay.subject !== selectedSubject) return false;
                 if (searchTerm) {
                     const haystack = [
                         essay.topic,
                         essay.urduMeaning,
                         essay.category,
+                        essay.subject,
                         essay.year,
                         essay.srno,
                         essay.examTitle || ''
@@ -708,13 +738,15 @@
             renderCards(filteredEssays);
         }
 
-        // ---------- populate dropdowns ----------
+        // ---------- populate dropdowns (now includes subject) ----------
         function populateFilters(essays) {
             const years = [...new Set(essays.map(e => e.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
             const categories = [...new Set(essays.map(e => e.category).filter(Boolean))].sort();
+            const subjects = [...new Set(essays.map(e => e.subject).filter(Boolean))].sort();
 
             const currentYear = yearFilter.value;
             const currentCategory = categoryFilter.value;
+            const currentSubject = subjectFilter.value;
 
             yearFilter.innerHTML = '<option value="">All years</option>';
             years.forEach(y => {
@@ -732,8 +764,17 @@
                 categoryFilter.appendChild(opt);
             });
 
+            subjectFilter.innerHTML = '<option value="">All subjects</option>';
+            subjects.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                subjectFilter.appendChild(opt);
+            });
+
             if (years.includes(currentYear)) yearFilter.value = currentYear;
             if (categories.includes(currentCategory)) categoryFilter.value = currentCategory;
+            if (subjects.includes(currentSubject)) subjectFilter.value = currentSubject;
         }
 
         // ---------- fetch & initialize ----------
@@ -756,6 +797,7 @@
                 searchInput.addEventListener('input', applyFilters);
                 yearFilter.addEventListener('change', applyFilters);
                 categoryFilter.addEventListener('change', applyFilters);
+                subjectFilter.addEventListener('change', applyFilters);
 
             } catch (error) {
                 console.error('Initialization error:', error);
