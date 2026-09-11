@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · click to search</title>
+    <title>Fact · click to search (desc by srno)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* minimal card – clickable fact text */
@@ -216,9 +216,10 @@
         const categorySelect = document.getElementById('categorySelect');
         const recordCount = document.getElementById('recordCount');
 
-        let allCards = [];
+        let allCards = [];          // keeps DOM elements and data, sorted descending by srno
         let categorySet = new Set();
 
+        // ----- helper: get key from row with case-insensitive matching -----
         function getHeaderKey(row, ...candidates) {
             const keys = Object.keys(row);
             for (let cand of candidates) {
@@ -235,6 +236,7 @@
             window.open(`https://www.google.com/search?q=${encoded}`, '_blank');
         }
 
+        // ----- filter cards (search + category) -----
         function filterCards() {
             const searchQuery = searchInput.value.trim().toLowerCase();
             const selectedCategory = categorySelect.value;
@@ -281,6 +283,7 @@
             }
         }
 
+        // ----- rebuild category dropdown -----
         function rebuildCategoryDropdown(selectedValue) {
             const currentVal = selectedValue || categorySelect.value || 'all';
             const categories = Array.from(categorySet).sort();
@@ -301,6 +304,18 @@
             }
         }
 
+        // ----- extract numeric value from srno string (for sorting) -----
+        function extractSrnoNumber(srnoStr) {
+            if (!srnoStr || srnoStr === '—') return -Infinity; // treat missing as very small
+            // try to parse a number from the start, or any number in the string
+            const num = parseFloat(srnoStr);
+            if (!isNaN(num)) return num;
+            // fallback: find digits in string
+            const match = srnoStr.match(/\d+/);
+            return match ? parseFloat(match[0]) : -Infinity;
+        }
+
+        // ----- render cards (with descending sort by srno) -----
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
@@ -324,8 +339,11 @@
                 if (keys.length >= 3) fallbackFactKey = keys[2];
             }
 
+            // ---- first pass: collect all card data with srno number ----
+            const cardDataList = [];
+
             rows.forEach((row) => {
-                const srno = srnoKey ? (row[srnoKey] || '').trim() : '';
+                const srnoRaw = srnoKey ? (row[srnoKey] || '').trim() : '';
                 let category = catKey ? (row[catKey] || '').trim() : '';
                 let fact = factKey ? (row[factKey] || '').trim() : '';
                 if (!fact && fallbackFactKey) fact = (row[fallbackFactKey] || '').trim();
@@ -337,11 +355,35 @@
                 if (!category) category = 'uncategorized';
                 if (!fact) fact = '—';
 
-                const displaySrno = srno || '—';
+                const displaySrno = srnoRaw || '—';
                 const displayCategory = category;
                 const displayFact = fact;
 
                 categorySet.add(displayCategory);
+
+                const srnoNum = extractSrnoNumber(displaySrno);
+                cardDataList.push({
+                    srnoRaw: displaySrno,
+                    srnoNum: srnoNum,
+                    category: displayCategory,
+                    fact: displayFact
+                });
+            });
+
+            // ---- sort descending by srnoNum (higher srno first; missing goes last) ----
+            cardDataList.sort((a, b) => {
+                // if both are -Infinity, keep original order (but they will be at the end)
+                if (a.srnoNum === -Infinity && b.srnoNum === -Infinity) return 0;
+                if (a.srnoNum === -Infinity) return 1;  // a goes after b
+                if (b.srnoNum === -Infinity) return -1; // b goes after a
+                return b.srnoNum - a.srnoNum;           // descending
+            });
+
+            // ---- second pass: create and append cards in sorted order ----
+            cardDataList.forEach(item => {
+                const displaySrno = item.srnoRaw;
+                const displayCategory = item.category;
+                const displayFact = item.fact;
 
                 // card: clickable — opens Google search with the fact text
                 const card = document.createElement('div');
@@ -350,11 +392,9 @@
                 card.setAttribute('tabindex', '0');
                 card.setAttribute('aria-label', `Search Google for: ${displayFact}`);
 
-                // click handler
                 card.addEventListener('click', function(e) {
                     searchGoogle(displayFact);
                 });
-                // keyboard support (Enter/Space)
                 card.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -393,6 +433,7 @@
             filterCards();
         }
 
+        // ----- fetch CSV and parse -----
         async function fetchFacts() {
             try {
                 const response = await fetch(CSV_URL);
@@ -421,7 +462,7 @@
             }
         }
 
-        // events
+        // ----- event listeners -----
         searchInput.addEventListener('input', filterCards);
         categorySelect.addEventListener('change', filterCards);
         clearBtn.addEventListener('click', function() {
@@ -437,6 +478,7 @@
             }
         });
 
+        // ----- start -----
         fetchFacts();
     })();
 </script>
