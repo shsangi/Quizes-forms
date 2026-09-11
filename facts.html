@@ -101,26 +101,15 @@
             width: 100%;
             box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
-        .control-bar .count-badge {
-            font-size: 0.7rem;
-            font-weight: 450;
-            color: #374151;
-            background: #f3f4f6;
-            padding: 0.1rem 0.7rem;
-            border-radius: 30px;
-            white-space: nowrap;
-            border: 1px solid #e5e7eb;
-        }
-        /* ----- compact search (same height & feel as dropdown) ----- */
         .control-bar .search-wrap {
-            flex: 0 1 130px;      /* narrower — matches dropdown width */
-            min-width: 90px;
+            flex: 1 1 160px;
+            min-width: 100px;
             position: relative;
         }
         .control-bar .search-wrap input {
             width: 100%;
-            padding: 0.15rem 1.4rem 0.15rem 0.7rem;
-            font-size: 0.7rem;
+            padding: 0.2rem 1.8rem 0.2rem 0.8rem;
+            font-size: 0.75rem;
             border: 1px solid #e5e7eb;
             border-radius: 30px;
             background: #fafbfc;
@@ -135,10 +124,10 @@
         }
         .control-bar .search-wrap .clear-btn {
             position: absolute;
-            right: 6px;
+            right: 8px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.55rem;
+            font-size: 0.6rem;
             color: #9ca3af;
             cursor: pointer;
             line-height: 1;
@@ -177,11 +166,11 @@
             }
             .control-bar .category-dropdown {
                 min-width: 75px;
-                flex: 0 0 auto;
+                flex: 1 0 auto;
             }
             .control-bar .search-wrap {
-                flex: 1 1 90px;
-                min-width: 70px;
+                flex: 2 1 120px;
+                min-width: 80px;
             }
         }
 
@@ -208,10 +197,9 @@
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- control bar -->
+    <!-- control bar (count badge removed) -->
     <div class="mb-4">
         <div class="control-bar">
-            <span id="recordCount" class="count-badge">0 facts</span>
             <div class="search-wrap">
                 <input id="searchInput" type="text" placeholder="Search …" autocomplete="off" />
                 <span id="clearSearch" class="clear-btn">✕</span>
@@ -250,11 +238,12 @@
         const searchInput = document.getElementById('searchInput');
         const clearBtn = document.getElementById('clearSearch');
         const categorySelect = document.getElementById('categorySelect');
-        const recordCount = document.getElementById('recordCount');
 
         let allCards = [];
         let categorySet = new Set();
+        let totalFacts = 0; // track total number of facts for the search hint
 
+        // ----- helper: get key from row with case-insensitive matching -----
         function getHeaderKey(row, ...candidates) {
             const keys = Object.keys(row);
             for (let cand of candidates) {
@@ -264,6 +253,7 @@
             return null;
         }
 
+        // ----- interpret ai_ans_true_false value -----
         function interpretVerification(raw) {
             if (raw === undefined || raw === null) return 'unknown';
             const v = String(raw).trim().toLowerCase();
@@ -273,17 +263,26 @@
             return 'unknown';
         }
 
+        // ----- Google search -----
         function searchGoogle(query) {
             if (!query || query.trim() === '') return;
             const encoded = encodeURIComponent(query.trim());
             window.open(`https://www.google.com/search?q=${encoded}`, '_blank');
         }
 
+        // ----- update search placeholder with total count -----
+        function updateSearchPlaceholder() {
+            if (totalFacts > 0) {
+                searchInput.placeholder = `Search ${totalFacts} facts …`;
+            } else {
+                searchInput.placeholder = 'Search …';
+            }
+        }
+
+        // ----- filter cards (search + category) -----
         function filterCards() {
             const searchQuery = searchInput.value.trim().toLowerCase();
             const selectedCategory = categorySelect.value;
-
-            let visibleCount = 0;
 
             allCards.forEach(item => {
                 const el = item.element;
@@ -303,16 +302,14 @@
                 const visible = categoryMatch && searchMatch;
                 if (visible) {
                     el.classList.remove('hidden-card');
-                    visibleCount++;
                 } else {
                     el.classList.add('hidden-card');
                 }
             });
 
-            recordCount.textContent = `${visibleCount} fact${visibleCount !== 1 ? 's' : ''}`;
-
             const existingMsg = document.getElementById('no-results-msg');
-            if (visibleCount === 0 && (searchQuery || selectedCategory !== 'all')) {
+            const anyVisible = allCards.some(item => !item.element.classList.contains('hidden-card'));
+            if (!anyVisible && (searchQuery || selectedCategory !== 'all')) {
                 if (!existingMsg) {
                     const msg = document.createElement('div');
                     msg.id = 'no-results-msg';
@@ -325,6 +322,7 @@
             }
         }
 
+        // ----- rebuild category dropdown -----
         function rebuildCategoryDropdown(selectedValue) {
             const currentVal = selectedValue || categorySelect.value || 'all';
             const categories = Array.from(categorySet).sort();
@@ -345,6 +343,7 @@
             }
         }
 
+        // ----- extract numeric value from srno string (for sorting) -----
         function extractSrnoNumber(srnoStr) {
             if (!srnoStr || srnoStr === '—') return -Infinity;
             const num = parseFloat(srnoStr);
@@ -353,6 +352,7 @@
             return match ? parseFloat(match[0]) : -Infinity;
         }
 
+        // ----- render cards (with descending sort by srno + tiny corner verification icon) -----
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
@@ -360,7 +360,8 @@
 
             if (rows.length === 0) {
                 container.innerHTML = `<div class="col-span-full text-center text-gray-400 text-sm py-12">✨ no facts found</div>`;
-                recordCount.textContent = '0 facts';
+                totalFacts = 0;
+                updateSearchPlaceholder();
                 rebuildCategoryDropdown('all');
                 return;
             }
@@ -370,6 +371,7 @@
             const catKey  = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
             const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
 
+            // dedicated key for ai_ans_true_false (column D)
             let verificationKey = getHeaderKey(sample,
                 'ai_ans_true_false', 'ai answ true false', 'ai_ans_true_false',
                 'aianstruefalse', 'ai answer true false'
@@ -419,6 +421,11 @@
                 });
             });
 
+            // total facts after collecting
+            totalFacts = cardDataList.length;
+            updateSearchPlaceholder();
+
+            // descending by srno
             cardDataList.sort((a, b) => {
                 if (a.srnoNum === -Infinity && b.srnoNum === -Infinity) return 0;
                 if (a.srnoNum === -Infinity) return 1;
@@ -432,6 +439,7 @@
                 const displayFact = item.fact;
                 const verification = item.verification;
 
+                // tiny corner icon
                 let cornerHtml = '';
                 let iconTitle = '';
                 if (verification === 'true') {
@@ -494,6 +502,7 @@
             filterCards();
         }
 
+        // ----- fetch CSV and parse -----
         async function fetchFacts() {
             try {
                 const response = await fetch(CSV_URL);
@@ -522,6 +531,7 @@
             }
         }
 
+        // ----- event listeners -----
         searchInput.addEventListener('input', filterCards);
         categorySelect.addEventListener('change', filterCards);
         clearBtn.addEventListener('click', function() {
