@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · click to search (desc by srno + corner verification)</title>
+    <title>Fact · click to search (desc by srno + tiny corner verification)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* minimal card – clickable fact text */
@@ -19,7 +19,7 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            position: relative; /* anchor for corner icon */
+            position: relative;
             overflow: hidden;
         }
         .card-fact:hover {
@@ -36,20 +36,20 @@
         /* ----- tiny corner verification icon (top-right) ----- */
         .verify-corner {
             position: absolute;
-            top: 2px;
-            right: 3px;
-            width: 13px;
-            height: 13px;
+            top: 1px;
+            right: 1px;
+            width: 9px;
+            height: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9px;
+            font-size: 6px;
             font-weight: 700;
             line-height: 1;
             border-radius: 50%;
             pointer-events: none;
             user-select: none;
-            box-shadow: 0 0 0 1.5px white;
+            box-shadow: 0 0 0 1px white;
         }
         .verify-corner.true {
             background: #2563eb;
@@ -71,8 +71,8 @@
             line-height: 1.5;
             word-break: break-word;
             width: 100%;
-            pointer-events: none; /* so click goes to card */
-            padding-right: 14px;  /* keep text clear of corner icon */
+            pointer-events: none;
+            padding-right: 8px; /* keep text clear of tiny corner icon */
         }
         .fact-line .srno {
             font-weight: 500;
@@ -358,7 +358,7 @@
             return match ? parseFloat(match[0]) : -Infinity;
         }
 
-        // ----- render cards (with descending sort by srno + corner verification icon) -----
+        // ----- render cards (with descending sort by srno + tiny corner verification icon) -----
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
@@ -441,7 +441,7 @@
                 const displayFact = item.fact;
                 const verification = item.verification;
 
-                // ----- tiny corner icon -----
+                // ----- ultra tiny corner icon -----
                 let cornerHtml = '';
                 let iconTitle = '';
                 if (verification === 'true') {
