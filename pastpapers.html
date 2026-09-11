@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#f5f9fe">
     <title>FPSC AI Solved Papers</title>
     <style>
-        /* ---------- modern reset & design tokens ---------- */
         * {
             margin: 0;
             padding: 0;
@@ -26,10 +25,8 @@
             --border-light: #d9e6f2;
             --text-dark: #0c1e30;
             --text-soft: #2e405b;
-            --text-muted: #5b6f8c;
             --shadow-sm: 0 4px 10px rgba(0, 20, 40, 0.04);
             --shadow-md: 0 8px 20px -6px rgba(0, 20, 40, 0.1);
-            --shadow-hover: 0 18px 32px -10px rgba(0, 40, 80, 0.18);
             --radius-card: 16px;
             --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
@@ -172,7 +169,7 @@
             background: var(--bg-card);
             border-radius: var(--radius-card);
             box-shadow: var(--shadow-md);
-            transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.15s;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -217,6 +214,50 @@
             align-items: center;
             gap: 0.2rem;
             border: 1px solid #cbdcee;
+            white-space: nowrap;
+        }
+
+        /* NEW: Subject + Requirement row (before essay topic) */
+        .card-subject-req {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subject-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #e7f5ee;
+            color: #0f5c3a;
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 0.18rem 0.6rem;
+            border-radius: 20px;
+            border: 1px solid #b7e0cb;
+            letter-spacing: 0.02em;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .req-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #fff3e0;
+            color: #8a4b08;
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 0.18rem 0.6rem;
+            border-radius: 20px;
+            border: 1px solid #fad9a8;
+            letter-spacing: 0.02em;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
@@ -513,7 +554,6 @@
 </head>
 <body>
 <div class="container">
-    <!-- Page title & overall stats -->
     <div class="page-header">
         <h1>FPSC AI Solved Papers</h1>
         <div class="header-stats">
@@ -526,7 +566,6 @@
         </div>
     </div>
 
-    <!-- Filter bar -->
     <div class="filter-bar">
         <input type="text" id="searchInput" placeholder="🔍 Search in past papers…" autocomplete="off" inputmode="search">
         <select id="yearFilter" aria-label="Filter by year">
@@ -632,41 +671,41 @@
             return /^https?:\/\//i.test(trimmed);
         }
 
+        // Build essays – matching exact sheet header order
         function buildEssaysFromRows(rows) {
             if (rows.length < 2) return [];
-            const headers = rows[0].map(h => h.trim());
+            const headers = rows[0].map(h => h.trim().toLowerCase());
             const dataRows = rows.slice(1);
 
-            const srnoIdx = headers.findIndex(h => /srno|sr no|sr\./i.test(h));
-            const titleIdx = headers.findIndex(h => /title of exam/i.test(h));
-            const instructionIdx = headers.findIndex(h => /instruction/i.test(h));
-            const yearIdx = headers.findIndex(h => /year/i.test(h));
-            const categoryIdx = headers.findIndex(h => /category/i.test(h));
-            const topicIdx = headers.findIndex(h => /essay topic/i.test(h));
-            const urduIdx = headers.findIndex(h => /urdu_meaning|urdu meaning/i.test(h));
-            const linkIdx = headers.findIndex(h => /ans_link|ans link|answer link/i.test(h));
+            // Column order from sheet:
+            // 0: Srno
+            // 1: title of exam complete
+            // 2: instruction every at top
+            // 3: exam year
+            // 4: related to which category
+            // 5: essay topic or question
+            // 6: urdu_meaning_esaay_topic
+            // 7: subject
+            // 8: requirement
 
-            const subjectHeaderIdx = headers.findIndex(h => /subject/i.test(h));
-            const lastColIdx = headers.length - 1;
+            const srnoIdx = 0;
+            const titleIdx = 1;
+            const instructionIdx = 2;
+            const yearIdx = 3;
+            const categoryIdx = 4;
+            const topicIdx = 5;
+            const urduIdx = 6;
+            const subjectIdx = 7;
+            const requirementIdx = 8;
 
             const getCol = (row, idx, fallback = '') => {
-                if (idx === -1 || row[idx] === undefined) return fallback;
+                if (idx === -1 || idx >= row.length || row[idx] === undefined) return fallback;
                 return row[idx].trim();
             };
 
             const essays = [];
             dataRows.forEach((row, i) => {
                 if (!row.some(cell => cell.trim() !== '')) return;
-
-                let subject = '';
-                if (subjectHeaderIdx !== -1 && row[subjectHeaderIdx] !== undefined) {
-                    subject = row[subjectHeaderIdx].trim();
-                } else if (row.length > lastColIdx && lastColIdx >= 0) {
-                    subject = row[lastColIdx].trim();
-                }
-                if (!subject) subject = 'General';
-
-                const rawLink = getCol(row, linkIdx, '');
 
                 const essay = {
                     srno: getCol(row, srnoIdx, String(i + 1)),
@@ -676,9 +715,10 @@
                     category: getCol(row, categoryIdx, 'General'),
                     topic: getCol(row, topicIdx, 'Untitled essay'),
                     urduMeaning: getCol(row, urduIdx, ''),
-                    answerLink: rawLink,
-                    hasValidLink: isValidLink(rawLink),
-                    subject: subject,
+                    subject: getCol(row, subjectIdx, 'General'),
+                    requirement: getCol(row, requirementIdx, ''),
+                    answerLink: '', // no link column in current sheet
+                    hasValidLink: false,
                 };
                 if (essay.topic && essay.topic !== 'Untitled essay') {
                     essays.push(essay);
@@ -702,34 +742,32 @@
                 const safeCategory = escapeHtml(essay.category);
                 const safeTopic = escapeHtml(essay.topic);
                 const safeUrdu = escapeHtml(essay.urduMeaning);
-                const safeLink = escapeHtml(essay.answerLink);
                 const safeExamTitle = escapeHtml(essay.examTitle);
                 const safeInstruction = escapeHtml(essay.instruction);
                 const safeSubject = escapeHtml(essay.subject);
+                const safeRequirement = escapeHtml(essay.requirement);
 
                 const expandId = `extra-${idx}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
-                let answerButtonHtml;
-                if (essay.hasValidLink) {
-                    answerButtonHtml = `
-                        <a class="answer-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">
-                            <span>📄</span> Solved
-                        </a>
-                    `;
-                } else {
-                    answerButtonHtml = `
-                        <span class="answer-link disabled" title="No solved paper link available" aria-disabled="true">
-                            <span>🔒</span> None
-                        </span>
-                    `;
+                // Subject + Requirement badges (shown before essay topic)
+                let subjectReqHtml = '';
+                if (safeSubject || safeRequirement) {
+                    subjectReqHtml = `<div class="card-subject-req">`;
+                    if (safeSubject) {
+                        subjectReqHtml += `<span class="subject-badge" title="Subject: ${safeSubject}">📚 ${safeSubject}</span>`;
+                    }
+                    if (safeRequirement) {
+                        subjectReqHtml += `<span class="req-badge" title="Requirement: ${safeRequirement}">📝 ${safeRequirement}</span>`;
+                    }
+                    subjectReqHtml += `</div>`;
                 }
 
-                let answerUrlHtml;
-                if (essay.hasValidLink) {
-                    answerUrlHtml = `<a href="${safeLink}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-600); text-decoration: underline; word-break: break-all;">${safeLink}</a>`;
-                } else {
-                    answerUrlHtml = `<span style="color: #94a3b8; font-style: italic;">Not available</span>`;
-                }
+                // Answer button (always disabled since no link column)
+                const answerButtonHtml = `
+                    <span class="answer-link disabled" title="No solved paper link available" aria-disabled="true">
+                        <span>🔒</span> None
+                    </span>
+                `;
 
                 cardsHtml += `
                     <div class="essay-card" data-essay-idx="${idx}">
@@ -738,6 +776,7 @@
                                 <span class="srno-badge">#${safeSrno}</span>
                                 <span class="year-badge"><i>📅</i> ${safeYear}</span>
                             </div>
+                            ${subjectReqHtml}
                             <div class="essay-title">${safeTopic}</div>
                             <div class="urdu-meaning">${safeUrdu}</div>
                             <div class="category-chip">${safeCategory}</div>
@@ -764,18 +803,16 @@
                                     <span class="detail-value">${safeSubject}</span>
                                 </div>
                                 <div class="detail-item">
+                                    <span class="detail-label">Requirement</span>
+                                    <span class="detail-value">${safeRequirement || '—'}</span>
+                                </div>
+                                <div class="detail-item">
                                     <span class="detail-label">Year</span>
                                     <span class="detail-value">${safeYear}</span>
                                 </div>
                                 <div class="detail-item">
                                     <span class="detail-label">Full instruction</span>
                                     <div class="instruction-preview">${safeInstruction}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="detail-label">Answer URL</span>
-                                    <span class="detail-value" style="font-size: 0.72rem;">
-                                        ${answerUrlHtml}
-                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -833,6 +870,7 @@
                         essay.urduMeaning,
                         essay.category,
                         essay.subject,
+                        essay.requirement,
                         essay.year,
                         essay.srno,
                         essay.examTitle || ''
