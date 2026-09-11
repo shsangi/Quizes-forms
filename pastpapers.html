@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSS Essay Hub · quick view</title>
+    <title>FPSC Past Papers Solved</title>
     <style>
         /* ---------- modern reset & design tokens ---------- */
         * {
@@ -102,14 +102,19 @@
             border-color: var(--primary-500);
         }
 
+        /* stats shows records */
         .stats {
             font-size: 0.8rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--primary-700);
             background: var(--accent-light);
-            padding: 0.3rem 1.1rem;
+            padding: 0.4rem 1.2rem;
             border-radius: 5%;
             white-space: nowrap;
+            letter-spacing: 0.01em;
+            border: 1px solid #c9dcf0;
+            min-width: 110px;
+            text-align: center;
         }
 
         /* ---------- card grid ---------- */
@@ -221,7 +226,7 @@
             flex: 1;
         }
 
-        /* action row: answer + toggle */
+        /* action row */
         .action-row {
             display: flex;
             align-items: center;
@@ -290,7 +295,7 @@
             transform: rotate(180deg);
         }
 
-        /* extra details - collapsible */
+        /* extra details */
         .extra-details {
             max-height: 0;
             overflow: hidden;
@@ -409,7 +414,7 @@
             .expand-toggle { flex: 1 1 100%; }
         }
 
-        /* skeleton loading */
+        /* skeleton */
         .skeleton-card {
             background: #fff;
             border-radius: var(--radius-card);
@@ -439,7 +444,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- filter bar with new Subject dropdown and updated search hint -->
+    <!-- filter bar: updated placeholder for past papers, subject filter, records count -->
     <div class="filter-bar">
         <input type="text" id="searchInput" placeholder="🔍 Search in past papers…" autocomplete="off">
         <select id="yearFilter">
@@ -451,10 +456,9 @@
         <select id="subjectFilter">
             <option value="">All subjects</option>
         </select>
-        <span id="statsCount" class="stats">0 essays</span>
+        <span id="statsCount" class="stats">0 records</span>
     </div>
 
-    <!-- cards container -->
     <div id="cardsContainer" class="cards-grid">
         <div class="skeleton-card">
             <div class="skeleton-line short"></div>
@@ -540,19 +544,12 @@
                 .replace(/'/g, '&#039;');
         }
 
-        function truncate(str, maxLength = 200) {
-            if (!str) return '';
-            if (str.length <= maxLength) return str;
-            return str.slice(0, maxLength) + '…';
-        }
-
-        // ---------- transform raw rows: now also capture subject from last column (J) ----------
+        // ---------- build essays, subject from last column (J) ----------
         function buildEssaysFromRows(rows) {
             if (rows.length < 2) return [];
             const headers = rows[0].map(h => h.trim());
             const dataRows = rows.slice(1);
 
-            // find column indices
             const srnoIdx = headers.findIndex(h => /srno|sr no|sr\./i.test(h));
             const titleIdx = headers.findIndex(h => /title of exam/i.test(h));
             const instructionIdx = headers.findIndex(h => /instruction/i.test(h));
@@ -562,10 +559,7 @@
             const urduIdx = headers.findIndex(h => /urdu_meaning|urdu meaning/i.test(h));
             const linkIdx = headers.findIndex(h => /ans_link|ans link|answer link/i.test(h));
 
-            // Subject is explicitly the last column (J) — we can rely on row length - 1,
-            // but we'll also try to find a header that includes 'subject' as fallback.
             const subjectHeaderIdx = headers.findIndex(h => /subject/i.test(h));
-            // default to last column index (if there are at least 10 columns)
             const lastColIdx = headers.length - 1;
 
             const getCol = (row, idx, fallback = '') => {
@@ -577,14 +571,12 @@
             dataRows.forEach((row, i) => {
                 if (!row.some(cell => cell.trim() !== '')) return;
 
-                // determine subject: prefer header match, else last column
                 let subject = '';
                 if (subjectHeaderIdx !== -1 && row[subjectHeaderIdx] !== undefined) {
                     subject = row[subjectHeaderIdx].trim();
                 } else if (row.length > lastColIdx && lastColIdx >= 0) {
                     subject = row[lastColIdx].trim();
                 }
-                // if subject empty, fallback to 'General'
                 if (!subject) subject = 'General';
 
                 const essay = {
@@ -608,8 +600,8 @@
         // ---------- render cards ----------
         function renderCards(essays) {
             if (!essays || essays.length === 0) {
-                cardsContainer.innerHTML = `<div class="no-results">🔎 No essays match your search. Try different keywords.</div>`;
-                statsCount.textContent = `0 essays`;
+                cardsContainer.innerHTML = `<div class="no-results">🔎 No past papers match your search. Try different keywords.</div>`;
+                statsCount.textContent = `0 records`;
                 return;
             }
 
@@ -642,7 +634,7 @@
                         <div class="card-body">
                             <div class="action-row">
                                 <a class="answer-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">
-                                    <span>📄</span> Open answer
+                                    <span>📄</span> Open solved paper
                                 </a>
                                 <div class="expand-toggle" data-target="${expandId}">
                                     <span>Details</span>
@@ -706,10 +698,11 @@
                 });
             });
 
-            statsCount.textContent = `${essays.length} essay${essays.length !== 1 ? 's' : ''}`;
+            // Show "records" count
+            statsCount.textContent = `${essays.length} record${essays.length !== 1 ? 's' : ''}`;
         }
 
-        // ---------- filter logic: now includes subject filter ----------
+        // ---------- filter ----------
         function applyFilters() {
             const searchTerm = searchInput.value.trim().toLowerCase();
             const selectedYear = yearFilter.value;
@@ -738,7 +731,7 @@
             renderCards(filteredEssays);
         }
 
-        // ---------- populate dropdowns (now includes subject) ----------
+        // ---------- populate dropdowns ----------
         function populateFilters(essays) {
             const years = [...new Set(essays.map(e => e.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
             const categories = [...new Set(essays.map(e => e.category).filter(Boolean))].sort();
@@ -777,7 +770,7 @@
             if (subjects.includes(currentSubject)) subjectFilter.value = currentSubject;
         }
 
-        // ---------- fetch & initialize ----------
+        // ---------- init ----------
         async function init() {
             try {
                 const response = await fetch(CSV_URL);
@@ -788,7 +781,7 @@
 
                 allEssays = buildEssaysFromRows(parsed);
 
-                if (allEssays.length === 0) throw new Error('No valid essay entries');
+                if (allEssays.length === 0) throw new Error('No valid past paper entries');
 
                 populateFilters(allEssays);
                 filteredEssays = [...allEssays];
@@ -801,12 +794,11 @@
 
             } catch (error) {
                 console.error('Initialization error:', error);
-                cardsContainer.innerHTML = `<div class="no-results">⚠️ Could not load essay data.<br><small>${escapeHtml(error.message)}</small></div>`;
-                statsCount.textContent = '0 essays';
+                cardsContainer.innerHTML = `<div class="no-results">⚠️ Could not load past papers.<br><small>${escapeHtml(error.message)}</small></div>`;
+                statsCount.textContent = '0 records';
             }
         }
 
-        // start
         init();
     })();
 </script>
