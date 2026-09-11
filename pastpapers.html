@@ -3,53 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSS Essay Compilation · Modern Cards</title>
+    <title>CSS Essay Hub · quick view</title>
     <style>
-        /* modern reset & base */
+        /* ---------- modern reset & design tokens ---------- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-body: #f5f9fe;
+            --bg-card: #ffffff;
+            --primary-900: #0b1b33;
+            --primary-800: #1a2f4e;
+            --primary-700: #1e3a5f;
+            --primary-600: #2c5282;
+            --primary-500: #2b6cb0;
+            --accent-light: #e6f0fd;
+            --border-light: #d9e6f2;
+            --text-dark: #0c1e30;
+            --text-soft: #2e405b;
+            --text-muted: #5b6f8c;
+            --shadow-sm: 0 4px 10px rgba(0, 20, 40, 0.04);
+            --shadow-md: 0 12px 28px -6px rgba(0, 20, 40, 0.1);
+            --shadow-hover: 0 24px 42px -12px rgba(0, 40, 80, 0.2);
+            --radius-card: 24px;
+            --radius-pill: 60px;
+            --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
         body {
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: linear-gradient(145deg, #f6f9fc 0%, #edf2f7 100%);
+            font-family: var(--font-sans);
+            background: var(--bg-body);
+            background-image: radial-gradient(circle at 20% 0%, #ffffff 0%, #f0f7ff 100%);
             min-height: 100vh;
-            padding: 2rem 1.5rem 4rem;
-            color: #1e293b;
+            padding: 1.8rem 1.5rem 4rem;
+            color: var(--text-dark);
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1560px;
             margin: 0 auto;
         }
 
-        /* header / status area */
+        /* ---------- header & status ---------- */
         .header {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2.5rem;
-            gap: 1rem;
+            margin-bottom: 2.4rem;
+            gap: 1.2rem;
         }
 
-        .title-section h1 {
-            font-size: 2.2rem;
-            font-weight: 600;
-            letter-spacing: -0.025em;
-            background: linear-gradient(135deg, #0f2b4b, #2c5282);
+        .brand h1 {
+            font-size: 2rem;
+            font-weight: 650;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #0b1b33, #1e3a5f);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             display: inline-block;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
-        .title-section .sub {
-            font-size: 0.95rem;
-            color: #4a5568;
+        .brand .sub {
+            font-size: 0.9rem;
+            color: var(--text-muted);
             font-weight: 400;
             display: flex;
             align-items: center;
@@ -58,235 +81,304 @@
 
         .status-badge {
             font-weight: 500;
-            padding: 0.5rem 1.25rem;
+            padding: 0.45rem 1.3rem;
             border-radius: 40px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid transparent;
+            background: #fff;
         }
 
         .status-success {
             background: #e6fffa;
             color: #0f5e5a;
-            border: 1px solid #b2f5ea;
+            border-color: #b2f5ea;
         }
-
         .status-loading {
             background: #fffaf0;
             color: #b7791f;
-            border: 1px solid #fde9c3;
+            border-color: #fde9c3;
         }
-
         .status-error {
             background: #fff5f5;
             color: #9b2c2c;
-            border: 1px solid #fed7d7;
+            border-color: #fed7d7;
         }
 
-        /* card grid */
+        /* ---------- search / filter bar (user friendly) ---------- */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-pill);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .filter-bar input {
+            flex: 2;
+            min-width: 220px;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.5rem 0.5rem 1rem;
+            font-family: var(--font-sans);
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .filter-bar input::placeholder {
+            color: #99aec9;
+            font-weight: 400;
+        }
+
+        .filter-bar select {
+            border: 1px solid var(--border-light);
+            background: #ffffff;
+            border-radius: 30px;
+            padding: 0.45rem 1.8rem 0.45rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-soft);
+            font-family: var(--font-sans);
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b6f8c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 14px;
+        }
+
+        .filter-bar select:hover {
+            border-color: var(--primary-500);
+        }
+
+        .stats {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--primary-700);
+            background: var(--accent-light);
+            padding: 0.3rem 1.1rem;
+            border-radius: 40px;
+            white-space: nowrap;
+        }
+
+        /* ---------- card grid ---------- */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 1.8rem;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.6rem;
         }
 
-        /* modern card */
+        /* ---------- modern card ---------- */
         .essay-card {
-            background: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.02);
-            transition: all 0.25s ease;
+            background: var(--bg-card);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            border: 1px solid rgba(226, 232, 240, 0.7);
-            backdrop-filter: blur(2px);
+            border: 1px solid rgba(220, 235, 250, 0.8);
+            will-change: transform;
         }
 
         .essay-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 24px 40px -12px rgba(0, 0, 0, 0.15), 0 8px 18px rgba(0, 0, 0, 0.05);
-            border-color: #cbd5e0;
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: #b8d1ea;
         }
 
-        /* card top / heading area */
+        /* card header */
         .card-head {
-            padding: 1.5rem 1.5rem 1rem;
-            background: linear-gradient(to bottom, #ffffff, #fafcff);
-            border-bottom: 1px solid #e9eef4;
+            padding: 1.4rem 1.4rem 0.9rem;
+            background: linear-gradient(to bottom, #ffffff, #fafdff);
+            border-bottom: 1px solid #e6eef9;
         }
 
         .card-meta {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1rem;
+            margin-bottom: 0.9rem;
         }
 
         .srno-badge {
-            background: #1e3a5f;
+            background: var(--primary-800);
             color: white;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             padding: 0.25rem 0.9rem;
             border-radius: 30px;
             letter-spacing: 0.02em;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
 
         .year-badge {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: #e9f0fa;
+            color: var(--primary-800);
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             padding: 0.25rem 0.9rem;
             border-radius: 30px;
             display: flex;
             align-items: center;
             gap: 0.3rem;
-        }
-
-        .year-badge i {
-            font-style: normal;
-            font-size: 0.9rem;
+            border: 1px solid #cbdcee;
         }
 
         .essay-title {
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             font-weight: 650;
             line-height: 1.4;
-            color: #0b1e33;
-            margin-bottom: 0.75rem;
+            color: var(--primary-900);
+            margin-bottom: 0.6rem;
             letter-spacing: -0.01em;
         }
 
         .urdu-meaning {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 500;
-            color: #2d3748;
+            color: #1a314b;
             direction: rtl;
             text-align: right;
-            padding: 0.5rem 0 0.25rem;
-            line-height: 1.6;
+            padding: 0.4rem 0 0.1rem;
+            line-height: 1.7;
             font-family: 'Noto Nastaliq Urdu', 'Segoe UI', system-ui, sans-serif;
-            border-top: 1px dashed #d4dfeb;
+            border-top: 1px dashed #d0e0f0;
             margin-top: 0.4rem;
         }
 
-        /* category chip */
         .category-chip {
             display: inline-block;
-            background: #edf2f7;
-            color: #1a365d;
-            font-size: 0.75rem;
+            background: #eef4fc;
+            color: #1f3d62;
+            font-size: 0.72rem;
             font-weight: 600;
-            padding: 0.25rem 1rem;
+            padding: 0.2rem 1rem;
             border-radius: 30px;
-            margin-top: 0.75rem;
+            margin-top: 0.8rem;
             letter-spacing: 0.02em;
             text-transform: capitalize;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #c9dcf0;
         }
 
-        /* card body / details */
+        /* card body */
         .card-body {
-            padding: 0 1.5rem 1.25rem;
+            padding: 0.9rem 1.4rem 1.2rem;
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 0.7rem;
+            flex: 1;
+        }
+
+        /* action row: answer + toggle */
+        .action-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 0.2rem;
         }
 
         .answer-link {
+            flex: 1;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.6rem;
-            background: #f1f5f9;
-            color: #0b3b5e;
+            gap: 0.5rem;
+            background: var(--primary-700);
+            color: white;
             font-weight: 600;
-            font-size: 0.9rem;
-            padding: 0.7rem 1.2rem;
+            font-size: 0.85rem;
+            padding: 0.7rem 1rem;
             border-radius: 60px;
             text-decoration: none;
             transition: all 0.15s ease;
-            border: 1px solid #cfddee;
-            margin-top: 0.25rem;
+            border: 1px solid var(--primary-700);
+            box-shadow: 0 6px 12px -4px rgba(28, 60, 100, 0.25);
+            letter-spacing: 0.01em;
         }
 
         .answer-link:hover {
-            background: #1a4972;
-            color: white;
-            border-color: #1a4972;
-            box-shadow: 0 6px 14px rgba(26, 73, 114, 0.25);
+            background: var(--primary-900);
+            border-color: var(--primary-900);
+            box-shadow: 0 10px 18px -6px rgba(11, 27, 51, 0.35);
+            transform: scale(1.01);
         }
 
-        .answer-link span {
-            font-size: 1.1rem;
-        }
-
-        /* expandable section */
         .expand-toggle {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: #f8fafd;
-            padding: 0.6rem 1.2rem;
-            border-radius: 50px;
+            justify-content: center;
+            gap: 0.3rem;
+            background: #f0f6fe;
+            padding: 0.7rem 1.2rem;
+            border-radius: 60px;
             font-size: 0.85rem;
-            font-weight: 500;
-            color: #2c3e50;
+            font-weight: 600;
+            color: var(--primary-700);
             cursor: pointer;
-            border: 1px solid #e2e8f0;
-            transition: background 0.2s;
+            border: 1px solid #c9dcf0;
+            transition: background 0.2s, border-color 0.2s;
             user-select: none;
-            margin-top: 0.25rem;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .expand-toggle:hover {
-            background: #eef2f7;
-            border-color: #bdd3e8;
+            background: #e2eefc;
+            border-color: #9db9d8;
         }
 
         .expand-toggle .arrow {
-            font-size: 1rem;
+            font-size: 0.9rem;
             transition: transform 0.25s ease;
             display: inline-block;
+            line-height: 1;
         }
 
         .expand-toggle.open .arrow {
             transform: rotate(180deg);
         }
 
+        /* extra details - collapsible */
         .extra-details {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s, padding 0.2s;
             opacity: 0;
-            background: #f9fcff;
+            background: #f7faff;
             border-radius: 18px;
             padding: 0 1rem;
-            margin-top: 0.25rem;
-            border-left: 3px solid #9bb7d4;
+            margin-top: 0.1rem;
+            border-left: 3px solid #a7c0dd;
+            font-size: 0.85rem;
         }
 
         .extra-details.show {
-            max-height: 600px;
+            max-height: 650px;
             opacity: 1;
             padding: 0.9rem 1rem;
-            margin-top: 0.5rem;
-            border-left-color: #2c5282;
+            margin-top: 0.6rem;
+            border-left-color: var(--primary-600);
+            overflow-y: auto;
         }
 
         .detail-item {
-            font-size: 0.85rem;
-            color: #2d3f5e;
-            padding: 0.4rem 0;
+            padding: 0.5rem 0;
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            border-bottom: 1px solid #e0e9f2;
+            gap: 0.6rem;
+            border-bottom: 1px solid #dfeaf7;
         }
 
         .detail-item:last-child {
@@ -295,88 +387,162 @@
 
         .detail-label {
             font-weight: 600;
-            min-width: 120px;
-            color: #1e2f4a;
+            min-width: 110px;
+            color: var(--primary-800);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
 
         .detail-value {
             flex: 1;
             word-break: break-word;
-            color: #2b3d5c;
+            color: #1f344b;
             font-weight: 400;
         }
 
         .instruction-preview {
             font-size: 0.8rem;
-            color: #536b8a;
-            background: #eef4fa;
-            padding: 0.6rem 0.9rem;
+            color: #2d4059;
+            background: #ecf3fc;
+            padding: 0.7rem 1rem;
             border-radius: 14px;
-            margin: 0.5rem 0 0.2rem;
-            line-height: 1.5;
-            max-height: 100px;
+            margin: 0.3rem 0 0.2rem;
+            line-height: 1.6;
+            max-height: 130px;
             overflow-y: auto;
-            border: 1px solid #d3e2f0;
+            border: 1px solid #cfdff0;
+            width: 100%;
         }
 
-        /* card footer (small) */
+        /* card footer */
         .card-footer {
-            padding: 0.75rem 1.5rem 1.25rem;
-            display: flex;
-            justify-content: flex-end;
+            padding: 0.65rem 1.4rem 1rem;
             font-size: 0.7rem;
-            color: #7f8fa4;
-            border-top: 1px solid #ecf1f7;
-            margin-top: 0.2rem;
+            color: #7d92aa;
+            border-top: 1px solid #e8f0f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* loader / empty state */
-        .placeholder-text {
+        .card-footer .hint {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* no results */
+        .no-results {
             grid-column: 1 / -1;
             text-align: center;
-            padding: 3rem;
-            color: #5b6f87;
-            font-size: 1rem;
-            background: #ffffffcc;
-            border-radius: 40px;
+            padding: 3.5rem 1rem;
+            background: #ffffffd0;
+            border-radius: 36px;
             backdrop-filter: blur(4px);
-            border: 1px dashed #bdd3e8;
+            border: 2px dashed #c2d6ed;
+            color: var(--primary-700);
+            font-size: 1rem;
+            font-weight: 500;
         }
 
         /* scrollbar for details */
-        .extra-details::-webkit-scrollbar {
-            width: 4px;
+        .extra-details::-webkit-scrollbar,
+        .instruction-preview::-webkit-scrollbar {
+            width: 5px;
         }
-
-        .extra-details::-webkit-scrollbar-thumb {
-            background: #b6c9dd;
+        .extra-details::-webkit-scrollbar-thumb,
+        .instruction-preview::-webkit-scrollbar-thumb {
+            background: #b8cde4;
             border-radius: 10px;
         }
 
         /* responsive */
-        @media (max-width: 600px) {
-            body { padding: 1.25rem 0.9rem 3rem; }
-            .cards-grid { gap: 1.25rem; }
-            .essay-title { font-size: 1.2rem; }
-            .urdu-meaning { font-size: 1rem; }
+        @media (max-width: 700px) {
+            body { padding: 1.2rem 0.8rem 2.5rem; }
+            .cards-grid { gap: 1.1rem; }
+            .essay-title { font-size: 1.15rem; }
+            .urdu-meaning { font-size: 0.95rem; }
+            .filter-bar { padding: 0.6rem 0.8rem; }
+            .action-row { flex-wrap: wrap; }
+            .answer-link { flex: 1 1 100%; }
+            .expand-toggle { flex: 1 1 100%; }
         }
+
+        /* skeleton loading placeholders */
+        .skeleton-card {
+            background: #fff;
+            border-radius: var(--radius-card);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e2edfa;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        .skeleton-line {
+            background: #e9f0fa;
+            border-radius: 8px;
+            height: 1rem;
+            width: 100%;
+        }
+        .skeleton-line.short { width: 60%; }
+        .skeleton-line.medium { width: 80%; }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- header -->
     <div class="header">
-        <div class="title-section">
-            <h1>📚 CSS Essay Compilation</h1>
-            <div class="sub">Federal Public Service Commission · past papers & answer links</div>
+        <div class="brand">
+            <h1>📘 Essay Hub</h1>
+            <div class="sub">CSS / PMS competitive essays · quick reference & answer links</div>
         </div>
         <div id="status" class="status-badge status-loading">
-            ⏳ Loading data...
+            ⏳ loading essays…
         </div>
     </div>
 
+    <!-- filter/search bar -->
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Search by topic, category, year, Urdu…" autocomplete="off">
+        <select id="yearFilter">
+            <option value="">All years</option>
+        </select>
+        <select id="categoryFilter">
+            <option value="">All categories</option>
+        </select>
+        <span id="statsCount" class="stats">0 essays</span>
+    </div>
+
+    <!-- cards container -->
     <div id="cardsContainer" class="cards-grid">
-        <!-- dynamic cards will be injected here -->
-        <div class="placeholder-text">Fetching essays from Google Sheets...</div>
+        <!-- loading skeleton -->
+        <div class="skeleton-card">
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line"></div>
+        </div>
+        <div class="skeleton-card">
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line"></div>
+        </div>
+        <div class="skeleton-card">
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line"></div>
+        </div>
     </div>
 </div>
 
@@ -385,8 +551,16 @@
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv";
         const statusDiv = document.getElementById("status");
         const cardsContainer = document.getElementById("cardsContainer");
+        const searchInput = document.getElementById("searchInput");
+        const yearFilter = document.getElementById("yearFilter");
+        const categoryFilter = document.getElementById("categoryFilter");
+        const statsCount = document.getElementById("statsCount");
 
-        // ---------- CSV parser (robust enough for our sheet) ----------
+        // store all essay data for filtering
+        let allEssays = [];
+        let filteredEssays = [];
+
+        // ---------- CSV parser (robust) ----------
         function parseCSV(text) {
             const lines = [];
             let currentLine = [];
@@ -400,7 +574,7 @@
                 if (ch === '"') {
                     if (inQuotes && nextCh === '"') {
                         currentField += '"';
-                        i++; // skip next quote
+                        i++;
                     } else {
                         inQuotes = !inQuotes;
                     }
@@ -426,7 +600,6 @@
             return lines.filter(row => row.some(cell => cell.trim() !== ''));
         }
 
-        // ---------- escape HTML (for safety & cleanliness) ----------
         function escapeHtml(str) {
             if (!str) return '';
             return str
@@ -437,69 +610,79 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // ---------- truncate long text for preview (instruction) ----------
-        function truncate(str, maxLength = 160) {
+        function truncate(str, maxLength = 200) {
             if (!str) return '';
             if (str.length <= maxLength) return str;
             return str.slice(0, maxLength) + '…';
         }
 
-        // ---------- render cards from parsed data ----------
-        function renderCards(rows) {
-            // first row = headers
-            if (rows.length < 2) {
-                cardsContainer.innerHTML = '<div class="placeholder-text">No essay data found.</div>';
-                return;
-            }
-
+        // ---------- transform raw rows to objects ----------
+        function buildEssaysFromRows(rows) {
+            if (rows.length < 2) return [];
             const headers = rows[0].map(h => h.trim());
             const dataRows = rows.slice(1);
 
-            // find column indices (based on header names; we have srno, title of exam, complete instruction, exam year, related to which category, essay topic, urdu_meaning_esaay_topic, ans_link)
-            const srnoIdx = headers.findIndex(h => h.toLowerCase().includes('srno') || h.toLowerCase() === 'srno');
-            const titleIdx = headers.findIndex(h => h.toLowerCase().includes('title of exam'));
-            const instructionIdx = headers.findIndex(h => h.toLowerCase().includes('instruction'));
-            const yearIdx = headers.findIndex(h => h.toLowerCase().includes('year'));
-            const categoryIdx = headers.findIndex(h => h.toLowerCase().includes('category'));
-            const topicIdx = headers.findIndex(h => h.toLowerCase().includes('essay topic'));
-            const urduIdx = headers.findIndex(h => h.toLowerCase().includes('urdu_meaning') || h.toLowerCase().includes('urdu meaning'));
-            const linkIdx = headers.findIndex(h => h.toLowerCase().includes('ans_link') || h.toLowerCase().includes('ans link'));
+            // find column indices
+            const srnoIdx = headers.findIndex(h => /srno|sr no|sr\./i.test(h));
+            const titleIdx = headers.findIndex(h => /title of exam/i.test(h));
+            const instructionIdx = headers.findIndex(h => /instruction/i.test(h));
+            const yearIdx = headers.findIndex(h => /year/i.test(h));
+            const categoryIdx = headers.findIndex(h => /category/i.test(h));
+            const topicIdx = headers.findIndex(h => /essay topic/i.test(h));
+            const urduIdx = headers.findIndex(h => /urdu_meaning|urdu meaning/i.test(h));
+            const linkIdx = headers.findIndex(h => /ans_link|ans link|answer link/i.test(h));
 
-            // fallback if some columns missing (should not happen, but safe)
-            const getCol = (row, idx, fallback = '') => idx !== -1 && row[idx] !== undefined ? row[idx].trim() : fallback;
+            const getCol = (row, idx, fallback = '') => {
+                if (idx === -1 || row[idx] === undefined) return fallback;
+                return row[idx].trim();
+            };
+
+            const essays = [];
+            dataRows.forEach((row, i) => {
+                if (!row.some(cell => cell.trim() !== '')) return;
+                const essay = {
+                    srno: getCol(row, srnoIdx, String(i + 1)),
+                    examTitle: getCol(row, titleIdx, 'FPSC Competitive Examination'),
+                    instruction: getCol(row, instructionIdx, ''),
+                    year: getCol(row, yearIdx, ''),
+                    category: getCol(row, categoryIdx, 'General'),
+                    topic: getCol(row, topicIdx, 'Untitled essay'),
+                    urduMeaning: getCol(row, urduIdx, ''),
+                    answerLink: getCol(row, linkIdx, '#'),
+                };
+                // filter out completely empty
+                if (essay.topic && essay.topic !== 'Untitled essay') {
+                    essays.push(essay);
+                }
+            });
+            return essays;
+        }
+
+        // ---------- render cards based on filteredEssays ----------
+        function renderCards(essays) {
+            if (!essays || essays.length === 0) {
+                cardsContainer.innerHTML = `<div class="no-results">🔎 No essays match your search. Try different keywords.</div>`;
+                statsCount.textContent = `0 essays`;
+                return;
+            }
 
             let cardsHtml = '';
 
-            dataRows.forEach((row, i) => {
-                // skip empty rows
-                if (!row.some(cell => cell.trim() !== '')) return;
+            essays.forEach((essay, idx) => {
+                const safeSrno = escapeHtml(essay.srno);
+                const safeYear = escapeHtml(essay.year);
+                const safeCategory = escapeHtml(essay.category);
+                const safeTopic = escapeHtml(essay.topic);
+                const safeUrdu = escapeHtml(essay.urduMeaning);
+                const safeLink = escapeHtml(essay.answerLink);
+                const safeExamTitle = escapeHtml(essay.examTitle);
+                const safeInstruction = escapeHtml(essay.instruction);
+                const previewInstruction = escapeHtml(truncate(essay.instruction, 150));
 
-                const srno = getCol(row, srnoIdx, (i + 1).toString());
-                const examTitle = getCol(row, titleIdx, 'FEDERAL PUBLIC SERVICE COMMISSION');
-                const instruction = getCol(row, instructionIdx, '');
-                const year = getCol(row, yearIdx, '');
-                const category = getCol(row, categoryIdx, 'General');
-                const essayTopic = getCol(row, topicIdx, 'Untitled essay');
-                const urduMeaning = getCol(row, urduIdx, '');
-                const answerLink = getCol(row, linkIdx, '#');
-
-                // Escape for HTML
-                const safeSrno = escapeHtml(srno);
-                const safeYear = escapeHtml(year);
-                const safeCategory = escapeHtml(category);
-                const safeTopic = escapeHtml(essayTopic);
-                const safeUrdu = escapeHtml(urduMeaning);
-                const safeLink = escapeHtml(answerLink);
-
-                // For instruction preview (also escape)
-                const safeInstruction = escapeHtml(instruction);
-                const previewInstruction = escapeHtml(truncate(instruction, 180));
-
-                // unique ID for expandable section
-                const expandId = `extra-${i}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+                const expandId = `extra-${idx}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
                 cardsHtml += `
-                    <div class="essay-card" data-card-idx="${i}">
+                    <div class="essay-card" data-essay-idx="${idx}">
                         <div class="card-head">
                             <div class="card-meta">
                                 <span class="srno-badge">#${safeSrno}</span>
@@ -510,22 +693,20 @@
                             <div class="category-chip">${safeCategory}</div>
                         </div>
                         <div class="card-body">
-                            <!-- answer link button -->
-                            <a class="answer-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">
-                                <span>📄</span> Open answer
-                            </a>
-
-                            <!-- expand toggle -->
-                            <div class="expand-toggle" data-target="${expandId}">
-                                <span>📋 More details & instructions</span>
-                                <span class="arrow">▼</span>
+                            <div class="action-row">
+                                <a class="answer-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">
+                                    <span>📄</span> Open answer
+                                </a>
+                                <div class="expand-toggle" data-target="${expandId}">
+                                    <span>Details</span>
+                                    <span class="arrow">▼</span>
+                                </div>
                             </div>
-
-                            <!-- hidden extra details (expanded) -->
+                            <!-- collapsible extra details -->
                             <div id="${expandId}" class="extra-details">
                                 <div class="detail-item">
-                                    <span class="detail-label">Exam title</span>
-                                    <span class="detail-value">${escapeHtml(examTitle)}</span>
+                                    <span class="detail-label">Exam</span>
+                                    <span class="detail-value">${safeExamTitle}</span>
                                 </div>
                                 <div class="detail-item">
                                     <span class="detail-label">Category</span>
@@ -536,37 +717,31 @@
                                     <span class="detail-value">${safeYear}</span>
                                 </div>
                                 <div class="detail-item" style="flex-direction: column; align-items: flex-start;">
-                                    <span class="detail-label" style="margin-bottom: 0.25rem;">Complete instruction</span>
-                                    <div class="instruction-preview" style="max-height: 140px; overflow-y: auto; width: 100%;">
-                                        ${safeInstruction}
-                                    </div>
+                                    <span class="detail-label" style="margin-bottom: 0.2rem;">Full instruction</span>
+                                    <div class="instruction-preview">${safeInstruction}</div>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="detail-label">Answer link</span>
-                                    <span class="detail-value" style="word-break: break-all;">
-                                        <a href="${safeLink}" target="_blank" style="color: #1a4972; text-decoration: underline;">${safeLink}</a>
+                                    <span class="detail-label">Answer URL</span>
+                                    <span class="detail-value" style="word-break: break-all; font-size: 0.78rem;">
+                                        <a href="${safeLink}" target="_blank" style="color: var(--primary-600); text-decoration: underline;">${safeLink}</a>
                                     </span>
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer">
-                            <span>⚡ expanded details available</span>
+                            <span class="hint">📌 tap "Details" for instructions</span>
                         </div>
                     </div>
                 `;
             });
 
-            if (cardsHtml === '') {
-                cardsContainer.innerHTML = '<div class="placeholder-text">No valid essay entries found.</div>';
-                return;
-            }
-
             cardsContainer.innerHTML = cardsHtml;
 
-            // attach event listeners to expand toggles
+            // attach expand listeners
             document.querySelectorAll('.expand-toggle').forEach(toggle => {
                 toggle.addEventListener('click', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     const targetId = this.dataset.target;
                     const extraDiv = document.getElementById(targetId);
                     if (!extraDiv) return;
@@ -582,41 +757,111 @@
                 });
             });
 
-            // open first card's extra section? no need, but let's leave it closed.
+            statsCount.textContent = `${essays.length} essay${essays.length !== 1 ? 's' : ''}`;
         }
 
-        // ---------- fetch and render ----------
-        async function loadSheetData() {
+        // ---------- apply filters (search, year, category) ----------
+        function applyFilters() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const selectedYear = yearFilter.value;
+            const selectedCategory = categoryFilter.value;
+
+            filteredEssays = allEssays.filter(essay => {
+                // year filter
+                if (selectedYear && essay.year !== selectedYear) return false;
+                // category filter
+                if (selectedCategory && essay.category !== selectedCategory) return false;
+                // search filter (topic, urdu, category, year, srno)
+                if (searchTerm) {
+                    const haystack = [
+                        essay.topic,
+                        essay.urduMeaning,
+                        essay.category,
+                        essay.year,
+                        essay.srno,
+                        essay.examTitle || ''
+                    ].join(' ').toLowerCase();
+                    if (!haystack.includes(searchTerm)) return false;
+                }
+                return true;
+            });
+
+            renderCards(filteredEssays);
+        }
+
+        // ---------- populate year & category dropdowns ----------
+        function populateFilters(essays) {
+            const years = [...new Set(essays.map(e => e.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
+            const categories = [...new Set(essays.map(e => e.category).filter(Boolean))].sort();
+
+            // preserve current selection if possible
+            const currentYear = yearFilter.value;
+            const currentCategory = categoryFilter.value;
+
+            yearFilter.innerHTML = '<option value="">All years</option>';
+            years.forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearFilter.appendChild(opt);
+            });
+
+            categoryFilter.innerHTML = '<option value="">All categories</option>';
+            categories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                categoryFilter.appendChild(opt);
+            });
+
+            // restore selection if still exists
+            if (years.includes(currentYear)) yearFilter.value = currentYear;
+            if (categories.includes(currentCategory)) categoryFilter.value = currentCategory;
+        }
+
+        // ---------- fetch & initialize ----------
+        async function init() {
             try {
                 statusDiv.className = 'status-badge status-loading';
-                statusDiv.innerHTML = '⏳ Loading data...';
+                statusDiv.innerHTML = '⏳ fetching essays…';
+                // skeleton is already visible
 
                 const response = await fetch(CSV_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
                 const csvText = await response.text();
                 const parsed = parseCSV(csvText);
+                if (parsed.length < 2) throw new Error('No data rows found');
 
-                if (parsed.length === 0) throw new Error('CSV is empty');
+                allEssays = buildEssaysFromRows(parsed);
+
+                if (allEssays.length === 0) throw new Error('No valid essay entries');
+
+                // populate filters
+                populateFilters(allEssays);
+                // initial filter (all)
+                filteredEssays = [...allEssays];
+                renderCards(filteredEssays);
 
                 // success status
-                const rowCount = parsed.length - 1;
                 statusDiv.className = 'status-badge status-success';
-                statusDiv.innerHTML = `✅ Loaded ${rowCount} essays`;
+                statusDiv.innerHTML = `✅ ${allEssays.length} essays loaded`;
 
-                // render cards (pass all rows including headers)
-                renderCards(parsed);
+                // attach filter listeners
+                searchInput.addEventListener('input', applyFilters);
+                yearFilter.addEventListener('change', applyFilters);
+                categoryFilter.addEventListener('change', applyFilters);
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Initialization error:', error);
                 statusDiv.className = 'status-badge status-error';
-                statusDiv.innerHTML = `❌ Failed to load: ${error.message}`;
-                cardsContainer.innerHTML = `<div class="placeholder-text">⚠️ Could not load essay data. Please check the Google Sheet connection.<br><small>${escapeHtml(error.message)}</small></div>`;
+                statusDiv.innerHTML = `❌ ${error.message}`;
+                cardsContainer.innerHTML = `<div class="no-results">⚠️ Could not load essay data.<br><small>${escapeHtml(error.message)}</small></div>`;
+                statsCount.textContent = '0 essays';
             }
         }
 
         // start
-        loadSheetData();
+        init();
     })();
 </script>
 </body>
