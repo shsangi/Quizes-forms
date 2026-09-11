@@ -3,157 +3,621 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sheets Data Viewer</title>
+    <title>CSS Essay Compilation · Modern Cards</title>
     <style>
+        /* modern reset & base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #f6f9fc 0%, #edf2f7 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem 4rem;
+            color: #1e293b;
         }
-        h2 {
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* header / status area */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            gap: 1rem;
+        }
+
+        .title-section h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #0f2b4b, #2c5282);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            margin-bottom: 0.25rem;
+        }
+
+        .title-section .sub {
+            font-size: 0.95rem;
+            color: #4a5568;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .status-success {
+            background: #e6fffa;
+            color: #0f5e5a;
+            border: 1px solid #b2f5ea;
+        }
+
+        .status-loading {
+            background: #fffaf0;
+            color: #b7791f;
+            border: 1px solid #fde9c3;
+        }
+
+        .status-error {
+            background: #fff5f5;
+            color: #9b2c2c;
+            border: 1px solid #fed7d7;
+        }
+
+        /* card grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.8rem;
+        }
+
+        /* modern card */
+        .essay-card {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.02);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            backdrop-filter: blur(2px);
+        }
+
+        .essay-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 24px 40px -12px rgba(0, 0, 0, 0.15), 0 8px 18px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e0;
+        }
+
+        /* card top / heading area */
+        .card-head {
+            padding: 1.5rem 1.5rem 1rem;
+            background: linear-gradient(to bottom, #ffffff, #fafcff);
+            border-bottom: 1px solid #e9eef4;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .srno-badge {
+            background: #1e3a5f;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .year-badge {
+            background: #e2e8f0;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .year-badge i {
+            font-style: normal;
+            font-size: 0.9rem;
+        }
+
+        .essay-title {
+            font-size: 1.35rem;
+            font-weight: 650;
+            line-height: 1.4;
+            color: #0b1e33;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .urdu-meaning {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2d3748;
+            direction: rtl;
+            text-align: right;
+            padding: 0.5rem 0 0.25rem;
+            line-height: 1.6;
+            font-family: 'Noto Nastaliq Urdu', 'Segoe UI', system-ui, sans-serif;
+            border-top: 1px dashed #d4dfeb;
+            margin-top: 0.4rem;
+        }
+
+        /* category chip */
+        .category-chip {
+            display: inline-block;
+            background: #edf2f7;
+            color: #1a365d;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            margin-top: 0.75rem;
+            letter-spacing: 0.02em;
+            text-transform: capitalize;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* card body / details */
+        .card-body {
+            padding: 0 1.5rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .answer-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            background: #f1f5f9;
+            color: #0b3b5e;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.7rem 1.2rem;
+            border-radius: 60px;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            border: 1px solid #cfddee;
+            margin-top: 0.25rem;
+        }
+
+        .answer-link:hover {
+            background: #1a4972;
+            color: white;
+            border-color: #1a4972;
+            box-shadow: 0 6px 14px rgba(26, 73, 114, 0.25);
+        }
+
+        .answer-link span {
+            font-size: 1.1rem;
+        }
+
+        /* expandable section */
+        .expand-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafd;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
             color: #2c3e50;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            transition: background 0.2s;
+            user-select: none;
+            margin-top: 0.25rem;
         }
-        #status {
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 4px;
+
+        .expand-toggle:hover {
+            background: #eef2f7;
+            border-color: #bdd3e8;
+        }
+
+        .expand-toggle .arrow {
+            font-size: 1rem;
+            transition: transform 0.25s ease;
             display: inline-block;
         }
-        .loading {
-            background-color: #fff3cd;
-            color: #856404;
+
+        .expand-toggle.open .arrow {
+            transform: rotate(180deg);
         }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
+
+        .extra-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+            opacity: 0;
+            background: #f9fcff;
+            border-radius: 18px;
+            padding: 0 1rem;
+            margin-top: 0.25rem;
+            border-left: 3px solid #9bb7d4;
         }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
+
+        .extra-details.show {
+            max-height: 600px;
+            opacity: 1;
+            padding: 0.9rem 1rem;
+            margin-top: 0.5rem;
+            border-left-color: #2c5282;
         }
-        .table-container {
-            max-height: 500px;
+
+        .detail-item {
+            font-size: 0.85rem;
+            color: #2d3f5e;
+            padding: 0.4rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid #e0e9f2;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            min-width: 120px;
+            color: #1e2f4a;
+        }
+
+        .detail-value {
+            flex: 1;
+            word-break: break-word;
+            color: #2b3d5c;
+            font-weight: 400;
+        }
+
+        .instruction-preview {
+            font-size: 0.8rem;
+            color: #536b8a;
+            background: #eef4fa;
+            padding: 0.6rem 0.9rem;
+            border-radius: 14px;
+            margin: 0.5rem 0 0.2rem;
+            line-height: 1.5;
+            max-height: 100px;
             overflow-y: auto;
-            border: 1px solid #ccc;
-            background: #fff;
-            border-radius: 4px;
+            border: 1px solid #d3e2f0;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
+
+        /* card footer (small) */
+        .card-footer {
+            padding: 0.75rem 1.5rem 1.25rem;
+            display: flex;
+            justify-content: flex-end;
+            font-size: 0.7rem;
+            color: #7f8fa4;
+            border-top: 1px solid #ecf1f7;
+            margin-top: 0.2rem;
         }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
+
+        /* loader / empty state */
+        .placeholder-text {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            color: #5b6f87;
+            font-size: 1rem;
+            background: #ffffffcc;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px dashed #bdd3e8;
         }
-        th {
-            background-color: #007bff;
-            color: white;
-            position: sticky;
-            top: 0;
+
+        /* scrollbar for details */
+        .extra-details::-webkit-scrollbar {
+            width: 4px;
         }
-        tr:hover {
-            background-color: #f1f1f1;
+
+        .extra-details::-webkit-scrollbar-thumb {
+            background: #b6c9dd;
+            border-radius: 10px;
+        }
+
+        /* responsive */
+        @media (max-width: 600px) {
+            body { padding: 1.25rem 0.9rem 3rem; }
+            .cards-grid { gap: 1.25rem; }
+            .essay-title { font-size: 1.2rem; }
+            .urdu-meaning { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
-
-    <h2>Google Sheets CSV Data Viewer</h2>
-    <div id="status" class="loading">Status: Loading data from Google Sheets...</div>
-
-    <div class="table-container">
-        <table id="dataTable">
-            <thead>
-                <tr id="tableHeader"></tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+<div class="container">
+    <div class="header">
+        <div class="title-section">
+            <h1>📚 CSS Essay Compilation</h1>
+            <div class="sub">Federal Public Service Commission · past papers & answer links</div>
+        </div>
+        <div id="status" class="status-badge status-loading">
+            ⏳ Loading data...
+        </div>
     </div>
 
-    <script>
-        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv";
-        const statusDiv = document.getElementById("status");
-        const tableHeader = document.getElementById("tableHeader");
-        const tableBody = document.getElementById("tableBody");
+    <div id="cardsContainer" class="cards-grid">
+        <!-- dynamic cards will be injected here -->
+        <div class="placeholder-text">Fetching essays from Google Sheets...</div>
+    </div>
+</div>
 
-        // Simple CSV parser that handles basic quotes
+<script>
+    (function() {
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv";
+        const statusDiv = document.getElementById("status");
+        const cardsContainer = document.getElementById("cardsContainer");
+
+        // ---------- CSV parser (robust enough for our sheet) ----------
         function parseCSV(text) {
-            let lines = text.split("\n");
-            let result = [];
-            for (let i = 0; i < lines.length; i++) {
-                if (!lines[i].trim()) continue;
-                let row = [];
-                let inQuotes = false;
-                let entry = "";
-                for (let j = 0; j < lines[i].length; j++) {
-                    let char = lines[i][j];
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        row.push(entry.trim());
-                        entry = "";
+            const lines = [];
+            let currentLine = [];
+            let currentField = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                const nextCh = text[i + 1];
+
+                if (ch === '"') {
+                    if (inQuotes && nextCh === '"') {
+                        currentField += '"';
+                        i++; // skip next quote
                     } else {
-                        entry += char;
+                        inQuotes = !inQuotes;
                     }
+                } else if (ch === ',' && !inQuotes) {
+                    currentLine.push(currentField);
+                    currentField = '';
+                } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+                    if (ch === '\r' && nextCh === '\n') i++;
+                    if (currentField !== '' || currentLine.length > 0) {
+                        currentLine.push(currentField);
+                        lines.push(currentLine);
+                        currentLine = [];
+                        currentField = '';
+                    }
+                } else {
+                    currentField += ch;
                 }
-                row.push(entry.trim());
-                result.push(row);
             }
-            return result;
+            if (currentField !== '' || currentLine.length > 0) {
+                currentLine.push(currentField);
+                lines.push(currentLine);
+            }
+            return lines.filter(row => row.some(cell => cell.trim() !== ''));
         }
 
+        // ---------- escape HTML (for safety & cleanliness) ----------
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // ---------- truncate long text for preview (instruction) ----------
+        function truncate(str, maxLength = 160) {
+            if (!str) return '';
+            if (str.length <= maxLength) return str;
+            return str.slice(0, maxLength) + '…';
+        }
+
+        // ---------- render cards from parsed data ----------
+        function renderCards(rows) {
+            // first row = headers
+            if (rows.length < 2) {
+                cardsContainer.innerHTML = '<div class="placeholder-text">No essay data found.</div>';
+                return;
+            }
+
+            const headers = rows[0].map(h => h.trim());
+            const dataRows = rows.slice(1);
+
+            // find column indices (based on header names; we have srno, title of exam, complete instruction, exam year, related to which category, essay topic, urdu_meaning_esaay_topic, ans_link)
+            const srnoIdx = headers.findIndex(h => h.toLowerCase().includes('srno') || h.toLowerCase() === 'srno');
+            const titleIdx = headers.findIndex(h => h.toLowerCase().includes('title of exam'));
+            const instructionIdx = headers.findIndex(h => h.toLowerCase().includes('instruction'));
+            const yearIdx = headers.findIndex(h => h.toLowerCase().includes('year'));
+            const categoryIdx = headers.findIndex(h => h.toLowerCase().includes('category'));
+            const topicIdx = headers.findIndex(h => h.toLowerCase().includes('essay topic'));
+            const urduIdx = headers.findIndex(h => h.toLowerCase().includes('urdu_meaning') || h.toLowerCase().includes('urdu meaning'));
+            const linkIdx = headers.findIndex(h => h.toLowerCase().includes('ans_link') || h.toLowerCase().includes('ans link'));
+
+            // fallback if some columns missing (should not happen, but safe)
+            const getCol = (row, idx, fallback = '') => idx !== -1 && row[idx] !== undefined ? row[idx].trim() : fallback;
+
+            let cardsHtml = '';
+
+            dataRows.forEach((row, i) => {
+                // skip empty rows
+                if (!row.some(cell => cell.trim() !== '')) return;
+
+                const srno = getCol(row, srnoIdx, (i + 1).toString());
+                const examTitle = getCol(row, titleIdx, 'FEDERAL PUBLIC SERVICE COMMISSION');
+                const instruction = getCol(row, instructionIdx, '');
+                const year = getCol(row, yearIdx, '');
+                const category = getCol(row, categoryIdx, 'General');
+                const essayTopic = getCol(row, topicIdx, 'Untitled essay');
+                const urduMeaning = getCol(row, urduIdx, '');
+                const answerLink = getCol(row, linkIdx, '#');
+
+                // Escape for HTML
+                const safeSrno = escapeHtml(srno);
+                const safeYear = escapeHtml(year);
+                const safeCategory = escapeHtml(category);
+                const safeTopic = escapeHtml(essayTopic);
+                const safeUrdu = escapeHtml(urduMeaning);
+                const safeLink = escapeHtml(answerLink);
+
+                // For instruction preview (also escape)
+                const safeInstruction = escapeHtml(instruction);
+                const previewInstruction = escapeHtml(truncate(instruction, 180));
+
+                // unique ID for expandable section
+                const expandId = `extra-${i}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+
+                cardsHtml += `
+                    <div class="essay-card" data-card-idx="${i}">
+                        <div class="card-head">
+                            <div class="card-meta">
+                                <span class="srno-badge">#${safeSrno}</span>
+                                <span class="year-badge"><i>📅</i> ${safeYear}</span>
+                            </div>
+                            <div class="essay-title">${safeTopic}</div>
+                            <div class="urdu-meaning">${safeUrdu}</div>
+                            <div class="category-chip">${safeCategory}</div>
+                        </div>
+                        <div class="card-body">
+                            <!-- answer link button -->
+                            <a class="answer-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">
+                                <span>📄</span> Open answer
+                            </a>
+
+                            <!-- expand toggle -->
+                            <div class="expand-toggle" data-target="${expandId}">
+                                <span>📋 More details & instructions</span>
+                                <span class="arrow">▼</span>
+                            </div>
+
+                            <!-- hidden extra details (expanded) -->
+                            <div id="${expandId}" class="extra-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Exam title</span>
+                                    <span class="detail-value">${escapeHtml(examTitle)}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Category</span>
+                                    <span class="detail-value">${safeCategory}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Year</span>
+                                    <span class="detail-value">${safeYear}</span>
+                                </div>
+                                <div class="detail-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="detail-label" style="margin-bottom: 0.25rem;">Complete instruction</span>
+                                    <div class="instruction-preview" style="max-height: 140px; overflow-y: auto; width: 100%;">
+                                        ${safeInstruction}
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Answer link</span>
+                                    <span class="detail-value" style="word-break: break-all;">
+                                        <a href="${safeLink}" target="_blank" style="color: #1a4972; text-decoration: underline;">${safeLink}</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <span>⚡ expanded details available</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (cardsHtml === '') {
+                cardsContainer.innerHTML = '<div class="placeholder-text">No valid essay entries found.</div>';
+                return;
+            }
+
+            cardsContainer.innerHTML = cardsHtml;
+
+            // attach event listeners to expand toggles
+            document.querySelectorAll('.expand-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.dataset.target;
+                    const extraDiv = document.getElementById(targetId);
+                    if (!extraDiv) return;
+
+                    const isOpen = extraDiv.classList.contains('show');
+                    if (isOpen) {
+                        extraDiv.classList.remove('show');
+                        this.classList.remove('open');
+                    } else {
+                        extraDiv.classList.add('show');
+                        this.classList.add('open');
+                    }
+                });
+            });
+
+            // open first card's extra section? no need, but let's leave it closed.
+        }
+
+        // ---------- fetch and render ----------
         async function loadSheetData() {
             try {
-                const response = await fetch(csvUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
+                statusDiv.className = 'status-badge status-loading';
+                statusDiv.innerHTML = '⏳ Loading data...';
+
+                const response = await fetch(CSV_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
                 const csvText = await response.text();
-                const parsedData = parseCSV(csvText);
+                const parsed = parseCSV(csvText);
 
-                if (parsedData.length === 0) {
-                    throw new Error("The CSV file is empty.");
-                }
+                if (parsed.length === 0) throw new Error('CSV is empty');
 
-                // Extract Headers (First row)
-                const headers = parsedData[0];
-                headers.forEach(headerText => {
-                    let th = document.createElement("th");
-                    th.textContent = headerText;
-                    tableHeader.appendChild(th);
-                });
+                // success status
+                const rowCount = parsed.length - 1;
+                statusDiv.className = 'status-badge status-success';
+                statusDiv.innerHTML = `✅ Loaded ${rowCount} essays`;
 
-                // Extract Rows (Remaining rows)
-                const rows = parsedData.slice(1);
-                rows.forEach(rowData => {
-                    let tr = document.createElement("tr");
-                    rowData.forEach(cellData => {
-                        let td = document.createElement("td");
-                        td.textContent = cellData;
-                        tr.appendChild(td);
-                    });
-                    tableBody.appendChild(tr);
-                });
-
-                // Success Status Update
-                statusDiv.className = "success";
-                statusDiv.textContent = `Status: Success! Loaded ${rows.length} rows from the sheet.`;
-                console.log("Data check passed: Successfully rendered rows.");
+                // render cards (pass all rows including headers)
+                renderCards(parsed);
 
             } catch (error) {
-                statusDiv.className = "error";
-                statusDiv.textContent = `Status: Failed to load data. Error: ${error.message}`;
-                console.error("Error fetching or parsing CSV:", error);
+                console.error('Error:', error);
+                statusDiv.className = 'status-badge status-error';
+                statusDiv.innerHTML = `❌ Failed to load: ${error.message}`;
+                cardsContainer.innerHTML = `<div class="placeholder-text">⚠️ Could not load essay data. Please check the Google Sheet connection.<br><small>${escapeHtml(error.message)}</small></div>`;
             }
         }
 
-        // Run the function on page load
+        // start
         loadSheetData();
-    </script>
-
+    })();
+</script>
 </body>
 </html>
