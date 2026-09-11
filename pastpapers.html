@@ -48,67 +48,7 @@
             margin: 0 auto;
         }
 
-        /* ---------- header & status ---------- */
-        .header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2.4rem;
-            gap: 1.2rem;
-        }
-
-        .brand h1 {
-            font-size: 2rem;
-            font-weight: 650;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #0b1b33, #1e3a5f);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            display: inline-block;
-            margin-bottom: 0.2rem;
-        }
-
-        .brand .sub {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 400;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-badge {
-            font-weight: 500;
-            padding: 0.45rem 1.3rem;
-            border-radius: 40px;
-            font-size: 0.82rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid transparent;
-            background: #fff;
-        }
-
-        .status-success {
-            background: #e6fffa;
-            color: #0f5e5a;
-            border-color: #b2f5ea;
-        }
-        .status-loading {
-            background: #fffaf0;
-            color: #b7791f;
-            border-color: #fde9c3;
-        }
-        .status-error {
-            background: #fff5f5;
-            color: #9b2c2c;
-            border-color: #fed7d7;
-        }
-
-        /* ---------- search / filter bar (user friendly) ---------- */
+        /* ---------- search / filter bar ---------- */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -499,18 +439,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- header -->
-    <div class="header">
-        <div class="brand">
-            <h1>📘 Essay Hub</h1>
-            <div class="sub">CSS / PMS competitive essays · quick reference & answer links</div>
-        </div>
-        <div id="status" class="status-badge status-loading">
-            ⏳ loading essays…
-        </div>
-    </div>
-
-    <!-- filter/search bar -->
+    <!-- filter/search bar (moved to top since header removed) -->
     <div class="filter-bar">
         <input type="text" id="searchInput" placeholder="🔍 Search by topic, category, year, Urdu…" autocomplete="off">
         <select id="yearFilter">
@@ -549,7 +478,6 @@
 <script>
     (function() {
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv";
-        const statusDiv = document.getElementById("status");
         const cardsContainer = document.getElementById("cardsContainer");
         const searchInput = document.getElementById("searchInput");
         const yearFilter = document.getElementById("yearFilter");
@@ -677,7 +605,6 @@
                 const safeLink = escapeHtml(essay.answerLink);
                 const safeExamTitle = escapeHtml(essay.examTitle);
                 const safeInstruction = escapeHtml(essay.instruction);
-                const previewInstruction = escapeHtml(truncate(essay.instruction, 150));
 
                 const expandId = `extra-${idx}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
@@ -794,7 +721,6 @@
             const years = [...new Set(essays.map(e => e.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
             const categories = [...new Set(essays.map(e => e.category).filter(Boolean))].sort();
 
-            // preserve current selection if possible
             const currentYear = yearFilter.value;
             const currentCategory = categoryFilter.value;
 
@@ -814,7 +740,6 @@
                 categoryFilter.appendChild(opt);
             });
 
-            // restore selection if still exists
             if (years.includes(currentYear)) yearFilter.value = currentYear;
             if (categories.includes(currentCategory)) categoryFilter.value = currentCategory;
         }
@@ -822,10 +747,6 @@
         // ---------- fetch & initialize ----------
         async function init() {
             try {
-                statusDiv.className = 'status-badge status-loading';
-                statusDiv.innerHTML = '⏳ fetching essays…';
-                // skeleton is already visible
-
                 const response = await fetch(CSV_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
@@ -836,25 +757,16 @@
 
                 if (allEssays.length === 0) throw new Error('No valid essay entries');
 
-                // populate filters
                 populateFilters(allEssays);
-                // initial filter (all)
                 filteredEssays = [...allEssays];
                 renderCards(filteredEssays);
 
-                // success status
-                statusDiv.className = 'status-badge status-success';
-                statusDiv.innerHTML = `✅ ${allEssays.length} essays loaded`;
-
-                // attach filter listeners
                 searchInput.addEventListener('input', applyFilters);
                 yearFilter.addEventListener('change', applyFilters);
                 categoryFilter.addEventListener('change', applyFilters);
 
             } catch (error) {
                 console.error('Initialization error:', error);
-                statusDiv.className = 'status-badge status-error';
-                statusDiv.innerHTML = `❌ ${error.message}`;
                 cardsContainer.innerHTML = `<div class="no-results">⚠️ Could not load essay data.<br><small>${escapeHtml(error.message)}</small></div>`;
                 statsCount.textContent = '0 essays';
             }
