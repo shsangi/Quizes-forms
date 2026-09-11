@@ -48,6 +48,55 @@
             margin: 0 auto;
         }
 
+        /* ---------- page header ---------- */
+        .page-header {
+            margin-bottom: 1.6rem;
+            padding: 0 0.4rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #0b1b33, #1e3a5f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+            line-height: 1.2;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .header-stat-pill {
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--primary-800);
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .header-stat-pill .num {
+            color: var(--primary-600);
+            font-weight: 700;
+        }
+
         /* ---------- search / filter bar (5% rounded corners) ---------- */
         .filter-bar {
             display: flex;
@@ -65,7 +114,7 @@
 
         .filter-bar input {
             flex: 2;
-            min-width: 220px;
+            min-width: 200px;
             border: none;
             background: transparent;
             font-size: 0.95rem;
@@ -96,14 +145,15 @@
             background-repeat: no-repeat;
             background-position: right 0.8rem center;
             background-size: 14px;
+            max-width: 200px;
         }
 
         .filter-bar select:hover {
             border-color: var(--primary-500);
         }
 
-        /* stats shows records */
-        .stats {
+        /* results count on filter bar */
+        .filter-count {
             font-size: 0.8rem;
             font-weight: 600;
             color: var(--primary-700);
@@ -115,6 +165,7 @@
             border: 1px solid #c9dcf0;
             min-width: 110px;
             text-align: center;
+            margin-left: auto;
         }
 
         /* ---------- card grid ---------- */
@@ -260,7 +311,7 @@
             transform: scale(1.01);
         }
 
-        /* disabled state for no link */
+        /* disabled state */
         .answer-link.disabled {
             background: #cbd5e1;
             color: #64748b;
@@ -414,6 +465,11 @@
         }
 
         /* responsive */
+        @media (max-width: 780px) {
+            .page-header h1 { font-size: 1.6rem; }
+            .filter-bar select { max-width: 100%; flex: 1; }
+        }
+
         @media (max-width: 700px) {
             body { padding: 1.2rem 0.8rem 2.5rem; }
             .cards-grid { gap: 1.1rem; }
@@ -423,6 +479,7 @@
             .action-row { flex-wrap: wrap; }
             .answer-link { flex: 1 1 100%; }
             .expand-toggle { flex: 1 1 100%; }
+            .filter-count { margin-left: 0; width: 100%; text-align: center; }
         }
 
         /* skeleton */
@@ -455,19 +512,32 @@
 </head>
 <body>
 <div class="container">
-    <!-- filter bar -->
+    <!-- Page title & overall stats -->
+    <div class="page-header">
+        <h1>FPSC AI Solved Papers</h1>
+        <div class="header-stats">
+            <span class="header-stat-pill" id="headerTotalRecords">
+                📄 Total: <span class="num">0</span> records
+            </span>
+            <span class="header-stat-pill" id="headerTotalYears">
+                📅 Years: <span class="num">0</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Filter bar: Search, Year, Subject, Topic -->
     <div class="filter-bar">
         <input type="text" id="searchInput" placeholder="🔍 Search in past papers…" autocomplete="off">
         <select id="yearFilter">
             <option value="">All years</option>
         </select>
-        <select id="categoryFilter">
-            <option value="">All categories</option>
-        </select>
         <select id="subjectFilter">
             <option value="">All subjects</option>
         </select>
-        <span id="statsCount" class="stats">0 records</span>
+        <select id="topicFilter">
+            <option value="">All topics</option>
+        </select>
+        <span id="statsCount" class="filter-count">0 records</span>
     </div>
 
     <div id="cardsContainer" class="cards-grid">
@@ -498,9 +568,11 @@
         const cardsContainer = document.getElementById("cardsContainer");
         const searchInput = document.getElementById("searchInput");
         const yearFilter = document.getElementById("yearFilter");
-        const categoryFilter = document.getElementById("categoryFilter");
         const subjectFilter = document.getElementById("subjectFilter");
+        const topicFilter = document.getElementById("topicFilter");
         const statsCount = document.getElementById("statsCount");
+        const headerTotalRecords = document.getElementById("headerTotalRecords");
+        const headerTotalYears = document.getElementById("headerTotalYears");
 
         let allEssays = [];
         let filteredEssays = [];
@@ -555,12 +627,10 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // ---------- check if link is valid ----------
         function isValidLink(link) {
             if (!link) return false;
             const trimmed = link.trim();
             if (trimmed === '' || trimmed === '#') return false;
-            // must start with http/https
             return /^https?:\/\//i.test(trimmed);
         }
 
@@ -643,7 +713,6 @@
 
                 const expandId = `extra-${idx}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
-                // Build the answer button based on link validity
                 let answerButtonHtml;
                 if (essay.hasValidLink) {
                     answerButtonHtml = `
@@ -659,7 +728,6 @@
                     `;
                 }
 
-                // Answer URL row in details
                 let answerUrlHtml;
                 if (essay.hasValidLink) {
                     answerUrlHtml = `<a href="${safeLink}" target="_blank" style="color: var(--primary-600); text-decoration: underline;">${safeLink}</a>`;
@@ -750,13 +818,13 @@
         function applyFilters() {
             const searchTerm = searchInput.value.trim().toLowerCase();
             const selectedYear = yearFilter.value;
-            const selectedCategory = categoryFilter.value;
             const selectedSubject = subjectFilter.value;
+            const selectedTopic = topicFilter.value;
 
             filteredEssays = allEssays.filter(essay => {
                 if (selectedYear && essay.year !== selectedYear) return false;
-                if (selectedCategory && essay.category !== selectedCategory) return false;
                 if (selectedSubject && essay.subject !== selectedSubject) return false;
+                if (selectedTopic && essay.topic !== selectedTopic) return false;
                 if (searchTerm) {
                     const haystack = [
                         essay.topic,
@@ -778,12 +846,12 @@
         // ---------- populate dropdowns ----------
         function populateFilters(essays) {
             const years = [...new Set(essays.map(e => e.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
-            const categories = [...new Set(essays.map(e => e.category).filter(Boolean))].sort();
             const subjects = [...new Set(essays.map(e => e.subject).filter(Boolean))].sort();
+            const topics = [...new Set(essays.map(e => e.topic).filter(Boolean))].sort();
 
             const currentYear = yearFilter.value;
-            const currentCategory = categoryFilter.value;
             const currentSubject = subjectFilter.value;
+            const currentTopic = topicFilter.value;
 
             yearFilter.innerHTML = '<option value="">All years</option>';
             years.forEach(y => {
@@ -791,14 +859,6 @@
                 opt.value = y;
                 opt.textContent = y;
                 yearFilter.appendChild(opt);
-            });
-
-            categoryFilter.innerHTML = '<option value="">All categories</option>';
-            categories.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c;
-                opt.textContent = c;
-                categoryFilter.appendChild(opt);
             });
 
             subjectFilter.innerHTML = '<option value="">All subjects</option>';
@@ -809,9 +869,26 @@
                 subjectFilter.appendChild(opt);
             });
 
+            topicFilter.innerHTML = '<option value="">All topics</option>';
+            topics.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t.length > 48 ? t.slice(0, 46) + '…' : t;
+                opt.title = t;
+                topicFilter.appendChild(opt);
+            });
+
             if (years.includes(currentYear)) yearFilter.value = currentYear;
-            if (categories.includes(currentCategory)) categoryFilter.value = currentCategory;
             if (subjects.includes(currentSubject)) subjectFilter.value = currentSubject;
+            if (topics.includes(currentTopic)) topicFilter.value = currentTopic;
+        }
+
+        // ---------- update header stats ----------
+        function updateHeaderStats(essays) {
+            const total = essays.length;
+            const totalYears = new Set(essays.map(e => e.year).filter(Boolean)).size;
+            headerTotalRecords.innerHTML = `📄 Total: <span class="num">${total}</span> record${total !== 1 ? 's' : ''}`;
+            headerTotalYears.innerHTML = `📅 Years: <span class="num">${totalYears}</span>`;
         }
 
         // ---------- init ----------
@@ -827,19 +904,24 @@
 
                 if (allEssays.length === 0) throw new Error('No valid past paper entries');
 
+                // update header with total counts (unfiltered)
+                updateHeaderStats(allEssays);
+
                 populateFilters(allEssays);
                 filteredEssays = [...allEssays];
                 renderCards(filteredEssays);
 
                 searchInput.addEventListener('input', applyFilters);
                 yearFilter.addEventListener('change', applyFilters);
-                categoryFilter.addEventListener('change', applyFilters);
                 subjectFilter.addEventListener('change', applyFilters);
+                topicFilter.addEventListener('change', applyFilters);
 
             } catch (error) {
                 console.error('Initialization error:', error);
                 cardsContainer.innerHTML = `<div class="no-results">⚠️ Could not load past papers.<br><small>${escapeHtml(error.message)}</small></div>`;
                 statsCount.textContent = '0 records';
+                headerTotalRecords.innerHTML = `📄 Total: <span class="num">0</span> records`;
+                headerTotalYears.innerHTML = `📅 Years: <span class="num">0</span>`;
             }
         }
 
