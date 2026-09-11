@@ -48,17 +48,17 @@
             margin: 0 auto;
         }
 
-        /* ---------- search / filter bar ---------- */
+        /* ---------- search / filter bar (5% rounded corners) ---------- */
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             gap: 0.8rem;
             margin-bottom: 2rem;
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(8px);
             padding: 0.8rem 1.2rem;
-            border-radius: var(--radius-pill);
+            border-radius: 5%;            /* ← 5% rounded corners */
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-light);
         }
@@ -83,7 +83,7 @@
         .filter-bar select {
             border: 1px solid var(--border-light);
             background: #ffffff;
-            border-radius: 30px;
+            border-radius: 5%;            /* ← 5% rounded corners */
             padding: 0.45rem 1.8rem 0.45rem 1rem;
             font-size: 0.85rem;
             font-weight: 500;
@@ -108,7 +108,7 @@
             color: var(--primary-700);
             background: var(--accent-light);
             padding: 0.3rem 1.1rem;
-            border-radius: 40px;
+            border-radius: 5%;            /* ← 5% rounded corners */
             white-space: nowrap;
         }
 
@@ -439,7 +439,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- filter/search bar (moved to top since header removed) -->
+    <!-- filter/search bar (5% rounded corners) -->
     <div class="filter-bar">
         <input type="text" id="searchInput" placeholder="🔍 Search by topic, category, year, Urdu…" autocomplete="off">
         <select id="yearFilter">
@@ -484,11 +484,10 @@
         const categoryFilter = document.getElementById("categoryFilter");
         const statsCount = document.getElementById("statsCount");
 
-        // store all essay data for filtering
         let allEssays = [];
         let filteredEssays = [];
 
-        // ---------- CSV parser (robust) ----------
+        // ---------- CSV parser ----------
         function parseCSV(text) {
             const lines = [];
             let currentLine = [];
@@ -550,7 +549,6 @@
             const headers = rows[0].map(h => h.trim());
             const dataRows = rows.slice(1);
 
-            // find column indices
             const srnoIdx = headers.findIndex(h => /srno|sr no|sr\./i.test(h));
             const titleIdx = headers.findIndex(h => /title of exam/i.test(h));
             const instructionIdx = headers.findIndex(h => /instruction/i.test(h));
@@ -578,7 +576,6 @@
                     urduMeaning: getCol(row, urduIdx, ''),
                     answerLink: getCol(row, linkIdx, '#'),
                 };
-                // filter out completely empty
                 if (essay.topic && essay.topic !== 'Untitled essay') {
                     essays.push(essay);
                 }
@@ -586,7 +583,7 @@
             return essays;
         }
 
-        // ---------- render cards based on filteredEssays ----------
+        // ---------- render cards ----------
         function renderCards(essays) {
             if (!essays || essays.length === 0) {
                 cardsContainer.innerHTML = `<div class="no-results">🔎 No essays match your search. Try different keywords.</div>`;
@@ -629,7 +626,6 @@
                                     <span class="arrow">▼</span>
                                 </div>
                             </div>
-                            <!-- collapsible extra details -->
                             <div id="${expandId}" class="extra-details">
                                 <div class="detail-item">
                                     <span class="detail-label">Exam</span>
@@ -664,7 +660,6 @@
 
             cardsContainer.innerHTML = cardsHtml;
 
-            // attach expand listeners
             document.querySelectorAll('.expand-toggle').forEach(toggle => {
                 toggle.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -687,18 +682,15 @@
             statsCount.textContent = `${essays.length} essay${essays.length !== 1 ? 's' : ''}`;
         }
 
-        // ---------- apply filters (search, year, category) ----------
+        // ---------- filter logic ----------
         function applyFilters() {
             const searchTerm = searchInput.value.trim().toLowerCase();
             const selectedYear = yearFilter.value;
             const selectedCategory = categoryFilter.value;
 
             filteredEssays = allEssays.filter(essay => {
-                // year filter
                 if (selectedYear && essay.year !== selectedYear) return false;
-                // category filter
                 if (selectedCategory && essay.category !== selectedCategory) return false;
-                // search filter (topic, urdu, category, year, srno)
                 if (searchTerm) {
                     const haystack = [
                         essay.topic,
@@ -716,7 +708,7 @@
             renderCards(filteredEssays);
         }
 
-        // ---------- populate year & category dropdowns ----------
+        // ---------- populate dropdowns ----------
         function populateFilters(essays) {
             const years = [...new Set(essays.map(e => e.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
             const categories = [...new Set(essays.map(e => e.category).filter(Boolean))].sort();
