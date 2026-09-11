@@ -72,7 +72,7 @@
             word-break: break-word;
             width: 100%;
             pointer-events: none;
-            padding-right: 8px; /* keep text clear of tiny corner icon */
+            padding-right: 8px;
         }
         .fact-line .srno {
             font-weight: 500;
@@ -111,15 +111,16 @@
             white-space: nowrap;
             border: 1px solid #e5e7eb;
         }
+        /* ----- compact search (same height & feel as dropdown) ----- */
         .control-bar .search-wrap {
-            flex: 1 1 160px;
-            min-width: 100px;
+            flex: 0 1 130px;      /* narrower — matches dropdown width */
+            min-width: 90px;
             position: relative;
         }
         .control-bar .search-wrap input {
             width: 100%;
-            padding: 0.2rem 1.8rem 0.2rem 0.8rem;
-            font-size: 0.75rem;
+            padding: 0.15rem 1.4rem 0.15rem 0.7rem;
+            font-size: 0.7rem;
             border: 1px solid #e5e7eb;
             border-radius: 30px;
             background: #fafbfc;
@@ -134,10 +135,10 @@
         }
         .control-bar .search-wrap .clear-btn {
             position: absolute;
-            right: 8px;
+            right: 6px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: #9ca3af;
             cursor: pointer;
             line-height: 1;
@@ -176,11 +177,11 @@
             }
             .control-bar .category-dropdown {
                 min-width: 75px;
-                flex: 1 0 auto;
+                flex: 0 0 auto;
             }
             .control-bar .search-wrap {
-                flex: 2 1 120px;
-                min-width: 80px;
+                flex: 1 1 90px;
+                min-width: 70px;
             }
         }
 
@@ -254,7 +255,6 @@
         let allCards = [];
         let categorySet = new Set();
 
-        // ----- helper: get key from row with case-insensitive matching -----
         function getHeaderKey(row, ...candidates) {
             const keys = Object.keys(row);
             for (let cand of candidates) {
@@ -264,7 +264,6 @@
             return null;
         }
 
-        // ----- interpret ai_ans_true_false value -----
         function interpretVerification(raw) {
             if (raw === undefined || raw === null) return 'unknown';
             const v = String(raw).trim().toLowerCase();
@@ -274,14 +273,12 @@
             return 'unknown';
         }
 
-        // ----- Google search -----
         function searchGoogle(query) {
             if (!query || query.trim() === '') return;
             const encoded = encodeURIComponent(query.trim());
             window.open(`https://www.google.com/search?q=${encoded}`, '_blank');
         }
 
-        // ----- filter cards (search + category) -----
         function filterCards() {
             const searchQuery = searchInput.value.trim().toLowerCase();
             const selectedCategory = categorySelect.value;
@@ -328,7 +325,6 @@
             }
         }
 
-        // ----- rebuild category dropdown -----
         function rebuildCategoryDropdown(selectedValue) {
             const currentVal = selectedValue || categorySelect.value || 'all';
             const categories = Array.from(categorySet).sort();
@@ -349,7 +345,6 @@
             }
         }
 
-        // ----- extract numeric value from srno string (for sorting) -----
         function extractSrnoNumber(srnoStr) {
             if (!srnoStr || srnoStr === '—') return -Infinity;
             const num = parseFloat(srnoStr);
@@ -358,7 +353,6 @@
             return match ? parseFloat(match[0]) : -Infinity;
         }
 
-        // ----- render cards (with descending sort by srno + tiny corner verification icon) -----
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
@@ -376,12 +370,10 @@
             const catKey  = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
             const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
 
-            // dedicated key for ai_ans_true_false (column D)
             let verificationKey = getHeaderKey(sample,
                 'ai_ans_true_false', 'ai answ true false', 'ai_ans_true_false',
                 'aianstruefalse', 'ai answer true false'
             );
-            // fallback: 4th column (index 3) if not found
             if (!verificationKey) {
                 const keys = Object.keys(sample);
                 if (keys.length >= 4) verificationKey = keys[3];
@@ -427,7 +419,6 @@
                 });
             });
 
-            // descending by srno
             cardDataList.sort((a, b) => {
                 if (a.srnoNum === -Infinity && b.srnoNum === -Infinity) return 0;
                 if (a.srnoNum === -Infinity) return 1;
@@ -441,7 +432,6 @@
                 const displayFact = item.fact;
                 const verification = item.verification;
 
-                // ----- ultra tiny corner icon -----
                 let cornerHtml = '';
                 let iconTitle = '';
                 if (verification === 'true') {
@@ -504,7 +494,6 @@
             filterCards();
         }
 
-        // ----- fetch CSV and parse -----
         async function fetchFacts() {
             try {
                 const response = await fetch(CSV_URL);
@@ -533,7 +522,6 @@
             }
         }
 
-        // ----- event listeners -----
         searchInput.addEventListener('input', filterCards);
         categorySelect.addEventListener('change', filterCards);
         clearBtn.addEventListener('click', function() {
