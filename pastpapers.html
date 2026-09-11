@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Data Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h2 {
+            color: #2c3e50;
+        }
+        #status {
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .loading {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background: #fff;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Google Sheets CSV Data Viewer</h2>
+    <div id="status" class="loading">Status: Loading data from Google Sheets...</div>
+
+    <div class="table-container">
+        <table id="dataTable">
+            <thead>
+                <tr id="tableHeader"></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv";
+        const statusDiv = document.getElementById("status");
+        const tableHeader = document.getElementById("tableHeader");
+        const tableBody = document.getElementById("tableBody");
+
+        // Simple CSV parser that handles basic quotes
+        function parseCSV(text) {
+            let lines = text.split("\n");
+            let result = [];
+            for (let i = 0; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                let row = [];
+                let inQuotes = false;
+                let entry = "";
+                for (let j = 0; j < lines[i].length; j++) {
+                    let char = lines[i][j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        row.push(entry.trim());
+                        entry = "";
+                    } else {
+                        entry += char;
+                    }
+                }
+                row.push(entry.trim());
+                result.push(row);
+            }
+            return result;
+        }
+
+        async function loadSheetData() {
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                const parsedData = parseCSV(csvText);
+
+                if (parsedData.length === 0) {
+                    throw new Error("The CSV file is empty.");
+                }
+
+                // Extract Headers (First row)
+                const headers = parsedData[0];
+                headers.forEach(headerText => {
+                    let th = document.createElement("th");
+                    th.textContent = headerText;
+                    tableHeader.appendChild(th);
+                });
+
+                // Extract Rows (Remaining rows)
+                const rows = parsedData.slice(1);
+                rows.forEach(rowData => {
+                    let tr = document.createElement("tr");
+                    rowData.forEach(cellData => {
+                        let td = document.createElement("td");
+                        td.textContent = cellData;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                });
+
+                // Success Status Update
+                statusDiv.className = "success";
+                statusDiv.textContent = `Status: Success! Loaded ${rows.length} rows from the sheet.`;
+                console.log("Data check passed: Successfully rendered rows.");
+
+            } catch (error) {
+                statusDiv.className = "error";
+                statusDiv.textContent = `Status: Failed to load data. Error: ${error.message}`;
+                console.error("Error fetching or parsing CSV:", error);
+            }
+        }
+
+        // Run the function on page load
+        loadSheetData();
+    </script>
+
+</body>
+</html>
