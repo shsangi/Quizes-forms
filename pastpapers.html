@@ -671,20 +671,11 @@
             return /^https?:\/\//i.test(trimmed);
         }
 
-        // Build essays – updated to use paper_subject header
+        // Build essays – solution/ref/link column added
         function buildEssaysFromRows(rows) {
             if (rows.length < 2) return [];
             const headers = rows[0].map(h => h.trim().toLowerCase());
             const dataRows = rows.slice(1);
-
-            // Find column indices by header name (case-insensitive, flexible matching)
-            const findIdx = (patterns) => {
-                for (let p of patterns) {
-                    const idx = headers.findIndex(h => h.includes(p) || p.includes(h));
-                    if (idx !== -1) return idx;
-                }
-                return -1;
-            };
 
             const srnoIdx = headers.findIndex(h => /srno|sr no/i.test(h));
             const titleIdx = headers.findIndex(h => /title of exam/i.test(h));
@@ -695,7 +686,11 @@
             const urduIdx = headers.findIndex(h => /urdu_meaning|urdu meaning/i.test(h));
             const subjectIdx = headers.findIndex(h => /paper_subject|paper subject/i.test(h));
             const requirementIdx = headers.findIndex(h => /requirement/i.test(h));
-            const linkIdx = headers.findIndex(h => /ans_link|ans link|answer link/i.test(h));
+
+            // NEW: solution / ref / link column
+            const solutionIdx = headers.findIndex(h =>
+                /solution/i.test(h) || /ref/i.test(h) || /link/i.test(h)
+            );
 
             const getCol = (row, idx, fallback = '') => {
                 if (idx === -1 || idx >= row.length || row[idx] === undefined) return fallback;
@@ -706,7 +701,7 @@
             dataRows.forEach((row, i) => {
                 if (!row.some(cell => cell.trim() !== '')) return;
 
-                const rawLink = getCol(row, linkIdx, '');
+                const rawSolution = getCol(row, solutionIdx, '');
 
                 const essay = {
                     srno: getCol(row, srnoIdx, String(i + 1)),
@@ -718,8 +713,9 @@
                     urduMeaning: getCol(row, urduIdx, ''),
                     subject: getCol(row, subjectIdx, 'General'),
                     requirement: getCol(row, requirementIdx, ''),
-                    answerLink: rawLink,
-                    hasValidLink: isValidLink(rawLink),
+                    solutionRaw: rawSolution,
+                    answerLink: rawSolution,
+                    hasValidLink: isValidLink(rawSolution),
                 };
                 if (essay.topic && essay.topic !== 'Untitled essay') {
                     essays.push(essay);
@@ -747,7 +743,7 @@
                 const safeInstruction = escapeHtml(essay.instruction);
                 const safeSubject = escapeHtml(essay.subject);
                 const safeRequirement = escapeHtml(essay.requirement);
-                const safeLink = escapeHtml(essay.answerLink);
+                const safeSolution = escapeHtml(essay.solutionRaw);
 
                 const expandId = `extra-${idx}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
@@ -763,10 +759,11 @@
                     subjectReqHtml += `</div>`;
                 }
 
+                // Answer button: only active if a valid http(s) link exists
                 let answerButtonHtml;
                 if (essay.hasValidLink) {
                     answerButtonHtml = `
-                        <a class="answer-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">
+                        <a class="answer-link" href="${safeSolution}" target="_blank" rel="noopener noreferrer">
                             <span>📄</span> Solved
                         </a>
                     `;
@@ -778,11 +775,15 @@
                     `;
                 }
 
-                let answerUrlHtml;
+                // Answer URL in details panel
+                let solutionDetailHtml;
                 if (essay.hasValidLink) {
-                    answerUrlHtml = `<a href="${safeLink}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-600); text-decoration: underline; word-break: break-all;">${safeLink}</a>`;
+                    solutionDetailHtml = `<a href="${safeSolution}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-600); text-decoration: underline; word-break: break-all;">${safeSolution}</a>`;
+                } else if (safeSolution) {
+                    // Non-URL reference text (e.g. "AI generated", "see notes")
+                    solutionDetailHtml = `<span style="color: #1f344b;">${safeSolution}</span>`;
                 } else {
-                    answerUrlHtml = `<span style="color: #94a3b8; font-style: italic;">Not available</span>`;
+                    solutionDetailHtml = `<span style="color: #94a3b8; font-style: italic;">Not available</span>`;
                 }
 
                 cardsHtml += `
@@ -831,9 +832,9 @@
                                     <div class="instruction-preview">${safeInstruction}</div>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="detail-label">Answer URL</span>
+                                    <span class="detail-label">Solution / Ref / Link</span>
                                     <span class="detail-value" style="font-size: 0.72rem;">
-                                        ${answerUrlHtml}
+                                        ${solutionDetailHtml}
                                     </span>
                                 </div>
                             </div>
@@ -895,7 +896,8 @@
                         essay.requirement,
                         essay.year,
                         essay.srno,
-                        essay.examTitle || ''
+                        essay.examTitle || '',
+                        essay.solutionRaw || ''
                     ].join(' ').toLowerCase();
                     if (!haystack.includes(searchTerm)) return false;
                 }
