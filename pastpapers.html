@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPSC Past Papers Solved</title>
+    <title>FPSC AI Solved Papers</title>
     <style>
         /* ---------- modern reset & design tokens ---------- */
         * {
@@ -253,11 +253,22 @@
             letter-spacing: 0.01em;
         }
 
-        .answer-link:hover {
+        .answer-link:hover:not(.disabled) {
             background: var(--primary-900);
             border-color: var(--primary-900);
             box-shadow: 0 10px 18px -6px rgba(11, 27, 51, 0.35);
             transform: scale(1.01);
+        }
+
+        /* disabled state for no link */
+        .answer-link.disabled {
+            background: #cbd5e1;
+            color: #64748b;
+            border-color: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.7;
         }
 
         .expand-toggle {
@@ -444,7 +455,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- filter bar: updated placeholder for past papers, subject filter, records count -->
+    <!-- filter bar -->
     <div class="filter-bar">
         <input type="text" id="searchInput" placeholder="🔍 Search in past papers…" autocomplete="off">
         <select id="yearFilter">
@@ -544,7 +555,16 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // ---------- build essays, subject from last column (J) ----------
+        // ---------- check if link is valid ----------
+        function isValidLink(link) {
+            if (!link) return false;
+            const trimmed = link.trim();
+            if (trimmed === '' || trimmed === '#') return false;
+            // must start with http/https
+            return /^https?:\/\//i.test(trimmed);
+        }
+
+        // ---------- build essays ----------
         function buildEssaysFromRows(rows) {
             if (rows.length < 2) return [];
             const headers = rows[0].map(h => h.trim());
@@ -579,6 +599,8 @@
                 }
                 if (!subject) subject = 'General';
 
+                const rawLink = getCol(row, linkIdx, '');
+
                 const essay = {
                     srno: getCol(row, srnoIdx, String(i + 1)),
                     examTitle: getCol(row, titleIdx, 'FPSC Competitive Examination'),
@@ -587,7 +609,8 @@
                     category: getCol(row, categoryIdx, 'General'),
                     topic: getCol(row, topicIdx, 'Untitled essay'),
                     urduMeaning: getCol(row, urduIdx, ''),
-                    answerLink: getCol(row, linkIdx, '#'),
+                    answerLink: rawLink,
+                    hasValidLink: isValidLink(rawLink),
                     subject: subject,
                 };
                 if (essay.topic && essay.topic !== 'Untitled essay') {
@@ -620,6 +643,30 @@
 
                 const expandId = `extra-${idx}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
+                // Build the answer button based on link validity
+                let answerButtonHtml;
+                if (essay.hasValidLink) {
+                    answerButtonHtml = `
+                        <a class="answer-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">
+                            <span>📄</span> Open solved paper
+                        </a>
+                    `;
+                } else {
+                    answerButtonHtml = `
+                        <span class="answer-link disabled" title="No solved paper link available">
+                            <span>🔒</span> No solved paper
+                        </span>
+                    `;
+                }
+
+                // Answer URL row in details
+                let answerUrlHtml;
+                if (essay.hasValidLink) {
+                    answerUrlHtml = `<a href="${safeLink}" target="_blank" style="color: var(--primary-600); text-decoration: underline;">${safeLink}</a>`;
+                } else {
+                    answerUrlHtml = `<span style="color: #94a3b8; font-style: italic;">Not available</span>`;
+                }
+
                 cardsHtml += `
                     <div class="essay-card" data-essay-idx="${idx}">
                         <div class="card-head">
@@ -633,9 +680,7 @@
                         </div>
                         <div class="card-body">
                             <div class="action-row">
-                                <a class="answer-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">
-                                    <span>📄</span> Open solved paper
-                                </a>
+                                ${answerButtonHtml}
                                 <div class="expand-toggle" data-target="${expandId}">
                                     <span>Details</span>
                                     <span class="arrow">▼</span>
@@ -665,7 +710,7 @@
                                 <div class="detail-item">
                                     <span class="detail-label">Answer URL</span>
                                     <span class="detail-value" style="word-break: break-all; font-size: 0.78rem;">
-                                        <a href="${safeLink}" target="_blank" style="color: var(--primary-600); text-decoration: underline;">${safeLink}</a>
+                                        ${answerUrlHtml}
                                     </span>
                                 </div>
                             </div>
@@ -698,7 +743,6 @@
                 });
             });
 
-            // Show "records" count
             statsCount.textContent = `${essays.length} record${essays.length !== 1 ? 's' : ''}`;
         }
 
