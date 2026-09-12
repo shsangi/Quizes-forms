@@ -1,1 +1,639 @@
-h
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>FIA Superintendent · Syllabus Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #eef2f7;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 14px 12px 32px;
+            color: #0b1e32;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+        .app {
+            max-width: 680px;
+            width: 100%;
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            gap: 6px 4px;
+        }
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #0a2a4a;
+        }
+        .header h1 span {
+            background: #d4e2f5;
+            padding: 0 10px;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #1b3f69;
+            line-height: 1.8;
+        }
+        .count-badge {
+            background: #dce6f0;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #1a3857;
+            white-space: nowrap;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .search-box {
+            flex: 1;
+            position: relative;
+            min-width: 140px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 1px solid #c5d2e0;
+            border-radius: 60px;
+            background: white;
+            font-size: 0.9rem;
+            font-family: inherit;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: 0.15s;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #2a6df4;
+            box-shadow: 0 0 0 3px rgba(42,109,244,0.12);
+        }
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            font-size: 0.95rem;
+        }
+        .subject-select {
+            padding: 10px 36px 10px 16px;
+            border: 1px solid #c5d2e0;
+            border-radius: 60px;
+            background: white;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: #1a2e4a;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233b5a7a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 14px;
+            min-width: 130px;
+            flex: 0 1 auto;
+        }
+        .subject-select:focus {
+            outline: none;
+            border-color: #2a6df4;
+        }
+
+        /* ----- syllabus style ----- */
+        .syllabus {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .paper-block {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 14px 14px;
+            margin-bottom: 14px;
+            border: 1px solid #dce5ef;
+            box-shadow: 0 2px 12px rgba(0,20,40,0.05);
+            transition: 0.15s;
+        }
+        .paper-block:last-child {
+            margin-bottom: 0;
+        }
+        .paper-block:nth-child(odd) {
+            background: #ffffff;
+        }
+        .paper-block:nth-child(even) {
+            background: #f8faff;
+        }
+        .paper-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0b2b4a;
+            letter-spacing: -0.2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px 8px;
+            padding-bottom: 4px;
+        }
+        .paper-title .marks {
+            font-weight: 500;
+            font-size: 0.7rem;
+            color: #3d6185;
+            background: #eef3fa;
+            padding: 0 12px;
+            border-radius: 40px;
+            line-height: 2;
+        }
+        .paper-title .subject-link {
+            color: #0b2b4a;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .paper-title .subject-link:hover {
+            color: #2a6df4;
+        }
+        .paper-title .subject-link::after {
+            content: "🔗";
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+
+        /* Last studied / Created date */
+        .last-studied {
+            font-size: 0.6rem;
+            color: #2a4a6a;
+            background: #e8eff8;
+            padding: 3px 12px;
+            border-radius: 40px;
+            display: inline-block;
+            margin: 4px 0 8px 0;
+            font-weight: 450;
+            border: 1px solid #d5e0ec;
+        }
+        .last-studied span {
+            font-weight: 500;
+            color: #1a4a7a;
+        }
+        .last-studied .pkt-badge {
+            font-weight: 400;
+            color: #5a7a9a;
+            font-size: 0.55rem;
+            margin-left: 4px;
+        }
+
+        .subject-divider {
+            border: none;
+            border-top: 2px solid #dce5f0;
+            margin: 6px 0 10px 0;
+        }
+
+        .module-group {
+            margin-bottom: 10px;
+        }
+        .module-group:last-child {
+            margin-bottom: 0;
+        }
+        .module-head {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1f406a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .module-head .module-marks {
+            font-weight: 400;
+            font-size: 0.65rem;
+            color: #3f6187;
+            background: #f0f5fc;
+            padding: 0 10px;
+            border-radius: 40px;
+            line-height: 1.9;
+        }
+        .topic-item {
+            padding: 6px 0 6px 14px;
+            border-left: 3px solid #b8cce0;
+            margin-left: 4px;
+            margin-bottom: 8px;
+        }
+        .topic-item:last-child {
+            margin-bottom: 0;
+        }
+        .topic-item .topic-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #0b2b4a;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 4px 8px;
+        }
+        .topic-item .topic-label .topic-link {
+            color: #0b2b4a;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .topic-item .topic-label .topic-link:hover {
+            color: #2a6df4;
+        }
+        .topic-item .topic-label .topic-link::after {
+            content: "🔗";
+            font-size: 0.6rem;
+            opacity: 0.4;
+        }
+        .subtopic-list {
+            margin: 4px 0 2px 6px;
+            padding-left: 4px;
+            list-style: none;
+            counter-reset: sub-counter;
+        }
+        .subtopic-list li {
+            counter-increment: sub-counter;
+            font-size: 0.8rem;
+            color: #1f3d60;
+            line-height: 1.5;
+            padding: 1px 0 1px 24px;
+            position: relative;
+            margin-bottom: 1px;
+        }
+        .subtopic-list li::before {
+            content: counter(sub-counter) ".";
+            position: absolute;
+            left: 2px;
+            font-weight: 500;
+            color: #2a6df4;
+            font-size: 0.75rem;
+        }
+        .subtopic-list li .sub-link {
+            color: #1f3d60;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .subtopic-list li .sub-link:hover {
+            color: #2a6df4;
+        }
+        .subtopic-list li .sub-link::after {
+            content: "🔗";
+            font-size: 0.5rem;
+            opacity: 0.35;
+        }
+        .topic-item .book-ref {
+            font-size: 0.75rem;
+            color: #3d6185;
+            margin-top: 3px;
+        }
+        .topic-item .book-ref .book-link {
+            color: #3d6185;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .topic-item .book-ref .book-link:hover {
+            color: #2a6df4;
+        }
+        .topic-item .book-ref .book-link::after {
+            content: "🔗";
+            font-size: 0.5rem;
+            opacity: 0.35;
+        }
+        .empty-state {
+            padding: 40px 16px;
+            text-align: center;
+            background: white;
+            border-radius: 40px;
+            color: #3b5f82;
+            border: 1px solid #e3eaf3;
+            font-size: 0.9rem;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 40px 0;
+            color: #2f557a;
+            font-size: 0.9rem;
+        }
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #d5dfea;
+            border-top: 3px solid #2a6df4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .footer {
+            margin-top: 16px;
+            font-size: 0.7rem;
+            color: #5f7c99;
+            text-align: right;
+            border-top: 1px solid #dce5ef;
+            padding-top: 12px;
+        }
+
+        @media print {
+            body { background: white !important; padding: 10px !important; font-size: 10px !important; }
+            .app { max-width: 100% !important; }
+            .controls { display: none !important; }
+            .paper-block { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; padding: 12px !important; margin-bottom: 10px !important; }
+            .paper-block:nth-child(odd), .paper-block:nth-child(even) { background: white !important; }
+            .subject-link::after, .topic-link::after, .sub-link::after, .book-link::after { content: "" !important; display: none !important; }
+            .last-studied { background: #f0f4f8 !important; border: 1px solid #d0d8e0 !important; }
+            .module-head { font-size: 0.8rem !important; }
+            .topic-item .topic-label { font-size: 0.8rem !important; }
+            .subtopic-list li { font-size: 0.75rem !important; }
+            .topic-item .book-ref { font-size: 0.7rem !important; }
+            .footer { font-size: 0.6rem !important; border-top: 1px solid #ccc !important; }
+            .header h1 { font-size: 1.1rem !important; }
+            .count-badge { display: none !important; }
+            .subject-divider { border-top: 1px solid #ccc !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <h1>🛡️ FIA Superintendent <span>syllabus</span></h1>
+        <span class="count-badge" id="countDisplay">0</span>
+    </div>
+
+    <div class="controls">
+        <div class="controls-row">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search topic, book, module…" />
+            </div>
+            <select id="subjectSelect" class="subject-select">
+                <option value="">All subjects</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="syllabus" id="syllabusContainer">
+        <div class="loading"><span class="spinner"></span> loading…</div>
+    </div>
+    <div class="footer">FIA Superintendent syllabus · live from Google Sheets</div>
+</div>
+
+<script>
+    (function() {
+        // REPLACE WITH YOUR PUBLISHED GOOGLE SHEETS CSV URL
+        const CSV_URL = 'YOUR_GOOGLE_SHEETS_CSV_URL_HERE';
+
+        const container = document.getElementById('syllabusContainer');
+        const searchInput = document.getElementById('searchInput');
+        const subjectSelect = document.getElementById('subjectSelect');
+        const countDisplay = document.getElementById('countDisplay');
+
+        let allRecords = [];
+        let filtered = [];
+
+        function parseLine(line) {
+            const res = [];
+            let cur = '', inside = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (inside) {
+                    if (ch === '"' && line[i+1] === '"') { cur += '"'; i++; }
+                    else if (ch === '"') inside = false;
+                    else cur += ch;
+                } else {
+                    if (ch === ',') { res.push(cur.trim()); cur = ''; }
+                    else if (ch === '"') inside = true;
+                    else cur += ch;
+                }
+            }
+            res.push(cur.trim());
+            return res;
+        }
+
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+            if (lines.length < 2) return [];
+            const h = parseLine(lines[0]);
+            
+            const idx = {
+                srno: h.indexOf('srno'),
+                job_title: h.indexOf('job_title'),
+                department: h.indexOf('department'),
+                subject_group: h.indexOf('subject_group'),
+                paper_module: h.indexOf('paper_module'),
+                topic_number: h.indexOf('topic_number'),
+                topic_name: h.indexOf('topic_name'),
+                subtopics: h.indexOf('subtopics'),
+                marks_weightage: h.indexOf('marks_weightage'),
+                recommended_books: h.indexOf('recommended_books'),
+                official_link: h.indexOf('official_link'),
+                created: h.indexOf('created')
+            };
+
+            const rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                const c = parseLine(lines[i]);
+                if (c.length < 5) continue;
+                const r = {
+                    srno: idx.srno !== -1 ? c[idx.srno] : '',
+                    subject: idx.subject_group !== -1 ? c[idx.subject_group] : '',
+                    Module: idx.paper_module !== -1 ? c[idx.paper_module] : '',
+                    topicNumber: idx.topic_number !== -1 ? c[idx.topic_number] : '',
+                    topicName: idx.topic_name !== -1 ? c[idx.topic_name] : '',
+                    subtopics: idx.subtopics !== -1 ? c[idx.subtopics] : '',
+                    marks: idx.marks_weightage !== -1 ? c[idx.marks_weightage] : '',
+                    book: idx.recommended_books !== -1 ? c[idx.recommended_books] : '',
+                    officialLink: idx.official_link !== -1 ? c[idx.official_link] : '',
+                    created: idx.created !== -1 ? c[idx.created] : ''
+                };
+                if (r.srno.trim() !== '') rows.push(r);
+            }
+            return rows;
+        }
+
+        function googleSearch(query) {
+            const clean = query.trim();
+            if (!clean) return;
+            const url = `https://www.google.com/search?q=FIA+superintendent+${encodeURIComponent(clean)}`;
+            window.open(url, '_blank');
+        }
+
+        function smartSplit(text) {
+            if (!text || text.trim() === '') return [];
+            if (text.includes(';')) {
+                return text.split(';').map(s => s.trim()).filter(s => s.length > 0);
+            }
+            if (text.includes(',')) {
+                return text.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            }
+            return [text.trim()];
+        }
+
+        function render(records) {
+            if (!records || records.length === 0) {
+                container.innerHTML = `<div class="empty-state">✨ No topics match your search</div>`;
+                countDisplay.textContent = '0';
+                return;
+            }
+
+            const groups = {};
+            for (const r of records) {
+                const key = r.subject || 'General';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(r);
+            }
+
+            let html = '';
+            for (const [subject, items] of Object.entries(groups)) {
+                items.sort((a,b) => parseFloat(a.srno) - parseFloat(b.srno));
+
+                let createdDate = items[0].created || '';
+
+                html += `<div class="paper-block">`;
+                html += `<div class="paper-title">
+                            <span class="subject-link" onclick="googleSearch('${subject.replace(/'/g, "\\'")}')">📚 ${subject}</span>
+                            <span class="marks">${items.length} topics</span>
+                        </div>`;
+
+                if (createdDate) {
+                    html += `<div class="last-studied">📅 Created: <span>${createdDate}</span></div>`;
+                }
+
+                html += `<hr class="subject-divider" />`;
+
+                const moduleMap = {};
+                for (const item of items) {
+                    const mod = item.Module || 'General';
+                    if (!moduleMap[mod]) moduleMap[mod] = [];
+                    moduleMap[mod].push(item);
+                }
+
+                for (const [mod, topics] of Object.entries(moduleMap)) {
+                    html += `<div class="module-group">`;
+                    html += `<div class="module-head">${mod}</div>`;
+                    for (const t of topics) {
+                        const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
+                        const topicSearch = t.topicName || '';
+
+                        html += `<div class="topic-item">`;
+                        html += `<div class="topic-label">
+                                    <span class="topic-link" onclick="googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>
+                                </div>`;
+
+                        const subItems = smartSplit(t.subtopics);
+                        if (subItems.length > 0) {
+                            html += `<ul class="subtopic-list">`;
+                            for (const sub of subItems) {
+                                html += `<li><span class="sub-link" onclick="googleSearch('${sub.replace(/'/g, "\\'")}')">${sub}</span></li>`;
+                            }
+                            html += `</ul>`;
+                        }
+
+                        if (t.book && t.book !== '—') {
+                            html += `<div class="book-ref">📖 <span class="book-link" onclick="googleSearch('${t.book.replace(/'/g, "\\'")}')">${t.book}</span></div>`;
+                        }
+
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
+            countDisplay.textContent = records.length;
+        }
+
+        function applyFilters() {
+            const search = searchInput.value.trim().toLowerCase();
+            const subject = subjectSelect.value;
+            filtered = allRecords.filter(r => {
+                if (search) {
+                    const all = `${r.srno} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.subtopics}`.toLowerCase();
+                    if (!all.includes(search)) return false;
+                }
+                if (subject && r.subject !== subject) return false;
+                return true;
+            });
+            render(filtered);
+        }
+
+        function updateSubjects(records) {
+            const subs = new Set();
+            records.forEach(r => { if (r.subject) subs.add(r.subject); });
+            const current = subjectSelect.value;
+            subjectSelect.innerHTML = `<option value="">All subjects</option>`;
+            [...subs].sort().forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                subjectSelect.appendChild(opt);
+            });
+            if ([...subs].includes(current)) subjectSelect.value = current;
+            else subjectSelect.value = '';
+        }
+
+        async function load() {
+            try {
+                container.innerHTML = `<div class="loading"><span class="spinner"></span> loading…</div>`;
+                const resp = await fetch(CSV_URL);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const text = await resp.text();
+                const parsed = parseCSV(text);
+                if (parsed.length === 0) {
+                    container.innerHTML = `<div class="empty-state">⚠️ No data found</div>`;
+                    countDisplay.textContent = '0';
+                    return;
+                }
+                allRecords = parsed;
+                updateSubjects(allRecords);
+                applyFilters();
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load syllabus. Check CSV URL.</div>`;
+                countDisplay.textContent = 'err';
+            }
+        }
+
+        window.googleSearch = googleSearch;
+
+        searchInput.addEventListener('input', applyFilters);
+        subjectSelect.addEventListener('change', applyFilters);
+
+        load();
+    })();
+</script>
+</body>
+</html>
