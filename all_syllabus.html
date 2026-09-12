@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>FIA Superintendent · Syllabus Tracker</title>
+    <title>FIA Syllabus Tracker</title>
     <style>
         * {
             margin: 0;
@@ -39,6 +39,7 @@
             align-items: center;
             gap: 6px;
             color: #0a2a4a;
+            flex-wrap: wrap;
         }
         .header h1 span {
             background: #d4e2f5;
@@ -275,7 +276,7 @@
 <body>
 <div class="app">
     <div class="header">
-        <h1>🛡️ FIA Superintendent <span>syllabus</span></h1>
+        <h1 id="pageTitle">🛡️ FIA <span id="titleJobSpan" style="display:none;"></span><span>syllabus</span></h1>
         <span class="count-badge" id="countDisplay">0</span>
     </div>
 
@@ -298,12 +299,12 @@
     <div class="syllabus" id="syllabusContainer">
         <div class="loading"><span class="spinner"></span> loading…</div>
     </div>
-    <div class="footer">FIA Superintendent syllabus · live from Google Sheets</div>
+    <div class="footer">FIA syllabus · live from Google Sheets</div>
 </div>
 
 <script>
     (function() {
-        // ✅ Using your PUBLISHED CSV URL
+        // ✅ Published CSV URL
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxkraEEj7tSPNpzCzmZDDlzVYThGTX-8UEjNNN6UUH7Wnh0dVDgHlWLvRKgEFA0FdF3JLUq2haFxsS/pub?output=csv';
 
         const container = document.getElementById('syllabusContainer');
@@ -311,6 +312,7 @@
         const subjectSelect = document.getElementById('subjectSelect');
         const jobTitleSelect = document.getElementById('jobTitleSelect');
         const countDisplay = document.getElementById('countDisplay');
+        const titleJobSpan = document.getElementById('titleJobSpan');
 
         let allRecords = [];
         let filtered = [];
@@ -383,7 +385,7 @@
         function googleSearch(query) {
             const clean = query.trim();
             if (!clean) return;
-            window.open(`https://www.google.com/search?q=FIA+superintendent+${encodeURIComponent(clean)}`, '_blank');
+            window.open(`https://www.google.com/search?q=FIA+${encodeURIComponent(clean)}`, '_blank');
         }
 
         function smartSplit(text) {
@@ -395,6 +397,20 @@
                 return text.split(',').map(s => s.trim()).filter(s => s.length > 0);
             }
             return [text.trim()];
+        }
+
+        // 🆕 Updates the header title based on selected job title
+        function updatePageTitle() {
+            const selectedJob = jobTitleSelect.value;
+            if (selectedJob) {
+                titleJobSpan.textContent = selectedJob;
+                titleJobSpan.style.display = 'inline-block';
+                document.title = `FIA ${selectedJob} · Syllabus Tracker`;
+            } else {
+                titleJobSpan.textContent = '';
+                titleJobSpan.style.display = 'none';
+                document.title = 'FIA Syllabus Tracker';
+            }
         }
 
         function render(records) {
@@ -480,6 +496,7 @@
                 return true;
             });
             render(filtered);
+            updatePageTitle(); // 🆕 keep header in sync
         }
 
         function updateSubjects(records) {
