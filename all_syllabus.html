@@ -284,7 +284,12 @@
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search topic, book, module…" />
             </div>
-            <select id="subjectSelect" class="subject-select">
+        </div>
+        <div class="controls-row">
+            <select id="jobTitleSelect" class="subject-select" style="flex:1;">
+                <option value="">All job titles</option>
+            </select>
+            <select id="subjectSelect" class="subject-select" style="flex:1;">
                 <option value="">All subjects</option>
             </select>
         </div>
@@ -298,12 +303,13 @@
 
 <script>
     (function() {
-        // ✅ FIXED: Using your PUBLISHED CSV URL (not the private export URL)
+        // ✅ Using your PUBLISHED CSV URL
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxkraEEj7tSPNpzCzmZDDlzVYThGTX-8UEjNNN6UUH7Wnh0dVDgHlWLvRKgEFA0FdF3JLUq2haFxsS/pub?output=csv';
 
         const container = document.getElementById('syllabusContainer');
         const searchInput = document.getElementById('searchInput');
         const subjectSelect = document.getElementById('subjectSelect');
+        const jobTitleSelect = document.getElementById('jobTitleSelect');
         const countDisplay = document.getElementById('countDisplay');
 
         let allRecords = [];
@@ -343,6 +349,7 @@
 
             const idx = {
                 srno: findCol(['srno', 'sr', 'no']),
+                jobTitle: findCol(['job_title', 'job title', 'jobtitle', 'post', 'position']),
                 subject: findCol(['subject', 'group']),
                 module: findCol(['module', 'paper']),
                 topicNum: findCol(['topic_number', 'number', 'num']),
@@ -359,6 +366,7 @@
 
                 const r = {
                     srno: idx.srno !== -1 ? c[idx.srno] : i,
+                    jobTitle: idx.jobTitle !== -1 ? c[idx.jobTitle] : '',
                     subject: idx.subject !== -1 ? c[idx.subject] : (c[3] || 'General'),
                     Module: idx.module !== -1 ? c[idx.module] : (c[4] || 'General'),
                     topicNumber: idx.topicNum !== -1 ? c[idx.topicNum] : '',
@@ -460,12 +468,15 @@
         function applyFilters() {
             const search = searchInput.value.trim().toLowerCase();
             const subject = subjectSelect.value;
+            const jobTitle = jobTitleSelect.value;
+
             filtered = allRecords.filter(r => {
                 if (search) {
-                    const all = `${r.srno} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.subtopics}`.toLowerCase();
+                    const all = `${r.srno} ${r.jobTitle} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.subtopics}`.toLowerCase();
                     if (!all.includes(search)) return false;
                 }
                 if (subject && r.subject !== subject) return false;
+                if (jobTitle && r.jobTitle !== jobTitle) return false;
                 return true;
             });
             render(filtered);
@@ -486,6 +497,21 @@
             else subjectSelect.value = '';
         }
 
+        function updateJobTitles(records) {
+            const jobs = new Set();
+            records.forEach(r => { if (r.jobTitle) jobs.add(r.jobTitle); });
+            const current = jobTitleSelect.value;
+            jobTitleSelect.innerHTML = `<option value="">All job titles</option>`;
+            [...jobs].sort().forEach(j => {
+                const opt = document.createElement('option');
+                opt.value = j;
+                opt.textContent = j;
+                jobTitleSelect.appendChild(opt);
+            });
+            if ([...jobs].includes(current)) jobTitleSelect.value = current;
+            else jobTitleSelect.value = '';
+        }
+
         async function load() {
             try {
                 container.innerHTML = `<div class="loading"><span class="spinner"></span> loading…</div>`;
@@ -495,6 +521,7 @@
                 const parsed = parseCSV(text);
                 allRecords = parsed;
                 updateSubjects(allRecords);
+                updateJobTitles(allRecords);
                 applyFilters();
             } catch (e) {
                 console.error(e);
@@ -506,6 +533,7 @@
         window.googleSearch = googleSearch;
         searchInput.addEventListener('input', applyFilters);
         subjectSelect.addEventListener('change', applyFilters);
+        jobTitleSelect.addEventListener('change', applyFilters);
 
         load();
     })();
