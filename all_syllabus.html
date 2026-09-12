@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>FIA Syllabus Tracker</title>
+    <title>Pak Jobs Syllabus Tracker</title>
     <style>
         * {
             margin: 0;
@@ -276,7 +276,7 @@
 <body>
 <div class="app">
     <div class="header">
-        <h1 id="pageTitle">🛡️ FIA <span id="titleJobSpan" style="display:none;"></span><span>syllabus</span></h1>
+        <h1 id="pageTitle">📋 Pak Jobs <span id="titleJobSpan" style="display:none;"></span><span>syllabus</span></h1>
         <span class="count-badge" id="countDisplay">0</span>
     </div>
 
@@ -299,7 +299,7 @@
     <div class="syllabus" id="syllabusContainer">
         <div class="loading"><span class="spinner"></span> loading…</div>
     </div>
-    <div class="footer">FIA syllabus · live from Google Sheets</div>
+    <div class="footer">Pak Jobs syllabus · live from Google Sheets</div>
 </div>
 
 <script>
@@ -385,7 +385,7 @@
         function googleSearch(query) {
             const clean = query.trim();
             if (!clean) return;
-            window.open(`https://www.google.com/search?q=FIA+${encodeURIComponent(clean)}`, '_blank');
+            window.open(`https://www.google.com/search?q=Pak+Jobs+${encodeURIComponent(clean)}`, '_blank');
         }
 
         function smartSplit(text) {
@@ -405,11 +405,11 @@
             if (selectedJob) {
                 titleJobSpan.textContent = selectedJob;
                 titleJobSpan.style.display = 'inline-block';
-                document.title = `FIA ${selectedJob} · Syllabus Tracker`;
+                document.title = `Pak Jobs ${selectedJob} · Syllabus Tracker`;
             } else {
                 titleJobSpan.textContent = '';
                 titleJobSpan.style.display = 'none';
-                document.title = 'FIA Syllabus Tracker';
+                document.title = 'Pak Jobs Syllabus Tracker';
             }
         }
 
