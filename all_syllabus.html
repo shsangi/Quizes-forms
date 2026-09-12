@@ -276,7 +276,7 @@
 <body>
 <div class="app">
     <div class="header">
-        <h1>🛡️ <span id="titleJobSpan">All PK Jobs</span><span>syllabus</span></h1>
+        <h1 id="pageTitle">🛡️ <span id="titleJobSpan">All PK Jobs</span> <span>syllabus</span></h1>
         <span class="count-badge" id="countDisplay">0</span>
     </div>
 
@@ -288,7 +288,7 @@
         </div>
         <div class="controls-row">
             <select id="jobTitleSelect" class="subject-select" style="flex:1;">
-                <option value="">All PK Jobs</option>
+                <option value="">All job titles</option>
             </select>
             <select id="subjectSelect" class="subject-select" style="flex:1;">
                 <option value="">All subjects</option>
@@ -299,7 +299,7 @@
     <div class="syllabus" id="syllabusContainer">
         <div class="loading"><span class="spinner"></span> loading…</div>
     </div>
-    <div class="footer">PK Jobs syllabus · live from Google Sheets</div>
+    <div class="footer">All PK Jobs syllabus · live from Google Sheets</div>
 </div>
 
 <script>
@@ -399,7 +399,7 @@
             return [text.trim()];
         }
 
-        // 🆕 Header title: "All PK Jobs" by default, job name when selected
+        // 🆕 Updates the header title based on selected job title
         function updatePageTitle() {
             const selectedJob = jobTitleSelect.value;
             if (selectedJob) {
@@ -494,7 +494,7 @@
                 return true;
             });
             render(filtered);
-            updatePageTitle();
+            updatePageTitle(); // 🆕 keep header in sync
         }
 
         function updateSubjects(records) {
@@ -516,7 +516,7 @@
             const jobs = new Set();
             records.forEach(r => { if (r.jobTitle) jobs.add(r.jobTitle); });
             const current = jobTitleSelect.value;
-            jobTitleSelect.innerHTML = `<option value="">All PK Jobs</option>`;
+            jobTitleSelect.innerHTML = `<option value="">All job titles</option>`;
             [...jobs].sort().forEach(j => {
                 const opt = document.createElement('option');
                 opt.value = j;
