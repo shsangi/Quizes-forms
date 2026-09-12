@@ -288,7 +288,7 @@
         </div>
         <div class="controls-row">
             <select id="jobTitleSelect" class="subject-select" style="flex:1;">
-                <option value="">All job titles</option>
+                <option value="">All PK Jobs</option>
             </select>
             <select id="subjectSelect" class="subject-select" style="flex:1;">
                 <option value="">All subjects</option>
@@ -399,7 +399,7 @@
             return [text.trim()];
         }
 
-        // 🆕 Updates the header title based on selected job title
+        // 🆕 Header title: "All PK Jobs" by default, job name when selected
         function updatePageTitle() {
             const selectedJob = jobTitleSelect.value;
             if (selectedJob) {
@@ -494,7 +494,7 @@
                 return true;
             });
             render(filtered);
-            updatePageTitle(); // 🆕 keep header in sync
+            updatePageTitle();
         }
 
         function updateSubjects(records) {
@@ -516,7 +516,7 @@
             const jobs = new Set();
             records.forEach(r => { if (r.jobTitle) jobs.add(r.jobTitle); });
             const current = jobTitleSelect.value;
-            jobTitleSelect.innerHTML = `<option value="">All job titles</option>`;
+            jobTitleSelect.innerHTML = `<option value="">All PK Jobs</option>`;
             [...jobs].sort().forEach(j => {
                 const opt = document.createElement('option');
                 opt.value = j;
