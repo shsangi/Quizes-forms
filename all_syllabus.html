@@ -298,7 +298,8 @@
 
 <script>
     (function() {
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv';
+        // Updated with your correct published CSV export URL
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxkraEEj7tSPNpzCzmZDDlzVYThGTX-8UEjNNN6UUH7Wnh0dVDgHlWLvRKgEFA0FdF3JLUq2haFxsS/pub?output=csv';
 
         const container = document.getElementById('syllabusContainer');
         const searchInput = document.getElementById('searchInput');
@@ -332,7 +333,6 @@
             if (lines.length < 2) return [];
             const headers = parseLine(lines[0]).map(h => h.toLowerCase().trim());
             
-            // Flexible finder function to look up columns regardless of exact naming
             function findCol(keywords) {
                 for (let kw of keywords) {
                     let idx = headers.findIndex(h => h.includes(kw));
@@ -391,7 +391,7 @@
 
         function render(records) {
             if (!records || records.length === 0) {
-                container.innerHTML = `<div class="empty-state">⚠️ No data found. Please check Google Sheet headers or link sharing permissions.</div>`;
+                container.innerHTML = `<div class="empty-state">⚠️ No data found. Please check Google Sheet columns.</div>`;
                 countDisplay.textContent = '0';
                 return;
             }
@@ -498,7 +498,7 @@
                 applyFilters();
             } catch (e) {
                 console.error(e);
-                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load. Make sure your Google Sheet is set to "Anyone with the link can view".</div>`;
+                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load. Make sure your Google Sheet is published to the web.</div>`;
                 countDisplay.textContent = 'err';
             }
         }
