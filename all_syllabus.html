@@ -199,12 +199,6 @@
             font-weight: 500;
             color: #1a4a7a;
         }
-        .last-studied .pkt-badge {
-            font-weight: 400;
-            color: #5a7a9a;
-            font-size: 0.55rem;
-            margin-left: 4px;
-        }
 
         .subject-divider {
             border: none;
@@ -227,15 +221,6 @@
             align-items: baseline;
             gap: 6px;
             flex-wrap: wrap;
-        }
-        .module-head .module-marks {
-            font-weight: 400;
-            font-size: 0.65rem;
-            color: #3f6187;
-            background: #f0f5fc;
-            padding: 0 10px;
-            border-radius: 40px;
-            line-height: 1.9;
         }
         .topic-item {
             padding: 6px 0 6px 14px;
@@ -412,8 +397,8 @@
 
 <script>
     (function() {
-        // REPLACE WITH YOUR PUBLISHED GOOGLE SHEETS CSV URL
-        const CSV_URL = 'YOUR_GOOGLE_SHEETS_CSV_URL_HERE';
+        // Connected directly to your Google Sheet CSV export link
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv';
 
         const container = document.getElementById('syllabusContainer');
         const searchInput = document.getElementById('searchInput');
@@ -622,7 +607,7 @@
                 applyFilters();
             } catch (e) {
                 console.error(e);
-                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load syllabus. Check CSV URL.</div>`;
+                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load syllabus. Check Google Sheet sharing permissions.</div>`;
                 countDisplay.textContent = 'err';
             }
         }
