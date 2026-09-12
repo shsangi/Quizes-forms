@@ -298,7 +298,7 @@
 
 <script>
     (function() {
-        // Updated with your correct published CSV export URL
+        // ✅ FIXED: Using your PUBLISHED CSV URL (not the private export URL)
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxkraEEj7tSPNpzCzmZDDlzVYThGTX-8UEjNNN6UUH7Wnh0dVDgHlWLvRKgEFA0FdF3JLUq2haFxsS/pub?output=csv';
 
         const container = document.getElementById('syllabusContainer');
@@ -332,7 +332,7 @@
             const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
             if (lines.length < 2) return [];
             const headers = parseLine(lines[0]).map(h => h.toLowerCase().trim());
-            
+
             function findCol(keywords) {
                 for (let kw of keywords) {
                     let idx = headers.findIndex(h => h.includes(kw));
@@ -356,7 +356,7 @@
             for (let i = 1; i < lines.length; i++) {
                 const c = parseLine(lines[i]);
                 if (c.length < 2) continue;
-                
+
                 const r = {
                     srno: idx.srno !== -1 ? c[idx.srno] : i,
                     subject: idx.subject !== -1 ? c[idx.subject] : (c[3] || 'General'),
@@ -391,7 +391,7 @@
 
         function render(records) {
             if (!records || records.length === 0) {
-                container.innerHTML = `<div class="empty-state">⚠️ No data found. Please check Google Sheet columns.</div>`;
+                container.innerHTML = `<div class="empty-state">⚠️ No data found. Please check Google Sheet headers or link sharing permissions.</div>`;
                 countDisplay.textContent = '0';
                 return;
             }
@@ -498,7 +498,7 @@
                 applyFilters();
             } catch (e) {
                 console.error(e);
-                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load. Make sure your Google Sheet is published to the web.</div>`;
+                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load. Make sure your Google Sheet is set to "Anyone with the link can view".</div>`;
                 countDisplay.textContent = 'err';
             }
         }
