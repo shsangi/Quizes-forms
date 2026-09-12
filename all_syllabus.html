@@ -121,7 +121,6 @@
             border-color: #2a6df4;
         }
 
-        /* ----- syllabus style ----- */
         .syllabus {
             display: flex;
             flex-direction: column;
@@ -134,13 +133,6 @@
             margin-bottom: 14px;
             border: 1px solid #dce5ef;
             box-shadow: 0 2px 12px rgba(0,20,40,0.05);
-            transition: 0.15s;
-        }
-        .paper-block:last-child {
-            margin-bottom: 0;
-        }
-        .paper-block:nth-child(odd) {
-            background: #ffffff;
         }
         .paper-block:nth-child(even) {
             background: #f8faff;
@@ -149,7 +141,6 @@
             font-size: 1.1rem;
             font-weight: 700;
             color: #0b2b4a;
-            letter-spacing: -0.2px;
             display: flex;
             justify-content: space-between;
             align-items: baseline;
@@ -170,20 +161,10 @@
             color: #0b2b4a;
             text-decoration: none;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
         .paper-title .subject-link:hover {
             color: #2a6df4;
         }
-        .paper-title .subject-link::after {
-            content: "🔗";
-            font-size: 0.7rem;
-            opacity: 0.5;
-        }
-
-        /* Last studied / Created date */
         .last-studied {
             font-size: 0.6rem;
             color: #2a4a6a;
@@ -195,32 +176,19 @@
             font-weight: 450;
             border: 1px solid #d5e0ec;
         }
-        .last-studied span {
-            font-weight: 500;
-            color: #1a4a7a;
-        }
-
         .subject-divider {
             border: none;
             border-top: 2px solid #dce5f0;
             margin: 6px 0 10px 0;
         }
-
         .module-group {
             margin-bottom: 10px;
-        }
-        .module-group:last-child {
-            margin-bottom: 0;
         }
         .module-head {
             font-weight: 600;
             font-size: 0.85rem;
             color: #1f406a;
             margin-bottom: 4px;
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-            flex-wrap: wrap;
         }
         .topic-item {
             padding: 6px 0 6px 14px;
@@ -228,33 +196,18 @@
             margin-left: 4px;
             margin-bottom: 8px;
         }
-        .topic-item:last-child {
-            margin-bottom: 0;
-        }
         .topic-item .topic-label {
             font-weight: 600;
             font-size: 0.85rem;
             color: #0b2b4a;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            gap: 4px 8px;
         }
         .topic-item .topic-label .topic-link {
             color: #0b2b4a;
             text-decoration: none;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
         .topic-item .topic-label .topic-link:hover {
             color: #2a6df4;
-        }
-        .topic-item .topic-label .topic-link::after {
-            content: "🔗";
-            font-size: 0.6rem;
-            opacity: 0.4;
         }
         .subtopic-list {
             margin: 4px 0 2px 6px;
@@ -269,7 +222,6 @@
             line-height: 1.5;
             padding: 1px 0 1px 24px;
             position: relative;
-            margin-bottom: 1px;
         }
         .subtopic-list li::before {
             content: counter(sub-counter) ".";
@@ -277,44 +229,11 @@
             left: 2px;
             font-weight: 500;
             color: #2a6df4;
-            font-size: 0.75rem;
-        }
-        .subtopic-list li .sub-link {
-            color: #1f3d60;
-            text-decoration: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-        .subtopic-list li .sub-link:hover {
-            color: #2a6df4;
-        }
-        .subtopic-list li .sub-link::after {
-            content: "🔗";
-            font-size: 0.5rem;
-            opacity: 0.35;
         }
         .topic-item .book-ref {
             font-size: 0.75rem;
             color: #3d6185;
             margin-top: 3px;
-        }
-        .topic-item .book-ref .book-link {
-            color: #3d6185;
-            text-decoration: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-        .topic-item .book-ref .book-link:hover {
-            color: #2a6df4;
-        }
-        .topic-item .book-ref .book-link::after {
-            content: "🔗";
-            font-size: 0.5rem;
-            opacity: 0.35;
         }
         .empty-state {
             padding: 40px 16px;
@@ -351,24 +270,6 @@
             border-top: 1px solid #dce5ef;
             padding-top: 12px;
         }
-
-        @media print {
-            body { background: white !important; padding: 10px !important; font-size: 10px !important; }
-            .app { max-width: 100% !important; }
-            .controls { display: none !important; }
-            .paper-block { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; padding: 12px !important; margin-bottom: 10px !important; }
-            .paper-block:nth-child(odd), .paper-block:nth-child(even) { background: white !important; }
-            .subject-link::after, .topic-link::after, .sub-link::after, .book-link::after { content: "" !important; display: none !important; }
-            .last-studied { background: #f0f4f8 !important; border: 1px solid #d0d8e0 !important; }
-            .module-head { font-size: 0.8rem !important; }
-            .topic-item .topic-label { font-size: 0.8rem !important; }
-            .subtopic-list li { font-size: 0.75rem !important; }
-            .topic-item .book-ref { font-size: 0.7rem !important; }
-            .footer { font-size: 0.6rem !important; border-top: 1px solid #ccc !important; }
-            .header h1 { font-size: 1.1rem !important; }
-            .count-badge { display: none !important; }
-            .subject-divider { border-top: 1px solid #ccc !important; }
-        }
     </style>
 </head>
 <body>
@@ -397,7 +298,6 @@
 
 <script>
     (function() {
-        // Connected directly to your Google Sheet CSV export link
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv';
 
         const container = document.getElementById('syllabusContainer');
@@ -430,40 +330,44 @@
         function parseCSV(text) {
             const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
             if (lines.length < 2) return [];
-            const h = parseLine(lines[0]);
+            const headers = parseLine(lines[0]).map(h => h.toLowerCase().trim());
             
+            // Flexible finder function to look up columns regardless of exact naming
+            function findCol(keywords) {
+                for (let kw of keywords) {
+                    let idx = headers.findIndex(h => h.includes(kw));
+                    if (idx !== -1) return idx;
+                }
+                return -1;
+            }
+
             const idx = {
-                srno: h.indexOf('srno'),
-                job_title: h.indexOf('job_title'),
-                department: h.indexOf('department'),
-                subject_group: h.indexOf('subject_group'),
-                paper_module: h.indexOf('paper_module'),
-                topic_number: h.indexOf('topic_number'),
-                topic_name: h.indexOf('topic_name'),
-                subtopics: h.indexOf('subtopics'),
-                marks_weightage: h.indexOf('marks_weightage'),
-                recommended_books: h.indexOf('recommended_books'),
-                official_link: h.indexOf('official_link'),
-                created: h.indexOf('created')
+                srno: findCol(['srno', 'sr', 'no']),
+                subject: findCol(['subject', 'group']),
+                module: findCol(['module', 'paper']),
+                topicNum: findCol(['topic_number', 'number', 'num']),
+                topicName: findCol(['topic_name', 'topic', 'detail']),
+                subtopics: findCol(['subtopic']),
+                book: findCol(['book', 'source']),
+                created: findCol(['created', 'date'])
             };
 
             const rows = [];
             for (let i = 1; i < lines.length; i++) {
                 const c = parseLine(lines[i]);
-                if (c.length < 5) continue;
+                if (c.length < 2) continue;
+                
                 const r = {
-                    srno: idx.srno !== -1 ? c[idx.srno] : '',
-                    subject: idx.subject_group !== -1 ? c[idx.subject_group] : '',
-                    Module: idx.paper_module !== -1 ? c[idx.paper_module] : '',
-                    topicNumber: idx.topic_number !== -1 ? c[idx.topic_number] : '',
-                    topicName: idx.topic_name !== -1 ? c[idx.topic_name] : '',
-                    subtopics: idx.subtopics !== -1 ? c[idx.subtopics] : '',
-                    marks: idx.marks_weightage !== -1 ? c[idx.marks_weightage] : '',
-                    book: idx.recommended_books !== -1 ? c[idx.recommended_books] : '',
-                    officialLink: idx.official_link !== -1 ? c[idx.official_link] : '',
+                    srno: idx.srno !== -1 ? c[idx.srno] : i,
+                    subject: idx.subject !== -1 ? c[idx.subject] : (c[3] || 'General'),
+                    Module: idx.module !== -1 ? c[idx.module] : (c[4] || 'General'),
+                    topicNumber: idx.topicNum !== -1 ? c[idx.topicNum] : '',
+                    topicName: idx.topicName !== -1 ? c[idx.topicName] : (c[6] || ''),
+                    subtopics: idx.subtopics !== -1 ? c[idx.subtopics] : (c[7] || ''),
+                    book: idx.book !== -1 ? c[idx.book] : '',
                     created: idx.created !== -1 ? c[idx.created] : ''
                 };
-                if (r.srno.trim() !== '') rows.push(r);
+                if (r.topicName) rows.push(r);
             }
             return rows;
         }
@@ -471,8 +375,7 @@
         function googleSearch(query) {
             const clean = query.trim();
             if (!clean) return;
-            const url = `https://www.google.com/search?q=FIA+superintendent+${encodeURIComponent(clean)}`;
-            window.open(url, '_blank');
+            window.open(`https://www.google.com/search?q=FIA+superintendent+${encodeURIComponent(clean)}`, '_blank');
         }
 
         function smartSplit(text) {
@@ -488,7 +391,7 @@
 
         function render(records) {
             if (!records || records.length === 0) {
-                container.innerHTML = `<div class="empty-state">✨ No topics match your search</div>`;
+                container.innerHTML = `<div class="empty-state">⚠️ No data found. Please check Google Sheet headers or link sharing permissions.</div>`;
                 countDisplay.textContent = '0';
                 return;
             }
@@ -502,18 +405,14 @@
 
             let html = '';
             for (const [subject, items] of Object.entries(groups)) {
-                items.sort((a,b) => parseFloat(a.srno) - parseFloat(b.srno));
-
-                let createdDate = items[0].created || '';
-
                 html += `<div class="paper-block">`;
                 html += `<div class="paper-title">
                             <span class="subject-link" onclick="googleSearch('${subject.replace(/'/g, "\\'")}')">📚 ${subject}</span>
                             <span class="marks">${items.length} topics</span>
                         </div>`;
 
-                if (createdDate) {
-                    html += `<div class="last-studied">📅 Created: <span>${createdDate}</span></div>`;
+                if (items[0].created) {
+                    html += `<div class="last-studied">📅 Created: <span>${items[0].created}</span></div>`;
                 }
 
                 html += `<hr class="subject-divider" />`;
@@ -529,25 +428,22 @@
                     html += `<div class="module-group">`;
                     html += `<div class="module-head">${mod}</div>`;
                     for (const t of topics) {
-                        const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
-                        const topicSearch = t.topicName || '';
-
                         html += `<div class="topic-item">`;
                         html += `<div class="topic-label">
-                                    <span class="topic-link" onclick="googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>
+                                    <span class="topic-link" onclick="googleSearch('${t.topicName.replace(/'/g, "\\'")}')">${t.topicNumber ? t.topicNumber + ' ' : ''}${t.topicName}</span>
                                 </div>`;
 
                         const subItems = smartSplit(t.subtopics);
                         if (subItems.length > 0) {
                             html += `<ul class="subtopic-list">`;
                             for (const sub of subItems) {
-                                html += `<li><span class="sub-link" onclick="googleSearch('${sub.replace(/'/g, "\\'")}')">${sub}</span></li>`;
+                                html += `<li><span class="topic-link" onclick="googleSearch('${sub.replace(/'/g, "\\'")}')">${sub}</span></li>`;
                             }
                             html += `</ul>`;
                         }
 
-                        if (t.book && t.book !== '—') {
-                            html += `<div class="book-ref">📖 <span class="book-link" onclick="googleSearch('${t.book.replace(/'/g, "\\'")}')">${t.book}</span></div>`;
+                        if (t.book) {
+                            html += `<div class="book-ref">📖 <span>${t.book}</span></div>`;
                         }
 
                         html += `</div>`;
@@ -597,23 +493,17 @@
                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const text = await resp.text();
                 const parsed = parseCSV(text);
-                if (parsed.length === 0) {
-                    container.innerHTML = `<div class="empty-state">⚠️ No data found</div>`;
-                    countDisplay.textContent = '0';
-                    return;
-                }
                 allRecords = parsed;
                 updateSubjects(allRecords);
                 applyFilters();
             } catch (e) {
                 console.error(e);
-                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load syllabus. Check Google Sheet sharing permissions.</div>`;
+                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ Failed to load. Make sure your Google Sheet is set to "Anyone with the link can view".</div>`;
                 countDisplay.textContent = 'err';
             }
         }
 
         window.googleSearch = googleSearch;
-
         searchInput.addEventListener('input', applyFilters);
         subjectSelect.addEventListener('change', applyFilters);
 
