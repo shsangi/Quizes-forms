@@ -522,12 +522,12 @@
                 factText += displayFact;
                 factText += ` <span class="search-hint">🔍</span>`;
 
-                // Answer line
+                // Answer line (label now "Answer/Details:")
                 let answerHtml = '';
                 if (displayAnswer && displayAnswer.trim() !== '') {
-                    answerHtml = `<div class="answer-line"><span class="answer-label">Answer:</span>${displayAnswer}</div>`;
+                    answerHtml = `<div class="answer-line"><span class="answer-label">Answer/Details:</span>${displayAnswer}</div>`;
                 } else {
-                    answerHtml = `<div class="answer-line empty"><span class="answer-label">Answer:</span>—</div>`;
+                    answerHtml = `<div class="answer-line empty"><span class="answer-label">Answer/Details:</span>—</div>`;
                 }
 
                 card.innerHTML = `
