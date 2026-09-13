@@ -32,10 +32,10 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-light);
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             color: var(--text-dark);
             font-size: 15px;
@@ -48,6 +48,23 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             width: 100%;
             max-width: 450px;
+            position: relative;
+        }
+
+        /* Version Tag */
+        .version-tag {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            background: #f8f9fa;
+            padding: 3px 6px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
         }
 
         h2 {
@@ -231,74 +248,18 @@
             transform: scale(0.98);
         }
 
-        /* --- MODAL (POPUP) STYLES --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: none;
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
+        /* --- RESULTS SECTION (On the same card) --- */
+        .results-section {
+            margin-top: 25px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+            display: none; /* Hidden by default */
         }
 
-        .modal-content {
-            background: var(--card-bg);
-            width: 100%;
-            max-width: 450px;
-            max-height: 85vh;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            padding: 20px;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease-out;
-            position: relative;
+        .results-section.visible {
+            display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 18px;
-            color: var(--text-dark);
-        }
-
-        .close-btn {
-            background: #f0f2f5;
-            border: none;
-            font-size: 20px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
-        }
-
-        /* --- YEAR-BY-YEAR CARDS --- */
         .year-cards-container {
             display: flex;
             flex-direction: column;
@@ -365,10 +326,10 @@
         }
 
         /* Custom Scrollbar */
-        .modal-content::-webkit-scrollbar {
+        ::-webkit-scrollbar {
             width: 5px;
         }
-        .modal-content::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar-thumb {
             background: #ccd1d9;
             border-radius: 10px;
         }
@@ -378,14 +339,15 @@
 <body>
 
 <div class="app-container">
+    <div class="version-tag">v1</div>
     <h2>🎯 CSS Eligibility Tracker</h2>
     
+    <!-- FORM INPUTS -->
     <div class="form-group">
         <label for="dob">Date of Birth:</label>
         <input type="date" id="dob" value="1997-03-11">
     </div>
 
-    <!-- RADIO BUTTONS FOR PREVIOUS ATTEMPTS -->
     <div class="form-group">
         <label>Number of Previous Attempts (Completed cycles):</label>
         <div class="radio-group">
@@ -404,7 +366,6 @@
         </div>
     </div>
 
-    <!-- TOGGLE SWITCH FOR CURRENT YEAR -->
     <div class="toggle-container active" id="toggleContainer" onclick="toggleSwitch()">
         <div class="toggle-text">
             <strong>Already filled form for the current cycle?</strong>
@@ -420,23 +381,23 @@
         <label for="relaxation">Age Relaxation Category (Rule 6(2)):</label>
         <select id="relaxation">
             <option value="none">No Relaxation (Max Age: 30)</option>
-            <option value="relaxed">Eligible for 2-Year Relaxation (Max Age: 32)</option>
+            <option value="relaxed">Scheduled Caste / Buddhist Community (+2 Years)</option>
+            <option value="relaxed">Recognized Tribes (Balochistan, Tribal Areas, etc.) (+2 Years)</option>
+            <option value="relaxed">Azad Kashmir (AJK) Permanent Resident (+2 Years)</option>
+            <option value="relaxed">Gilgit-Baltistan (GB) Permanent Resident (+2 Years)</option>
+            <option value="relaxed">Special Candidates (Physically/Hearing/Visually Impaired) (+2 Years)</option>
+            <option value="relaxed">In-Service Government Servant (2+ Years Continuous Service) (+2 Years)</option>
         </select>
+        <small style="color:#7f8c8d; display:block; margin-top:5px;">Select your category to apply the 2-year upper age relaxation.</small>
     </div>
 
     <button class="btn-primary" onclick="calculateEligibility()">Check Eligibility</button>
-</div>
 
-<!-- MODAL POPUP -->
-<div class="modal-overlay" id="resultModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>📅 Year-by-Year Eligibility</h3>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-        </div>
-        
-        <div id="modalBody">
-            <!-- Dynamic Content Will Be Inserted Here -->
+    <!-- RESULTS SECTION (On the same card) -->
+    <div class="results-section" id="resultsSection">
+        <h3 style="margin-bottom:15px; font-size:16px; color:var(--text-dark);">📅 Year-by-Year Eligibility</h3>
+        <div class="year-cards-container" id="yearCardsContainer">
+            <!-- Dynamic Cards Will Be Inserted Here -->
         </div>
     </div>
 </div>
@@ -483,11 +444,12 @@
 
         // --- RULE 6: AGE LIMITS ---
         let minAge = 21;
-        let maxAge = (relaxation === 'relaxed') ? 32 : 30;
+        // If any relaxation category is selected, max age becomes 32
+        let maxAge = (relaxation === 'none') ? 30 : 32;
         let maxAttempts = 3;
 
-        // --- BUILD THE MODAL CONTENT (ONLY YEAR CARDS) ---
-        let modalHtml = `<div class="year-cards-container">`;
+        // --- BUILD THE CARDS ---
+        let cardsHtml = "";
 
         let startExamYear = CURRENT_CYCLE_YEAR;
         let simulatedAttemptsUsed = prevAttempts; 
@@ -512,7 +474,6 @@
             
             // --- CORRECT AGE CHECK ---
             // A candidate is eligible if their completed age in years is <= maxAge on the cut-off date.
-            // Turning 31 after the cut-off date does not make them ineligible.
             let isSimAgeEligible = (yearAge >= minAge && yearAge <= maxAge);
             
             let isCurrentYearBox = (i === 0 && isCurrentYearApplied);
@@ -564,7 +525,7 @@
                 noteText = `Above Max Age (${maxAge})`;
             }
 
-            modalHtml += `
+            cardsHtml += `
                 <div class="year-card ${cardClass}">
                     <div class="year-card-info">
                         <span class="year-card-title">CSS ${targetExamYear}</span>
@@ -578,24 +539,13 @@
             `;
         }
 
-        modalHtml += `</div>`;
-
-        document.getElementById('modalBody').innerHTML = modalHtml;
-        document.getElementById('resultModal').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        // Inject into the container and show the results section
+        document.getElementById('yearCardsContainer').innerHTML = cardsHtml;
+        document.getElementById('resultsSection').classList.add('visible');
+        
+        // Scroll to results smoothly
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
     }
-
-    function closeModal() {
-        document.getElementById('resultModal').style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    document.getElementById('resultModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal();
-        }
-    });
-
 </script>
 
 </body>
