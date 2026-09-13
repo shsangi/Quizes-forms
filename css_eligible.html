@@ -144,7 +144,7 @@
             background: rgba(0, 0, 0, 0.6);
             display: none;
             justify-content: center;
-            align-items: flex-end; /* Slide up from bottom */
+            align-items: flex-end;
             z-index: 1000;
             animation: fadeIn 0.3s ease;
         }
@@ -375,6 +375,7 @@
     </div>
 
     <div class="checkbox-group">
+        <!-- DEFAULT CHECKED: This counts the Aug 2026 form as Attempt #1 -->
         <input type="checkbox" id="appliedCurrentYear" checked>
         <label for="appliedCurrentYear">
             <strong>Already filled form for the upcoming cycle?</strong><br>
@@ -453,7 +454,9 @@
         let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
         let isAttemptEligible = (totalAttemptsRemaining > 0);
 
-        // --- CALCULATE USABLE ATTEMPTS ---
+        // --- CALCULATE USABLE ATTEMPTS (FIXED) ---
+        // We only count attempts that can actually be used in the future, 
+        // stopping as soon as age exceeds maxAge.
         let usableAttemptsRemaining = 0;
         let tempYear = examYear;
         let tempAttemptsUsed = attemptsUsed;
@@ -480,6 +483,7 @@
             tempYear++;
         }
 
+        // IMPORTANT: If the current year is already applied, we must NOT count it again as a future usable attempt.
         if (isCurrentYearApplied && usableAttemptsRemaining > 0) {
             usableAttemptsRemaining--;
         }
@@ -573,7 +577,7 @@
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
                     
-                    // Check if this is the LAST usable attempt
+                    // Check if this is the LAST usable attempt based on future age limits
                     let isLastUsable = false;
                     if (simulatedAttemptsUsed === maxAttempts) {
                         isLastUsable = true;
@@ -641,6 +645,9 @@
             closeModal();
         }
     });
+
+    // Auto-calculate on page load (optional, remove if you only want it on click)
+    // window.onload = calculateEligibility;
 
 </script>
 
