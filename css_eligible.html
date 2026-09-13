@@ -3,151 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accurate Job Eligibility & Attempt Calculator</title>
+    <title>Official Job Eligibility & Attempt Tracker</title>
     <style>
+        :root {
+            --primary: #2575fc;
+            --primary-hover: #1a5db6;
+            --success-bg: #e8f8f5;
+            --success-border: #27ae60;
+            --success-text: #0e6251;
+            --danger-bg: #ffd2d2;
+            --danger-border: #e74c3c;
+            --danger-text: #78281f;
+            --warning-bg: #fef9e7;
+            --warning-border: #f1c40f;
+            --warning-text: #7d6608;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f0f2f5;
+            --card-bg: #ffffff;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            background-color: var(--bg-light);
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            color: var(--text-dark);
         }
+        
         .container {
-            background: #ffffff;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 520px;
+            max-width: 550px;
         }
+        
         h2 {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 20px;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            font-size: 22px;
         }
+        
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
+        
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #34495e;
+            color: var(--text-dark);
+            font-size: 14px;
         }
+        
         input, select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccd1d9;
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 14px;
+            transition: border 0.3s;
         }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
         .inline-group {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
+        
         .inline-group input[type="checkbox"] {
             width: auto;
             margin: 0;
+            transform: scale(1.2);
         }
-        button {
+        
+        .btn-primary {
             width: 100%;
-            padding: 12px;
-            background-color: #2575fc;
+            padding: 14px;
+            background-color: var(--primary);
             color: white;
             border: none;
             border-radius: 6px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
             transition: background 0.3s;
+            margin-top: 10px;
         }
-        button:hover {
-            background-color: #1a5db6;
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
         }
+        
         .btn-secondary {
             background-color: #6c757d;
-            font-size: 14px;
-            padding: 8px;
-            margin-top: 0;
-            width: auto;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 15px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
         }
+        
         .btn-secondary:hover {
             background-color: #5a6268;
         }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 6px;
-            display: none;
-        }
-        .eligible {
-            background-color: #e8f8f5;
-            border: 1px solid #27ae60;
-            color: #0e6251;
-        }
-        .not-eligible {
-            background-color: #ffd2d2;
-            border: 1px solid #e74c3c;
-            color: #78281f;
-        }
-        .result h3 {
-            margin-top: 0;
-            font-size: 18px;
-        }
-        .result p {
-            margin: 6px 0;
-            font-size: 14px;
-        }
-        .summary-box {
-            background: #fdfefe;
-            border: 1px solid #d5dbdb;
-            padding: 12px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-        .summary-box strong {
-            color: #2c3e50;
-        }
-        .timeline-box {
-            margin-top: 12px;
-            background: #ffffff;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #bdc3c7;
-            color: #2c3e50;
-        }
-        .timeline-box ul {
-            margin: 5px 0 0 20px;
-            padding: 0;
-            font-size: 13px;
-        }
+
         .fetch-row {
             display: flex;
             gap: 10px;
             align-items: center;
         }
-        .highlight {
-            font-weight: bold;
-            color: #c0392b;
+        
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .success-text {
-            font-weight: bold;
-            color: #27ae60;
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        
+        .status-eligible {
+            background-color: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: var(--success-text);
+        }
+        
+        .status-not-eligible {
+            background-color: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger-text);
+        }
+        
+        .status-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        /* Badges for Summary */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        
+        .summary-card .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card .value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .value.success { color: var(--success-border); }
+        .value.danger { color: var(--danger-border); }
+        .value.warning { color: var(--warning-border); }
+
+        /* Details Text */
+        .details-text {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.5);
+            padding: 12px;
+            border-radius: 6px;
+        }
+        
+        .details-text strong {
+            color: var(--text-dark);
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background-color: var(--warning-bg);
+            border-left: 4px solid var(--warning-border);
+            color: var(--warning-text);
+            padding: 12px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* Timeline */
+        .timeline-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .timeline-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 13px;
+        }
+        
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+        
+        .timeline-year {
+            font-weight: bold;
+            width: 60px;
+            flex-shrink: 0;
+        }
+        
+        .timeline-age {
+            width: 70px;
+            flex-shrink: 0;
+            color: var(--text-light);
+        }
+        
+        .timeline-status {
+            flex-grow: 1;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .badge-success { background: #d4efdf; color: #145a32; }
+        .badge-danger { background: #fadbd8; color: #78281f; }
+        .badge-warning { background: #fdebd0; color: #7e5109; }
+        
+        .text-green { color: var(--success-border); font-weight: bold; }
+        .text-red { color: var(--danger-border); font-weight: bold; }
+        .text-orange { color: #e67e22; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Official Job Eligibility Checker</h2>
+    <h2>🎯 Eligibility & Attempt Tracker</h2>
     
     <div class="form-group">
         <label for="dob">Date of Birth:</label>
@@ -158,19 +301,18 @@
         <label for="cutoff">Official Age Cut-Off Date (e.g., Dec 31 of exam year):</label>
         <div class="fetch-row">
             <input type="date" id="cutoff" value="2026-12-31">
-            <button class="btn-secondary" onclick="fetchCurrentDate()" title="Simulate fetching from CSS website">Fetch Current Year Date</button>
+            <button class="btn-secondary" onclick="fetchCurrentDate()">Fetch Current</button>
         </div>
-        <small style="color:#7f8c8d; display:block; margin-top:5px;">Note: The "Fetch" button simulates an API call. Real fetching requires a backend server.</small>
     </div>
 
     <div class="form-group">
-        <label for="previousAttempts">Number of Previous Attempts (Optional):</label>
+        <label for="previousAttempts">Number of Previous Attempts:</label>
         <input type="number" id="previousAttempts" value="0" min="0" max="10">
     </div>
 
     <div class="inline-group">
         <input type="checkbox" id="appliedCurrentYear">
-        <label for="appliedCurrentYear" style="margin-bottom: 0; font-weight: normal;">Already applied in the current year cycle?</label>
+        <label for="appliedCurrentYear">Already applied in the current year cycle?</label>
     </div>
     
     <div class="form-group">
@@ -182,36 +324,46 @@
         </select>
     </div>
 
-    <button onclick="checkJobEligibility()">Calculate Accurate Eligibility</button>
+    <button class="btn-primary" onclick="checkJobEligibility()">Calculate Accurate Eligibility</button>
 
-    <div class="result" id="resultBox">
-        <h3 id="statusTitle"></h3>
+    <!-- RESULT SECTION -->
+    <div class="result-box" id="resultBox">
         
-        <div class="summary-box">
-            <strong>📊 Status Summary:</strong><br>
-            <span id="resAgeSummary"></span><br>
-            <span id="resAttemptSummary"></span>
+        <h3 class="status-header" id="statusTitle"></h3>
+        
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Age Status</div>
+                <div class="value" id="summaryAge"></div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Attempts Left</div>
+                <div class="value" id="summaryAttempts"></div>
+            </div>
         </div>
 
-        <p id="resAge">Age on Cut-Off Date: </p>
-        <p id="resWindow">Criteria Rule: </p>
-        <p id="resDetails">Details: </p>
-        
-        <div class="timeline-box">
-            <strong>Year-by-Year Attempt Outlook:</strong>
-            <ul id="timelineList"></ul>
+        <!-- Detailed Text -->
+        <div class="details-text" id="detailsText"></div>
+
+        <!-- Critical Warning -->
+        <div class="warning-box">
+            <strong>⚠️ Critical Reminder:</strong> This tool uses <b>Dec 31st</b> as the standard cut-off. Always verify the exact "Age as on" date and attempt rules in the official <b>FPSC advertisement</b> for the specific exam year, as these rules can change.
         </div>
+
+        <!-- Timeline -->
+        <div class="timeline-title">📅 Year-by-Year Outlook</div>
+        <ul class="timeline-list" id="timelineList"></ul>
     </div>
 </div>
 
 <script>
     function fetchCurrentDate() {
-        alert("Simulating fetch from CSS website... \n\nIn a real application, this would fetch the latest deadline.\nFor now, we will set the cut-off to the current year's Dec 31.");
         const today = new Date();
         const currentYear = today.getFullYear();
-        const simulatedDeadline = `${currentYear}-12-31`;
-        document.getElementById('cutoff').value = simulatedDeadline;
+        document.getElementById('cutoff').value = `${currentYear}-12-31`;
         document.getElementById('appliedCurrentYear').checked = true;
+        alert("Simulating fetch from CSS website. \n\nIn a real application, this would retrieve the latest official deadline.\nFor now, the cut-off date has been set to the current year's Dec 31.");
     }
 
     function checkJobEligibility() {
@@ -243,88 +395,88 @@
             ageMonths += 12;
         }
 
-        let minAge = 21;
-        let maxAge = 30;
-        let maxAttempts = 3;
-        let ruleName = "";
-
+        // Define Rules
+        let minAge = 21, maxAge = 30, maxAttempts = 3, ruleName = "";
         if (category === 'css') {
-            minAge = 21; maxAge = 30; maxAttempts = 3;
-            ruleName = "CSS Exam (21-30 Years, 3 Attempts)";
+            minAge = 21; maxAge = 30; maxAttempts = 3; ruleName = "CSS Exam";
         } else if (category === 'general30') {
-            minAge = 18; maxAge = 30; maxAttempts = 6;
-            ruleName = "Standard Govt Job (18-30 Years, 6 Attempts)";
+            minAge = 18; maxAge = 30; maxAttempts = 6; ruleName = "Standard Govt Job";
         } else if (category === 'general35') {
-            minAge = 21; maxAge = 35; maxAttempts = 6;
-            ruleName = "Officer Scale (21-35 Years, 6 Attempts)";
+            minAge = 21; maxAge = 35; maxAttempts = 6; ruleName = "Officer Scale";
         }
 
+        // DOM Elements
         const resultBox = document.getElementById('resultBox');
         const statusTitle = document.getElementById('statusTitle');
-        const resAgeSummary = document.getElementById('resAgeSummary');
-        const resAttemptSummary = document.getElementById('resAttemptSummary');
-        const resAge = document.getElementById('resAge');
-        const resWindow = document.getElementById('resWindow');
-        const resDetails = document.getElementById('resDetails');
+        const summaryAge = document.getElementById('summaryAge');
+        const summaryAttempts = document.getElementById('summaryAttempts');
+        const detailsText = document.getElementById('detailsText');
         const timelineList = document.getElementById('timelineList');
 
-        resultBox.style.display = 'block';
-        timelineList.innerHTML = "";
-
-        // --- CALCULATE ATTEMPTS REMAINING ---
-        let attemptsUsed = prevAttempts;
-        if (isCurrentYearApplied) {
-            attemptsUsed += 1; 
-        }
+        // Calculate Attempts
+        let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
         let attemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
 
-        // --- CALCULATE AGE REMAINING ---
+        // Calculate Age Limits
         let yearsUntilOverage = maxAge - ageYears;
         let yearsUntilEligible = minAge - ageYears;
-
-        // --- UPDATE SUMMARY BOXES ---
-        // 1. Age Summary
-        if (ageYears > maxAge) {
-            resAgeSummary.innerHTML = `⏳ <strong>Age Limit:</strong> <span class="highlight">Overage by ${ageYears - maxAge} year(s).</span> You have exceeded the maximum age of ${maxAge}.`;
-        } else if (ageYears < minAge) {
-            resAgeSummary.innerHTML = `⏳ <strong>Age Limit:</strong> <span class="highlight">Underage.</span> You need ${yearsUntilEligible} more year(s) to reach the minimum age of ${minAge}.`;
-        } else {
-            resAgeSummary.innerHTML = `⏳ <strong>Age Limit:</strong> <span class="success-text">Within limits.</span> You have <strong>${yearsUntilOverage} year(s)</strong> left before reaching the maximum age of ${maxAge}.`;
-        }
-
-        // 2. Attempts Summary
-        if (attemptsRemaining === 0) {
-            resAttemptSummary.innerHTML = `🔢 <strong>Attempts:</strong> <span class="highlight">0 attempts remaining.</span> You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
-        } else {
-            resAttemptSummary.innerHTML = `🔢 <strong>Attempts:</strong> <span class="success-text">${attemptsRemaining} attempt(s) remaining.</span> You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
-        }
-
-        // --- FINAL ELIGIBILITY CHECK ---
         let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
         let isAttemptEligible = (attemptsRemaining > 0);
 
-        if (isAgeEligible && isAttemptEligible) {
-            resultBox.className = "result eligible";
-            statusTitle.innerText = "Status: ELIGIBLE FOR THIS EXAM CYCLE ✅";
-            resDetails.innerText = `You meet both the age and attempt criteria for this cycle.`;
-        } else if (!isAgeEligible && !isAttemptEligible) {
-            resultBox.className = "result not-eligible";
-            statusTitle.innerText = "Status: NOT ELIGIBLE ❌";
-            resDetails.innerText = `You do not meet the age criteria, and you have also exhausted your attempts.`;
-        } else if (!isAgeEligible) {
-            resultBox.className = "result not-eligible";
-            statusTitle.innerText = "Status: NOT ELIGIBLE (Age) ❌";
-            resDetails.innerText = `You are outside the allowed age window (${minAge}-${maxAge} years).`;
+        // Update Summary Cards
+        if (ageYears > maxAge) {
+            summaryAge.innerHTML = `Overage`;
+            summaryAge.className = "value danger";
+        } else if (ageYears < minAge) {
+            summaryAge.innerHTML = `Underage`;
+            summaryAge.className = "value warning";
         } else {
-            resultBox.className = "result not-eligible";
-            statusTitle.innerText = "Status: NOT ELIGIBLE (Attempts) ❌";
-            resDetails.innerText = `You have used all ${maxAttempts} of your allowed attempts.`;
+            summaryAge.innerHTML = `${yearsUntilOverage} Yrs Left`;
+            summaryAge.className = "value success";
         }
 
-        resAge.innerText = `Age on Cut-Off Date: ${ageYears} years, ${ageMonths} months, and ${ageDays} days`;
-        resWindow.innerText = `Criteria Rule: ${ruleName}`;
+        if (attemptsRemaining === 0) {
+            summaryAttempts.innerHTML = `0 Left`;
+            summaryAttempts.className = "value danger";
+        } else {
+            summaryAttempts.innerHTML = `${attemptsRemaining} Left`;
+            summaryAttempts.className = "value success";
+        }
 
-        // --- YEAR-BY-YEAR OUTLOOK ---
+        // Update Main Status Header
+        if (isAgeEligible && isAttemptEligible) {
+            resultBox.className = "result-box status-eligible";
+            statusTitle.innerHTML = "✅ ELIGIBLE FOR THIS EXAM CYCLE";
+        } else if (!isAgeEligible && !isAttemptEligible) {
+            resultBox.className = "result-box status-not-eligible";
+            statusTitle.innerHTML = "❌ NOT ELIGIBLE";
+        } else if (!isAgeEligible) {
+            resultBox.className = "result-box status-not-eligible";
+            statusTitle.innerHTML = "❌ NOT ELIGIBLE (Age Restriction)";
+        } else {
+            resultBox.className = "result-box status-not-eligible";
+            statusTitle.innerHTML = "❌ NOT ELIGIBLE (Attempts Exhausted)";
+        }
+
+        // Update Detailed Text
+        let ageDetail = "";
+        if (ageYears > maxAge) ageDetail = `You are <b>${ageYears - maxAge} year(s) over</b> the maximum age limit of ${maxAge}.`;
+        else if (ageYears < minAge) ageDetail = `You need <b>${yearsUntilEligible} more year(s)</b> to reach the minimum age of ${minAge}.`;
+        else ageDetail = `You are <b>within the age limits</b> (${minAge}-${maxAge} years). You have <b>${yearsUntilOverage} year(s)</b> before reaching the maximum age.`;
+
+        let attemptDetail = "";
+        if (attemptsRemaining === 0) attemptDetail = `You have <b>used all ${maxAttempts} allowed attempts</b>.`;
+        else attemptDetail = `You have <b>${attemptsRemaining} attempt(s) remaining</b>. You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
+
+        detailsText.innerHTML = `
+            <strong>Age on Cut-Off Date:</strong> ${ageYears} years, ${ageMonths} months, ${ageDays} days<br>
+            <strong>Rule Applied:</strong> ${ruleName} (${minAge}-${maxAge} Years, ${maxAttempts} Attempts)<br><br>
+            <strong>Age Analysis:</strong> ${ageDetail}<br>
+            <strong>Attempt Analysis:</strong> ${attemptDetail}
+        `;
+
+        // Build Timeline
+        timelineList.innerHTML = "";
         let startExamYear = cutoffDate.getFullYear();
         let simulatedAttemptsUsed = prevAttempts;
         
@@ -332,33 +484,39 @@
             let targetExamYear = startExamYear + i;
             let simulatedCutoff = new Date(`${targetExamYear}-12-31`);
             
-            let yearAgeYears = simulatedCutoff.getFullYear() - dob.getFullYear();
-            let yearAgeMonths = simulatedCutoff.getMonth() - dob.getMonth();
-            if (yearAgeMonths < 0 || (yearAgeMonths === 0 && simulatedCutoff.getDate() < dob.getDate())) {
-                yearAgeYears--;
-            }
+            let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
+            let m = simulatedCutoff.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && simulatedCutoff.getDate() < dob.getDate())) yearAge--;
+            
+            let isSimAgeEligible = (yearAge >= minAge && yearAge <= maxAge);
+            let isCurrentYearBox = (i === 0 && isCurrentYearApplied);
             
             let li = document.createElement('li');
-            let isSimAgeEligible = (yearAgeYears >= minAge && yearAgeYears <= maxAge);
-            
-            // Special handling for the current year checkbox
-            let isCurrentYearBox = (i === 0 && isCurrentYearApplied);
+            li.className = "timeline-item";
 
+            let statusHtml = "";
+            
             if (isCurrentYearBox) {
-                simulatedAttemptsUsed++; // Count it as used
-                li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:green;">Eligible</span> — <b>Already Applied (Attempt #${simulatedAttemptsUsed})</b>`;
+                simulatedAttemptsUsed++; 
+                statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Already Applied (Attempt #${simulatedAttemptsUsed})</span>`;
             } else if (isSimAgeEligible) {
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
-                    li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:green;">Eligible</span> — Attempt <b>#${simulatedAttemptsUsed}</b> of ${maxAttempts}.`;
+                    statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Attempt #${simulatedAttemptsUsed}</span>`;
                 } else {
-                    li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:orange;">Age-Eligible</span>, but max attempts (${maxAttempts}) finished.`;
+                    statusHtml = `<span class="badge badge-warning">Age OK</span> <span style="color:var(--text-light); font-size:11px;">Attempts Finished</span>`;
                 }
-            } else if (yearAgeYears < minAge) {
-                li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:red;">Not Eligible</span> (Under min age ${minAge})`;
+            } else if (yearAge < minAge) {
+                statusHtml = `<span class="badge badge-danger">Underage</span>`;
             } else {
-                li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:red;">Not Eligible</span> (Overage > ${maxAge})`;
+                statusHtml = `<span class="badge badge-danger">Overage</span>`;
             }
+
+            li.innerHTML = `
+                <div class="timeline-year">${targetExamYear}</div>
+                <div class="timeline-age">Age ${yearAge}</div>
+                <div class="timeline-status">${statusHtml}</div>
+            `;
             timelineList.appendChild(li);
         }
     }
