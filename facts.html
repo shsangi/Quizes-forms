@@ -17,7 +17,8 @@
             height: auto;
             min-height: 40px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center;
             cursor: pointer;
             position: relative;
             overflow: hidden;
@@ -50,6 +51,7 @@
             pointer-events: none;
             user-select: none;
             box-shadow: 0 0 0 1px white;
+            z-index: 2;
         }
         .verify-corner.true {
             background: #2563eb;
@@ -64,7 +66,7 @@
             color: #6b7280;
         }
 
-        /* simple fact text: srno. fact */
+        /* fact text: srno. fact */
         .fact-line {
             font-size: 0.92rem;
             color: #1f2937;
@@ -77,6 +79,32 @@
         .fact-line .srno {
             font-weight: 500;
             color: #4b5563;
+        }
+
+        /* answer line */
+        .answer-line {
+            font-size: 0.78rem;
+            color: #059669;
+            line-height: 1.4;
+            word-break: break-word;
+            width: 100%;
+            pointer-events: none;
+            padding-right: 8px;
+            margin-top: 0.25rem;
+            border-top: 1px dashed #e5e7eb;
+            padding-top: 0.25rem;
+        }
+        .answer-line .answer-label {
+            font-weight: 600;
+            color: #047857;
+            margin-right: 0.15rem;
+        }
+        .answer-line.empty {
+            color: #9ca3af;
+            font-style: italic;
+        }
+        .answer-line.empty .answer-label {
+            color: #9ca3af;
         }
 
         /* search hint – subtle */
@@ -197,7 +225,7 @@
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- control bar (count badge removed) -->
+    <!-- control bar -->
     <div class="mb-4">
         <div class="control-bar">
             <div class="search-wrap">
@@ -288,6 +316,7 @@
                 const el = item.element;
                 const cat = (item.category || '').toLowerCase();
                 const fact = (item.fact || '').toLowerCase();
+                const answer = (item.answer || '').toLowerCase();
 
                 let categoryMatch = true;
                 if (selectedCategory !== 'all') {
@@ -296,7 +325,9 @@
 
                 let searchMatch = true;
                 if (searchQuery) {
-                    searchMatch = cat.includes(searchQuery) || fact.includes(searchQuery);
+                    searchMatch = cat.includes(searchQuery) ||
+                                  fact.includes(searchQuery) ||
+                                  answer.includes(searchQuery);
                 }
 
                 const visible = categoryMatch && searchMatch;
@@ -352,7 +383,7 @@
             return match ? parseFloat(match[0]) : -Infinity;
         }
 
-        // ----- render cards (with descending sort by srno + tiny corner verification icon) -----
+        // ----- render cards (with descending sort by srno + answer + tiny corner verification icon) -----
         function renderCards(rows) {
             container.innerHTML = '';
             allCards = [];
@@ -378,7 +409,7 @@
             const questionCatKey = getHeaderKey(sample, 'Question Category', 'question category', 'question_category');
             const aiAnswerKey = getHeaderKey(sample, 'ai_answer_true_false', 'ai_answer_true_false', 'ai answer true false');
 
-            // fallback verification: if ai_answer_true_false not found, use 4th column as before
+            // fallback verification
             let verificationKey = aiAnswerKey;
             if (!verificationKey) {
                 const keys = Object.keys(sample);
@@ -400,7 +431,6 @@
 
                 // fallback: if fact is empty, use fallback logic
                 if (!fact) {
-                    // Use details or answer as fallback if fact missing
                     if (details) fact = details;
                     else if (answer) fact = answer;
                     else {
@@ -415,6 +445,7 @@
                 const displaySrno = srnoRaw || '—';
                 const displayCategory = category;
                 const displayFact = fact;
+                const displayAnswer = answer; // could be empty string
 
                 // verification
                 const rawVerification = verificationKey ? (row[verificationKey] || '').trim() : '';
@@ -428,6 +459,7 @@
                     srnoNum: srnoNum,
                     category: displayCategory,
                     fact: displayFact,
+                    answer: displayAnswer,
                     verification: verification
                 });
             });
@@ -447,6 +479,7 @@
                 const displaySrno = item.srnoRaw;
                 const displayCategory = item.category;
                 const displayFact = item.fact;
+                const displayAnswer = item.answer;
                 const verification = item.verification;
 
                 // tiny corner icon
@@ -479,6 +512,7 @@
                     }
                 });
 
+                // Fact line
                 let factText = '';
                 if (displaySrno !== '—') {
                     factText = `<span class="srno">${displaySrno}.</span> `;
@@ -488,11 +522,20 @@
                 factText += displayFact;
                 factText += ` <span class="search-hint">🔍</span>`;
 
+                // Answer line
+                let answerHtml = '';
+                if (displayAnswer && displayAnswer.trim() !== '') {
+                    answerHtml = `<div class="answer-line"><span class="answer-label">Answer:</span>${displayAnswer}</div>`;
+                } else {
+                    answerHtml = `<div class="answer-line empty"><span class="answer-label">Answer:</span>—</div>`;
+                }
+
                 card.innerHTML = `
                     ${cornerHtml}
                     <div class="fact-line">
                         ${factText}
                     </div>
+                    ${answerHtml}
                 `;
 
                 container.appendChild(card);
@@ -502,6 +545,7 @@
                     srno: displaySrno,
                     category: displayCategory,
                     fact: displayFact,
+                    answer: displayAnswer,
                     verification: verification
                 });
             });
