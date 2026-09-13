@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · click to search (desc by srno + tiny corner verification)</title>
+    <title>Facts · updated headers · click to search</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* minimal card – clickable fact text */
@@ -192,12 +192,22 @@
         #no-results-msg {
             grid-column: 1 / -1;
         }
+
+        /* small header note – updated headers */
+        .header-note {
+            font-size: 0.6rem;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- control bar (count badge removed) -->
+    <!-- control bar (count badge removed) + header note -->
     <div class="mb-4">
         <div class="control-bar">
             <div class="search-wrap">
@@ -209,6 +219,8 @@
                     <option value="all">All categories</option>
                 </select>
             </div>
+            <!-- small note: updated headers -->
+            <span class="header-note hidden sm:inline">headers: srno, tag, category, fact, ai_ans_true_false</span>
         </div>
     </div>
 
@@ -223,6 +235,7 @@
     <div class="max-w-6xl mx-auto mt-6 text-[0.5rem] text-gray-300 text-center border-t border-gray-100/50 pt-3 tracking-wider">
         <span class="bg-white/50 px-2 py-0.5 rounded-full">click any fact → Google search</span>
         <span class="ml-2 bg-white/50 px-2 py-0.5 rounded-full">✔ true · ✘ false · ? unverified</span>
+        <span class="ml-2 bg-white/50 px-2 py-0.5 rounded-full">headers: srno · tag · catgory · fact · ai_ans_true_false</span>
     </div>
 </div>
 
@@ -241,7 +254,7 @@
 
         let allCards = [];
         let categorySet = new Set();
-        let totalFacts = 0; // track total number of facts for the search hint
+        let totalFacts = 0;
 
         // ----- helper: get key from row with case-insensitive matching -----
         function getHeaderKey(row, ...candidates) {
@@ -367,24 +380,29 @@
             }
 
             const sample = rows[0];
-            const srnoKey = getHeaderKey(sample, 'srno', 's.no', 'sno', 'sr no', 'serial');
-            const catKey  = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
-            const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
 
-            // dedicated key for ai_ans_true_false (column D)
-            let verificationKey = getHeaderKey(sample,
+            // ----- UPDATED HEADER MAPPING -----
+            // Current headers: srno, tag, catgory (category), fact, ai_ans_true_false
+            const srnoKey = getHeaderKey(sample, 'srno', 's.no', 'sno', 'sr no', 'serial');
+            const tagKey  = getHeaderKey(sample, 'tag', 'tags');            // <-- new 'tag' field
+            const catKey  = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie'); // intentional misspelling kept
+            const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
+            const verificationKey = getHeaderKey(sample,
                 'ai_ans_true_false', 'ai answ true false', 'ai_ans_true_false',
                 'aianstruefalse', 'ai answer true false'
             );
-            if (!verificationKey) {
+
+            // fallback if verificationKey not found – use 5th column (index 4)
+            let finalVerificationKey = verificationKey;
+            if (!finalVerificationKey) {
                 const keys = Object.keys(sample);
-                if (keys.length >= 4) verificationKey = keys[3];
+                if (keys.length >= 5) finalVerificationKey = keys[4];
             }
 
             let fallbackFactKey = null;
             if (!factKey) {
                 const keys = Object.keys(sample);
-                if (keys.length >= 3) fallbackFactKey = keys[2];
+                if (keys.length >= 4) fallbackFactKey = keys[3];
             }
 
             const cardDataList = [];
@@ -399,6 +417,9 @@
                     if (fallback) fact = fallback.trim();
                 }
 
+                // tag is read but we keep the display focused on fact + srno.
+                // We could optionally use tag for something, but it's not displayed per original design.
+
                 if (!category) category = 'uncategorized';
                 if (!fact) fact = '—';
 
@@ -406,7 +427,7 @@
                 const displayCategory = category;
                 const displayFact = fact;
 
-                const rawVerification = verificationKey ? (row[verificationKey] || '').trim() : '';
+                const rawVerification = finalVerificationKey ? (row[finalVerificationKey] || '').trim() : '';
                 const verification = interpretVerification(rawVerification);
 
                 categorySet.add(displayCategory);
@@ -421,7 +442,6 @@
                 });
             });
 
-            // total facts after collecting
             totalFacts = cardDataList.length;
             updateSearchPlaceholder();
 
@@ -439,7 +459,6 @@
                 const displayFact = item.fact;
                 const verification = item.verification;
 
-                // tiny corner icon
                 let cornerHtml = '';
                 let iconTitle = '';
                 if (verification === 'true') {
