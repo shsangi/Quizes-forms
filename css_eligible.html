@@ -455,8 +455,6 @@
         let isAttemptEligible = (totalAttemptsRemaining > 0);
 
         // --- CALCULATE USABLE ATTEMPTS (FIXED) ---
-        // We only count attempts that can actually be used in the future, 
-        // stopping as soon as age exceeds maxAge.
         let usableAttemptsRemaining = 0;
         let tempYear = examYear;
         let tempAttemptsUsed = attemptsUsed;
@@ -483,7 +481,6 @@
             tempYear++;
         }
 
-        // IMPORTANT: If the current year is already applied, we must NOT count it again as a future usable attempt.
         if (isCurrentYearApplied && usableAttemptsRemaining > 0) {
             usableAttemptsRemaining--;
         }
@@ -577,7 +574,6 @@
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
                     
-                    // Check if this is the LAST usable attempt based on future age limits
                     let isLastUsable = false;
                     if (simulatedAttemptsUsed === maxAttempts) {
                         isLastUsable = true;
@@ -624,30 +620,23 @@
             `;
         }
 
-        modalHtml += `</div>`; // Close year-cards-container
+        modalHtml += `</div>`;
 
-        // Inject into modal and show
         document.getElementById('modalBody').innerHTML = modalHtml;
         document.getElementById('resultModal').style.display = 'flex';
-        
-        // Prevent background scrolling
         document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
         document.getElementById('resultModal').style.display = 'none';
-        document.body.style.overflow = 'auto'; // Restore scrolling
+        document.body.style.overflow = 'auto';
     }
 
-    // Close modal if clicking outside of it
     document.getElementById('resultModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeModal();
         }
     });
-
-    // Auto-calculate on page load (optional, remove if you only want it on click)
-    // window.onload = calculateEligibility;
 
 </script>
 
