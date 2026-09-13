@@ -1,257 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Job Eligibility & Attempt Calculator</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 520px;
-        }
-        h2 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #34495e;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccd1d9;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        .today-box {
-            background: #eaf2f8;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #2980b9;
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #2575fc;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 5px;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background-color: #1a5db6;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 6px;
-            display: none;
-        }
-        .eligible {
-            background-color: #e8f8f5;
-            border: 1px solid #27ae60;
-            color: #0e6251;
-        }
-        .not-eligible {
-            background-color: #ffd2d2;
-            border: 1px solid #e74c3c;
-            color: #78281f;
-        }
-        .result h3 {
-            margin-top: 0;
-            font-size: 18px;
-        }
-        .result p {
-            margin: 6px 0;
-            font-size: 14px;
-        }
-        .timeline-box {
-            margin-top: 12px;
-            background: #ffffff;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #bdc3c7;
-            color: #2c3e50;
-        }
-        .timeline-box ul {
-            margin: 5px 0 0 20px;
-            padding: 0;
-            font-size: 13px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>Job Eligibility & Attempt Checker</h2>
-    
-    <div class="today-box" id="displayToday">Checking current date...</div>
-
-    <div class="form-group">
-        <label for="dob">Your Date of Birth:</label>
-        <input type="date" id="dob" value="1997-03-11">
-    </div>
-    
-    <div class="form-group">
-        <label for="category">Target Job / Category Rule:</label>
-        <select id="category">
-            <option value="css">CSS / Competitive Exam (Min 21, Max 30 Yrs, 3 Attempts)</option>
-            <option value="general30">Standard Govt Job (Min 18, Max 30 Yrs, 6 Attempts)</option>
-            <option value="general35">Officer Scale / Upper Cap (Min 21, Max 35 Yrs, 6 Attempts)</option>
-        </select>
-    </div>
-
-    <button onclick="checkEligibilityToday()">Check Eligibility Today</button>
-
-    <div class="result" id="resultBox">
-        <h3 id="statusTitle"></h3>
-        <p id="resAge">Exact Age Today: </p>
-        <p id="resWindow">Criteria Rule: </p>
-        <p id="resDetails">Details: </p>
-        
-        <div class="timeline-box">
-            <strong>Year-by-Year Attempt Outlook:</strong>
-            <ul id="timelineList"></ul>
-        </div>
-    </div>
-</div>
-
 <script>
-    // Automatically display today's date on load
-    const today = new Date();
-    document.getElementById('displayToday').innerText = `Current System Date: ${today.toDateString()}`;
-
-    function checkEligibilityToday() {
+    function checkJobEligibility() {
         const dobInput = document.getElementById('dob').value;
+        const cutoffInput = document.getElementById('cutoff').value;
         const category = document.getElementById('category').value;
 
-        if (!dobInput) {
-            alert("Please select your date of birth!");
+        if (!dobInput || !cutoffInput) {
+            alert("Please fill in both Date of Birth and Cut-Off Date!");
             return;
         }
 
         const dob = new Date(dobInput);
+        const cutoffDate = document.getElementById('cutoff').valueAsDate;
         
-        // Rules configuration
-        let minAge = 18;
-        let maxAge = 30;
-        let maxAttempts = 3;
-        let ruleName = "";
+        let birthYear = dob.getFullYear();
+        let startExamYear = cutoffDate.getFullYear();
 
-        if (category === 'css') {
-            minAge = 21;
-            maxAge = 30; 
-            maxAttempts = 3;
-            ruleName = "CSS Exam (21-30 Years, 3 Attempts)";
-        } else if (category === 'general30') {
-            minAge = 18;
-            maxAge = 30;
-            maxAttempts = 6;
-            ruleName = "Standard Govt Job (18-30 Years, 6 Attempts)";
-        } else if (category === 'general35') {
-            minAge = 21;
-            maxAge = 35;
-            maxAttempts = 6;
-            ruleName = "Officer Scale (21-35 Years, 6 Attempts)";
-        }
+        let minAge = category === 'general30' ? 18 : 21;
+        let maxAge = category === 'general35' ? 35 : 30;
+        let maxAttempts = category === 'general35' || category === 'general30' ? 6 : 3;
+        let ruleName = category === 'css' ? "CSS Exam (21-30 Years, 3 Attempts)" : "Govt Job Rule";
 
-        // Calculate exact age as of today
-        let ageYears = today.getFullYear() - dob.getFullYear();
-        let ageMonths = today.getMonth() - dob.getMonth();
-        let ageDays = today.getDate() - dob.getDate();
-
-        if (ageDays < 0) {
-            ageMonths--;
-            ageDays += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
-        }
-        if (ageMonths < 0) {
+        // Calculate exact age on cutoff date
+        let ageYears = cutoffDate.getFullYear() - dob.getFullYear();
+        let m = cutoffDate.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && cutoffDate.getDate() < dob.getDate())) {
             ageYears--;
-            ageMonths += 12;
         }
 
         const resultBox = document.getElementById('resultBox');
         resultBox.style.display = 'block';
 
-        // Evaluate status based on today's date
         if (ageYears >= minAge && ageYears <= maxAge) {
             resultBox.className = "result eligible";
-            document.getElementById('statusTitle').innerText = "Status: ELIGIBLE TODAY ✅";
-            document.getElementById('resDetails').innerText = `As of today, your age falls securely within the accepted ${minAge}-${maxAge} bracket.`;
-        } else if (ageYears < minAge) {
-            resultBox.className = "result not-eligible";
-            document.getElementById('statusTitle').innerText = "Status: NOT YET ELIGIBLE ❌";
-            document.getElementById('resDetails').innerText = `You are under the minimum age requirement of ${minAge} today.`;
+            document.getElementById('statusTitle').innerText = "Status: ELIGIBLE FOR THIS EXAM CYCLE ✅";
+            document.getElementById('resDetails').innerText = `You are within the ${minAge}-${maxAge} age bracket.`;
         } else {
             resultBox.className = "result not-eligible";
-            document.getElementById('statusTitle').innerText = "Status: OVERAGE ❌";
-            document.getElementById('resDetails').innerText = `You have crossed the maximum upper age limit of ${maxAge} years today.`;
+            document.getElementById('statusTitle').innerText = "Status: NOT ELIGIBLE ❌";
+            document.getElementById('resDetails').innerText = ageYears < minAge ? "Under minimum age." : "Overage for this bracket.";
         }
 
-        document.getElementById('resAge').innerText = `Exact Age Today: ${ageYears} years, ${ageMonths} months, and ${ageDays} days`;
+        document.getElementById('resAge').innerText = `Age on Cut-Off Date: ${ageYears} years`;
         document.getElementById('resWindow').innerText = `Criteria Rule: ${ruleName}`;
 
-        // Build Year-by-Year Attempt Outlook starting from the year they turned minAge
+        // Accurate Lifetime Attempt Tracking
         let timelineList = document.getElementById('timelineList');
         timelineList.innerHTML = "";
         
-        let birthYear = dob.getFullYear();
         let firstEligibleYear = birthYear + minAge;
-        let currentYear = today.getFullYear();
-        
-        let attemptCounter = 1;
+        let attemptTracker = 1;
 
-        // Loop through past/present/future years around their eligible window
-        for (let i = -1; i <= 4; i++) {
-            let targetYear = currentYear + i;
+        // Look back and forward to show true attempt numbers based on age 21
+        for (let i = 0; i < 6; i++) {
+            let targetYear = startExamYear + i;
             let yearAge = targetYear - birthYear;
             
             let li = document.createElement('li');
             if (yearAge >= minAge && yearAge <= maxAge) {
-                if (attemptCounter <= maxAttempts) {
-                    li.innerHTML = `<b>${targetYear} Cycle</b> (Age ~${yearAge}): <span style="color:green;">Eligible</span> — Lifetime Attempt <b>#${attemptCounter}</b> of ${maxAttempts}.`;
-                    attemptCounter++;
+                if (attemptTracker <= maxAttempts) {
+                    li.innerHTML = `<b>${targetYear} Exam</b> (Age ${yearAge}): <span style="color:green;">Eligible</span> — Lifetime Attempt <b>#${attemptTracker}</b> of ${maxAttempts}.`;
+                    attemptTracker++;
                 } else {
-                    li.innerHTML = `<b>${targetYear} Cycle</b> (Age ~${yearAge}): <span style="color:orange;">Age-Eligible</span>, but max lifetime attempts (${maxAttempts}) exhausted.`;
+                    li.innerHTML = `<b>${targetYear} Exam</b> (Age ${yearAge}): <span style="color:orange;">Age-Eligible</span>, but max lifetime attempts (${maxAttempts}) exhausted.`;
                 }
-            } else if (yearAge < minAge) {
-                li.innerHTML = `<b>${targetYear} Cycle</b> (Age ~${yearAge}): <span style="color:red;">Not Eligible</span> (Under minimum age)`;
             } else {
-                li.innerHTML = `<b>${targetYear} Cycle</b> (Age ~${yearAge}): <span style="color:red;">Not Eligible</span> (Overage / Limit crossed)`;
+                li.innerHTML = `<b>${targetYear} Exam</b> (Age ${yearAge}): <span style="color:red;">Not Eligible</span> (Outside age limits)`;
             }
             timelineList.appendChild(li);
         }
     }
 </script>
-
-</body>
-</html>
