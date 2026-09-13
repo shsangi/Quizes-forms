@@ -97,6 +97,7 @@
             padding: 14px;
             border-radius: 10px;
             border: 1px solid #e0e6ed;
+            cursor: pointer;
         }
         
         .checkbox-group input[type="checkbox"] {
@@ -105,6 +106,7 @@
             margin-top: 2px;
             flex-shrink: 0;
             accent-color: var(--primary);
+            cursor: pointer;
         }
         
         .checkbox-group label {
@@ -113,6 +115,7 @@
             font-size: 12px;
             line-height: 1.4;
             cursor: pointer;
+            pointer-events: none; /* Let the parent div handle clicks */
         }
         
         .btn-primary {
@@ -356,12 +359,12 @@
     
     <div class="form-group">
         <label for="dob">Date of Birth:</label>
-        <input type="date" id="dob" value="1997-03-11">
+        <input type="date" id="dob" value="1997-03-11" onchange="calculateEligibility()">
     </div>
 
     <div class="form-group">
         <label for="examYear">Target CSS Exam Year:</label>
-        <select id="examYear">
+        <select id="examYear" onchange="calculateEligibility()">
             <option value="2026">CSS 2026 (Cut-off: Dec 31, 2025)</option>
             <option value="2027" selected>CSS 2027 (Cut-off: Dec 31, 2026)</option>
             <option value="2028">CSS 2028 (Cut-off: Dec 31, 2027)</option>
@@ -371,21 +374,21 @@
 
     <div class="form-group">
         <label for="previousAttempts">Previous Attempts (Completed cycles):</label>
-        <input type="number" id="previousAttempts" value="0" min="0" max="10">
+        <input type="number" id="previousAttempts" value="0" min="0" max="10" oninput="calculateEligibility()">
     </div>
 
-    <div class="checkbox-group">
-        <!-- DEFAULT CHECKED: This counts the Aug 2026 form as Attempt #1 -->
-        <input type="checkbox" id="appliedCurrentYear" checked>
-        <label for="appliedCurrentYear">
+    <!-- WRAPPED IN A LABEL FOR EASIER CLICKING -->
+    <label class="checkbox-group" for="appliedCurrentYear">
+        <input type="checkbox" id="appliedCurrentYear" checked onchange="calculateEligibility()">
+        <span>
             <strong>Already filled form for the upcoming cycle?</strong><br>
             (e.g., filled in Aug 2026 for the Jan 2027 exam).
-        </label>
-    </div>
+        </span>
+    </label>
 
     <div class="form-group">
         <label for="relaxation">Age Relaxation Category (Rule 6(2)):</label>
-        <select id="relaxation">
+        <select id="relaxation" onchange="calculateEligibility()">
             <option value="none">No Relaxation (Max Age: 30)</option>
             <option value="relaxed">Eligible for 2-Year Relaxation (Max Age: 32)</option>
         </select>
@@ -417,7 +420,7 @@
         const isCurrentYearApplied = document.getElementById('appliedCurrentYear').checked;
 
         if (!dobInput) {
-            alert("Please enter your Date of Birth.");
+            // Don't show alert on auto-update, just return
             return;
         }
 
@@ -454,18 +457,27 @@
         let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
         let isAttemptEligible = (totalAttemptsRemaining > 0);
 
-        // --- CALCULATE USABLE ATTEMPTS (FIXED) ---
+        // --- CALCULATE USABLE ATTEMPTS (STRICT RULE 5 CUT-OFF) ---
         let usableAttemptsRemaining = 0;
         let tempYear = examYear;
         let tempAttemptsUsed = attemptsUsed;
         
         for (let j = 0; j < 10; j++) {
-            let tempCutoffYear = tempYear - 1;
+            let tempCutoffYear = tempYear - 1; // Rule 5: Preceding year
             let tempCutoff = new Date(`${tempCutoffYear}-12-31`);
             
+            // Exact age calculation for this specific future year
             let tempAge = tempCutoff.getFullYear() - dob.getFullYear();
             let tempM = tempCutoff.getMonth() - dob.getMonth();
-            if (tempM < 0 || (tempM === 0 && tempCutoff.getDate() < dob.getDate())) tempAge--;
+            let tempD = tempCutoff.getDate() - dob.getDate();
+            
+            if (tempD < 0) {
+                tempM--;
+                tempD += new Date(tempCutoff.getFullYear(), tempCutoff.getMonth(), 0).getDate();
+            }
+            if (tempM < 0) {
+                tempAge--;
+            }
             
             let isTempAgeEligible = (tempAge >= minAge && tempAge <= maxAge);
             let isTempAttemptEligible = (tempAttemptsUsed < maxAttempts);
@@ -474,13 +486,14 @@
                 usableAttemptsRemaining++;
                 tempAttemptsUsed++;
             } else if (!isTempAgeEligible) {
-                break; 
+                break; // Stop counting once overage
             } else {
-                break; 
+                break; // Stop counting once attempts exhausted
             }
             tempYear++;
         }
 
+        // If already applied, we do not count the current year as a "future usable" attempt
         if (isCurrentYearApplied && usableAttemptsRemaining > 0) {
             usableAttemptsRemaining--;
         }
@@ -551,12 +564,20 @@
         
         for (let i = 0; i < 10; i++) {
             let targetExamYear = startExamYear + i;
-            let targetCutoffYear = targetExamYear - 1;
+            let targetCutoffYear = targetExamYear - 1; // Rule 5
             let simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
             
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
             let m = simulatedCutoff.getMonth() - dob.getMonth();
-            if (m < 0 || (m === 0 && simulatedCutoff.getDate() < dob.getDate())) yearAge--;
+            let d = simulatedCutoff.getDate() - dob.getDate();
+            
+            if (d < 0) {
+                m--;
+                d += new Date(simulatedCutoff.getFullYear(), simulatedCutoff.getMonth(), 0).getDate();
+            }
+            if (m < 0) {
+                yearAge--;
+            }
             
             let isSimAgeEligible = (yearAge >= minAge && yearAge <= maxAge);
             let isCurrentYearBox = (i === 0 && isCurrentYearApplied);
@@ -578,9 +599,12 @@
                     if (simulatedAttemptsUsed === maxAttempts) {
                         isLastUsable = true;
                     } else {
+                        // Check if next year is overage
                         let nextCutoffYear = targetExamYear - 1 + 1; 
                         let nextCutoff = new Date(`${nextCutoffYear}-12-31`);
                         let nextAge = nextCutoff.getFullYear() - dob.getFullYear();
+                        let nextM = nextCutoff.getMonth() - dob.getMonth();
+                        if (nextM < 0) nextAge--;
                         if (nextAge > maxAge) isLastUsable = true;
                     }
 
@@ -623,8 +647,12 @@
         modalHtml += `</div>`;
 
         document.getElementById('modalBody').innerHTML = modalHtml;
-        document.getElementById('resultModal').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        
+        // Only show modal if it's not already open (to prevent flickering on auto-update)
+        if (document.getElementById('resultModal').style.display !== 'flex') {
+            document.getElementById('resultModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     function closeModal() {
@@ -637,6 +665,9 @@
             closeModal();
         }
     });
+
+    // Optional: Auto-run on page load to show results immediately
+    // window.onload = calculateEligibility;
 
 </script>
 
