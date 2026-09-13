@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fact · click to search (desc by srno + corner verification)</title>
+    <title>Fact · click to search (desc by srno + tiny corner verification)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* minimal card – clickable fact text */
@@ -197,7 +197,7 @@
 <body class="bg-gray-50 min-h-screen p-4 sm:p-6 font-sans antialiased">
 
 <div class="max-w-6xl mx-auto">
-    <!-- control bar -->
+    <!-- control bar (count badge removed) -->
     <div class="mb-4">
         <div class="control-bar">
             <div class="search-wrap">
@@ -367,36 +367,46 @@
             }
 
             const sample = rows[0];
+            // map headers using your exact column names (case-insensitive)
             const srnoKey = getHeaderKey(sample, 'srno', 's.no', 'sno', 'sr no', 'serial');
-            const catKey  = getHeaderKey(sample, 'catgory', 'category', 'cat', 'categorie');
-            const factKey = getHeaderKey(sample, 'fact', 'facts', 'description', 'content');
+            const catKey  = getHeaderKey(sample, 'tag_beloging_css_subject', 'tag_belonging_css_subject', 'tag belonging css subject', 'category', 'catgory');
+            const factKey = getHeaderKey(sample, 'Fact_or_Question', 'fact_or_question', 'fact or question', 'fact', 'question');
+            const answerKey = getHeaderKey(sample, 'answer', 'Answer');
+            const detailsKey = getHeaderKey(sample, 'details_about_fact', 'details_about_fact', 'details about fact');
+            const createdKey = getHeaderKey(sample, 'created_date', 'created_date', 'created date');
+            const srnoTagKey = getHeaderKey(sample, 'srno tag', 'srno_tag', 'srno tag');
+            const questionCatKey = getHeaderKey(sample, 'Question Category', 'question category', 'question_category');
+            const aiAnswerKey = getHeaderKey(sample, 'ai_answer_true_false', 'ai_answer_true_false', 'ai answer true false');
 
-            // dedicated key for ai_ans_true_false (column D)
-            let verificationKey = getHeaderKey(sample,
-                'ai_ans_true_false', 'ai answ true false', 'ai_ans_true_false',
-                'aianstruefalse', 'ai answer true false'
-            );
+            // fallback verification: if ai_answer_true_false not found, use 4th column as before
+            let verificationKey = aiAnswerKey;
             if (!verificationKey) {
                 const keys = Object.keys(sample);
                 if (keys.length >= 4) verificationKey = keys[3];
             }
 
-            let fallbackFactKey = null;
-            if (!factKey) {
-                const keys = Object.keys(sample);
-                if (keys.length >= 3) fallbackFactKey = keys[2];
-            }
-
             const cardDataList = [];
 
             rows.forEach((row) => {
+                // extract using exact headers, with safe fallbacks
                 const srnoRaw = srnoKey ? (row[srnoKey] || '').trim() : '';
                 let category = catKey ? (row[catKey] || '').trim() : '';
                 let fact = factKey ? (row[factKey] || '').trim() : '';
-                if (!fact && fallbackFactKey) fact = (row[fallbackFactKey] || '').trim();
+                const answer = answerKey ? (row[answerKey] || '').trim() : '';
+                const details = detailsKey ? (row[detailsKey] || '').trim() : '';
+                const created = createdKey ? (row[createdKey] || '').trim() : '';
+                const srnoTag = srnoTagKey ? (row[srnoTagKey] || '').trim() : '';
+                const questionCat = questionCatKey ? (row[questionCatKey] || '').trim() : '';
+
+                // fallback: if fact is empty, use fallback logic
                 if (!fact) {
-                    const fallback = Object.values(row).find(v => v && v.trim() !== '');
-                    if (fallback) fact = fallback.trim();
+                    // Use details or answer as fallback if fact missing
+                    if (details) fact = details;
+                    else if (answer) fact = answer;
+                    else {
+                        const fallback = Object.values(row).find(v => v && v.trim() !== '');
+                        if (fallback) fact = fallback.trim();
+                    }
                 }
 
                 if (!category) category = 'uncategorized';
@@ -406,6 +416,7 @@
                 const displayCategory = category;
                 const displayFact = fact;
 
+                // verification
                 const rawVerification = verificationKey ? (row[verificationKey] || '').trim() : '';
                 const verification = interpretVerification(rawVerification);
 
@@ -421,7 +432,6 @@
                 });
             });
 
-            // total facts after collecting
             totalFacts = cardDataList.length;
             updateSearchPlaceholder();
 
