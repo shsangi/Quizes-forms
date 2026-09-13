@@ -250,7 +250,7 @@
         
         .timeline-year {
             font-weight: bold;
-            width: 60px;
+            width: 70px;
             flex-shrink: 0;
         }
         
@@ -277,7 +277,6 @@
         .badge-success { background: #d4efdf; color: #145a32; }
         .badge-danger { background: #fadbd8; color: #78281f; }
         .badge-warning { background: #fdebd0; color: #7e5109; }
-        
     </style>
 </head>
 <body>
@@ -287,30 +286,30 @@
     
     <div class="form-group">
         <label for="dob">Date of Birth:</label>
-        <input type="date" id="dob" value="1997-03-11">
+        <input type="date" id="dob" value="1997-03-11" onchange="checkJobEligibility()">
     </div>
 
     <div class="form-group">
         <label for="cutoff">Official Age Cut-Off Date (e.g., Dec 31 of exam year):</label>
         <div class="fetch-row">
-            <input type="date" id="cutoff" value="2026-12-31">
+            <input type="date" id="cutoff" value="2026-12-31" onchange="checkJobEligibility()">
             <button class="btn-secondary" onclick="fetchCurrentDate()">Fetch Current</button>
         </div>
     </div>
 
     <div class="form-group">
         <label for="previousAttempts">Number of Previous Attempts:</label>
-        <input type="number" id="previousAttempts" value="0" min="0" max="10">
+        <input type="number" id="previousAttempts" value="0" min="0" max="10" oninput="checkJobEligibility()">
     </div>
 
     <div class="inline-group">
-        <input type="checkbox" id="appliedCurrentYear">
+        <input type="checkbox" id="appliedCurrentYear" onchange="checkJobEligibility()">
         <label for="appliedCurrentYear">Already applied in the current year cycle?</label>
     </div>
     
     <div class="form-group">
         <label for="category">Target Job / Category Rule:</label>
-        <select id="category">
+        <select id="category" onchange="checkJobEligibility()">
             <option value="css">CSS / Competitive Exam (Min 21, Max 30 Yrs, 3 Attempts)</option>
             <option value="general30">Standard Govt Job (Min 18, Max 30 Yrs, 6 Attempts)</option>
             <option value="general35">Officer Scale / Upper Cap (Min 21, Max 35 Yrs, 6 Attempts)</option>
@@ -338,7 +337,7 @@
         <div class="details-text" id="detailsText"></div>
 
         <div class="warning-box">
-            <strong>⚠️ Critical Reminder:</strong> This tool uses <b>Dec 31st</b> as the standard cut-off. Always verify the exact "Age as on" date and attempt rules in the official <b>FPSC advertisement</b> for the specific exam year, as these rules can change.
+            <strong>⚠️ Critical Reminder:</strong> This tool uses <b>Dec 31st</b> as the standard cut-off. Always verify the exact "Age as on" date and attempt rules in the official recruitment advertisement for the specific exam year.
         </div>
 
         <div class="timeline-title">📅 Year-by-Year Outlook</div>
@@ -352,7 +351,7 @@
         const currentYear = today.getFullYear();
         document.getElementById('cutoff').value = `${currentYear}-12-31`;
         document.getElementById('appliedCurrentYear').checked = true;
-        alert("Simulating fetch from CSS website. \n\nIn a real application, this would retrieve the latest official deadline.\nFor now, the cut-off date has been set to the current year's Dec 31.");
+        checkJobEligibility();
     }
 
     function checkJobEligibility() {
@@ -363,7 +362,6 @@
         const isCurrentYearApplied = document.getElementById('appliedCurrentYear').checked;
 
         if (!dobInput || !cutoffInput) {
-            alert("Please fill in both Date of Birth and Cut-Off Date!");
             return;
         }
 
@@ -401,6 +399,9 @@
         const summaryAttempts = document.getElementById('summaryAttempts');
         const detailsText = document.getElementById('detailsText');
         const timelineList = document.getElementById('timelineList');
+
+        // Make sure box is visible
+        resultBox.style.display = 'block';
 
         // Calculate Attempts
         let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
@@ -464,16 +465,15 @@
             <strong>Attempt Analysis:</strong> ${attemptDetail}
         `;
 
-        // --- FIXED YEAR-BY-YEAR TIMELINE LOGIC ---
+        // Year-by-Year Timeline Logic
         timelineList.innerHTML = "";
         let startExamYear = cutoffDate.getFullYear();
-        let simulatedAttemptsUsed = prevAttempts; // Start with previous attempts
+        let simulatedAttemptsUsed = prevAttempts; 
         
         for (let i = 0; i < 6; i++) {
             let targetExamYear = startExamYear + i;
             let simulatedCutoff = new Date(`${targetExamYear}-12-31`);
             
-            // Calculate Age for this specific year
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
             let m = simulatedCutoff.getMonth() - dob.getMonth();
             if (m < 0 || (m === 0 && simulatedCutoff.getDate() < dob.getDate())) yearAge--;
@@ -486,13 +486,10 @@
 
             let statusHtml = "";
             
-            // 1. Handle the Current Year if applied
             if (isCurrentYearBox) {
                 simulatedAttemptsUsed++; 
-                statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Already Applied (Attempt #${simulatedAttemptsUsed})</span>`;
-            } 
-            // 2. Handle Future Years (or current year if NOT applied)
-            else if (isSimAgeEligible) {
+                statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Applied (Attempt #${simulatedAttemptsUsed})</span>`;
+            } else if (isSimAgeEligible) {
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
                     statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Attempt #${simulatedAttemptsUsed}</span>`;
@@ -513,6 +510,11 @@
             timelineList.appendChild(li);
         }
     }
+
+    // Automatically calculate results instantly when page opens
+    window.onload = function() {
+        checkJobEligibility();
+    };
 </script>
 
 </body>
