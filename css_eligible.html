@@ -378,6 +378,7 @@
         <input type="number" id="previousAttempts" value="0" min="0" max="10">
     </div>
 
+    <!-- FIXED: ADDED 'checked' TO DEFAULT -->
     <label class="checkbox-group" for="appliedCurrentYear">
         <input type="checkbox" id="appliedCurrentYear" checked>
         <span>
@@ -450,7 +451,7 @@
         let maxAttempts = 3;
         let ruleName = (relaxation === 'relaxed') ? "CSS (Relaxed: 21-32 Years)" : "CSS (General: 21-30 Years)";
 
-        // Calculate Attempts
+        // --- CALCULATE TOTAL ATTEMPTS USED ---
         let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
         let totalAttemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
 
@@ -463,7 +464,7 @@
         let tempAttemptsUsed = attemptsUsed;
         
         for (let j = 0; j < 10; j++) {
-            let tempCutoffYear = tempYear - 1; // Rule 5: Preceding year
+            let tempCutoffYear = tempYear - 1; 
             let tempCutoff = new Date(`${tempCutoffYear}-12-31`);
             
             let tempAge = tempCutoff.getFullYear() - dob.getFullYear();
@@ -566,7 +567,6 @@
             let targetCutoffYear = targetExamYear - 1; // Rule 5: Strict Cut-off
             let simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
             
-            // Calculate exact age for this specific year's cut-off
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
             let m = simulatedCutoff.getMonth() - dob.getMonth();
             let d = simulatedCutoff.getDate() - dob.getDate();
