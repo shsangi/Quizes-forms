@@ -247,7 +247,7 @@
         .timeline-item {
             display: flex;
             align-items: center;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px dashed #eee;
             font-size: 13px;
         }
@@ -258,19 +258,19 @@
         
         .timeline-year {
             font-weight: bold;
-            width: 50px;
+            width: 55px;
             flex-shrink: 0;
         }
         
         .timeline-cutoff {
-            width: 90px;
+            width: 85px;
             flex-shrink: 0;
             color: var(--text-light);
             font-size: 11px;
         }
         
         .timeline-age {
-            width: 60px;
+            width: 55px;
             flex-shrink: 0;
             color: var(--text-light);
         }
@@ -279,26 +279,35 @@
             flex-grow: 1;
             text-align: right;
             font-weight: 500;
+            line-height: 1.4;
         }
 
         .badge {
             padding: 3px 8px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             text-transform: uppercase;
+            display: inline-block;
         }
         
         .badge-success { background: #d4efdf; color: #145a32; }
         .badge-danger { background: #fadbd8; color: #78281f; }
         .badge-warning { background: #fdebd0; color: #7e5109; }
+        .badge-info { background: #ebf5fb; color: #1a5276; }
         
+        .status-note {
+            font-size: 10px;
+            color: var(--text-light);
+            display: block;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="version-tag">v4 (Final)</div>
+    <div class="version-tag">v5 (Final)</div>
     <h2>🎯 CSS Eligibility & Attempt Tracker</h2>
     
     <div class="form-group">
@@ -427,12 +436,10 @@
         let isAttemptEligible = (totalAttemptsRemaining > 0);
 
         // --- CALCULATE USABLE ATTEMPTS (FIXED) ---
-        // We need to simulate future years and stop counting as soon as age becomes ineligible.
         let usableAttemptsRemaining = 0;
         let tempYear = examYear;
         let tempAttemptsUsed = attemptsUsed;
         
-        // Check the next 10 years to see how many attempts can actually be used
         for (let j = 0; j < 10; j++) {
             let tempCutoffYear = tempYear - 1; // Rule 5
             let tempCutoff = new Date(`${tempCutoffYear}-12-31`);
@@ -444,21 +451,17 @@
             let isTempAgeEligible = (tempAge >= minAge && tempAge <= maxAge);
             let isTempAttemptEligible = (tempAttemptsUsed < maxAttempts);
             
-            // If the candidate is age-eligible for this future year, count it as usable
             if (isTempAgeEligible && isTempAttemptEligible) {
                 usableAttemptsRemaining++;
                 tempAttemptsUsed++;
             } else if (!isTempAgeEligible) {
-                // STOP: If they are overage in a future year, they cannot use any attempts after this.
                 break; 
             } else {
-                // STOP: If attempts are exhausted, break.
                 break; 
             }
             tempYear++;
         }
 
-        // If the current year is already applied, we don't count it as "remaining".
         if (isCurrentYearApplied && usableAttemptsRemaining > 0) {
             usableAttemptsRemaining--;
         }
@@ -522,7 +525,7 @@
             <strong>Attempt Analysis:</strong> ${attemptDetail}
         `;
 
-        // Year-by-Year Timeline Logic
+        // --- FIXED YEAR-BY-YEAR TIMELINE LOGIC ---
         timelineList.innerHTML = "";
         let startExamYear = examYear;
         let simulatedAttemptsUsed = prevAttempts; 
@@ -546,18 +549,34 @@
             
             if (isCurrentYearBox) {
                 simulatedAttemptsUsed++; 
-                statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Applied (Attempt #${simulatedAttemptsUsed})</span>`;
+                statusHtml = `<span class="badge badge-success">ELIGIBLE</span> <span class="status-note">Applied (Attempt #${simulatedAttemptsUsed})</span>`;
             } else if (isSimAgeEligible) {
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
-                    statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Attempt #${simulatedAttemptsUsed}</span>`;
+                    // Check if this is the LAST usable attempt based on future age limits
+                    let isLastUsable = false;
+                    if (simulatedAttemptsUsed === maxAttempts) {
+                        isLastUsable = true;
+                    } else {
+                        // Check if the NEXT year would be overage
+                        let nextCutoffYear = targetExamYear - 1 + 1; 
+                        let nextCutoff = new Date(`${nextCutoffYear}-12-31`);
+                        let nextAge = nextCutoff.getFullYear() - dob.getFullYear();
+                        if (nextAge > maxAge) isLastUsable = true;
+                    }
+
+                    if (isLastUsable) {
+                        statusHtml = `<span class="badge badge-success">ELIGIBLE</span> <span class="status-note" style="color:#e74c3c; font-weight:bold;">LAST USABLE ATTEMPT (#${simulatedAttemptsUsed})</span>`;
+                    } else {
+                        statusHtml = `<span class="badge badge-success">ELIGIBLE</span> <span class="status-note">Attempt #${simulatedAttemptsUsed}</span>`;
+                    }
                 } else {
-                    statusHtml = `<span class="badge badge-warning">Age OK</span> <span style="color:var(--text-light); font-size:11px;">Attempts Finished</span>`;
+                    statusHtml = `<span class="badge badge-warning">AGE OK</span> <span class="status-note">Attempts Finished</span>`;
                 }
             } else if (yearAge < minAge) {
-                statusHtml = `<span class="badge badge-danger">Underage</span>`;
+                statusHtml = `<span class="badge badge-danger">UNDERAGE</span>`;
             } else {
-                statusHtml = `<span class="badge badge-danger">Overage</span>`;
+                statusHtml = `<span class="badge badge-danger">OVERAGE</span>`;
             }
 
             li.innerHTML = `
