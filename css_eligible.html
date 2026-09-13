@@ -71,7 +71,7 @@
             font-size: 13px;
         }
         
-        input, select {
+        input[type="date"], select {
             width: 100%;
             padding: 14px;
             border: 1px solid #ccd1d9;
@@ -82,12 +82,51 @@
             appearance: none;
         }
         
-        input:focus, select:focus {
+        input[type="date"]:focus, select:focus {
             border-color: var(--primary);
             outline: none;
             background-color: #ffffff;
         }
-        
+
+        /* --- RADIO BUTTONS --- */
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .radio-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .radio-option label {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background: #f9fbfd;
+            border: 1px solid #ccd1d9;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(37, 117, 252, 0.3);
+        }
+
         /* --- TOGGLE SWITCH --- */
         .toggle-container {
             display: flex;
@@ -427,13 +466,27 @@
         </select>
     </div>
 
+    <!-- RADIO BUTTONS FOR PREVIOUS ATTEMPTS -->
     <div class="form-group">
-        <label for="previousAttempts">Previous Attempts (Completed cycles):</label>
-        <input type="number" id="previousAttempts" value="0" min="0" max="10">
+        <label>Number of Previous Attempts (Completed cycles):</label>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" id="prev0" name="prevAttempts" value="0" checked>
+                <label for="prev0">0</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="prev1" name="prevAttempts" value="1">
+                <label for="prev1">1</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="prev2" name="prevAttempts" value="2">
+                <label for="prev2">2</label>
+            </div>
+        </div>
     </div>
 
     <!-- TOGGLE SWITCH -->
-    <div class="toggle-container" id="toggleContainer" onclick="toggleSwitch()">
+    <div class="toggle-container active" id="toggleContainer" onclick="toggleSwitch()">
         <div class="toggle-text">
             <strong>Already filled form for the upcoming cycle?</strong>
             <span>(e.g., filled in Aug 2026 for the Jan 2027 exam).</span>
@@ -487,8 +540,17 @@
         const dobInput = document.getElementById('dob').value;
         const examYear = parseInt(document.getElementById('examYear').value);
         const relaxation = document.getElementById('relaxation').value;
-        let prevAttempts = parseInt(document.getElementById('previousAttempts').value) || 0;
         const isCurrentYearApplied = document.getElementById('appliedCurrentYear').checked;
+        
+        // Get selected radio value
+        let prevAttempts = 0;
+        const radios = document.getElementsByName('prevAttempts');
+        for (let r of radios) {
+            if (r.checked) {
+                prevAttempts = parseInt(r.value);
+                break;
+            }
+        }
 
         if (!dobInput) {
             alert("Please enter your Date of Birth.");
