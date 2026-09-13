@@ -138,27 +138,6 @@
             background-color: var(--primary-hover);
         }
         
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 15px;
-            font-size: 13px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        .fetch-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
         .result-box {
             margin-top: 25px;
             padding: 20px;
@@ -319,7 +298,7 @@
 <body>
 
 <div class="container">
-    <div class="version-tag">v3 (Final Rules)</div>
+    <div class="version-tag">v4 (Final)</div>
     <h2>🎯 CSS Eligibility & Attempt Tracker</h2>
     
     <div class="form-group">
@@ -447,34 +426,41 @@
         let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
         let isAttemptEligible = (totalAttemptsRemaining > 0);
 
-        // --- CALCULATE USABLE ATTEMPTS BASED ON AGE ---
+        // --- CALCULATE USABLE ATTEMPTS (FIXED) ---
+        // We need to simulate future years and stop counting as soon as age becomes ineligible.
         let usableAttemptsRemaining = 0;
-        if (isAgeEligible && isAttemptEligible) {
-            let tempYear = examYear;
-            let tempAttemptsUsed = attemptsUsed;
+        let tempYear = examYear;
+        let tempAttemptsUsed = attemptsUsed;
+        
+        // Check the next 10 years to see how many attempts can actually be used
+        for (let j = 0; j < 10; j++) {
+            let tempCutoffYear = tempYear - 1; // Rule 5
+            let tempCutoff = new Date(`${tempCutoffYear}-12-31`);
             
-            // Check the next 10 years to see how many attempts can actually be used
-            for (let j = 0; j < 10; j++) {
-                let tempCutoffYear = tempYear - 1; // Rule 5
-                let tempCutoff = new Date(`${tempCutoffYear}-12-31`);
-                
-                let tempAge = tempCutoff.getFullYear() - dob.getFullYear();
-                let tempM = tempCutoff.getMonth() - dob.getMonth();
-                if (tempM < 0 || (tempM === 0 && tempCutoff.getDate() < dob.getDate())) tempAge--;
-                
-                let isTempAgeEligible = (tempAge >= minAge && tempAge <= maxAge);
-                let isTempAttemptEligible = (tempAttemptsUsed < maxAttempts);
-                
-                if (isTempAgeEligible && isTempAttemptEligible) {
-                    usableAttemptsRemaining++;
-                    tempAttemptsUsed++;
-                } else if (!isTempAgeEligible) {
-                    break; // Stop counting if we hit an age wall
-                } else {
-                    break; // Stop counting if attempts are exhausted
-                }
-                tempYear++;
+            let tempAge = tempCutoff.getFullYear() - dob.getFullYear();
+            let tempM = tempCutoff.getMonth() - dob.getMonth();
+            if (tempM < 0 || (tempM === 0 && tempCutoff.getDate() < dob.getDate())) tempAge--;
+            
+            let isTempAgeEligible = (tempAge >= minAge && tempAge <= maxAge);
+            let isTempAttemptEligible = (tempAttemptsUsed < maxAttempts);
+            
+            // If the candidate is age-eligible for this future year, count it as usable
+            if (isTempAgeEligible && isTempAttemptEligible) {
+                usableAttemptsRemaining++;
+                tempAttemptsUsed++;
+            } else if (!isTempAgeEligible) {
+                // STOP: If they are overage in a future year, they cannot use any attempts after this.
+                break; 
+            } else {
+                // STOP: If attempts are exhausted, break.
+                break; 
             }
+            tempYear++;
+        }
+
+        // If the current year is already applied, we don't count it as "remaining".
+        if (isCurrentYearApplied && usableAttemptsRemaining > 0) {
+            usableAttemptsRemaining--;
         }
 
         // Update Summary Cards
@@ -522,9 +508,9 @@
         if (totalAttemptsRemaining === 0) {
             attemptDetail = `You have <b>used all ${maxAttempts} allowed attempts</b>.`;
         } else {
-            attemptDetail = `You have <b>${totalAttemptsRemaining} attempt(s) remaining</b>. You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
+            attemptDetail = `You have <b>${totalAttemptsRemaining} attempt(s) remaining in total</b>. You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
             if (usableAttemptsRemaining < totalAttemptsRemaining) {
-                attemptDetail += `<br><span style="color:var(--danger-border); font-weight:bold;">⚠️ Due to age restrictions, you can only use <b>${usableAttemptsRemaining}</b> of these remaining attempts.</span>`;
+                attemptDetail += `<br><span style="color:var(--danger-border); font-weight:bold;">⚠️ Due to age restrictions, you can only use <b>${usableAttemptsRemaining}</b> of these remaining attempts before becoming overage.</span>`;
             }
         }
 
@@ -536,7 +522,7 @@
             <strong>Attempt Analysis:</strong> ${attemptDetail}
         `;
 
-        // Year-by-Year Timeline Logic (Based on Official Cut-off Rules)
+        // Year-by-Year Timeline Logic
         timelineList.innerHTML = "";
         let startExamYear = examYear;
         let simulatedAttemptsUsed = prevAttempts; 
