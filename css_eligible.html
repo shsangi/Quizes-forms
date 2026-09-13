@@ -298,75 +298,7 @@
             color: var(--text-light);
         }
 
-        /* --- RESULT CARDS --- */
-        .result-summary-card {
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .result-summary-card.eligible {
-            background-color: var(--success-bg);
-            color: var(--success-text);
-            border: 1px solid var(--success-border);
-        }
-
-        .result-summary-card.not-eligible {
-            background-color: var(--danger-bg);
-            color: var(--danger-text);
-            border: 1px solid var(--danger-border);
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-
-        .stat-card .label {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-light);
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .stat-card .value {
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .stat-card .value.success { color: var(--success-border); }
-        .stat-card .value.danger { color: var(--danger-border); }
-
-        .criteria-text {
-            font-size: 13px;
-            line-height: 1.6;
-            color: var(--text-dark);
-            background: #fdfefe;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        .criteria-text strong {
-            color: var(--text-dark);
-        }
-
-        /* --- YEAR-BY-YEAR CARDS --- */
+        /* --- YEAR-BY-YEAR CARDS (SIMPLIFIED) --- */
         .year-cards-container {
             display: flex;
             flex-direction: column;
@@ -376,8 +308,8 @@
         .year-card {
             background: var(--card-bg);
             border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -396,29 +328,26 @@
 
         .year-card-title {
             font-weight: bold;
-            font-size: 15px;
-            margin-bottom: 2px;
+            font-size: 16px;
+            margin-bottom: 4px;
         }
 
         .year-card-age {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-light);
+            font-weight: 500;
         }
 
         .year-card-status {
-            font-size: 12px;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 6px;
             text-align: right;
-            min-width: 100px;
+            min-width: 110px;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             text-transform: uppercase;
         }
@@ -426,13 +355,13 @@
         .badge-success { background: #d4efdf; color: #145a32; }
         .badge-danger { background: #fadbd8; color: #78281f; }
         .badge-warning { background: #fdebd0; color: #7e5109; }
-        .badge-info { background: #ebf5fb; color: #1a5276; }
 
         .year-card-note {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-light);
             display: block;
-            margin-top: 3px;
+            margin-top: 4px;
+            font-weight: 600;
         }
 
         /* Custom Scrollbar */
@@ -502,7 +431,7 @@
 <div class="modal-overlay" id="resultModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>📋 Eligibility Report</h3>
+            <h3>📅 Year-by-Year Eligibility</h3>
             <button class="close-btn" onclick="closeModal()">&times;</button>
         </div>
         
@@ -556,7 +485,6 @@
         let minAge = 21;
         let maxAge = (relaxation === 'relaxed') ? 32 : 30;
         let maxAttempts = 3;
-        let ruleName = (relaxation === 'relaxed') ? "CSS (Relaxed: 21-32 Years)" : "CSS (General: 21-30 Years)";
 
         // --- CALCULATE AGE FOR THE CURRENT CYCLE (Dec 31, 2026) ---
         const currentCutoffDate = new Date(`${CURRENT_CUTOFF_YEAR}-12-31`);
@@ -576,119 +504,9 @@
 
         // Calculate Total Attempts Used
         let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
-        let totalAttemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
 
-        let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
-        let isAttemptEligible = (totalAttemptsRemaining > 0);
-
-        // --- CALCULATE USABLE ATTEMPTS (Strict Rule 5 Cut-off) ---
-        let usableAttemptsRemaining = 0;
-        let tempYear = CURRENT_CYCLE_YEAR;
-        let tempAttemptsUsed = attemptsUsed;
-        
-        for (let j = 0; j < 10; j++) {
-            let tempCutoffYear = tempYear - 1; 
-            let tempCutoff = new Date(`${tempCutoffYear}-12-31`);
-            
-            let tempAge = tempCutoff.getFullYear() - dob.getFullYear();
-            let tempM = tempCutoff.getMonth() - dob.getMonth();
-            let tempD = tempCutoff.getDate() - dob.getDate();
-            
-            if (tempD < 0) {
-                tempM--;
-                tempD += new Date(tempCutoff.getFullYear(), tempCutoff.getMonth(), 0).getDate();
-            }
-            if (tempM < 0) {
-                tempAge--;
-            }
-            
-            let isTempAgeEligible = (tempAge >= minAge && tempAge <= maxAge);
-            let isTempAttemptEligible = (tempAttemptsUsed < maxAttempts);
-            
-            if (isTempAgeEligible && isTempAttemptEligible) {
-                usableAttemptsRemaining++;
-                tempAttemptsUsed++;
-            } else if (!isTempAgeEligible) {
-                break; 
-            } else {
-                break; 
-            }
-            tempYear++;
-        }
-
-        // If already applied, we do not count the current year as a "future usable" attempt
-        if (isCurrentYearApplied && usableAttemptsRemaining > 0) {
-            usableAttemptsRemaining--;
-        }
-
-        // --- BUILD THE MODAL CONTENT ---
-        let modalHtml = "";
-
-        // 1. Status Header for the CURRENT cycle
-        if (isAgeEligible && isAttemptEligible && usableAttemptsRemaining > 0) {
-            modalHtml += `<div class="result-summary-card eligible">✅ ELIGIBLE TO APPLY FOR CSS ${CURRENT_CYCLE_YEAR}</div>`;
-        } else if (!isAgeEligible) {
-            modalHtml += `<div class="result-summary-card not-eligible">❌ NOT ELIGIBLE (Age Restriction)</div>`;
-        } else if (totalAttemptsRemaining === 0) {
-            modalHtml += `<div class="result-summary-card not-eligible">❌ NOT ELIGIBLE (Attempts Exhausted)</div>`;
-        } else {
-            modalHtml += `<div class="result-summary-card not-eligible">❌ NOT ELIGIBLE FOR CSS ${CURRENT_CYCLE_YEAR}</div>`;
-        }
-
-        // 2. Stat Cards
-        let ageStatClass = isAgeEligible ? "success" : "danger";
-        let attemptStatClass = (usableAttemptsRemaining > 0) ? "success" : "danger";
-
-        modalHtml += `
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <span class="label">Age Status</span>
-                    <span class="value ${ageStatClass}">${isAgeEligible ? (maxAge - ageYears) + ' Yrs Left' : 'Overage'}</span>
-                </div>
-                <div class="stat-card">
-                    <span class="label">Usable Attempts</span>
-                    <span class="value ${attemptStatClass}">${usableAttemptsRemaining} Left</span>
-                </div>
-            </div>
-        `;
-
-        // 3. Criteria Details
-        let ageDetail = "";
-        if (ageYears > maxAge) ageDetail = `You are <b>${ageYears - maxAge} year(s) over</b> the maximum age limit of ${maxAge}.`;
-        else if (ageYears < minAge) ageDetail = `You need <b>${minAge - ageYears} more year(s)</b> to reach the minimum age of ${minAge}.`;
-        else ageDetail = `You are <b>within the age limits</b> (${minAge}-${maxAge} years). You have <b>${maxAge - ageYears} year(s)</b> before reaching the maximum age.`;
-
-        let attemptDetail = "";
-        if (totalAttemptsRemaining === 0) {
-            attemptDetail = `You have <b>used all ${maxAttempts} allowed attempts</b>.`;
-        } else {
-            attemptDetail = `You have <b>${totalAttemptsRemaining} attempt(s) remaining in total</b>. You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
-            if (usableAttemptsRemaining < totalAttemptsRemaining) {
-                attemptDetail += `<br><span style="color:var(--danger-border); font-weight:bold;">⚠️ Due to age restrictions, you can only use <b>${usableAttemptsRemaining}</b> of these remaining attempts before becoming overage.</span>`;
-            }
-        }
-
-        // Status line for current year
-        let toggleStatusLine = "";
-        if (isCurrentYearApplied) {
-            toggleStatusLine = `<br><strong>Status:</strong> <span style="color:var(--success-border);">You have already filled the form for CSS ${CURRENT_CYCLE_YEAR}.</span>`;
-        } else {
-            toggleStatusLine = `<br><strong>Status:</strong> <span style="color:var(--danger-border);">You have NOT filled the form for CSS ${CURRENT_CYCLE_YEAR} yet.</span>`;
-        }
-
-        modalHtml += `
-            <div class="criteria-text">
-                <strong>Official Cut-off Date (Rule 5):</strong> 31 December ${CURRENT_CUTOFF_YEAR}<br>
-                <strong>Your Age on Cut-off Date:</strong> ${ageYears} years, ${ageMonths} months, ${ageDays} days<br>
-                <strong>Rule Applied:</strong> ${ruleName}${toggleStatusLine}<br><br>
-                <strong>Age Analysis:</strong> ${ageDetail}<br>
-                <strong>Attempt Analysis:</strong> ${attemptDetail}
-            </div>
-        `;
-
-        // 4. Year-by-Year Cards (10 Years from CURRENT_CYCLE_YEAR onwards)
-        modalHtml += `<h4 style="margin-bottom:10px; font-size:15px; color:var(--text-dark);">📅 10-Year Outlook</h4>`;
-        modalHtml += `<div class="year-cards-container">`;
+        // --- BUILD THE MODAL CONTENT (ONLY YEAR CARDS) ---
+        let modalHtml = `<div class="year-cards-container">`;
 
         let startExamYear = CURRENT_CYCLE_YEAR;
         let simulatedAttemptsUsed = prevAttempts; 
@@ -698,16 +516,17 @@
             let targetCutoffYear = targetExamYear - 1; 
             let simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
             
+            // Calculate exact age (Years and Months) for this specific year
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
-            let m = simulatedCutoff.getMonth() - dob.getMonth();
-            let d = simulatedCutoff.getDate() - dob.getDate();
+            let yearMonths = simulatedCutoff.getMonth() - dob.getMonth();
+            let dayDiff = simulatedCutoff.getDate() - dob.getDate();
             
-            if (d < 0) {
-                m--;
-                d += new Date(simulatedCutoff.getFullYear(), simulatedCutoff.getMonth(), 0).getDate();
+            if (dayDiff < 0) {
+                yearMonths--;
             }
-            if (m < 0) {
+            if (yearMonths < 0) {
                 yearAge--;
+                yearMonths += 12;
             }
             
             let isSimAgeEligible = (yearAge >= minAge && yearAge <= maxAge);
@@ -721,12 +540,11 @@
                 simulatedAttemptsUsed++; 
                 cardClass = "eligible";
                 statusBadge = `<span class="badge badge-success">ELIGIBLE</span>`;
-                noteText = `<span style="color:var(--success-border); font-weight:bold;">Applied (Attempt #${simulatedAttemptsUsed})</span>`;
+                noteText = `Applied (Attempt #${simulatedAttemptsUsed})`;
             } else if (isSimAgeEligible) {
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
                     
-                    // Check if this is the LAST usable attempt based on future age limits
                     let isLastUsable = false;
                     if (simulatedAttemptsUsed === maxAttempts) {
                         isLastUsable = true;
@@ -765,7 +583,7 @@
                 <div class="year-card ${cardClass}">
                     <div class="year-card-info">
                         <span class="year-card-title">CSS ${targetExamYear}</span>
-                        <span class="year-card-age">Cut-off: Dec ${targetCutoffYear} | Age: ${yearAge}</span>
+                        <span class="year-card-age">Cut-off: Dec ${targetCutoffYear} | Age: ${yearAge}y ${yearMonths}m</span>
                     </div>
                     <div class="year-card-status">
                         ${statusBadge}
