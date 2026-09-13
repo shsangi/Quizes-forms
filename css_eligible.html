@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Eligibility & Age Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccd1d9;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #1a5db6;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        .eligible {
+            background-color: #e8f8f5;
+            border: 1px solid #27ae60;
+            color: #0e6251;
+        }
+        .not-eligible {
+            background-color: #ffd2d2;
+            border: 1px solid #e74c3c;
+            color: #78281f;
+        }
+        .result h3 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .result p {
+            margin: 6px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Job Eligibility Checker</h2>
+    
+    <div class="form-group">
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob">
+    </div>
+    
+    <div class="form-group">
+        <label for="category">Target Job / Category Rule:</label>
+        <select id="category">
+            <option value="css">CSS / Officer Scale (Min 21, Max 30 Yrs, 3 Attempts)</option>
+            <option value="general30">Standard General Job (Min 18, Max 30 Yrs)</option>
+            <option value="general35">Extended General / Officer Job (Min 21, Max 35 Yrs)</option>
+        </select>
+    </div>
+
+    <button onclick="checkJobEligibility()">Check Eligibility Status</button>
+
+    <div class="result" id="resultBox">
+        <h3 id="statusTitle"></h3>
+        <p id="resAge">Exact Age: </p>
+        <p id="resWindow">Eligible Age Window: </p>
+        <p id="resDetails">Details: </p>
+    </div>
+</div>
+
+<script>
+    function checkJobEligibility() {
+        const dobInput = document.getElementById('dob').value;
+        const category = document.getElementById('category').value;
+
+        if (!dobInput) {
+            alert("Please enter your date of birth!");
+            return;
+        }
+
+        const dob = new Date(dobInput);
+        const today = new Date();
+
+        // Calculate exact age relative to today
+        let ageYears = today.getFullYear() - dob.getFullYear();
+        let ageMonths = today.getMonth() - dob.getMonth();
+        let ageDays = today.getDate() - dob.getDate();
+
+        if (ageDays < 0) {
+            ageMonths--;
+            ageDays += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+        }
+        if (ageMonths < 0) {
+            ageYears--;
+            ageMonths += 12;
+        }
+
+        let minAge = 18;
+        let maxAge = 30;
+        let ruleName = "";
+
+        if (category === 'css') {
+            minAge = 21;
+            maxAge = 30; // Standard framework
+            ruleName = "CSS / Competitive Exam (21-30 Years)";
+        } else if (category === 'general30') {
+            minAge = 18;
+            maxAge = 30;
+            ruleName = "Standard Govt Job (18-30 Years)";
+        } else if (category === 'general35') {
+            minAge = 21;
+            maxAge = 35;
+            ruleName = "Officer Scale / Upper Cap (21-35 Years)";
+        }
+
+        const resultBox = document.getElementById('resultBox');
+        const statusTitle = document.getElementById('statusTitle');
+        const resAge = document.getElementById('resAge');
+        const resWindow = document.getElementById('resWindow');
+        const resDetails = document.getElementById('resDetails');
+
+        resultBox.style.display = 'block';
+
+        // Evaluate eligibility
+        if (ageYears >= minAge && ageYears <= maxAge) {
+            resultBox.className = "result eligible";
+            statusTitle.innerText = "Status: ELIGIBLE TO APPLY ✅";
+            resDetails.innerText = `You fall securely within the accepted age boundaries for this category.`;
+        } else if (ageYears < minAge) {
+            let yearsToGo = minAge - ageYears;
+            resultBox.className = "result not-eligible";
+            statusTitle.innerText = "Status: NOT YET ELIGIBLE ❌";
+            resDetails.innerText = `You are under the minimum age requirement. You will be eligible in roughly ${yearsToGo} year(s) when you turn ${minAge}.`;
+        } else {
+            resultBox.className = "result not-eligible";
+            statusTitle.innerText = "Status: OVERAGE ❌";
+            resDetails.innerText = `You have crossed the maximum upper age limit (${maxAge} years) specified for this bracket.`;
+        }
+
+        resAge.innerText = `Exact Age Today: ${ageYears} years, ${ageMonths} months, and ${ageDays} days`;
+        resWindow.innerText = `Criteria Rule: ${ruleName}`;
+    }
+</script>
+
+</body>
+</html>
