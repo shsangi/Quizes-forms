@@ -298,7 +298,7 @@
             color: var(--text-light);
         }
 
-        /* --- YEAR-BY-YEAR CARDS (SIMPLIFIED) --- */
+        /* --- YEAR-BY-YEAR CARDS --- */
         .year-cards-container {
             display: flex;
             flex-direction: column;
@@ -486,25 +486,6 @@
         let maxAge = (relaxation === 'relaxed') ? 32 : 30;
         let maxAttempts = 3;
 
-        // --- CALCULATE AGE FOR THE CURRENT CYCLE (Dec 31, 2026) ---
-        const currentCutoffDate = new Date(`${CURRENT_CUTOFF_YEAR}-12-31`);
-        
-        let ageYears = currentCutoffDate.getFullYear() - dob.getFullYear();
-        let ageMonths = currentCutoffDate.getMonth() - dob.getMonth();
-        let ageDays = currentCutoffDate.getDate() - dob.getDate();
-
-        if (ageDays < 0) {
-            ageMonths--;
-            ageDays += new Date(currentCutoffDate.getFullYear(), currentCutoffDate.getMonth(), 0).getDate();
-        }
-        if (ageMonths < 0) {
-            ageYears--;
-            ageMonths += 12;
-        }
-
-        // Calculate Total Attempts Used
-        let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
-
         // --- BUILD THE MODAL CONTENT (ONLY YEAR CARDS) ---
         let modalHtml = `<div class="year-cards-container">`;
 
@@ -529,7 +510,11 @@
                 yearMonths += 12;
             }
             
+            // --- CORRECT AGE CHECK ---
+            // A candidate is eligible if their completed age in years is <= maxAge on the cut-off date.
+            // Turning 31 after the cut-off date does not make them ineligible.
             let isSimAgeEligible = (yearAge >= minAge && yearAge <= maxAge);
+            
             let isCurrentYearBox = (i === 0 && isCurrentYearApplied);
             
             let cardClass = "";
