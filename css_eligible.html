@@ -42,8 +42,25 @@
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
             width: 100%;
             max-width: 550px;
+            position: relative; /* Needed for absolute positioning of version tag */
         }
         
+        /* Version Tag */
+        .version-tag {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            background: #f8f9fa;
+            padding: 3px 6px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
         h2 {
             text-align: center;
             color: var(--text-dark);
@@ -295,6 +312,7 @@
 <body>
 
 <div class="container">
+    <div class="version-tag">v1</div>
     <h2>🎯 Eligibility & Attempt Tracker</h2>
     
     <div class="form-group">
@@ -484,7 +502,6 @@
         let startExamYear = cutoffDate.getFullYear();
         let simulatedAttemptsUsed = prevAttempts; 
         
-        // If the current year is applied, the FIRST year in the timeline is the current cycle
         for (let i = 0; i < 6; i++) {
             let targetExamYear = startExamYear + i;
             let simulatedCutoff = new Date(`${targetExamYear}-12-31`);
