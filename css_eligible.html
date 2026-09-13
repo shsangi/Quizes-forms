@@ -138,6 +138,27 @@
             background-color: var(--primary-hover);
         }
         
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 15px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .fetch-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
         .result-box {
             margin-top: 25px;
             padding: 20px;
@@ -292,12 +313,13 @@
         .badge-success { background: #d4efdf; color: #145a32; }
         .badge-danger { background: #fadbd8; color: #78281f; }
         .badge-warning { background: #fdebd0; color: #7e5109; }
+        
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="version-tag">v2 (Official Rules)</div>
+    <div class="version-tag">v3 (Final Rules)</div>
     <h2>🎯 CSS Eligibility & Attempt Tracker</h2>
     
     <div class="form-group">
@@ -330,7 +352,7 @@
     </div>
 
     <div class="form-group">
-        <label for="relaxation">Age Relaxation Category (Rule 6):</label>
+        <label for="relaxation">Age Relaxation Category (Rule 6(2)):</label>
         <select id="relaxation" onchange="checkJobEligibility()">
             <option value="none">No Relaxation (Max Age: 30)</option>
             <option value="relaxed">Eligible for 2-Year Relaxation (Max Age: 32)</option>
@@ -351,7 +373,7 @@
                 <div class="value" id="summaryAge"></div>
             </div>
             <div class="summary-card">
-                <div class="label">Attempts Left</div>
+                <div class="label">Usable Attempts</div>
                 <div class="value" id="summaryAttempts"></div>
             </div>
         </div>
@@ -415,15 +437,45 @@
 
         resultBox.style.display = 'block';
 
-        // Calculate Attempts
+        // Calculate Total Attempts
         let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
-        let attemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
+        let totalAttemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
 
         // Calculate Age Limits
         let yearsUntilOverage = maxAge - ageYears;
         let yearsUntilEligible = minAge - ageYears;
         let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
-        let isAttemptEligible = (attemptsRemaining > 0);
+        let isAttemptEligible = (totalAttemptsRemaining > 0);
+
+        // --- CALCULATE USABLE ATTEMPTS BASED ON AGE ---
+        let usableAttemptsRemaining = 0;
+        if (isAgeEligible && isAttemptEligible) {
+            let tempYear = examYear;
+            let tempAttemptsUsed = attemptsUsed;
+            
+            // Check the next 10 years to see how many attempts can actually be used
+            for (let j = 0; j < 10; j++) {
+                let tempCutoffYear = tempYear - 1; // Rule 5
+                let tempCutoff = new Date(`${tempCutoffYear}-12-31`);
+                
+                let tempAge = tempCutoff.getFullYear() - dob.getFullYear();
+                let tempM = tempCutoff.getMonth() - dob.getMonth();
+                if (tempM < 0 || (tempM === 0 && tempCutoff.getDate() < dob.getDate())) tempAge--;
+                
+                let isTempAgeEligible = (tempAge >= minAge && tempAge <= maxAge);
+                let isTempAttemptEligible = (tempAttemptsUsed < maxAttempts);
+                
+                if (isTempAgeEligible && isTempAttemptEligible) {
+                    usableAttemptsRemaining++;
+                    tempAttemptsUsed++;
+                } else if (!isTempAgeEligible) {
+                    break; // Stop counting if we hit an age wall
+                } else {
+                    break; // Stop counting if attempts are exhausted
+                }
+                tempYear++;
+            }
+        }
 
         // Update Summary Cards
         if (ageYears > maxAge) {
@@ -437,27 +489,27 @@
             summaryAge.className = "value success";
         }
 
-        if (attemptsRemaining === 0) {
+        if (usableAttemptsRemaining === 0) {
             summaryAttempts.innerHTML = `0 Left`;
             summaryAttempts.className = "value danger";
         } else {
-            summaryAttempts.innerHTML = `${attemptsRemaining} Left`;
+            summaryAttempts.innerHTML = `${usableAttemptsRemaining} Left`;
             summaryAttempts.className = "value success";
         }
 
         // Update Main Status Header
-        if (isAgeEligible && isAttemptEligible) {
+        if (isAgeEligible && isAttemptEligible && usableAttemptsRemaining > 0) {
             resultBox.className = "result-box status-eligible";
             statusTitle.innerHTML = `✅ ELIGIBLE FOR CSS ${examYear}`;
-        } else if (!isAgeEligible && !isAttemptEligible) {
-            resultBox.className = "result-box status-not-eligible";
-            statusTitle.innerHTML = `❌ NOT ELIGIBLE FOR CSS ${examYear}`;
         } else if (!isAgeEligible) {
             resultBox.className = "result-box status-not-eligible";
             statusTitle.innerHTML = `❌ NOT ELIGIBLE (Age Restriction)`;
-        } else {
+        } else if (totalAttemptsRemaining === 0) {
             resultBox.className = "result-box status-not-eligible";
             statusTitle.innerHTML = `❌ NOT ELIGIBLE (Attempts Exhausted)`;
+        } else {
+            resultBox.className = "result-box status-not-eligible";
+            statusTitle.innerHTML = `❌ NOT ELIGIBLE FOR CSS ${examYear}`;
         }
 
         // Update Detailed Text
@@ -467,8 +519,14 @@
         else ageDetail = `You are <b>within the age limits</b> (${minAge}-${maxAge} years). You have <b>${yearsUntilOverage} year(s)</b> before reaching the maximum age.`;
 
         let attemptDetail = "";
-        if (attemptsRemaining === 0) attemptDetail = `You have <b>used all ${maxAttempts} allowed attempts</b>.`;
-        else attemptDetail = `You have <b>${attemptsRemaining} attempt(s) remaining</b>. You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
+        if (totalAttemptsRemaining === 0) {
+            attemptDetail = `You have <b>used all ${maxAttempts} allowed attempts</b>.`;
+        } else {
+            attemptDetail = `You have <b>${totalAttemptsRemaining} attempt(s) remaining</b>. You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
+            if (usableAttemptsRemaining < totalAttemptsRemaining) {
+                attemptDetail += `<br><span style="color:var(--danger-border); font-weight:bold;">⚠️ Due to age restrictions, you can only use <b>${usableAttemptsRemaining}</b> of these remaining attempts.</span>`;
+            }
+        }
 
         detailsText.innerHTML = `
             <strong>Official Cut-off Date (Rule 5):</strong> 31 December ${cutoffYear}<br>
@@ -485,7 +543,7 @@
         
         for (let i = 0; i < 6; i++) {
             let targetExamYear = startExamYear + i;
-            let targetCutoffYear = targetExamYear - 1; // Rule 5: Cut-off is preceding year
+            let targetCutoffYear = targetExamYear - 1; // Rule 5
             let simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
             
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
