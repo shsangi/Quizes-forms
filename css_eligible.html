@@ -88,37 +88,91 @@
             background-color: #ffffff;
         }
         
-        .checkbox-group {
+        /* --- PROFESSIONAL TOGGLE SWITCH --- */
+        .toggle-container {
             display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 15px;
+            align-items: center;
+            justify-content: space-between;
             background: #f9fbfd;
             padding: 14px;
             border-radius: 10px;
             border: 1px solid #e0e6ed;
+            margin-bottom: 15px;
             cursor: pointer;
-            user-select: none;
+            transition: background 0.3s;
         }
-        
-        .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-top: 2px;
+
+        .toggle-container.active {
+            background: #e8f8f5;
+            border-color: #27ae60;
+        }
+
+        .toggle-text {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .toggle-text strong {
+            display: block;
+            font-size: 13px;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .toggle-text span {
+            font-size: 11px;
+            color: var(--text-light);
+            line-height: 1.3;
+            display: block;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
             flex-shrink: 0;
-            accent-color: var(--primary);
-            cursor: pointer;
         }
-        
-        .checkbox-group label {
-            margin-bottom: 0;
-            font-weight: normal;
-            font-size: 12px;
-            line-height: 1.4;
-            cursor: pointer;
-            pointer-events: none;
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
         }
-        
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--success-border);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
         .btn-primary {
             width: 100%;
             padding: 16px;
@@ -378,14 +432,17 @@
         <input type="number" id="previousAttempts" value="0" min="0" max="10">
     </div>
 
-    <!-- FIXED: ADDED 'checked' TO DEFAULT -->
-    <label class="checkbox-group" for="appliedCurrentYear">
-        <input type="checkbox" id="appliedCurrentYear" checked>
-        <span>
-            <strong>Already filled form for the upcoming cycle?</strong><br>
-            (e.g., filled in Aug 2026 for the Jan 2027 exam).
-        </span>
-    </label>
+    <!-- PROFESSIONAL TOGGLE SWITCH -->
+    <div class="toggle-container" id="toggleContainer" onclick="toggleSwitch()">
+        <div class="toggle-text">
+            <strong>Already filled form for the upcoming cycle?</strong>
+            <span>(e.g., filled in Aug 2026 for the Jan 2027 exam).</span>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="appliedCurrentYear" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
 
     <div class="form-group">
         <label for="relaxation">Age Relaxation Category (Rule 6(2)):</label>
@@ -413,6 +470,19 @@
 </div>
 
 <script>
+    function toggleSwitch() {
+        const checkbox = document.getElementById('appliedCurrentYear');
+        const container = document.getElementById('toggleContainer');
+        
+        checkbox.checked = !checkbox.checked;
+        
+        if (checkbox.checked) {
+            container.classList.add('active');
+        } else {
+            container.classList.remove('active');
+        }
+    }
+
     function calculateEligibility() {
         const dobInput = document.getElementById('dob').value;
         const examYear = parseInt(document.getElementById('examYear').value);
@@ -452,6 +522,7 @@
         let ruleName = (relaxation === 'relaxed') ? "CSS (Relaxed: 21-32 Years)" : "CSS (General: 21-30 Years)";
 
         // --- CALCULATE TOTAL ATTEMPTS USED ---
+        // This is the single source of truth.
         let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
         let totalAttemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
 
