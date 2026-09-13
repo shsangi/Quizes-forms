@@ -105,6 +105,17 @@
             margin: 6px 0;
             font-size: 14px;
         }
+        .summary-box {
+            background: #fdfefe;
+            border: 1px solid #d5dbdb;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .summary-box strong {
+            color: #2c3e50;
+        }
         .timeline-box {
             margin-top: 12px;
             background: #ffffff;
@@ -122,6 +133,14 @@
             display: flex;
             gap: 10px;
             align-items: center;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #c0392b;
+        }
+        .success-text {
+            font-weight: bold;
+            color: #27ae60;
         }
     </style>
 </head>
@@ -167,6 +186,13 @@
 
     <div class="result" id="resultBox">
         <h3 id="statusTitle"></h3>
+        
+        <div class="summary-box">
+            <strong>📊 Status Summary:</strong><br>
+            <span id="resAgeSummary"></span><br>
+            <span id="resAttemptSummary"></span>
+        </div>
+
         <p id="resAge">Age on Cut-Off Date: </p>
         <p id="resWindow">Criteria Rule: </p>
         <p id="resDetails">Details: </p>
@@ -179,18 +205,12 @@
 </div>
 
 <script>
-    // Simulated API fetch for the current year's CSS deadline
     function fetchCurrentDate() {
-        // In a real app, you would use fetch('https://api.css.gov.pk/deadline') here.
         alert("Simulating fetch from CSS website... \n\nIn a real application, this would fetch the latest deadline.\nFor now, we will set the cut-off to the current year's Dec 31.");
-        
         const today = new Date();
         const currentYear = today.getFullYear();
         const simulatedDeadline = `${currentYear}-12-31`;
-        
         document.getElementById('cutoff').value = simulatedDeadline;
-        
-        // Auto-check the box if they are fetching current year data
         document.getElementById('appliedCurrentYear').checked = true;
     }
 
@@ -198,7 +218,7 @@
         const dobInput = document.getElementById('dob').value;
         const cutoffInput = document.getElementById('cutoff').value;
         const category = document.getElementById('category').value;
-        const prevAttempts = parseInt(document.getElementById('previousAttempts').value) || 0;
+        let prevAttempts = parseInt(document.getElementById('previousAttempts').value) || 0;
         const isCurrentYearApplied = document.getElementById('appliedCurrentYear').checked;
 
         if (!dobInput || !cutoffInput) {
@@ -209,7 +229,7 @@
         const dob = new Date(dobInput);
         const cutoffDate = new Date(cutoffInput);
 
-        // Calculate exact age as of the official cut-off date
+        // Calculate exact age
         let ageYears = cutoffDate.getFullYear() - dob.getFullYear();
         let ageMonths = cutoffDate.getMonth() - dob.getMonth();
         let ageDays = cutoffDate.getDate() - dob.getDate();
@@ -229,62 +249,85 @@
         let ruleName = "";
 
         if (category === 'css') {
-            minAge = 21;
-            maxAge = 30; 
-            maxAttempts = 3;
+            minAge = 21; maxAge = 30; maxAttempts = 3;
             ruleName = "CSS Exam (21-30 Years, 3 Attempts)";
         } else if (category === 'general30') {
-            minAge = 18;
-            maxAge = 30;
-            maxAttempts = 6;
+            minAge = 18; maxAge = 30; maxAttempts = 6;
             ruleName = "Standard Govt Job (18-30 Years, 6 Attempts)";
         } else if (category === 'general35') {
-            minAge = 21;
-            maxAge = 35;
-            maxAttempts = 6;
+            minAge = 21; maxAge = 35; maxAttempts = 6;
             ruleName = "Officer Scale (21-35 Years, 6 Attempts)";
         }
 
         const resultBox = document.getElementById('resultBox');
         const statusTitle = document.getElementById('statusTitle');
+        const resAgeSummary = document.getElementById('resAgeSummary');
+        const resAttemptSummary = document.getElementById('resAttemptSummary');
         const resAge = document.getElementById('resAge');
         const resWindow = document.getElementById('resWindow');
         const resDetails = document.getElementById('resDetails');
         const timelineList = document.getElementById('timelineList');
 
         resultBox.style.display = 'block';
+        timelineList.innerHTML = "";
 
-        // Evaluate eligibility on the cut-off date
-        if (ageYears >= minAge && ageYears <= maxAge) {
+        // --- CALCULATE ATTEMPTS REMAINING ---
+        let attemptsUsed = prevAttempts;
+        if (isCurrentYearApplied) {
+            attemptsUsed += 1; 
+        }
+        let attemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
+
+        // --- CALCULATE AGE REMAINING ---
+        let yearsUntilOverage = maxAge - ageYears;
+        let yearsUntilEligible = minAge - ageYears;
+
+        // --- UPDATE SUMMARY BOXES ---
+        // 1. Age Summary
+        if (ageYears > maxAge) {
+            resAgeSummary.innerHTML = `⏳ <strong>Age Limit:</strong> <span class="highlight">Overage by ${ageYears - maxAge} year(s).</span> You have exceeded the maximum age of ${maxAge}.`;
+        } else if (ageYears < minAge) {
+            resAgeSummary.innerHTML = `⏳ <strong>Age Limit:</strong> <span class="highlight">Underage.</span> You need ${yearsUntilEligible} more year(s) to reach the minimum age of ${minAge}.`;
+        } else {
+            resAgeSummary.innerHTML = `⏳ <strong>Age Limit:</strong> <span class="success-text">Within limits.</span> You have <strong>${yearsUntilOverage} year(s)</strong> left before reaching the maximum age of ${maxAge}.`;
+        }
+
+        // 2. Attempts Summary
+        if (attemptsRemaining === 0) {
+            resAttemptSummary.innerHTML = `🔢 <strong>Attempts:</strong> <span class="highlight">0 attempts remaining.</span> You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
+        } else {
+            resAttemptSummary.innerHTML = `🔢 <strong>Attempts:</strong> <span class="success-text">${attemptsRemaining} attempt(s) remaining.</span> You have used ${attemptsUsed} of ${maxAttempts} allowed attempts.`;
+        }
+
+        // --- FINAL ELIGIBILITY CHECK ---
+        let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
+        let isAttemptEligible = (attemptsRemaining > 0);
+
+        if (isAgeEligible && isAttemptEligible) {
             resultBox.className = "result eligible";
             statusTitle.innerText = "Status: ELIGIBLE FOR THIS EXAM CYCLE ✅";
-            resDetails.innerText = `As of the cut-off date, you fall within the accepted age boundaries.`;
-        } else if (ageYears < minAge) {
+            resDetails.innerText = `You meet both the age and attempt criteria for this cycle.`;
+        } else if (!isAgeEligible && !isAttemptEligible) {
             resultBox.className = "result not-eligible";
-            statusTitle.innerText = "Status: NOT YET ELIGIBLE ❌";
-            resDetails.innerText = `You are under the minimum age requirement on this cut-off date.`;
+            statusTitle.innerText = "Status: NOT ELIGIBLE ❌";
+            resDetails.innerText = `You do not meet the age criteria, and you have also exhausted your attempts.`;
+        } else if (!isAgeEligible) {
+            resultBox.className = "result not-eligible";
+            statusTitle.innerText = "Status: NOT ELIGIBLE (Age) ❌";
+            resDetails.innerText = `You are outside the allowed age window (${minAge}-${maxAge} years).`;
         } else {
             resultBox.className = "result not-eligible";
-            statusTitle.innerText = "Status: OVERAGE ❌";
-            resDetails.innerText = `You have crossed the maximum upper age limit (${maxAge} years) on this cut-off date.`;
+            statusTitle.innerText = "Status: NOT ELIGIBLE (Attempts) ❌";
+            resDetails.innerText = `You have used all ${maxAttempts} of your allowed attempts.`;
         }
 
         resAge.innerText = `Age on Cut-Off Date: ${ageYears} years, ${ageMonths} months, and ${ageDays} days`;
         resWindow.innerText = `Criteria Rule: ${ruleName}`;
 
-        // Build Year-by-Year Outlook
-        timelineList.innerHTML = "";
-        
-        // Determine the starting exam year (based on the cutoff date provided)
+        // --- YEAR-BY-YEAR OUTLOOK ---
         let startExamYear = cutoffDate.getFullYear();
+        let simulatedAttemptsUsed = prevAttempts;
         
-        // Determine current attempt count. 
-        // If they applied this year, the previous attempts + current year = total used.
-        let attemptsUsed = prevAttempts;
-        if (isCurrentYearApplied) {
-            attemptsUsed += 1; 
-        }
-
         for (let i = 0; i < 6; i++) {
             let targetExamYear = startExamYear + i;
             let simulatedCutoff = new Date(`${targetExamYear}-12-31`);
@@ -296,24 +339,18 @@
             }
             
             let li = document.createElement('li');
+            let isSimAgeEligible = (yearAgeYears >= minAge && yearAgeYears <= maxAge);
             
-            // Check age eligibility
-            let isAgeEligible = (yearAgeYears >= minAge && yearAgeYears <= maxAge);
-            
-            // Check attempt eligibility
-            let isAttemptEligible = (attemptsUsed < maxAttempts);
-
-            // Special handling for the very first year if it's the current year
+            // Special handling for the current year checkbox
             let isCurrentYearBox = (i === 0 && isCurrentYearApplied);
-            
-            if (isAgeEligible) {
-                if (isCurrentYearBox) {
-                    // If they already applied this year, it's not a "future attempt", it's the current one.
-                    li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:green;">Eligible</span> — <b>Already Applied (Attempt #${attemptsUsed})</b>`;
-                } else if (isAttemptEligible) {
-                    // If they haven't applied, this is the next available attempt
-                    li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:green;">Eligible</span> — Attempt <b>#${attemptsUsed + 1}</b> of ${maxAttempts}.`;
-                    attemptsUsed++; // Increment for the next loop
+
+            if (isCurrentYearBox) {
+                simulatedAttemptsUsed++; // Count it as used
+                li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:green;">Eligible</span> — <b>Already Applied (Attempt #${simulatedAttemptsUsed})</b>`;
+            } else if (isSimAgeEligible) {
+                if (simulatedAttemptsUsed < maxAttempts) {
+                    simulatedAttemptsUsed++;
+                    li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:green;">Eligible</span> — Attempt <b>#${simulatedAttemptsUsed}</b> of ${maxAttempts}.`;
                 } else {
                     li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:orange;">Age-Eligible</span>, but max attempts (${maxAttempts}) finished.`;
                 }
