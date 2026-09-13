@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accurate Job Eligibility & Attempt Calculator</title>
+    <title>Real-Time Job Eligibility & Attempt Calculator</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -45,6 +45,16 @@
             box-sizing: border-box;
             font-size: 14px;
         }
+        .today-box {
+            background: #eaf2f8;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #2980b9;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
         button {
             width: 100%;
             padding: 12px;
@@ -55,7 +65,7 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 5px;
             transition: background 0.3s;
         }
         button:hover {
@@ -103,16 +113,13 @@
 <body>
 
 <div class="container">
-    <h2>Official Job Eligibility Checker</h2>
+    <h2>Job Eligibility & Attempt Checker</h2>
     
-    <div class="form-group">
-        <label for="dob">Date of Birth:</label>
-        <input type="date" id="dob" value="2005-11-06">
-    </div>
+    <div class="today-box" id="displayToday">Checking current date...</div>
 
     <div class="form-group">
-        <label for="cutoff">Official Age Cut-Off Date (e.g., Dec 31 of exam year):</label>
-        <input type="date" id="cutoff" value="2026-12-31">
+        <label for="dob">Your Date of Birth:</label>
+        <input type="date" id="dob" value="1997-03-11">
     </div>
     
     <div class="form-group">
@@ -124,11 +131,11 @@
         </select>
     </div>
 
-    <button onclick="checkJobEligibility()">Calculate Accurate Eligibility</button>
+    <button onclick="checkEligibilityToday()">Check Eligibility Today</button>
 
     <div class="result" id="resultBox">
         <h3 id="statusTitle"></h3>
-        <p id="resAge">Age on Cut-Off Date: </p>
+        <p id="resAge">Exact Age Today: </p>
         <p id="resWindow">Criteria Rule: </p>
         <p id="resDetails">Details: </p>
         
@@ -140,33 +147,22 @@
 </div>
 
 <script>
-    function checkJobEligibility() {
+    // Automatically display today's date on load
+    const today = new Date();
+    document.getElementById('displayToday').innerText = `Current System Date: ${today.toDateString()}`;
+
+    function checkEligibilityToday() {
         const dobInput = document.getElementById('dob').value;
-        const cutoffInput = document.getElementById('cutoff').value;
         const category = document.getElementById('category').value;
 
-        if (!dobInput || !cutoffInput) {
-            alert("Please fill in both Date of Birth and Cut-Off Date!");
+        if (!dobInput) {
+            alert("Please select your date of birth!");
             return;
         }
 
         const dob = new Date(dobInput);
-        const cutoffDate = new Date(cutoffInput);
-
-        // Calculate age strictly as of the official cut-off date
-        let ageYears = cutoffDate.getFullYear() - dob.getFullYear();
-        let ageMonths = cutoffDate.getMonth() - dob.getMonth();
-        let ageDays = cutoffDate.getDate() - dob.getDate();
-
-        if (ageDays < 0) {
-            ageMonths--;
-            ageDays += new Date(cutoffDate.getFullYear(), cutoffDate.getMonth(), 0).getDate();
-        }
-        if (ageMonths < 0) {
-            ageYears--;
-            ageMonths += 12;
-        }
-
+        
+        // Rules configuration
         let minAge = 18;
         let maxAge = 30;
         let maxAttempts = 3;
@@ -189,61 +185,68 @@
             ruleName = "Officer Scale (21-35 Years, 6 Attempts)";
         }
 
-        const resultBox = document.getElementById('resultBox');
-        const statusTitle = document.getElementById('statusTitle');
-        const resAge = document.getElementById('resAge');
-        const resWindow = document.getElementById('resWindow');
-        const resDetails = document.getElementById('resDetails');
-        const timelineList = document.getElementById('timelineList');
+        // Calculate exact age as of today
+        let ageYears = today.getFullYear() - dob.getFullYear();
+        let ageMonths = today.getMonth() - dob.getMonth();
+        let ageDays = today.getDate() - dob.getDate();
 
-        resultBox.style.display = 'block';
-
-        // Evaluate eligibility on the cut-off date
-        if (ageYears >= minAge && ageYears <= maxAge) {
-            resultBox.className = "result eligible";
-            statusTitle.innerText = "Status: ELIGIBLE FOR THIS EXAM CYCLE ✅";
-            resDetails.innerText = `As of the cut-off date, you fall within the accepted age boundaries.`;
-        } else if (ageYears < minAge) {
-            let yearsToGo = minAge - ageYears;
-            resultBox.className = "result not-eligible";
-            statusTitle.innerText = "Status: NOT YET ELIGIBLE ❌";
-            resDetails.innerText = `You are under the minimum age requirement on this cut-off date.`;
-        } else {
-            resultBox.className = "result not-eligible";
-            statusTitle.innerText = "Status: OVERAGE ❌";
-            resDetails.innerText = `You have crossed the maximum upper age limit (${maxAge} years) on this cut-off date.`;
+        if (ageDays < 0) {
+            ageMonths--;
+            ageDays += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+        }
+        if (ageMonths < 0) {
+            ageYears--;
+            ageMonths += 12;
         }
 
-        resAge.innerText = `Age on Cut-Off Date: ${ageYears} years, ${ageMonths} months, and ${ageDays} days`;
-        resWindow.innerText = `Criteria Rule: ${ruleName}`;
+        const resultBox = document.getElementById('resultBox');
+        resultBox.style.display = 'block';
 
-        // Build Year-by-Year Outlook based on Dec 31 cut-offs for future years
+        // Evaluate status based on today's date
+        if (ageYears >= minAge && ageYears <= maxAge) {
+            resultBox.className = "result eligible";
+            document.getElementById('statusTitle').innerText = "Status: ELIGIBLE TODAY ✅";
+            document.getElementById('resDetails').innerText = `As of today, your age falls securely within the accepted ${minAge}-${maxAge} bracket.`;
+        } else if (ageYears < minAge) {
+            resultBox.className = "result not-eligible";
+            document.getElementById('statusTitle').innerText = "Status: NOT YET ELIGIBLE ❌";
+            document.getElementById('resDetails').innerText = `You are under the minimum age requirement of ${minAge} today.`;
+        } else {
+            resultBox.className = "result not-eligible";
+            document.getElementById('statusTitle').innerText = "Status: OVERAGE ❌";
+            document.getElementById('resDetails').innerText = `You have crossed the maximum upper age limit of ${maxAge} years today.`;
+        }
+
+        document.getElementById('resAge').innerText = `Exact Age Today: ${ageYears} years, ${ageMonths} months, and ${ageDays} days`;
+        document.getElementById('resWindow').innerText = `Criteria Rule: ${ruleName}`;
+
+        // Build Year-by-Year Attempt Outlook starting from the year they turned minAge
+        let timelineList = document.getElementById('timelineList');
         timelineList.innerHTML = "";
-        let simulatedAttemptCount = 1;
-        let startExamYear = cutoffDate.getFullYear();
+        
+        let birthYear = dob.getFullYear();
+        let firstEligibleYear = birthYear + minAge;
+        let currentYear = today.getFullYear();
+        
+        let attemptCounter = 1;
 
-        for (let i = 0; i < 6; i++) {
-            let targetExamYear = startExamYear + i;
-            let simulatedCutoff = new Date(`${targetExamYear}-12-31`);
-            
-            let yearAgeYears = simulatedCutoff.getFullYear() - dob.getFullYear();
-            let yearAgeMonths = simulatedCutoff.getMonth() - dob.getMonth();
-            if (yearAgeMonths < 0 || (yearAgeMonths === 0 && simulatedCutoff.getDate() < dob.getDate())) {
-                yearAgeYears--;
-            }
+        // Loop through past/present/future years around their eligible window
+        for (let i = -1; i <= 4; i++) {
+            let targetYear = currentYear + i;
+            let yearAge = targetYear - birthYear;
             
             let li = document.createElement('li');
-            if (yearAgeYears >= minAge && yearAgeYears <= maxAge) {
-                if (simulatedAttemptCount <= maxAttempts) {
-                    li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:green;">Eligible</span> — Attempt <b>#${simulatedAttemptCount}</b> of ${maxAttempts}.`;
-                    simulatedAttemptCount++;
+            if (yearAge >= minAge && yearAge <= maxAge) {
+                if (attemptCounter <= maxAttempts) {
+                    li.innerHTML = `<b>${targetYear} Cycle</b> (Age ~${yearAge}): <span style="color:green;">Eligible</span> — Lifetime Attempt <b>#${attemptCounter}</b> of ${maxAttempts}.`;
+                    attemptCounter++;
                 } else {
-                    li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:orange;">Age-Eligible</span>, but max attempts (${maxAttempts}) finished.`;
+                    li.innerHTML = `<b>${targetYear} Cycle</b> (Age ~${yearAge}): <span style="color:orange;">Age-Eligible</span>, but max lifetime attempts (${maxAttempts}) exhausted.`;
                 }
-            } else if (yearAgeYears < minAge) {
-                li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:red;">Not Eligible</span> (Under min age 21)`;
+            } else if (yearAge < minAge) {
+                li.innerHTML = `<b>${targetYear} Cycle</b> (Age ~${yearAge}): <span style="color:red;">Not Eligible</span> (Under minimum age)`;
             } else {
-                li.innerHTML = `<b>${targetExamYear} Exam</b> (Age ${yearAgeYears} by Dec 31): <span style="color:red;">Not Eligible</span> (Overage > ${maxAge})`;
+                li.innerHTML = `<b>${targetYear} Cycle</b> (Age ~${yearAge}): <span style="color:red;">Not Eligible</span> (Overage / Limit crossed)`;
             }
             timelineList.appendChild(li);
         }
