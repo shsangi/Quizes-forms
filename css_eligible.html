@@ -450,20 +450,21 @@
         let maxAttempts = 3;
         let ruleName = (relaxation === 'relaxed') ? "CSS (Relaxed: 21-32 Years)" : "CSS (General: 21-30 Years)";
 
-        // Calculate Attempts
+        // --- CALCULATE TOTAL ATTEMPTS USED ---
+        // This is the single source of truth. Everything else uses this variable.
         let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
         let totalAttemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
 
         let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
         let isAttemptEligible = (totalAttemptsRemaining > 0);
 
-        // --- CALCULATE USABLE ATTEMPTS ---
+        // --- CALCULATE USABLE ATTEMPTS (Based on strict Rule 5) ---
         let usableAttemptsRemaining = 0;
         let tempYear = examYear;
         let tempAttemptsUsed = attemptsUsed;
         
         for (let j = 0; j < 10; j++) {
-            let tempCutoffYear = tempYear - 1;
+            let tempCutoffYear = tempYear - 1; 
             let tempCutoff = new Date(`${tempCutoffYear}-12-31`);
             
             let tempAge = tempCutoff.getFullYear() - dob.getFullYear();
@@ -492,6 +493,7 @@
             tempYear++;
         }
 
+        // If already applied, we do not count the current year as a "future usable" attempt
         if (isCurrentYearApplied && usableAttemptsRemaining > 0) {
             usableAttemptsRemaining--;
         }
@@ -499,6 +501,7 @@
         // --- BUILD THE MODAL CONTENT ---
         let modalHtml = "";
 
+        // 1. Status Header
         if (isAgeEligible && isAttemptEligible && usableAttemptsRemaining > 0) {
             modalHtml += `<div class="result-summary-card eligible">✅ ELIGIBLE TO APPLY FOR CSS ${examYear}</div>`;
         } else if (!isAgeEligible) {
@@ -509,6 +512,7 @@
             modalHtml += `<div class="result-summary-card not-eligible">❌ NOT ELIGIBLE FOR CSS ${examYear}</div>`;
         }
 
+        // 2. Stat Cards
         let ageStatClass = isAgeEligible ? "success" : "danger";
         let attemptStatClass = (usableAttemptsRemaining > 0) ? "success" : "danger";
 
@@ -525,6 +529,7 @@
             </div>
         `;
 
+        // 3. Criteria Details
         let ageDetail = "";
         if (ageYears > maxAge) ageDetail = `You are <b>${ageYears - maxAge} year(s) over</b> the maximum age limit of ${maxAge}.`;
         else if (ageYears < minAge) ageDetail = `You need <b>${minAge - ageYears} more year(s)</b> to reach the minimum age of ${minAge}.`;
@@ -550,11 +555,12 @@
             </div>
         `;
 
+        // 4. Year-by-Year Cards (10 Years)
         modalHtml += `<h4 style="margin-bottom:10px; font-size:15px; color:var(--text-dark);">📅 10-Year Outlook</h4>`;
         modalHtml += `<div class="year-cards-container">`;
 
         let startExamYear = examYear;
-        let simulatedAttemptsUsed = prevAttempts; 
+        let simulatedAttemptsUsed = prevAttempts; // Start from previous attempts
         
         for (let i = 0; i < 10; i++) {
             let targetExamYear = startExamYear + i;
