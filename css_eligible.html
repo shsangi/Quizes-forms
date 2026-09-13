@@ -164,7 +164,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Badges for Summary */
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -198,7 +197,6 @@
         .value.danger { color: var(--danger-border); }
         .value.warning { color: var(--warning-border); }
 
-        /* Details Text */
         .details-text {
             font-size: 14px;
             line-height: 1.6;
@@ -212,7 +210,6 @@
             color: var(--text-dark);
         }
 
-        /* Warning Box */
         .warning-box {
             background-color: var(--warning-bg);
             border-left: 4px solid var(--warning-border);
@@ -224,7 +221,6 @@
             line-height: 1.5;
         }
 
-        /* Timeline */
         .timeline-title {
             font-size: 16px;
             font-weight: bold;
@@ -282,9 +278,6 @@
         .badge-danger { background: #fadbd8; color: #78281f; }
         .badge-warning { background: #fdebd0; color: #7e5109; }
         
-        .text-green { color: var(--success-border); font-weight: bold; }
-        .text-red { color: var(--danger-border); font-weight: bold; }
-        .text-orange { color: #e67e22; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -331,7 +324,6 @@
         
         <h3 class="status-header" id="statusTitle"></h3>
         
-        <!-- Summary Cards -->
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="label">Age Status</div>
@@ -343,15 +335,12 @@
             </div>
         </div>
 
-        <!-- Detailed Text -->
         <div class="details-text" id="detailsText"></div>
 
-        <!-- Critical Warning -->
         <div class="warning-box">
             <strong>⚠️ Critical Reminder:</strong> This tool uses <b>Dec 31st</b> as the standard cut-off. Always verify the exact "Age as on" date and attempt rules in the official <b>FPSC advertisement</b> for the specific exam year, as these rules can change.
         </div>
 
-        <!-- Timeline -->
         <div class="timeline-title">📅 Year-by-Year Outlook</div>
         <ul class="timeline-list" id="timelineList"></ul>
     </div>
@@ -475,15 +464,16 @@
             <strong>Attempt Analysis:</strong> ${attemptDetail}
         `;
 
-        // Build Timeline
+        // --- FIXED YEAR-BY-YEAR TIMELINE LOGIC ---
         timelineList.innerHTML = "";
         let startExamYear = cutoffDate.getFullYear();
-        let simulatedAttemptsUsed = prevAttempts;
+        let simulatedAttemptsUsed = prevAttempts; // Start with previous attempts
         
         for (let i = 0; i < 6; i++) {
             let targetExamYear = startExamYear + i;
             let simulatedCutoff = new Date(`${targetExamYear}-12-31`);
             
+            // Calculate Age for this specific year
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
             let m = simulatedCutoff.getMonth() - dob.getMonth();
             if (m < 0 || (m === 0 && simulatedCutoff.getDate() < dob.getDate())) yearAge--;
@@ -496,10 +486,13 @@
 
             let statusHtml = "";
             
+            // 1. Handle the Current Year if applied
             if (isCurrentYearBox) {
                 simulatedAttemptsUsed++; 
                 statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Already Applied (Attempt #${simulatedAttemptsUsed})</span>`;
-            } else if (isSimAgeEligible) {
+            } 
+            // 2. Handle Future Years (or current year if NOT applied)
+            else if (isSimAgeEligible) {
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
                     statusHtml = `<span class="badge badge-success">Eligible</span> <span style="color:var(--text-light); font-size:11px;">Attempt #${simulatedAttemptsUsed}</span>`;
