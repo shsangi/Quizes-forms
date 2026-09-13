@@ -80,15 +80,28 @@
         
         .inline-group {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
             margin-bottom: 18px;
+            background: #f9fbfd;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e6ed;
         }
         
         .inline-group input[type="checkbox"] {
             width: auto;
-            margin: 0;
+            margin: 4px 0 0 0;
             transform: scale(1.2);
+            flex-shrink: 0;
+        }
+        
+        .inline-group label {
+            margin-bottom: 0;
+            font-weight: normal;
+            font-size: 13px;
+            line-height: 1.4;
+            cursor: pointer;
         }
         
         .btn-primary {
@@ -298,13 +311,16 @@
     </div>
 
     <div class="form-group">
-        <label for="previousAttempts">Number of Previous Attempts:</label>
+        <label for="previousAttempts">Number of Previous Attempts (Completed cycles):</label>
         <input type="number" id="previousAttempts" value="0" min="0" max="10" oninput="checkJobEligibility()">
     </div>
 
     <div class="inline-group">
         <input type="checkbox" id="appliedCurrentYear" onchange="checkJobEligibility()">
-        <label for="appliedCurrentYear">Already applied in the current year cycle?</label>
+        <label for="appliedCurrentYear">
+            <strong>Already filled form for the upcoming cycle?</strong><br>
+            (e.g., filled in Aug 2026 for the Jan 2027 exam). This counts as 1 attempt.
+        </label>
     </div>
     
     <div class="form-group">
@@ -350,7 +366,6 @@
         const today = new Date();
         const currentYear = today.getFullYear();
         document.getElementById('cutoff').value = `${currentYear}-12-31`;
-        document.getElementById('appliedCurrentYear').checked = true;
         checkJobEligibility();
     }
 
@@ -400,7 +415,6 @@
         const detailsText = document.getElementById('detailsText');
         const timelineList = document.getElementById('timelineList');
 
-        // Make sure box is visible
         resultBox.style.display = 'block';
 
         // Calculate Attempts
@@ -470,6 +484,7 @@
         let startExamYear = cutoffDate.getFullYear();
         let simulatedAttemptsUsed = prevAttempts; 
         
+        // If the current year is applied, the FIRST year in the timeline is the current cycle
         for (let i = 0; i < 6; i++) {
             let targetExamYear = startExamYear + i;
             let simulatedCutoff = new Date(`${targetExamYear}-12-31`);
@@ -511,7 +526,6 @@
         }
     }
 
-    // Automatically calculate results instantly when page opens
     window.onload = function() {
         checkJobEligibility();
     };
