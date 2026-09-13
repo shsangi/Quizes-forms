@@ -88,7 +88,7 @@
             background-color: #ffffff;
         }
         
-        /* --- PROFESSIONAL TOGGLE SWITCH --- */
+        /* --- TOGGLE SWITCH --- */
         .toggle-container {
             display: flex;
             align-items: center;
@@ -432,7 +432,7 @@
         <input type="number" id="previousAttempts" value="0" min="0" max="10">
     </div>
 
-    <!-- PROFESSIONAL TOGGLE SWITCH -->
+    <!-- TOGGLE SWITCH -->
     <div class="toggle-container" id="toggleContainer" onclick="toggleSwitch()">
         <div class="toggle-text">
             <strong>Already filled form for the upcoming cycle?</strong>
@@ -522,14 +522,13 @@
         let ruleName = (relaxation === 'relaxed') ? "CSS (Relaxed: 21-32 Years)" : "CSS (General: 21-30 Years)";
 
         // --- CALCULATE TOTAL ATTEMPTS USED ---
-        // This is the single source of truth.
         let attemptsUsed = prevAttempts + (isCurrentYearApplied ? 1 : 0);
         let totalAttemptsRemaining = Math.max(0, maxAttempts - attemptsUsed);
 
         let isAgeEligible = (ageYears >= minAge && ageYears <= maxAge);
         let isAttemptEligible = (totalAttemptsRemaining > 0);
 
-        // --- CALCULATE USABLE ATTEMPTS (Strict Rule 5 Cut-off) ---
+        // --- CALCULATE USABLE ATTEMPTS ---
         let usableAttemptsRemaining = 0;
         let tempYear = examYear;
         let tempAttemptsUsed = attemptsUsed;
@@ -564,7 +563,6 @@
             tempYear++;
         }
 
-        // If already applied, we do not count the current year as a "future usable" attempt
         if (isCurrentYearApplied && usableAttemptsRemaining > 0) {
             usableAttemptsRemaining--;
         }
@@ -616,11 +614,19 @@
             }
         }
 
+        // Add a status line to clarify the toggle state
+        let toggleStatusLine = "";
+        if (isCurrentYearApplied) {
+            toggleStatusLine = `<br><strong>Status:</strong> <span style="color:var(--success-border);">You have already filled the form for CSS ${examYear}.</span>`;
+        } else {
+            toggleStatusLine = `<br><strong>Status:</strong> <span style="color:var(--danger-border);">You have NOT filled the form for CSS ${examYear} yet.</span>`;
+        }
+
         modalHtml += `
             <div class="criteria-text">
                 <strong>Official Cut-off Date (Rule 5):</strong> 31 December ${cutoffYear}<br>
                 <strong>Your Age on Cut-off Date:</strong> ${ageYears} years, ${ageMonths} months, ${ageDays} days<br>
-                <strong>Rule Applied:</strong> ${ruleName}<br><br>
+                <strong>Rule Applied:</strong> ${ruleName}${toggleStatusLine}<br><br>
                 <strong>Age Analysis:</strong> ${ageDetail}<br>
                 <strong>Attempt Analysis:</strong> ${attemptDetail}
             </div>
@@ -635,7 +641,7 @@
         
         for (let i = 0; i < 10; i++) {
             let targetExamYear = startExamYear + i;
-            let targetCutoffYear = targetExamYear - 1; // Rule 5: Strict Cut-off
+            let targetCutoffYear = targetExamYear - 1; 
             let simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
             
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
@@ -661,7 +667,7 @@
                 simulatedAttemptsUsed++; 
                 cardClass = "eligible";
                 statusBadge = `<span class="badge badge-success">ELIGIBLE</span>`;
-                noteText = `Applied (Attempt #${simulatedAttemptsUsed})`;
+                noteText = `<span style="color:var(--success-border); font-weight:bold;">Applied (Attempt #${simulatedAttemptsUsed})</span>`;
             } else if (isSimAgeEligible) {
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
