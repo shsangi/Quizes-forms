@@ -4,169 +4,225 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CSS Eligibility Tracker · Self Learners</title>
-    <!-- Inter font for professional look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2575fc;
-            --primary-hover: #1a5db6;
-            --success-bg: #e8f8f5;
-            --success-border: #27ae60;
-            --success-text: #0e6251;
-            --danger-bg: #ffd2d2;
-            --danger-border: #e74c3c;
-            --danger-text: #78281f;
-            --warning-bg: #fef9e7;
-            --warning-border: #f1c40f;
-            --warning-text: #7d6608;
-            --text-dark: #2c3e50;
-            --text-light: #7f8c8d;
-            --bg-light: #f2f6fc;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --success-border: #10b981;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --danger-border: #ef4444;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --warning-border: #f59e0b;
+            --neutral: #64748b;
+            --neutral-bg: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border: #e2e8f0;
+            --border-focus: #2563eb;
             --card-bg: #ffffff;
-            --brand-blue: #2575fc;
-            --brand-dark: #0b2a3b;
+            --bg: #f1f5f9;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --radius: 14px;
+            --radius-sm: 10px;
         }
-        
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-light);
-            margin: 0;
-            padding: 10px;
+            background: var(--bg);
+            color: var(--text-dark);
+            font-size: 15px;
+            line-height: 1.5;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
-            color: var(--text-dark);
-            font-size: 15px;
+            padding: 16px 12px 40px;
+            -webkit-font-smoothing: antialiased;
         }
-        
+
         .app-container {
             background: var(--card-bg);
-            padding: 22px 20px 25px;
-            border-radius: 18px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
             width: 100%;
-            max-width: 450px;
+            max-width: 460px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
             position: relative;
         }
 
-        /* --- WATERMARK VERSION (top-left, subtle) --- */
+        /* Top accent bar */
+        .top-accent {
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #3b82f6, #60a5fa);
+        }
+
+        .content {
+            padding: 20px 20px 28px;
+        }
+
+        /* Version watermark */
         .version-watermark {
             position: absolute;
-            top: 12px;
-            left: 20px;
+            top: 14px;
+            right: 18px;
             font-size: 10px;
             font-weight: 700;
-            color: #b0b8c5;
-            letter-spacing: 0.8px;
+            color: #94a3b8;
+            letter-spacing: 0.6px;
             text-transform: uppercase;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            opacity: 0.85;
+            font-family: ui-monospace, 'SF Mono', 'Fira Code', monospace;
+            opacity: 0.8;
             z-index: 5;
         }
 
-        /* --- PROFESSIONAL BRAND HEADER (centered logo + name) --- */
+        /* Brand header */
         .brand-header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            margin-top: 14px;
-            margin-bottom: 4px;
-            gap: 8px;
+            padding-top: 8px;
+            margin-bottom: 6px;
+            gap: 10px;
         }
 
         .brand-logo {
-            width: 54px;
-            height: 54px;
+            width: 56px;
+            height: 56px;
             object-fit: contain;
-            display: block;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(37, 117, 252, 0.12);
-            background: #ffffff;
+            border-radius: 14px;
+            background: #fff;
             padding: 6px;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.12);
+            border: 1px solid #eef2ff;
         }
 
         .brand-name {
             font-size: 22px;
             font-weight: 800;
-            color: var(--brand-dark);
-            letter-spacing: -0.5px;
-            line-height: 1.2;
+            color: #0f172a;
+            letter-spacing: -0.6px;
+            line-height: 1.15;
             text-align: center;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .brand-name .brand-accent {
-            color: var(--brand-blue);
-            font-weight: 800;
+            color: var(--primary);
         }
 
-        /* Divider under brand */
         .brand-divider {
-            width: 50px;
+            width: 40px;
             height: 3px;
-            background: linear-gradient(90deg, var(--brand-blue), #6ea8fe);
+            background: linear-gradient(90deg, var(--primary), #93c5fd);
             border-radius: 4px;
-            margin: 8px auto 4px;
-            opacity: 0.7;
+            margin: 10px auto 2px;
+            opacity: 0.85;
         }
 
-        /* Clean title – no target icon */
+        /* Title */
         h2 {
             text-align: center;
-            color: var(--text-dark);
-            margin-top: 12px;
-            margin-bottom: 22px;
-            font-size: 19px;
+            font-size: 18px;
             font-weight: 700;
-            letter-spacing: -0.2px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
             color: var(--text-dark);
-            font-size: 13px;
-        }
-        
-        input[type="date"], select {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ccd1d9;
-            border-radius: 10px;
-            font-size: 15px;
-            background-color: #f9fbfd;
-            transition: border 0.3s;
-            appearance: none;
-        }
-        
-        input[type="date"]:focus, select:focus {
-            border-color: var(--primary);
-            outline: none;
-            background-color: #ffffff;
+            margin: 14px 0 22px;
+            letter-spacing: -0.3px;
         }
 
+        /* Form */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-dark);
+            letter-spacing: -0.1px;
+        }
+
+        .helper-text {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: inherit;
+            background: #f8fafc;
+            color: var(--text-dark);
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* Custom select arrow */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #64748b;
+            pointer-events: none;
+        }
+
+        select {
+            padding-right: 36px;
+            cursor: pointer;
+        }
+
+        /* Radio group – pill style */
         .radio-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
 
         .radio-option {
-            flex: 1;
             position: relative;
         }
 
@@ -178,144 +234,277 @@
         }
 
         .radio-option label {
-            display: block;
-            text-align: center;
-            padding: 12px;
-            background: #f9fbfd;
-            border: 1px solid #ccd1d9;
-            border-radius: 10px;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 8px;
+            background: #f8fafc;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
             cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 0;
+            transition: all 0.18s ease;
+            margin: 0;
+            user-select: none;
         }
 
         .radio-option input[type="radio"]:checked + label {
             background: var(--primary);
-            color: white;
+            color: #fff;
             border-color: var(--primary);
-            box-shadow: 0 2px 8px rgba(37, 117, 252, 0.3);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
         }
 
+        .radio-option label:active {
+            transform: scale(0.97);
+        }
+
+        /* Primary button */
         .btn-primary {
             width: 100%;
-            padding: 16px;
-            background-color: var(--primary);
-            color: white;
+            padding: 15px 16px;
+            background: var(--primary);
+            color: #fff;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: var(--radius-sm);
+            font-size: 15.5px;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 5px;
-        }
-        
-        .btn-primary:active {
-            background-color: var(--primary-hover);
-            transform: scale(0.98);
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            margin-top: 6px;
+            letter-spacing: -0.2px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
         }
 
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.985);
+            box-shadow: 0 1px 4px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Results */
         .results-section {
-            margin-top: 25px;
-            border-top: 2px solid #eee;
-            padding-top: 20px;
+            margin-top: 26px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
             display: none;
         }
 
         .results-section.visible {
             display: block;
+            animation: fadeIn 0.35s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .year-cards-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 9px;
         }
 
         .year-card {
-            background: var(--card-bg);
-            border: 1px solid #e0e0e0;
+            background: #fff;
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 14px;
+            padding: 13px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            gap: 12px;
+            transition: box-shadow 0.2s;
         }
 
-        .year-card.eligible { border-left: 5px solid var(--success-border); }
-        .year-card.overage { border-left: 5px solid var(--danger-border); }
-        .year-card.underage { border-left: 5px solid var(--warning-border); }
-        .year-card.attempts-finished { border-left: 5px solid #bdc3c7; }
+        .year-card.eligible {
+            border-left: 4px solid var(--success-border);
+            background: linear-gradient(90deg, #f0fdf4 0%, #fff 18%);
+        }
+
+        .year-card.overage {
+            border-left: 4px solid var(--danger-border);
+            background: linear-gradient(90deg, #fef2f2 0%, #fff 18%);
+        }
+
+        .year-card.underage {
+            border-left: 4px solid var(--warning-border);
+            background: linear-gradient(90deg, #fffbeb 0%, #fff 18%);
+        }
+
+        .year-card.attempts-finished {
+            border-left: 4px solid #94a3b8;
+            background: linear-gradient(90deg, #f8fafc 0%, #fff 18%);
+        }
 
         .year-card-info {
             display: flex;
             flex-direction: column;
+            gap: 2px;
+            min-width: 0;
         }
 
         .year-card-title {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 4px;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
         }
 
         .year-card-age {
-            font-size: 13px;
-            color: var(--text-light);
+            font-size: 12px;
+            color: var(--text-muted);
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .year-card-status {
             text-align: right;
-            min-width: 110px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 5px 10px;
+            padding: 4px 9px;
             border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
         }
 
-        .badge-success { background: #d4efdf; color: #145a32; }
-        .badge-danger { background: #fadbd8; color: #78281f; }
-        .badge-warning { background: #fdebd0; color: #7e5109; }
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-neutral {
+            background: #e2e8f0;
+            color: #475569;
+        }
 
         .year-card-note {
             font-size: 11px;
-            color: var(--text-light);
-            display: block;
-            margin-top: 4px;
+            color: var(--text-muted);
             font-weight: 600;
+            max-width: 120px;
+            line-height: 1.3;
         }
 
-        ::-webkit-scrollbar {
-            width: 5px;
+        .year-card-note.last-attempt {
+            color: #dc2626;
+            font-weight: 700;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #ccd1d9;
+
+        .results-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 16px;
+            line-height: 1.5;
+            padding: 12px 14px;
+            background: #f8fafc;
             border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
 
-        @media (max-width: 380px) {
-            .version-watermark {
-                font-size: 9px;
-                top: 10px;
-                left: 15px;
+        .results-note strong {
+            color: var(--text-dark);
+        }
+
+        /* Mobile refinements */
+        @media (max-width: 400px) {
+            body {
+                padding: 10px 8px 32px;
             }
+
+            .content {
+                padding: 16px 16px 24px;
+            }
+
             .brand-logo {
-                width: 46px;
-                height: 46px;
+                width: 50px;
+                height: 50px;
             }
+
             .brand-name {
-                font-size: 19px;
+                font-size: 20px;
             }
+
             h2 {
-                font-size: 17px;
-                margin-bottom: 18px;
+                font-size: 16.5px;
+                margin: 12px 0 18px;
+            }
+
+            input[type="date"],
+            select {
+                padding: 12px 13px;
+                font-size: 14.5px;
+            }
+
+            .radio-option label {
+                padding: 11px 6px;
+                font-size: 13.5px;
+            }
+
+            .btn-primary {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            .year-card {
+                padding: 12px 12px;
+            }
+
+            .year-card-title {
+                font-size: 14.5px;
+            }
+
+            .year-card-age {
+                font-size: 11.5px;
+            }
+        }
+
+        @media (max-width: 340px) {
+            .radio-group {
+                gap: 6px;
+            }
+
+            .status-badge {
+                font-size: 10px;
+                padding: 3px 7px;
             }
         }
     </style>
@@ -323,84 +512,89 @@
 <body>
 
 <div class="app-container">
-    <!-- Watermark version – small, top before title -->
-    <div class="version-watermark">v2.1</div>
+    <div class="top-accent"></div>
+    <div class="version-watermark">v2.2</div>
 
-    <!-- Professional Self Learners branding: logo + name -->
-    <div class="brand-header">
-        <img 
-            class="brand-logo" 
-            src="https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL" 
-            alt="Self Learners Logo"
-            onerror="this.style.display='none'"
-        >
-        <div class="brand-name">Self<span class="brand-accent">Learners</span></div>
-    </div>
-    <div class="brand-divider"></div>
+    <div class="content">
+        <!-- Brand -->
+        <div class="brand-header">
+            <img 
+                class="brand-logo" 
+                src="https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL" 
+                alt="Self Learners Logo"
+                onerror="this.style.display='none'"
+            >
+            <div class="brand-name">Self<span class="brand-accent">Learners</span></div>
+        </div>
+        <div class="brand-divider"></div>
 
-    <!-- Title without target icon -->
-    <h2>CSS Eligibility Tracker</h2>
-    
-    <div class="form-group">
-        <label for="dob">Date of Birth:</label>
-        <input type="date" id="dob" value="1997-03-11">
-    </div>
+        <h2>CSS Eligibility Tracker</h2>
 
-    <div class="form-group">
-        <label>Number of Previous Attempts (Completed cycles):</label>
-        <div class="radio-group">
-            <div class="radio-option">
-                <input type="radio" id="prev0" name="prevAttempts" value="0" checked>
-                <label for="prev0">0</label>
-            </div>
-            <div class="radio-option">
-                <input type="radio" id="prev1" name="prevAttempts" value="1">
-                <label for="prev1">1</label>
-            </div>
-            <div class="radio-option">
-                <input type="radio" id="prev2" name="prevAttempts" value="2">
-                <label for="prev2">2</label>
+        <!-- DOB -->
+        <div class="form-group">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" value="1997-03-11">
+        </div>
+
+        <!-- Previous Attempts -->
+        <div class="form-group">
+            <label>Previous Attempts (Completed Cycles)</label>
+            <div class="radio-group">
+                <div class="radio-option">
+                    <input type="radio" id="prev0" name="prevAttempts" value="0" checked>
+                    <label for="prev0">0</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="prev1" name="prevAttempts" value="1">
+                    <label for="prev1">1</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="prev2" name="prevAttempts" value="2">
+                    <label for="prev2">2</label>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="relaxation">Age Relaxation Category (Rule 6(2)):</label>
-        <select id="relaxation">
-            <option value="none">No Relaxation (Max Age: 30)</option>
-            <option value="relaxed">Scheduled Caste / Buddhist Community (+2 Years)</option>
-            <option value="relaxed">Recognized Tribes (Balochistan, Tribal Areas, etc.) (+2 Years)</option>
-            <option value="relaxed">Azad Kashmir (AJK) Permanent Resident (+2 Years)</option>
-            <option value="relaxed">Gilgit-Baltistan (GB) Permanent Resident (+2 Years)</option>
-            <option value="relaxed">Special Candidates (Physically/Hearing/Visually Impaired) (+2 Years)</option>
-            <option value="relaxed">In-Service Government Servant (2+ Years Continuous Service) (+2 Years)</option>
-        </select>
-        <small style="color:#7f8c8d; display:block; margin-top:5px;">Select your category to apply the 2-year upper age relaxation.</small>
-    </div>
-
-    <button class="btn-primary" onclick="calculateEligibility()">Check Eligibility</button>
-
-    <div class="results-section" id="resultsSection">
-        <h3 style="margin-bottom:15px; font-size:16px; color:var(--text-dark);">📅 Year-by-Year Eligibility</h3>
-        <div class="year-cards-container" id="yearCardsContainer">
-            <!-- Dynamic Cards Will Be Inserted Here -->
+        <!-- Age Relaxation -->
+        <div class="form-group">
+            <label for="relaxation">Age Relaxation Category (Rule 6(2))</label>
+            <div class="select-wrapper">
+                <select id="relaxation">
+                    <option value="none">No Relaxation (Max Age: 30)</option>
+                    <option value="relaxed">Scheduled Caste / Buddhist Community (+2 Years)</option>
+                    <option value="relaxed">Recognized Tribes (Balochistan, Tribal Areas, etc.) (+2 Years)</option>
+                    <option value="relaxed">Azad Kashmir (AJK) Permanent Resident (+2 Years)</option>
+                    <option value="relaxed">Gilgit-Baltistan (GB) Permanent Resident (+2 Years)</option>
+                    <option value="relaxed">Special Candidates (Physically/Hearing/Visually Impaired) (+2 Years)</option>
+                    <option value="relaxed">In-Service Government Servant (2+ Years Continuous Service) (+2 Years)</option>
+                </select>
+            </div>
+            <span class="helper-text">Select your category to apply the 2-year upper age relaxation.</span>
         </div>
-        <p style="font-size:12px; color:#7f8c8d; margin-top:15px; line-height:1.4;">
-            <strong>Note:</strong> Based on official CSS CE Rules 2019 Explanation. 
-            A candidate who has <em>completed</em> 30 years (or 32 with relaxation) on the cut-off date is treated as overage.
-        </p>
+
+        <button class="btn-primary" onclick="calculateEligibility()">Check Eligibility</button>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection">
+            <div class="results-title">Year-by-Year Eligibility</div>
+            <div class="year-cards-container" id="yearCardsContainer">
+                <!-- Dynamic cards -->
+            </div>
+            <p class="results-note">
+                <strong>Note:</strong> Based on official CSS CE Rules 2019 Explanation. 
+                A candidate who has <em>completed</em> 30 years (or 32 with relaxation) on the cut-off date is treated as overage.
+            </p>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- CONSTANTS ---
-    const CURRENT_CYCLE_YEAR = 2027; // Starting exam year to display
+    const CURRENT_CYCLE_YEAR = 2027;
 
     function calculateEligibility() {
         const dobInput = document.getElementById('dob').value;
         const relaxation = document.getElementById('relaxation').value;
-        
-        // Get selected radio value
+
         let prevAttempts = 0;
         const radios = document.getElementsByName('prevAttempts');
         for (let r of radios) {
@@ -417,39 +611,30 @@
 
         const dob = new Date(dobInput);
 
-        // --- RULE 6: AGE LIMITS ---
-        let minAge = 21;
-        // Official interpretation from the 2019 Explanation:
-        // Completed age must be < maxAge (i.e. 30 or 32)
-        let maxAge = (relaxation === 'none') ? 30 : 32;
-        let maxAttempts = 3;
+        const minAge = 21;
+        const maxAge = (relaxation === 'none') ? 30 : 32;
+        const maxAttempts = 3;
 
-        // --- BUILD THE CARDS ---
         let cardsHtml = "";
-        let simulatedAttemptsUsed = prevAttempts; 
-        
+        let simulatedAttemptsUsed = prevAttempts;
+
         for (let i = 0; i < 10; i++) {
-            let targetExamYear = CURRENT_CYCLE_YEAR + i;
-            let targetCutoffYear = targetExamYear - 1; 
-            let simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
-            
-            // Calculate completed age (years and months) on the cut-off date
+            const targetExamYear = CURRENT_CYCLE_YEAR + i;
+            const targetCutoffYear = targetExamYear - 1;
+            const simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
+
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
             let yearMonths = simulatedCutoff.getMonth() - dob.getMonth();
-            let dayDiff = simulatedCutoff.getDate() - dob.getDate();
-            
-            if (dayDiff < 0) {
-                yearMonths--;
-            }
+            const dayDiff = simulatedCutoff.getDate() - dob.getDate();
+
+            if (dayDiff < 0) yearMonths--;
             if (yearMonths < 0) {
                 yearAge--;
                 yearMonths += 12;
             }
-            
-            // --- CORRECTED AGE CHECK (per official Explanation) ---
-            // Eligible only if completed years are >= 21 AND < maxAge
-            let isSimAgeEligible = (yearAge >= minAge && yearAge < maxAge);
-            
+
+            const isSimAgeEligible = (yearAge >= minAge && yearAge < maxAge);
+
             let cardClass = "";
             let statusBadge = "";
             let noteText = "";
@@ -457,65 +642,58 @@
             if (isSimAgeEligible) {
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
-                    
-                    // Check if this is the last usable attempt
+
                     let isLastUsable = false;
                     if (simulatedAttemptsUsed === maxAttempts) {
                         isLastUsable = true;
                     } else {
-                        // Look ahead to next year
-                        let nextCutoffYear = targetExamYear;
-                        let nextCutoff = new Date(`${nextCutoffYear}-12-31`);
+                        const nextCutoffYear = targetExamYear;
+                        const nextCutoff = new Date(`${nextCutoffYear}-12-31`);
                         let nextAge = nextCutoff.getFullYear() - dob.getFullYear();
                         let nextM = nextCutoff.getMonth() - dob.getMonth();
                         if (nextM < 0) nextAge--;
-                        // Next year becomes overage when completed age reaches maxAge
                         if (nextAge >= maxAge) isLastUsable = true;
                     }
 
                     cardClass = "eligible";
-                    statusBadge = `<span class="status-badge badge-success">ELIGIBLE</span>`;
+                    statusBadge = `<span class="status-badge badge-success">Eligible</span>`;
                     if (isLastUsable) {
-                        noteText = `<span style="color:#e74c3c; font-weight:bold;">LAST USABLE ATTEMPT (#${simulatedAttemptsUsed})</span>`;
+                        noteText = `<span class="year-card-note last-attempt">Last usable attempt (#${simulatedAttemptsUsed})</span>`;
                     } else {
-                        noteText = `Attempt #${simulatedAttemptsUsed}`;
+                        noteText = `<span class="year-card-note">Attempt #${simulatedAttemptsUsed}</span>`;
                     }
                 } else {
                     cardClass = "attempts-finished";
-                    statusBadge = `<span class="status-badge badge-warning">AGE OK</span>`;
-                    noteText = `Attempts Finished`;
+                    statusBadge = `<span class="status-badge badge-neutral">Age OK</span>`;
+                    noteText = `<span class="year-card-note">Attempts finished</span>`;
                 }
             } else if (yearAge < minAge) {
                 cardClass = "underage";
-                statusBadge = `<span class="status-badge badge-danger">UNDERAGE</span>`;
-                noteText = `Below Min Age (${minAge})`;
+                statusBadge = `<span class="status-badge badge-warning">Underage</span>`;
+                noteText = `<span class="year-card-note">Below min age (${minAge})</span>`;
             } else {
-                // yearAge >= maxAge
                 cardClass = "overage";
-                statusBadge = `<span class="status-badge badge-danger">OVERAGE</span>`;
-                noteText = `Completed ${maxAge}+ years`;
+                statusBadge = `<span class="status-badge badge-danger">Overage</span>`;
+                noteText = `<span class="year-card-note">Completed ${maxAge}+ years</span>`;
             }
 
             cardsHtml += `
                 <div class="year-card ${cardClass}">
                     <div class="year-card-info">
                         <span class="year-card-title">CSS ${targetExamYear}</span>
-                        <span class="year-card-age">Cut-off: Dec ${targetCutoffYear} | Age: ${yearAge}y ${yearMonths}m</span>
+                        <span class="year-card-age">Cut-off: Dec ${targetCutoffYear} · Age: ${yearAge}y ${yearMonths}m</span>
                     </div>
                     <div class="year-card-status">
                         ${statusBadge}
-                        <span class="year-card-note">${noteText}</span>
+                        ${noteText}
                     </div>
                 </div>
             `;
         }
 
-        // Inject into the container and show the results section
         document.getElementById('yearCardsContainer').innerHTML = cardsHtml;
         document.getElementById('resultsSection').classList.add('visible');
-        
-        // Scroll to results smoothly
-        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 </script>
 
