@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CSS Eligibility Tracker</title>
+    <title>CSS Eligibility Tracker · Self Learners</title>
     <style>
         :root {
             --primary: #2575fc;
@@ -51,27 +51,57 @@
             position: relative;
         }
 
-        /* Version Tag */
-        .version-tag {
+        /* --- WATERMARK VERSION (small, top, before title) --- */
+        .version-watermark {
             position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 11px;
-            color: var(--text-light);
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            top: 10px;
+            left: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #b0b8c5;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            background: #f8f9fa;
-            padding: 3px 6px;
-            border-radius: 4px;
-            border: 1px solid #e9ecef;
+            background: transparent;
+            padding: 0;
+            z-index: 5;
+            opacity: 0.8;
+            font-family: monospace;
         }
 
+        /* --- LOGO & BRANDING (Self Learners) --- */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 5px;
+            margin-bottom: 6px;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e2b3a;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-name span {
+            color: var(--primary);
+        }
+
+        /* keep h2 margin small because brand sits above */
         h2 {
             text-align: center;
             color: var(--text-dark);
-            margin-top: 5px;
-            margin-bottom: 20px;
+            margin-top: 6px;
+            margin-bottom: 18px;
             font-size: 20px;
             font-weight: 700;
         }
@@ -105,7 +135,6 @@
             background-color: #ffffff;
         }
 
-        /* --- RADIO BUTTONS --- */
         .radio-group {
             display: flex;
             gap: 10px;
@@ -144,91 +173,6 @@
             box-shadow: 0 2px 8px rgba(37, 117, 252, 0.3);
         }
 
-        /* --- TOGGLE SWITCH --- */
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f9fbfd;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid #e0e6ed;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toggle-container.active {
-            background: #e8f8f5;
-            border-color: #27ae60;
-        }
-
-        .toggle-text {
-            flex-grow: 1;
-            margin-right: 10px;
-        }
-
-        .toggle-text strong {
-            display: block;
-            font-size: 13px;
-            color: var(--text-dark);
-            margin-bottom: 2px;
-        }
-
-        .toggle-text span {
-            font-size: 11px;
-            color: var(--text-light);
-            line-height: 1.3;
-            display: block;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 28px;
-            flex-shrink: 0;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-            position: absolute;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        input:checked + .slider {
-            background-color: var(--success-border);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(22px);
-        }
-
         .btn-primary {
             width: 100%;
             padding: 16px;
@@ -248,12 +192,11 @@
             transform: scale(0.98);
         }
 
-        /* --- RESULTS SECTION (On the same card) --- */
         .results-section {
             margin-top: 25px;
             border-top: 2px solid #eee;
             padding-top: 20px;
-            display: none; /* Hidden by default */
+            display: none;
         }
 
         .results-section.visible {
@@ -325,7 +268,6 @@
             font-weight: 600;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -334,15 +276,43 @@
             border-radius: 10px;
         }
 
+        /* small adjustment for version watermark on very small screens */
+        @media (max-width: 380px) {
+            .version-watermark {
+                font-size: 9px;
+                top: 8px;
+                left: 15px;
+            }
+            .brand-logo {
+                width: 30px;
+                height: 30px;
+            }
+            .brand-name {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="version-tag">v1</div>
+    <!-- Watermark version – small, top before title -->
+    <div class="version-watermark">v2.1</div>
+
+    <!-- Self Learners logo & branding -->
+    <div class="brand-header">
+        <!-- Logo from Google Drive (direct image link) -->
+        <img 
+            class="brand-logo" 
+            src="https://drive.google.com/uc?export=view&id=1WjJxkkzjA2BmBLrr-VysDCr78xaDkg99" 
+            alt="Self Learners Logo"
+            onerror="this.style.display='none'"
+        >
+        <div class="brand-name">Self <span>Learners</span></div>
+    </div>
+
     <h2>🎯 CSS Eligibility Tracker</h2>
     
-    <!-- FORM INPUTS -->
     <div class="form-group">
         <label for="dob">Date of Birth:</label>
         <input type="date" id="dob" value="1997-03-11">
@@ -366,17 +336,6 @@
         </div>
     </div>
 
-    <div class="toggle-container active" id="toggleContainer" onclick="toggleSwitch()">
-        <div class="toggle-text">
-            <strong>Already filled form for the current cycle?</strong>
-            <span>(e.g., filled in Aug 2026 for the Jan 2027 exam).</span>
-        </div>
-        <label class="toggle-switch">
-            <input type="checkbox" id="appliedCurrentYear" checked>
-            <span class="slider"></span>
-        </label>
-    </div>
-
     <div class="form-group">
         <label for="relaxation">Age Relaxation Category (Rule 6(2)):</label>
         <select id="relaxation">
@@ -393,37 +352,25 @@
 
     <button class="btn-primary" onclick="calculateEligibility()">Check Eligibility</button>
 
-    <!-- RESULTS SECTION (On the same card) -->
     <div class="results-section" id="resultsSection">
         <h3 style="margin-bottom:15px; font-size:16px; color:var(--text-dark);">📅 Year-by-Year Eligibility</h3>
         <div class="year-cards-container" id="yearCardsContainer">
             <!-- Dynamic Cards Will Be Inserted Here -->
         </div>
+        <p style="font-size:12px; color:#7f8c8d; margin-top:15px; line-height:1.4;">
+            <strong>Note:</strong> Based on official CSS CE Rules 2019 Explanation. 
+            A candidate who has <em>completed</em> 30 years (or 32 with relaxation) on the cut-off date is treated as overage.
+        </p>
     </div>
 </div>
 
 <script>
     // --- CONSTANTS ---
-    const CURRENT_CYCLE_YEAR = 2027; // The exam year you are applying for now
-    const CURRENT_CUTOFF_YEAR = 2026; // Rule 5: Dec 31, 2026
-
-    function toggleSwitch() {
-        const checkbox = document.getElementById('appliedCurrentYear');
-        const container = document.getElementById('toggleContainer');
-        
-        checkbox.checked = !checkbox.checked;
-        
-        if (checkbox.checked) {
-            container.classList.add('active');
-        } else {
-            container.classList.remove('active');
-        }
-    }
+    const CURRENT_CYCLE_YEAR = 2027; // Starting exam year to display
 
     function calculateEligibility() {
         const dobInput = document.getElementById('dob').value;
         const relaxation = document.getElementById('relaxation').value;
-        const isCurrentYearApplied = document.getElementById('appliedCurrentYear').checked;
         
         // Get selected radio value
         let prevAttempts = 0;
@@ -444,22 +391,21 @@
 
         // --- RULE 6: AGE LIMITS ---
         let minAge = 21;
-        // If any relaxation category is selected, max age becomes 32
+        // Official interpretation from the 2019 Explanation:
+        // Completed age must be < maxAge (i.e. 30 or 32)
         let maxAge = (relaxation === 'none') ? 30 : 32;
         let maxAttempts = 3;
 
         // --- BUILD THE CARDS ---
         let cardsHtml = "";
-
-        let startExamYear = CURRENT_CYCLE_YEAR;
         let simulatedAttemptsUsed = prevAttempts; 
         
         for (let i = 0; i < 10; i++) {
-            let targetExamYear = startExamYear + i;
+            let targetExamYear = CURRENT_CYCLE_YEAR + i;
             let targetCutoffYear = targetExamYear - 1; 
             let simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
             
-            // Calculate exact age (Years and Months) for this specific year
+            // Calculate completed age (years and months) on the cut-off date
             let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
             let yearMonths = simulatedCutoff.getMonth() - dob.getMonth();
             let dayDiff = simulatedCutoff.getDate() - dob.getDate();
@@ -472,39 +418,35 @@
                 yearMonths += 12;
             }
             
-            // --- CORRECT AGE CHECK ---
-            // A candidate is eligible if their completed age in years is <= maxAge on the cut-off date.
-            let isSimAgeEligible = (yearAge >= minAge && yearAge <= maxAge);
-            
-            let isCurrentYearBox = (i === 0 && isCurrentYearApplied);
+            // --- CORRECTED AGE CHECK (per official Explanation) ---
+            // Eligible only if completed years are >= 21 AND < maxAge
+            let isSimAgeEligible = (yearAge >= minAge && yearAge < maxAge);
             
             let cardClass = "";
             let statusBadge = "";
             let noteText = "";
 
-            if (isCurrentYearBox) {
-                simulatedAttemptsUsed++; 
-                cardClass = "eligible";
-                statusBadge = `<span class="badge badge-success">ELIGIBLE</span>`;
-                noteText = `Applied (Attempt #${simulatedAttemptsUsed})`;
-            } else if (isSimAgeEligible) {
+            if (isSimAgeEligible) {
                 if (simulatedAttemptsUsed < maxAttempts) {
                     simulatedAttemptsUsed++;
                     
+                    // Check if this is the last usable attempt
                     let isLastUsable = false;
                     if (simulatedAttemptsUsed === maxAttempts) {
                         isLastUsable = true;
                     } else {
-                        let nextCutoffYear = targetExamYear - 1 + 1; 
+                        // Look ahead to next year
+                        let nextCutoffYear = targetExamYear;
                         let nextCutoff = new Date(`${nextCutoffYear}-12-31`);
                         let nextAge = nextCutoff.getFullYear() - dob.getFullYear();
                         let nextM = nextCutoff.getMonth() - dob.getMonth();
                         if (nextM < 0) nextAge--;
-                        if (nextAge > maxAge) isLastUsable = true;
+                        // Next year becomes overage when completed age reaches maxAge
+                        if (nextAge >= maxAge) isLastUsable = true;
                     }
 
                     cardClass = "eligible";
-                    statusBadge = `<span class="badge badge-success">ELIGIBLE</span>`;
+                    statusBadge = `<span class="status-badge badge-success">ELIGIBLE</span>`;
                     if (isLastUsable) {
                         noteText = `<span style="color:#e74c3c; font-weight:bold;">LAST USABLE ATTEMPT (#${simulatedAttemptsUsed})</span>`;
                     } else {
@@ -512,17 +454,18 @@
                     }
                 } else {
                     cardClass = "attempts-finished";
-                    statusBadge = `<span class="badge badge-warning">AGE OK</span>`;
+                    statusBadge = `<span class="status-badge badge-warning">AGE OK</span>`;
                     noteText = `Attempts Finished`;
                 }
             } else if (yearAge < minAge) {
                 cardClass = "underage";
-                statusBadge = `<span class="badge badge-danger">UNDERAGE</span>`;
+                statusBadge = `<span class="status-badge badge-danger">UNDERAGE</span>`;
                 noteText = `Below Min Age (${minAge})`;
             } else {
+                // yearAge >= maxAge
                 cardClass = "overage";
-                statusBadge = `<span class="badge badge-danger">OVERAGE</span>`;
-                noteText = `Above Max Age (${maxAge})`;
+                statusBadge = `<span class="status-badge badge-danger">OVERAGE</span>`;
+                noteText = `Completed ${maxAge}+ years`;
             }
 
             cardsHtml += `
