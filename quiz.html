@@ -326,9 +326,13 @@
             background-clip: text;
             color: transparent;
             line-height: 1.15;
+            max-width: 340px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .brand-title .subtitle {
-            display: none; /* hide the extra subtitle for compactness */
+            display: none;
         }
         .top-actions {
             display: flex;
@@ -907,7 +911,7 @@
         @media (max-width: 560px) {
             .quiz-wrapper { padding: 1.15rem 0.85rem; }
             .brand-logo { width: 30px; height: 30px; }
-            .brand-title h1 { font-size: 0.95rem; }
+            .brand-title h1 { font-size: 0.95rem; max-width: 180px; }
             .question-card { padding: 1.15rem 1.05rem 0.75rem; }
             .question-card .q-text { font-size: 1.05rem; }
             .options-list .option-btn { padding: 0.7rem 1.05rem; font-size: 0.92rem; }
@@ -971,7 +975,7 @@
             <div class="brand">
                 <img class="brand-logo" id="brandLogo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230f766e'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ESL%3C/text%3E%3C/svg%3E" alt="Logo">
                 <div class="brand-title">
-                    <h1 id="quizTitle">Loading...</h1>
+                    <h1 id="quizTitle" title="">All Jobs MCQs</h1>
                     <span class="subtitle" id="quizSubtitle">Self Learners</span>
                 </div>
             </div>
@@ -1077,6 +1081,8 @@
         const STORAGE_KEY = 'selfLearnersOneByOneV4';
         const SESSION_KEY = 'selfLearnersSessionUser';
 
+        const DEFAULT_TITLE = 'All Jobs MCQs';
+
         let questions = [];
         let currentIndex = 0;
         let score = 0;
@@ -1087,13 +1093,12 @@
         let lockedQuestions = [];
         let originalQuestions = [];
         let totalQuestions = 0;
-        let quizTitleText = 'Quiz';
         let timerInterval = null;
         let timeRemaining = 0;
         let allSubjects = [];
         let allJobs = [];
         let currentSubject = 'all';
-        let currentJob = 'all';
+        let currentJob = 'all';           // raw job value from sheet ('' or 'all' means all)
         let invalidQuestions = [];
 
         let users = [];
@@ -1156,6 +1161,49 @@
         const confirmOk = document.getElementById('confirmOk');
         const confirmCancel = document.getElementById('confirmCancel');
         let confirmResolve = null;
+
+        // ============================================================
+        // TITLE CASE HELPER
+        // ============================================================
+        const SMALL_WORDS = new Set(['a','an','and','as','at','but','by','for','from','in','into','nor','of','on','onto','or','per','the','to','vs','via','with']);
+
+        function toTitleCase(str) {
+            if (!str) return '';
+            const cleaned = cleanCell(str);
+            if (!cleaned) return '';
+
+            return cleaned
+                .split(/(\s+|\/|-)/)
+                .map((chunk, i) => {
+                    if (/^[\s\/-]+$/.test(chunk)) return chunk;
+                    const lower = chunk.toLowerCase();
+                    if (/^[A-Z]{2,5}$/.test(chunk)) return chunk;
+                    if (/\d/.test(chunk)) {
+                        return chunk.charAt(0).toUpperCase() + chunk.slice(1).toLowerCase();
+                    }
+                    if (i > 0 && SMALL_WORDS.has(lower)) return lower;
+                    return lower.charAt(0).toUpperCase() + lower.slice(1);
+                })
+                .join('');
+        }
+
+        // ============================================================
+        // TITLE RESOLVER — Job-based title
+        // "All Jobs MCQs" if no job selected, otherwise "<Job> MCQs"
+        // ============================================================
+        function resolveTitle(jobValue) {
+            const raw = cleanCell(jobValue);
+            if (!raw || raw.toLowerCase() === 'all') {
+                return DEFAULT_TITLE;
+            }
+            return toTitleCase(raw) + ' MCQs';
+        }
+
+        function applyTitle(jobValue) {
+            const t = resolveTitle(jobValue);
+            quizTitle.textContent = t;
+            quizTitle.title = t;
+        }
 
         // ============================================================
         // CONFIRM DIALOG
@@ -1269,6 +1317,11 @@
 
         function getAttemptedCount() {
             return selectedAllAnswers.filter(a => a !== null).length;
+        }
+
+        function sameValueCI(a, b) {
+            if (!a || !b) return false;
+            return cleanCell(a).toLowerCase() === cleanCell(b).toLowerCase();
         }
 
         // ============================================================
@@ -1446,7 +1499,7 @@
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({
                     questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
-                    score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions,
+                    score, totalQuestions, lockedQuestions, originalQuestions,
                     currentIndex, timeRemaining, currentSubject, currentJob,
                     allSubjects, allJobs, invalidQuestions
                 }));
@@ -1469,7 +1522,7 @@
         function showLoading() {
             questionCard.innerHTML =
                 '<div style="padding:2rem;text-align:center;color:#475569;">🔄 Loading questions...</div>';
-            quizTitle.textContent = 'Loading...';
+            applyTitle(currentJob === 'all' ? '' : currentJob);
             prevBtn.disabled = true;
             nextBtn.disabled = true;
             endQuizBtn.disabled = true;
@@ -1537,7 +1590,8 @@
             modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
             subjects.forEach(s => {
                 const o = document.createElement('option');
-                o.value = s; o.textContent = s || 'Uncategorized';
+                o.value = s;
+                o.textContent = toTitleCase(s) || 'Uncategorized';
                 modalYearSelect.appendChild(o);
             });
             if (curSub && subjects.includes(curSub)) modalYearSelect.value = curSub;
@@ -1547,15 +1601,16 @@
             modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
             jobs.forEach(j => {
                 const o = document.createElement('option');
-                o.value = j; o.textContent = j || 'Uncategorized';
+                o.value = j;
+                o.textContent = toTitleCase(j) || 'Uncategorized';
                 modalJobSelect.appendChild(o);
             });
             if (curJob && jobs.includes(curJob)) modalJobSelect.value = curJob;
-            else modalJobSelect.value = currentJob || 'all';
+            else modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
 
+            // Badge — only subject shown, job is now in title
             const badgeParts = [];
-            if (currentSubject && currentSubject !== 'all') badgeParts.push('📂 ' + currentSubject);
-            if (currentJob && currentJob !== 'all') badgeParts.push('💼 ' + currentJob);
+            if (currentSubject && currentSubject !== 'all') badgeParts.push('📂 ' + toTitleCase(currentSubject));
             if (badgeParts.length) {
                 yearBadge.textContent = badgeParts.join(' · ');
                 yearBadge.style.display = 'inline-block';
@@ -1563,6 +1618,9 @@
                 yearBadge.textContent = '';
                 yearBadge.style.display = 'none';
             }
+
+            // Title reflects job selection
+            applyTitle(currentJob);
         }
 
         // ============================================================
@@ -1591,7 +1649,6 @@
                 if (saved && saved.questions.length > 0) {
                     questions = saved.questions;
                     originalQuestions = saved.originalQuestions || saved.questions.map(q => ({...q}));
-                    quizTitleText = saved.quizTitleText || 'Quiz';
                     totalQuestions = saved.totalQuestions || questions.length;
                     selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
                     answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
@@ -1606,7 +1663,7 @@
                     allSubjects = saved.allSubjects || [];
                     allJobs = saved.allJobs || [];
                     invalidQuestions = saved.invalidQuestions || [];
-                    quizTitle.textContent = quizTitleText;
+                    applyTitle(currentJob);
                     totalCount.textContent = totalQuestions;
                     populateDropdowns(allSubjects, allJobs);
                     hideLoading();
@@ -1629,17 +1686,19 @@
                     if (parsed.questions.length === 0) throw new Error('No data');
 
                     originalQuestions = parsed.questions;
-                    quizTitleText = parsed.title || 'Quiz';
 
                     const subjects = [...new Set(originalQuestions.map(q => q.subject || '').filter(c => c && c.trim()))];
                     const jobs = [...new Set(originalQuestions.map(q => q.job || '').filter(c => c && c.trim()))];
-                    populateDropdowns(subjects, jobs);
 
                     let filtered = originalQuestions;
                     const targetSubject = subject || currentSubject || 'all';
                     const targetJob = job || currentJob || 'all';
-                    if (targetSubject !== 'all') filtered = filtered.filter(q => q.subject === targetSubject);
-                    if (targetJob !== 'all') filtered = filtered.filter(q => q.job === targetJob);
+                    if (targetSubject !== 'all') {
+                        filtered = filtered.filter(q => sameValueCI(q.subject, targetSubject));
+                    }
+                    if (targetJob !== 'all') {
+                        filtered = filtered.filter(q => sameValueCI(q.job, targetJob));
+                    }
 
                     if (filtered.length === 0) {
                         showToast('⚠️ No questions match the selected filters. Loading all.', 'warning', 3000);
@@ -1648,8 +1707,6 @@
                         modalJobSelect.value = 'all';
                         currentSubject = 'all';
                         currentJob = 'all';
-                        yearBadge.textContent = '';
-                        yearBadge.style.display = 'none';
                     }
 
                     questions = filtered.map(q => {
@@ -1670,8 +1727,12 @@
                     currentIndex = 0;
                     timeRemaining = totalQuestions * 60;
                     clearState();
-                    quizTitle.textContent = quizTitleText;
+
+                    // Update title & badge based on current job selection
+                    applyTitle(currentJob);
+                    populateDropdowns(subjects, jobs);
                     totalCount.textContent = totalQuestions;
+
                     hideLoading();
                     resetToQuizView();
                     updateTimerDisplay();
@@ -1696,9 +1757,8 @@
         // ============================================================
         function parseQuizCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
-            if (lines.length < 2) return { questions: [], title: 'Quiz' };
+            if (lines.length < 2) return { questions: [] };
 
-            let title = 'Quiz';
             const result = [];
 
             for (let i = 1; i < lines.length; i++) {
@@ -1718,10 +1778,6 @@
                 const rawCorrect = cols[6] ? cols[6].trim() : '';
                 const correctIdx = resolveCorrectIndex(rawCorrect, opts);
 
-                if (rawCorrect && correctIdx === -1) {
-                    console.warn(`[Self Learners] Q#${i} UNMATCHED: "${rawCorrect}" | options:`, opts);
-                }
-
                 const topic   = cols[7] ? cols[7].trim() : '';
                 const subject = cols[8] ? cols[8].trim() : '';
                 const job     = cols[10] ? cols[10].trim() : '';
@@ -1738,12 +1794,11 @@
                 });
             }
 
-            if (result.length > 0 && result[0].subject) title = result[0].subject;
-            return { questions: result, title };
+            return { questions: result };
         }
 
         // ============================================================
-        // RENDER QUESTION — meta shown only after selection, below feedback
+        // RENDER QUESTION
         // ============================================================
         function renderQuestion() {
             if (!questions.length) {
@@ -1786,7 +1841,6 @@
             });
             bodyHtml += '</div>';
 
-            // Feedback + Meta (only when answered and not in submitted/completed review — or always when answered)
             if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) {
                 const isCorrect = selectedAllAnswers[idx] === q.correct;
                 const icon = isCorrect ? '✅' : '❌';
@@ -1796,11 +1850,10 @@
                     ${icon} ${msg}
                 </div>`;
 
-                // META INFO — BELOW the feedback, only visible after selection
                 const metaChips = [];
-                if (q.subject) metaChips.push(`<span class="meta-chip subject-chip">📚 ${q.subject}</span>`);
-                if (q.topic)   metaChips.push(`<span class="meta-chip topic-chip">🏷️ ${q.topic}</span>`);
-                if (q.job)     metaChips.push(`<span class="meta-chip job-chip">💼 ${q.job}</span>`);
+                if (q.subject) metaChips.push(`<span class="meta-chip subject-chip" title="${q.subject}">📚 ${toTitleCase(q.subject)}</span>`);
+                if (q.topic)   metaChips.push(`<span class="meta-chip topic-chip" title="${q.topic}">🏷️ ${toTitleCase(q.topic)}</span>`);
+                if (q.job)     metaChips.push(`<span class="meta-chip job-chip" title="${q.job}">💼 ${toTitleCase(q.job)}</span>`);
                 if (metaChips.length) {
                     bodyHtml += `<div class="q-meta-block">${metaChips.join('')}</div>`;
                 }
@@ -2070,7 +2123,8 @@
             modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
             allSubjects.forEach(s => {
                 const o = document.createElement('option');
-                o.value = s; o.textContent = s || 'Uncategorized';
+                o.value = s;
+                o.textContent = toTitleCase(s) || 'Uncategorized';
                 modalYearSelect.appendChild(o);
             });
             modalYearSelect.value = currentSubject || 'all';
@@ -2078,10 +2132,11 @@
             modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
             allJobs.forEach(j => {
                 const o = document.createElement('option');
-                o.value = j; o.textContent = j || 'Uncategorized';
+                o.value = j;
+                o.textContent = toTitleCase(j) || 'Uncategorized';
                 modalJobSelect.appendChild(o);
             });
-            modalJobSelect.value = currentJob || 'all';
+            modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
 
             refreshModal.classList.add('active');
         }
