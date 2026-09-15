@@ -863,8 +863,8 @@
                 </div>
             </div>
             <div class="top-actions">
-                <button class="btn-icon" id="refreshBtn" title="Refresh Quiz">
-                    <span id="refreshIcon">🔄</span>
+                <button class="btn-icon" id="refreshBtn" title="Filter &amp; Refresh Quiz">
+                    <span id="refreshIcon">⚙️</span>
                 </button>
                 <div class="user-badge" id="userBadge" title="Click to logout">
                     <span class="avatar" id="userAvatar">U</span>
@@ -922,7 +922,7 @@
 
         <div class="modal-overlay" id="refreshModal">
             <div class="modal-box">
-                <h3>🔄 Filter & Refresh</h3>
+                <h3>⚙️ Filter &amp; Refresh</h3>
                 <p>Optionally filter by Job and/or Subject, then click "Load &amp; Refresh".</p>
 
                 <label class="modal-label" for="modalJobSelect">💼 Job (column K)</label>
@@ -1161,24 +1161,17 @@
             const raw = cleanCell(rawCorrect);
             if (!raw) return -1;
 
-            // 1) Exact text match
             for (let i = 0; i < options.length; i++) {
                 if (cleanCell(options[i]) === raw) return i;
             }
-
-            // 2) Case-insensitive text match
             const rawLower = raw.toLowerCase();
             for (let i = 0; i < options.length; i++) {
                 if (cleanCell(options[i]).toLowerCase() === rawLower) return i;
             }
-
-            // 3) Letter fallback — pure A/B/C/D
             if (raw.length === 1 && /^[A-Da-d]$/.test(raw)) {
                 const idx = 'abcd'.indexOf(raw.toLowerCase());
                 if (idx >= 0 && idx < options.length) return idx;
             }
-
-            // 3b) Letter with wrappers
             if (raw.length <= 25) {
                 const m = raw.match(/^(?:option\s*|opt\.?\s*)?[\(\[\{\-]?\s*([A-Da-d])\s*[\)\]\}\.\-:]?(?:\s.*)?$/i);
                 if (m && m[1]) {
@@ -1186,13 +1179,10 @@
                     if (idx >= 0 && idx < options.length) return idx;
                 }
             }
-
-            // 4) Numeric fallback
             if (/^[1-4]$/.test(raw)) {
                 const idx = parseInt(raw, 10) - 1;
                 if (idx >= 0 && idx < options.length) return idx;
             }
-
             return -1;
         }
 
@@ -1371,7 +1361,7 @@
         }
         function hideLoading() {
             refreshBtn.disabled = false;
-            refreshIcon.textContent = '🔄';
+            refreshIcon.textContent = '⚙️';
             refreshIcon.classList.remove('refresh-spin');
         }
 
@@ -1751,6 +1741,9 @@
             totalCount.textContent = totalQuestions;
         }
 
+        // ============================================================
+        // RENDER DOTS — zero invalid hidden
+        // ============================================================
         function renderDots(activeIdx) {
             dotGrid.innerHTML = '';
             for (let i = 0; i < totalQuestions; i++) {
@@ -1760,6 +1753,7 @@
 
                 const isInvalid = invalidQuestions.includes(i);
 
+                // Only show invalid if count > 0 (but we still style it, just not add a separate legend)
                 if (isInvalid) {
                     dot.classList.add('invalid-dot');
                 } else {
@@ -1792,6 +1786,9 @@
             }
         }
 
+        // ============================================================
+        // UPDATE OVERVIEW — zero invalid hidden
+        // ============================================================
         function updateOverview() {
             let done = 0, pending = 0, correct = 0, wrong = 0, invalid = 0;
             for (let i = 0; i < totalQuestions; i++) {
@@ -1816,9 +1813,11 @@
             wrongCount.textContent = wrong;
             invalidCount.textContent = invalid;
 
+            // Hide invalid legend when zero
+            invalidLegend.style.display = invalid > 0 ? 'inline-flex' : 'none';
+            // Correct/wrong legends always visible
             correctLegend.style.display = 'inline-flex';
             wrongLegend.style.display = 'inline-flex';
-            invalidLegend.style.display = 'inline-flex';
         }
 
         function gradeQuiz() {
