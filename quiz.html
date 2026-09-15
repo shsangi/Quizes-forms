@@ -241,7 +241,26 @@
             from { transform: scale(0.92); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
-        .custom-confirm-box .icon { font-size: 2.5rem; text-align: center; margin-bottom: 0.4rem; }
+        /* Single icon rendered as a circle badge */
+        .custom-confirm-box .icon { 
+            font-size: 2.5rem; 
+            text-align: center; 
+            margin-bottom: 0.4rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .custom-confirm-box .icon span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--surface-2);
+            font-size: 2rem;
+            line-height: 1;
+        }
         .custom-confirm-box h3 {
             font-size: 1.25rem;
             font-weight: 700;
@@ -335,7 +354,6 @@
             word-break: break-word;
             max-width: 320px;
         }
-        /* Selected subjects shown below the title in small letters, up to 2 lines */
         .selected-subjects {
             font-size: 0.72rem;
             font-weight: 500;
@@ -913,7 +931,6 @@
         }
         .year-select:focus { border-color: var(--primary); }
 
-        /* ===== Multi-select checkbox list ===== */
         .checkbox-list-wrapper {
             border: 1.5px solid var(--border);
             border-radius: 14px;
@@ -969,7 +986,14 @@
             white-space: nowrap;
         }
 
-        /* user info section inside modal */
+        .checkbox-empty {
+            font-size: 0.8rem;
+            color: var(--text-3);
+            text-align: center;
+            padding: 1rem 0.5rem;
+            font-style: italic;
+        }
+
         .modal-user-info {
             display: flex;
             align-items: center;
@@ -1056,9 +1080,10 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- ===== CONFIRM DIALOG (fixed single icon) ===== -->
     <div class="custom-confirm-overlay" id="confirmOverlay">
         <div class="custom-confirm-box">
-            <div class="icon" id="confirmIcon">❓</div>
+            <div class="icon" id="confirmIconWrap"><span id="confirmIcon">❓</span></div>
             <h3 id="confirmTitle">Are you sure?</h3>
             <p id="confirmMessage">This action cannot be undone.</p>
             <div class="btn-group">
@@ -1183,9 +1208,7 @@
                 </select>
 
                 <label class="modal-label">📚 Subjects (select multiple)</label>
-                <div class="checkbox-list-wrapper" id="subjectCheckboxList">
-                    <!-- dynamically populated -->
-                </div>
+                <div class="checkbox-list-wrapper" id="subjectCheckboxList"></div>
 
                 <div class="modal-actions" style="margin-top:1rem;">
                     <button class="btn-secondary" id="modalCancel">Cancel</button>
@@ -1228,8 +1251,7 @@
         let timeRemaining = 0;
         let allSubjects = [];
         let allJobs = [];
-        let currentSubject = 'all';   // kept for compatibility but not used for filtering
-        let currentSubjects = [];      // <-- multi-select array of subjects
+        let currentSubjects = [];
         let currentJob = 'all';
         let invalidQuestions = [];
 
@@ -1281,7 +1303,6 @@
         const timerDisplay = document.getElementById('timerDisplay');
         const timerPill = document.getElementById('timerPill');
         const singleQuestionView = document.getElementById('singleQuestionView');
-        const yearBadge = document.getElementById('yearBadge');
 
         const modalUserAvatar = document.getElementById('modalUserAvatar');
         const modalUserName = document.getElementById('modalUserName');
@@ -1346,7 +1367,6 @@
                 selectedSubjectsLine.style.display = 'none';
                 return;
             }
-            // Show them comma-separated, uppercase small letters
             const names = currentSubjects.map(s => toTitleCase(s));
             const joined = names.join(', ');
             selectedSubjectsLine.innerHTML =
@@ -1355,7 +1375,7 @@
         }
 
         // ============================================================
-        // CONFIRM DIALOG
+        // CONFIRM DIALOG (single icon)
         // ============================================================
         function showConfirm(icon, title, message, confirmClass = 'btn-confirm') {
             return new Promise(resolve => {
@@ -1591,9 +1611,6 @@
             } catch (e) {}
         }
 
-        // ------------------------------------------------------------
-        // RESET EVERYTHING TO A FRESH, NEUTRAL STATE
-        // ------------------------------------------------------------
         function resetAllState() {
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             clearState();
@@ -1611,7 +1628,6 @@
             timeRemaining = 0;
             allSubjects = [];
             allJobs = [];
-            currentSubject = 'all';
             currentSubjects = [];
             currentJob = 'all';
             invalidQuestions = [];
@@ -1702,7 +1718,7 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({
                     questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
                     score, totalQuestions, lockedQuestions, originalQuestions,
-                    currentIndex, timeRemaining, currentSubject, currentSubjects, currentJob,
+                    currentIndex, timeRemaining, currentSubjects, currentJob,
                     allSubjects, allJobs, invalidQuestions
                 }));
             } catch (e) {}
@@ -1782,10 +1798,46 @@
         }
 
         // ============================================================
+        // GET SUBJECTS AVAILABLE FOR A GIVEN JOB
+        // ============================================================
+        function getSubjectsForJob(jobValue) {
+            const pool = originalQuestions.length ? originalQuestions : questions;
+            if (!pool || pool.length === 0) return [];
+
+            if (!jobValue || jobValue === 'all') {
+                // All subjects across all jobs
+                const set = new Set();
+                pool.forEach(q => {
+                    const s = cleanCell(q.subject);
+                    if (s) set.add(s);
+                });
+                return [...set];
+            }
+
+            // Subjects that exist within the selected job only
+            const set = new Set();
+            pool.forEach(q => {
+                if (sameValueCI(q.job, jobValue)) {
+                    const s = cleanCell(q.subject);
+                    if (s) set.add(s);
+                }
+            });
+            return [...set];
+        }
+
+        // ============================================================
         // BUILD SUBJECT CHECKBOX LIST
         // ============================================================
         function buildSubjectCheckboxList(subjects, selectedArr) {
             subjectCheckboxList.innerHTML = '';
+
+            if (!subjects || subjects.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'checkbox-empty';
+                empty.textContent = 'No subjects available for this job.';
+                subjectCheckboxList.appendChild(empty);
+                return;
+            }
 
             // "All Subjects" row
             const allRow = document.createElement('label');
@@ -1793,7 +1845,9 @@
             const allCb = document.createElement('input');
             allCb.type = 'checkbox';
             allCb.id = 'cbAllSubjects';
-            allCb.checked = (selectedArr.length === 0);
+            // "All" is checked only when no specific subject is selected
+            const hasAnySpecific = selectedArr.some(s => subjects.some(sub => sameValueCI(sub, s)));
+            allCb.checked = !hasAnySpecific;
             allRow.appendChild(allCb);
             const allLbl = document.createElement('span');
             allLbl.className = 'cb-label';
@@ -1803,9 +1857,12 @@
 
             allCb.addEventListener('change', function() {
                 if (this.checked) {
-                    // uncheck all others
                     subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects)')
                         .forEach(cb => { cb.checked = false; });
+                } else {
+                    // If user unchecks All, and no individual ones checked, re-check it
+                    const anyChecked = subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects):checked').length > 0;
+                    if (!anyChecked) this.checked = true;
                 }
             });
 
@@ -1829,7 +1886,6 @@
                     if (this.checked) {
                         allCb.checked = false;
                     }
-                    // If nothing is checked, auto-check "All Subjects"
                     const anyChecked = subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects):checked').length > 0;
                     if (!anyChecked) allCb.checked = true;
                 });
@@ -1843,6 +1899,24 @@
             });
             return checked;
         }
+
+        // ============================================================
+        // REBUILD SUBJECTS WHEN JOB CHANGES (live, no refresh needed)
+        // ============================================================
+        function onJobChangedInModal() {
+            const selectedJob = modalJobSelect.value;
+            const availableSubjects = getSubjectsForJob(selectedJob);
+
+            // Preserve currently-checked subjects that still exist in the new pool
+            const currentChecked = getCheckedSubjects();
+            const stillValid = currentChecked.filter(s =>
+                availableSubjects.some(as => sameValueCI(as, s))
+            );
+
+            buildSubjectCheckboxList(availableSubjects, stillValid);
+        }
+
+        modalJobSelect.addEventListener('change', onJobChangedInModal);
 
         // ============================================================
         // DROPDOWNS / JOB
@@ -1863,10 +1937,11 @@
             if (curJob && jobs.includes(curJob)) modalJobSelect.value = curJob;
             else modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
 
-            // Subject checkbox list (multi-select)
-            buildSubjectCheckboxList(subjects, currentSubjects);
+            // Subject checkbox list — filtered by currently selected job
+            const jobForFilter = modalJobSelect.value || 'all';
+            const filteredSubjects = getSubjectsForJob(jobForFilter);
+            buildSubjectCheckboxList(filteredSubjects, currentSubjects);
 
-            // Update title + selected subjects line
             applyTitle(currentJob);
             renderSelectedSubjectsLine();
         }
@@ -1906,7 +1981,7 @@
                     score = saved.score || 0;
                     currentIndex = saved.currentIndex || 0;
                     timeRemaining = saved.timeRemaining || (totalQuestions * 60);
-                    currentSubjects = saved.currentSubjects || (saved.currentSubject && saved.currentSubject !== 'all' ? [saved.currentSubject] : []);
+                    currentSubjects = saved.currentSubjects || [];
                     currentJob = saved.currentJob || 'all';
                     allSubjects = saved.allSubjects || [];
                     allJobs = saved.allJobs || [];
@@ -1944,13 +2019,11 @@
                     const targetSubjects = subjectArr || currentSubjects || [];
                     const targetJob = job || currentJob || 'all';
 
-                    // Filter by multiple subjects
                     if (targetSubjects.length > 0) {
                         filtered = filtered.filter(q =>
                             targetSubjects.some(ts => sameValueCI(q.subject, ts))
                         );
                     }
-                    // Filter by job
                     if (targetJob !== 'all') {
                         filtered = filtered.filter(q => sameValueCI(q.job, targetJob));
                     }
@@ -2384,17 +2457,18 @@
             });
             modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
 
-            // Subject checkbox list
-            buildSubjectCheckboxList(allSubjects, currentSubjects);
+            // Build subject list for the currently selected job
+            const jobForFilter = modalJobSelect.value || 'all';
+            const filteredSubjects = getSubjectsForJob(jobForFilter);
+            buildSubjectCheckboxList(filteredSubjects, currentSubjects);
 
-            // Update modal user info
             updateModalUserInfo();
 
             refreshModal.classList.add('active');
         }
 
         function handleRefreshConfirm() {
-            const selSubjects = getCheckedSubjects(); // array
+            const selSubjects = getCheckedSubjects();
             const selJob = modalJobSelect.value;
             if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
