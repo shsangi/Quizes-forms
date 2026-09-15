@@ -18,6 +18,8 @@
       justify-content: center;
       padding: 1.2rem;
     }
+
+    /* ---------- TOAST NOTIFICATIONS ---------- */
     .toast-container {
       position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999;
       display: flex; flex-direction: column; gap: 0.6rem;
@@ -47,6 +49,7 @@
     @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
     .toast.removing { animation: fadeOut 0.3s ease forwards; }
 
+    /* ---------- CUSTOM CONFIRM DIALOG ---------- */
     .custom-confirm-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
@@ -92,6 +95,7 @@
       box-shadow: 0 6px 16px rgba(40, 167, 69, 0.3);
     }
 
+    /* ---------- LOGIN SCREEN ---------- */
     .login-wrapper {
       max-width: 420px; width: 100%; background: white;
       border-radius: 2.5rem; padding: 2.8rem 2.2rem;
@@ -150,6 +154,7 @@
       text-align: center; font-size: 0.8rem; color: #8aa3b5; margin-top: 1.2rem;
     }
 
+    /* ---------- QUIZ SCREEN ---------- */
     .quiz-wrapper {
       max-width: 920px; width: 100%; background: white;
       border-radius: 2.5rem; padding: 2.2rem 2.5rem 2rem;
@@ -532,13 +537,11 @@
   <script>
     (function() {
       // ==============================================================
-      // 1. CONFIGURATION – EXACT URLs AS PROVIDED
+      // 1. CONFIGURATION – YOUR EXACT URLs
       // ==============================================================
-      // MCQs published CSV URL (as given)
       const QUIZ_CSV_URL =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
 
-      // Login sheet URL (as given – edit URL, converted to CSV export)
       const SHEET_ID = '17yY_LUiqMsABz7tbtAXFpZIYpHN2TJTZSxo7oJWzckI';
       const LOGIN_GID = '2076597807';
       const LOGIN_CSV_URL =
@@ -679,7 +682,7 @@
       // ==============================================================
       // 8. SESSION MANAGEMENT
       // ==============================================================
-      const SESSION_KEY = 'quiz_session_data_v5';
+      const SESSION_KEY = 'quiz_session_data_v7';
 
       function saveSession() {
         if (!loggedInUser || quizCompleted) return;
@@ -736,20 +739,21 @@
           .then(csvText => {
             users = parseLoginCSV(csvText);
             isLoadingUsers = false;
-            loginStatus.textContent = `🔐 ${users.length} user(s) loaded. Sign in to continue`;
+            loginStatus.textContent = '🔐 Sign in to continue';
             loginBtn.disabled = false;
 
+            // Silent debug-only check (doesn't expose count to UI)
             if (users.length === 0) {
-              showToast('⚠️ No users found. Make sure the sheet is shared as "Anyone with the link → Viewer".', 'warning', 5000);
+              console.warn('[Self Learners] Login sheet returned 0 users. Check sharing settings.');
             }
 
             checkAndRestoreSession();
           })
           .catch(err => {
             console.error('Login load error:', err);
-            loginStatus.textContent = '⚠️ Failed to load user data';
+            loginStatus.textContent = '⚠️ Unable to connect. Please try again.';
             loginBtn.disabled = true;
-            showToast('⚠️ Failed to load user data. Check sharing settings.', 'error', 4000);
+            showToast('⚠️ Unable to load user data. Please refresh.', 'error', 4000);
           });
       }
 
@@ -812,7 +816,7 @@
         if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         quizScreen.style.display = 'none';
         loginScreen.style.display = 'block';
-        loginStatus.textContent = `🔐 ${users.length} user(s) loaded. Sign in to continue`;
+        loginStatus.textContent = '🔐 Sign in to continue';
         emailInput.value = '';
         passwordInput.value = '';
         showToast('👋 Logged out successfully. Progress not saved.', 'info', 3000);
