@@ -1054,50 +1054,52 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
         }
 
-        /* ========== M‑COL BADGE (top-right of question card) ========== */
+        /* ========== M‑COL BADGE — small round circle (top-right) ========== */
         .m-col-badge {
             position: absolute;
-            top: 10px;
-            right: 12px;
+            top: 8px;
+            right: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 26px;
-            height: 26px;
-            border-radius: 8px;
-            background: transparent;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(2px);
             transition: background 0.15s ease;
             z-index: 5;
             pointer-events: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
         .m-col-badge svg {
-            width: 18px;
-            height: 18px;
+            width: 13px;
+            height: 13px;
             display: block;
         }
         .m-col-badge .q-mark {
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 700;
             color: #9ca3af;
             line-height: 1;
             transform: translateY(-1px);
         }
-        .m-col-badge.true  { color: #0969da; }
-        .m-col-badge.false { color: #cf222e; }
-        .m-col-badge.empty { color: #9ca3af; }
+        .m-col-badge.true  { background: #e0f2fe; }
+        .m-col-badge.false { background: #fee2e2; }
+        .m-col-badge.empty { background: #f1f5f9; }
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 640px) {
             .brand-title h1 { max-width: 220px; font-size: 0.95rem; }
             .selected-subjects { max-width: 220px; }
             .m-col-badge {
-                top: 8px;
-                right: 8px;
-                width: 22px;
-                height: 22px;
+                top: 6px;
+                right: 6px;
+                width: 17px;
+                height: 17px;
             }
-            .m-col-badge svg { width: 15px; height: 15px; }
-            .m-col-badge .q-mark { font-size: 0.95rem; }
+            .m-col-badge svg { width: 11px; height: 11px; }
+            .m-col-badge .q-mark { font-size: 0.72rem; }
         }
         @media (max-width: 560px) {
             .quiz-wrapper { padding: 1.15rem 0.85rem; }
@@ -1373,10 +1375,9 @@
         let confirmResolve = null;
 
         // ============================================================
-        // M‑COL RENDERER  →  blue tick / red cross / question mark
+        // M‑COL RENDERER  →  small round circle with tick/cross/?
         // ============================================================
         function renderMColBadge(rawValue) {
-            // empty / null / undefined / whitespace → ?
             if (rawValue === null || rawValue === undefined || String(rawValue).trim() === '') {
                 return `<div class="m-col-badge empty" title="empty"><span class="q-mark">?</span></div>`;
             }
@@ -1387,7 +1388,7 @@
                 return `
                     <div class="m-col-badge true" title="true">
                         <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M13.5 4.5L6 12L2.5 8.5" stroke="#0969da" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13.5 4.5L6 12L2.5 8.5" stroke="#0969da" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
                 `;
@@ -1397,13 +1398,12 @@
                 return `
                     <div class="m-col-badge false" title="false">
                         <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 4L12 12M12 4L4 12" stroke="#cf222e" stroke-width="2.4" stroke-linecap="round"/>
+                            <path d="M4 4L12 12M12 4L4 12" stroke="#cf222e" stroke-width="2.8" stroke-linecap="round"/>
                         </svg>
                     </div>
                 `;
             }
 
-            // fallback → empty
             return `<div class="m-col-badge empty" title="unknown: ${rawValue}"><span class="q-mark">?</span></div>`;
         }
 
@@ -1489,7 +1489,7 @@
         });
 
         // ============================================================
-        // TOAST — with optional icon
+        // TOAST
         // ============================================================
         const toastContainer = document.getElementById('toastContainer');
         let toastTimeout = null;
@@ -1540,7 +1540,7 @@
         });
 
         // ============================================================
-        // LOGIN INPUT — SCROLL INTO VIEW WHEN FOCUSED (keyboard)
+        // LOGIN INPUT — SCROLL INTO VIEW WHEN FOCUSED
         // ============================================================
         function scrollLoginInputIntoView(el) {
             setTimeout(() => {
@@ -2256,7 +2256,7 @@
 
             const isAnswered = lockedQuestions[idx] || isSubmitted || quizCompleted;
 
-            // ---- M‑col badge (top-right) ----
+            // ---- M‑col badge (top-right, small round) ----
             const mBadgeHtml = renderMColBadge(q.mcol);
 
             let bodyHtml = '';
@@ -2307,7 +2307,6 @@
                 }
             }
 
-            // Inject badge + body
             questionCard.innerHTML = `${mBadgeHtml}<div class="question-body">${bodyHtml}</div>`;
 
             const qTextEl = questionCard.querySelector('.q-text');
