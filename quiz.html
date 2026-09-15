@@ -1,1433 +1,1444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Self Learners · Login & Quiz</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f0f4f9;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.2rem;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Self Learners · Login & Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f2f6fc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+        }
 
-    /* ---------- TOAST NOTIFICATIONS ---------- */
-    .toast-container {
-      position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999;
-      display: flex; flex-direction: column; gap: 0.6rem;
-      max-width: 380px; width: 100%;
-    }
-    .toast {
-      padding: 0.9rem 1.2rem; border-radius: 16px; font-size: 0.9rem;
-      font-weight: 500; box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-      animation: slideInRight 0.4s ease; display: flex; align-items: center;
-      gap: 0.8rem; backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    .toast.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
-    .toast.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
-    .toast.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
-    .toast.info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
-    .toast .toast-icon { font-size: 1.3rem; flex-shrink: 0; }
-    .toast .toast-close {
-      margin-left: auto; background: none; border: none; font-size: 1.2rem;
-      cursor: pointer; color: inherit; opacity: 0.6; padding: 0 0.2rem; transition: 0.2s;
-    }
-    .toast .toast-close:hover { opacity: 1; }
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
-    .toast.removing { animation: fadeOut 0.3s ease forwards; }
+        /* ================= LOGIN SCREEN ================= */
+        .login-wrapper {
+            max-width: 420px; width: 100%; background: white;
+            border-radius: 2.5rem; padding: 2.8rem 2.2rem;
+            box-shadow: 0 25px 60px -15px rgba(0, 20, 30, 0.2);
+            display: block;
+        }
+        .login-wrapper .logo {
+            width: 80px; height: 80px; border-radius: 20px; object-fit: contain;
+            background: #f0f4f9; padding: 10px; margin: 0 auto 1rem;
+            display: block; box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+        .login-wrapper h1 {
+            font-size: 2rem; font-weight: 800;
+            background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent; margin-bottom: 0.2rem; text-align: center;
+        }
+        .login-wrapper .sub {
+            color: #6c8a9e; font-size: 0.9rem; text-align: center; margin-bottom: 2rem;
+        }
+        .login-wrapper label {
+            display: block; text-align: left; font-weight: 600;
+            font-size: 0.85rem; color: #1f4d66; margin-bottom: 0.3rem;
+        }
+        .login-wrapper .input-group { position: relative; margin-bottom: 1.2rem; }
+        .login-wrapper .input-group input {
+            width: 100%; padding: 0.9rem 1.2rem; padding-right: 3.2rem;
+            border: 2px solid #e2eaf2; border-radius: 60px; font-size: 1rem;
+            font-family: 'Inter', sans-serif; transition: 0.25s; background: #fafcfe;
+        }
+        .login-wrapper .input-group input:focus {
+            outline: none; border-color: #2f7b9e;
+            box-shadow: 0 0 0 4px rgba(47, 123, 158, 0.12);
+        }
+        .login-wrapper .toggle-password {
+            position: absolute; right: 1.2rem; top: 50%;
+            transform: translateY(-50%); background: none; border: none;
+            cursor: pointer; font-size: 1.2rem; color: #8aa3b5;
+            padding: 0.3rem; border-radius: 30px; transition: 0.2s;
+        }
+        .login-wrapper .toggle-password:hover { color: #0b2a3b; background: #f0f4f9; }
+        .login-wrapper .btn-login {
+            width: 100%; background: linear-gradient(145deg, #0b2a3b, #1a4b62);
+            border: none; color: white; font-weight: 600; font-size: 1.05rem;
+            padding: 0.9rem; border-radius: 60px; cursor: pointer;
+            box-shadow: 0 8px 24px rgba(11, 42, 59, 0.2);
+            transition: 0.2s; margin-top: 0.4rem;
+        }
+        .login-wrapper .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px); box-shadow: 0 12px 32px rgba(11, 42, 59, 0.25);
+        }
+        .login-wrapper .btn-login:disabled {
+            opacity: 0.5; cursor: not-allowed; transform: none;
+        }
+        .login-wrapper .login-footer {
+            text-align: center; font-size: 0.8rem; color: #8aa3b5; margin-top: 1.2rem;
+        }
 
-    /* ---------- CUSTOM CONFIRM DIALOG ---------- */
-    .custom-confirm-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-      z-index: 10000; display: none; align-items: center; justify-content: center;
-      animation: fadeInOverlay 0.3s ease;
-    }
-    .custom-confirm-overlay.active { display: flex; }
-    @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
-    .custom-confirm-box {
-      background: white; border-radius: 24px; padding: 2rem 2.5rem;
-      max-width: 440px; width: 90%; box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-      animation: scaleIn 0.3s ease;
-    }
-    @keyframes scaleIn {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .custom-confirm-box .icon { font-size: 2.8rem; text-align: center; margin-bottom: 0.5rem; }
-    .custom-confirm-box h3 {
-      font-size: 1.3rem; font-weight: 700; color: #0b2a3b;
-      text-align: center; margin-bottom: 0.5rem;
-    }
-    .custom-confirm-box p {
-      color: #5a7a8e; font-size: 0.95rem; text-align: center;
-      margin-bottom: 1.5rem; line-height: 1.5;
-    }
-    .custom-confirm-box .btn-group { display: flex; gap: 0.8rem; justify-content: center; }
-    .custom-confirm-box .btn-group button {
-      padding: 0.6rem 2rem; border-radius: 60px; font-weight: 600;
-      font-size: 0.9rem; border: none; cursor: pointer;
-      transition: 0.2s; font-family: 'Inter', sans-serif;
-    }
-    .custom-confirm-box .btn-cancel { background: #f0f4f9; color: #1f4d66; }
-    .custom-confirm-box .btn-cancel:hover { background: #e2eaf2; }
-    .custom-confirm-box .btn-confirm { background: #dc3545; color: white; }
-    .custom-confirm-box .btn-confirm:hover {
-      background: #c82333; transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
-    }
-    .custom-confirm-box .btn-confirm-success { background: #28a745; color: white; }
-    .custom-confirm-box .btn-confirm-success:hover {
-      background: #218838; transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.3);
-    }
+        /* ================= TOAST ================= */
+        .toast-container {
+            position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999;
+            display: flex; flex-direction: column; gap: 0.6rem;
+            max-width: 380px; width: 100%;
+        }
+        .toast {
+            padding: 0.9rem 1.2rem; border-radius: 16px; font-size: 0.9rem;
+            font-weight: 500; box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            animation: slideInRight 0.4s ease; display: flex; align-items: center;
+            gap: 0.8rem; backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .toast.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .toast.error   { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .toast.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .toast.info    { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+        .toast .toast-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .toast .toast-close {
+            margin-left: auto; background: none; border: none; font-size: 1.2rem;
+            cursor: pointer; color: inherit; opacity: 0.6; padding: 0 0.2rem; transition: 0.2s;
+        }
+        .toast .toast-close:hover { opacity: 1; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-10px); } }
+        .toast.removing { animation: fadeOutToast 0.3s ease forwards; }
 
-    /* ---------- LOGIN SCREEN ---------- */
-    .login-wrapper {
-      max-width: 420px; width: 100%; background: white;
-      border-radius: 2.5rem; padding: 2.8rem 2.2rem;
-      box-shadow: 0 25px 60px -15px rgba(0, 20, 30, 0.2); transition: 0.3s;
-    }
-    .login-wrapper .logo {
-      width: 80px; height: 80px; border-radius: 20px; object-fit: contain;
-      background: #f0f4f9; padding: 10px; margin: 0 auto 1rem;
-      display: block; box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-    }
-    .login-wrapper h1 {
-      font-size: 2rem; font-weight: 800;
-      background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
-      -webkit-background-clip: text; background-clip: text;
-      color: transparent; margin-bottom: 0.2rem; text-align: center;
-    }
-    .login-wrapper .sub {
-      color: #6c8a9e; font-size: 0.9rem; text-align: center; margin-bottom: 2rem;
-    }
-    .login-wrapper label {
-      display: block; text-align: left; font-weight: 600;
-      font-size: 0.85rem; color: #1f4d66; margin-bottom: 0.3rem;
-    }
-    .login-wrapper .input-group { position: relative; margin-bottom: 1.2rem; }
-    .login-wrapper .input-group input {
-      width: 100%; padding: 0.9rem 1.2rem; padding-right: 3.2rem;
-      border: 2px solid #e2eaf2; border-radius: 60px; font-size: 1rem;
-      font-family: 'Inter', sans-serif;
-      transition: border 0.25s, box-shadow 0.25s; background: #fafcfe;
-    }
-    .login-wrapper .input-group input:focus {
-      outline: none; border-color: #2f7b9e;
-      box-shadow: 0 0 0 4px rgba(47, 123, 158, 0.12);
-    }
-    .login-wrapper .toggle-password {
-      position: absolute; right: 1.2rem; top: 50%;
-      transform: translateY(-50%); background: none; border: none;
-      cursor: pointer; font-size: 1.2rem; color: #8aa3b5;
-      padding: 0.3rem; border-radius: 30px; transition: 0.2s;
-    }
-    .login-wrapper .toggle-password:hover { color: #0b2a3b; background: #f0f4f9; }
-    .login-wrapper .btn-primary {
-      width: 100%; background: linear-gradient(145deg, #0b2a3b, #1a4b62);
-      border: none; color: white; font-weight: 600; font-size: 1.05rem;
-      padding: 0.9rem; border-radius: 60px; cursor: pointer;
-      box-shadow: 0 8px 24px rgba(11, 42, 59, 0.2);
-      transition: 0.2s; margin-top: 0.4rem;
-    }
-    .login-wrapper .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px); box-shadow: 0 12px 32px rgba(11, 42, 59, 0.25);
-    }
-    .login-wrapper .btn-primary:disabled {
-      opacity: 0.5; cursor: not-allowed; transform: none;
-    }
-    .login-wrapper .login-footer {
-      text-align: center; font-size: 0.8rem; color: #8aa3b5; margin-top: 1.2rem;
-    }
+        /* ================= QUIZ SCREEN ================= */
+        .quiz-wrapper {
+            max-width: 720px; width: 100%; background: white;
+            border-radius: 2rem; padding: 2rem 2rem 1.8rem;
+            box-shadow: 0 25px 50px -10px rgba(0, 20, 30, 0.15);
+            display: none;
+        }
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 0.5rem 1.2rem; margin-bottom: 0.5rem;
+        }
+        .brand { display: flex; align-items: center; gap: 0.8rem; }
+        .brand-logo {
+            width: 48px; height: 48px; border-radius: 12px; object-fit: contain;
+            background: #f0f4f9; padding: 4px; flex-shrink: 0; display: block !important;
+        }
+        .brand-title h1 {
+            font-size: 1.6rem; font-weight: 700;
+            background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent; letter-spacing: -0.02em; line-height: 1.2;
+        }
+        .brand-title .subtitle {
+            font-size: 0.7rem; font-weight: 500; color: #6c8a9e;
+            letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .top-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .btn-icon {
+            background: transparent; border: none; font-size: 1.3rem;
+            cursor: pointer; padding: 0.3rem; border-radius: 50%;
+            transition: 0.15s; width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center; color: #1f4d66;
+        }
+        .btn-icon:hover { background: #eaf1f8; transform: scale(1.05); }
+        .btn-icon:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-icon .refresh-spin { display: inline-block; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* ---------- QUIZ SCREEN ---------- */
-    .quiz-wrapper {
-      max-width: 920px; width: 100%; background: white;
-      border-radius: 2.5rem; padding: 2.2rem 2.5rem 2rem;
-      box-shadow: 0 25px 60px -15px rgba(0, 20, 30, 0.15);
-      display: none; animation: fadeIn 0.5s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .quiz-wrapper .top-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 0.5rem 1.2rem; margin-bottom: 0.3rem;
-    }
-    .quiz-wrapper .brand { display: flex; align-items: center; gap: 0.8rem; }
-    .quiz-wrapper .brand-logo {
-      width: 48px; height: 48px; border-radius: 14px; object-fit: contain;
-      background: #f0f4f9; padding: 6px; flex-shrink: 0;
-    }
-    .quiz-wrapper .brand-title h1 {
-      font-size: 1.5rem; font-weight: 800;
-      background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
-      -webkit-background-clip: text; background-clip: text;
-      color: transparent; line-height: 1.2;
-    }
-    .quiz-wrapper .brand-title .subtitle {
-      font-size: 0.65rem; font-weight: 600; color: #6c8a9e;
-      text-transform: uppercase; letter-spacing: 0.8px;
-    }
-    .quiz-wrapper .top-actions { display: flex; align-items: center; gap: 0.6rem; }
-    .quiz-wrapper .user-badge {
-      display: flex; align-items: center; gap: 0.6rem;
-      background: #f0f4f9; padding: 0.3rem 1rem 0.3rem 0.8rem;
-      border-radius: 60px; font-size: 0.8rem; font-weight: 500;
-      color: #1f4d66; cursor: pointer; transition: 0.2s;
-      border: 2px solid transparent;
-    }
-    .quiz-wrapper .user-badge:hover { border-color: #dc3545; background: #fde8ea; }
-    .quiz-wrapper .user-badge .avatar {
-      width: 30px; height: 30px; border-radius: 30px;
-      background: linear-gradient(145deg, #1b5a7a, #2f7b9e);
-      color: white; display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
-    }
-    .quiz-wrapper .session-restore {
-      font-size: 0.7rem; color: #6c8a9e; background: #eef3f8;
-      padding: 0.15rem 0.8rem; border-radius: 30px; margin-left: 0.3rem;
-    }
+        .user-badge {
+            display: flex; align-items: center; gap: 0.6rem;
+            background: #f0f4f9; padding: 0.3rem 1rem 0.3rem 0.8rem;
+            border-radius: 60px; font-size: 0.8rem; font-weight: 500;
+            color: #1f4d66; cursor: pointer; transition: 0.2s;
+            border: 2px solid transparent;
+        }
+        .user-badge:hover { border-color: #dc3545; background: #fde8ea; }
+        .user-badge .avatar {
+            width: 28px; height: 28px; border-radius: 30px;
+            background: linear-gradient(145deg, #1b5a7a, #2f7b9e);
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.75rem; flex-shrink: 0;
+        }
 
-    .icon-btn {
-      width: 38px; height: 38px; border-radius: 50%;
-      border: 2px solid #e2eaf2; background: white; color: #1f4d66;
-      font-size: 1.1rem; cursor: pointer; transition: all 0.2s;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .icon-btn:hover { background: #f0f4f9; border-color: #2f7b9e; transform: rotate(30deg); }
-    .icon-btn:active { transform: rotate(90deg); }
+        .category-badge {
+            display: inline-block; background: #eaf1f8; color: #1f4d66;
+            font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.8rem;
+            border-radius: 20px; margin-left: 0.5rem;
+        }
+        .top-info {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.2rem 0 0.8rem 0; font-weight: 500; font-size: 0.95rem;
+            color: #1f4d66; letter-spacing: 0.3px; font-variant-numeric: tabular-nums;
+            flex-wrap: wrap; gap: 0.3rem 0.8rem;
+        }
+        .top-info .timer { font-weight: 600; color: #0b2a3b; }
+        .top-info .timer.warning { color: #856404; }
+        .top-info .timer.danger { color: #b33c3c; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-    .quiz-wrapper .timer-line {
-      text-align: center; padding: 0.1rem 0 0.6rem;
-      font-weight: 500; font-size: 0.95rem; color: #1f4d66;
-      letter-spacing: 0.3px; font-variant-numeric: tabular-nums;
-    }
-    .quiz-wrapper .timer-line .timer {
-      font-weight: 700; color: #0b2a3b; background: #f0f4f9;
-      padding: 0.15rem 1.2rem; border-radius: 60px;
-    }
-    .quiz-wrapper .timer-line .timer.warning { color: #856404; background: #fff3cd; }
-    .quiz-wrapper .timer-line .timer.danger {
-      color: #b33c3c; background: #f8d7da; animation: pulse 1s infinite;
-    }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .progress-block {
+            background: #e6edf5; height: 8px; border-radius: 20px;
+            margin: 0.6rem 0 0.3rem 0; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #2f7b9e, #4ba3c7);
+            border-radius: 20px; transition: width 0.35s ease;
+        }
 
-    .quiz-wrapper .progress-block {
-      background: #e8eff5; height: 8px; border-radius: 20px;
-      margin: 0.4rem 0 1.2rem; overflow: hidden;
-    }
-    .quiz-wrapper .progress-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #2f7b9e, #4ba3c7);
-      border-radius: 20px; transition: width 0.5s ease;
-    }
+        .question-card {
+            background: #fafcfe; border: 1px solid #e2eaf2;
+            border-radius: 1.5rem; padding: 1.8rem 1.5rem 1.5rem;
+            margin: 0.5rem 0 1.5rem; transition: 0.1s;
+        }
+        .question-card .q-text {
+            font-weight: 600; font-size: 1.2rem; margin-bottom: 1.2rem;
+            color: #0a212b; line-height: 1.4; cursor: pointer; transition: color 0.15s;
+        }
+        .question-card .q-text:hover { color: #1b5a7a; text-decoration: underline; }
+        .options-list { display: flex; flex-direction: column; gap: 0.6rem; }
+        .options-list .option-btn {
+            background: white; border: 1.5px solid #dce6ef; border-radius: 60px;
+            padding: 0.7rem 1.4rem; font-size: 1rem; font-weight: 500;
+            color: #1d3847; text-align: left; cursor: pointer; transition: all 0.12s;
+            display: flex; align-items: center; gap: 0.8rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.01); width: 100%;
+        }
+        .options-list .option-btn:hover:not(:disabled) {
+            background: #f5faff; border-color: #6fa6c7;
+        }
+        .options-list .option-btn .letter {
+            background: #e7f0f7; color: #1a5a7a; font-weight: 700;
+            width: 30px; height: 30px; border-radius: 30px;
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .options-list .option-btn.correct {
+            background: #d8eddf; border-color: #1f8b4c;
+            box-shadow: 0 0 0 2px rgba(31,139,76,0.15);
+        }
+        .options-list .option-btn.correct .letter { background: #1f8b4c; color: white; }
+        .options-list .option-btn.wrong {
+            background: #f5dddd; border-color: #b33c3c;
+            box-shadow: 0 0 0 2px rgba(179,60,60,0.12);
+        }
+        .options-list .option-btn.wrong .letter { background: #b33c3c; color: white; }
+        .options-list .option-btn.selected-opt { border-color: #2f7b9e; background: #e6f0f7; }
+        .options-list .option-btn.locked-btn { cursor: not-allowed; opacity: 0.85; }
+        .options-list .option-btn:disabled { cursor: default; opacity: 0.8; }
+        .options-list .option-btn:disabled:hover { transform: none; }
+        .options-list .option-btn .icon-indicator { margin-left: auto; font-size: 1.1rem; font-weight: 600; }
 
-    .quiz-wrapper .q-meta {
-      display: flex; justify-content: space-between; align-items: baseline;
-      flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 0.3rem;
-    }
-    .quiz-wrapper .q-label {
-      font-weight: 700; font-size: 0.8rem; color: #1f4d66;
-      background: #eaf1f8; padding: 0.2rem 1.2rem; border-radius: 40px;
-      letter-spacing: 0.5px;
-    }
-    .quiz-wrapper .q-category {
-      font-size: 0.75rem; font-weight: 500; color: #1f5672;
-      background: rgba(26, 90, 122, 0.06); padding: 0.15rem 1.2rem;
-      border-radius: 30px; border: 1px solid rgba(26, 90, 122, 0.08);
-    }
+        .action-bar {
+            display: flex; flex-wrap: wrap; align-items: center;
+            justify-content: space-between; gap: 1rem; margin: 1rem 0 0.2rem;
+        }
+        .action-bar .left-buttons { display: flex; gap: 0.6rem; }
+        .btn-primary {
+            background: #0b2a3b; border: none; color: white; font-weight: 600;
+            font-size: 1rem; padding: 0.7rem 2rem; border-radius: 60px; cursor: pointer;
+            box-shadow: 0 6px 14px rgba(11,42,59,0.16); transition: 0.15s;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .btn-primary:hover:not(:disabled) { background: #1a4b62; transform: scale(1.02); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-success {
+            background: #1f8b4c; border: none; color: white; font-weight: 600;
+            font-size: 1rem; padding: 0.7rem 2rem; border-radius: 60px; cursor: pointer;
+            box-shadow: 0 6px 14px rgba(31,139,76,0.25); transition: 0.15s;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .btn-success:hover:not(:disabled) { background: #167a3e; transform: scale(1.02); }
+        .btn-success:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .quiz-wrapper .question-text {
-      font-size: 1.4rem; font-weight: 600; line-height: 1.6;
-      color: #0a212b; margin: 0.6rem 0 1.6rem; min-height: 4rem; padding: 0.2rem 0;
-    }
+        .overview-section {
+            margin-top: 1.8rem; border-top: 1px solid #e2eaf2; padding-top: 1rem;
+        }
+        .overview-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.4rem;
+        }
+        .overview-header span { font-weight: 600; font-size: 0.9rem; color: #1f4d66; }
+        .legend {
+            display: flex; gap: 1rem; font-size: 0.8rem;
+            font-weight: 500; color: #2d5a72; flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+        .legend-item .count {
+            font-weight: 700; font-size: 0.9rem; min-width: 1.2rem; text-align: center;
+        }
+        .legend-dot {
+            width: 14px; height: 14px; border-radius: 30px;
+            display: inline-block; flex-shrink: 0;
+        }
+        .legend-dot.done-dot { background: #2f7b9e; }
+        .legend-dot.pending-dot { background: #dce6ef; }
+        .legend-dot.correct-dot { background: #1f8b4c; }
+        .legend-dot.wrong-dot { background: #b33c3c; }
+        .legend-dot.invalid-dot { background: #e91e8c; }
 
-    .quiz-wrapper .options-grid {
-      display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.6rem;
-    }
-    .quiz-wrapper .option-btn {
-      background: white; border: 2px solid #e2eaf2; border-radius: 60px;
-      padding: 0.85rem 1.8rem; font-size: 1rem; font-weight: 500;
-      color: #1d3847; text-align: left; cursor: pointer; transition: all 0.2s;
-      display: flex; align-items: center; gap: 1rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-    }
-    .quiz-wrapper .option-btn:hover:not(:disabled) {
-      background: #f5faff; border-color: #6fa6c7;
-      transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    }
-    .quiz-wrapper .option-btn .letter {
-      background: #e7f0f7; color: #1a5a7a; font-weight: 700;
-      width: 32px; height: 32px; border-radius: 30px;
-      display: inline-flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: 0.2s;
-    }
-    .quiz-wrapper .option-btn.correct {
-      background: #d4edda; border-color: #28a745;
-      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
-    }
-    .quiz-wrapper .option-btn.correct .letter { background: #28a745; color: white; }
-    .quiz-wrapper .option-btn.wrong {
-      background: #f8d7da; border-color: #dc3545;
-      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
-    }
-    .quiz-wrapper .option-btn.wrong .letter { background: #dc3545; color: white; }
-    .quiz-wrapper .option-btn:disabled { cursor: default; opacity: 0.85; }
-    .quiz-wrapper .option-btn:disabled:hover { transform: none; box-shadow: none; }
+        .grid-dots {
+            display: flex; flex-wrap: wrap; gap: 0.4rem;
+            justify-content: center; margin-top: 0.2rem;
+        }
+        .grid-dot {
+            width: 32px; height: 32px; border-radius: 30px; background: #dce6ef;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 0.7rem; color: #1d4b61;
+            transition: 0.1s; cursor: pointer; border: 2px solid transparent;
+            font-family: inherit;
+        }
+        .grid-dot:hover { transform: scale(1.08); filter: brightness(0.92); }
+        .grid-dot.done-dot { background: #2f7b9e; color: white; }
+        .grid-dot.correct-dot { background: #1f8b4c; color: white; }
+        .grid-dot.wrong-dot { background: #b33c3c; color: white; }
+        .grid-dot.pending-dot { background: #dce6ef; color: #1d4b61; }
+        .grid-dot.invalid-dot { background: #e91e8c; color: white; }
+        .grid-dot.no-answer-dot { background: #999; color: white; }
+        .grid-dot.active-dot { border-color: #0b2a3b; transform: scale(1.1); }
 
-    .quiz-wrapper .action-bar {
-      display: flex; flex-wrap: wrap; align-items: center;
-      justify-content: flex-end; gap: 1rem; margin: 0.2rem 0 1.2rem;
-    }
-    .quiz-wrapper .feedback-msg {
-      font-weight: 500; font-size: 0.9rem; padding: 0.4rem 1.4rem;
-      border-radius: 60px; background: #f0f4f9; min-height: 2.8rem;
-      display: none; align-items: center; flex: 1; gap: 0.5rem;
-    }
-    .quiz-wrapper .feedback-msg.visible { display: flex; }
-    .quiz-wrapper .nav-group { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; }
-    .quiz-wrapper .btn-primary {
-      background: linear-gradient(145deg, #0b2a3b, #1a4b62);
-      border: none; color: white; font-weight: 600; font-size: 1rem;
-      padding: 0.6rem 2.4rem; border-radius: 60px; cursor: pointer;
-      box-shadow: 0 6px 18px rgba(11, 42, 59, 0.16); transition: 0.2s;
-    }
-    .quiz-wrapper .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px); box-shadow: 0 10px 28px rgba(11, 42, 59, 0.2);
-    }
-    .quiz-wrapper .btn-primary:disabled {
-      opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none;
-    }
-    .quiz-wrapper .btn-danger {
-      background: transparent; border: 2px solid #dc3545; color: #dc3545;
-      font-weight: 600; font-size: 0.9rem; padding: 0.5rem 1.6rem;
-      border-radius: 60px; cursor: pointer; transition: 0.2s;
-    }
-    .quiz-wrapper .btn-danger:hover { background: #dc3545; color: white; }
+        .result-card {
+            text-align: center; padding: 0.5rem 0.5rem 0.5rem; display: none;
+        }
+        .result-card h2 { font-size: 2.2rem; font-weight: 700; color: #0b2a3b; }
+        .result-score {
+            font-size: 3.6rem; font-weight: 800;
+            background: linear-gradient(135deg, #1a5a7a, #48a0c7);
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent; margin: 0.3rem 0 0.2rem;
+        }
+        .result-msg { color: #1f4b61; font-size: 1.1rem; margin: 0.2rem 0 1.6rem; }
+        .result-details {
+            text-align: left; margin: 1.5rem 0 1rem;
+            display: flex; flex-direction: column; gap: 1.2rem;
+            max-height: 400px; overflow-y: auto; padding-right: 0.5rem;
+        }
+        .result-details .detail-item {
+            background: #fafcfe; border: 1px solid #e2eaf2;
+            border-radius: 1rem; padding: 0.8rem 1rem;
+        }
+        .result-details .detail-item.correct-detail { border-left: 6px solid #1f8b4c; }
+        .result-details .detail-item.wrong-detail { border-left: 6px solid #b33c3c; }
+        .result-details .detail-item.invalid-detail { border-left: 6px solid #e91e8c; background: #fce4ec; }
+        .result-details .detail-q {
+            font-weight: 600; font-size: 0.95rem; color: #0a212b;
+            margin-bottom: 0.2rem; cursor: pointer;
+        }
+        .result-details .detail-q:hover { color: #1b5a7a; text-decoration: underline; }
+        .result-details .detail-answer { font-size: 0.9rem; color: #1f4d66; }
+        .result-details .detail-answer .correct-ans { color: #1f8b4c; font-weight: 600; }
+        .result-details .detail-answer .wrong-ans { color: #b33c3c; font-weight: 600; }
 
-    .quiz-wrapper .overview-section {
-      margin-top: 1.2rem; border-top: 2px solid #eef3f8; padding-top: 1rem;
-    }
-    .quiz-wrapper .overview-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.4rem;
-    }
-    .quiz-wrapper .overview-header span {
-      font-weight: 700; font-size: 0.85rem; color: #1f4d66; letter-spacing: 0.5px;
-    }
-    .quiz-wrapper .legend {
-      display: flex; gap: 0.8rem; font-size: 0.7rem;
-      font-weight: 600; color: #2d5a72; flex-wrap: wrap;
-    }
-    .quiz-wrapper .legend-item {
-      display: flex; align-items: center; gap: 0.25rem;
-      background: #f5f8fc; padding: 0.15rem 0.7rem 0.15rem 0.4rem;
-      border-radius: 30px;
-    }
-    .quiz-wrapper .legend-item .count {
-      font-weight: 700; font-size: 0.75rem; min-width: 1.2rem; text-align: center;
-    }
-    .quiz-wrapper .legend-dot {
-      width: 12px; height: 12px; border-radius: 30px;
-      display: inline-block; flex-shrink: 0;
-    }
-    .quiz-wrapper .legend-dot.correct-dot { background: #28a745; }
-    .quiz-wrapper .legend-dot.wrong-dot { background: #dc3545; }
-    .quiz-wrapper .legend-dot.active { background: #2f7b9e; }
-    .quiz-wrapper .legend-dot.pending { background: #dce6ef; }
+        .submitted-header {
+            text-align: center; padding: 0.5rem; background: #d8eddf;
+            border-radius: 60px; margin-bottom: 1rem; font-weight: 600; color: #1f8b4c;
+        }
 
-    .quiz-wrapper .grid-dots {
-      display: flex; flex-wrap: wrap; gap: 0.4rem;
-      justify-content: center; margin-top: 0.3rem;
-    }
-    .quiz-wrapper .grid-dot {
-      width: 34px; height: 34px; border-radius: 30px;
-      background: #e8eff5; display: flex; align-items: center;
-      justify-content: center; font-weight: 700; font-size: 0.7rem;
-      color: #1d4b61; transition: 0.2s; cursor: default;
-    }
-    .quiz-wrapper .grid-dot.active {
-      background: #2f7b9e; color: white;
-      box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.25); transform: scale(1.05);
-    }
-    .quiz-wrapper .grid-dot.correct-dot { background: #28a745; color: white; }
-    .quiz-wrapper .grid-dot.wrong-dot { background: #dc3545; color: white; }
-    .quiz-wrapper .grid-dot.no-answer-dot { background: #adb5bd; color: white; }
-    .quiz-wrapper .grid-dot.timeout {
-      background: #6c757d; color: white; opacity: 0.5;
-    }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; align-items: center;
+            justify-content: center; z-index: 1000; backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: white; max-width: 440px; width: 90%;
+            border-radius: 1.5rem; padding: 2rem 1.8rem 1.8rem;
+            text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-box h3 { font-size: 1.3rem; color: #0b2a3b; margin-bottom: 0.5rem; }
+        .modal-box p { color: #1f4d66; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; }
+        .modal-actions { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+        .modal-actions .btn-primary { padding: 0.6rem 2rem; font-size: 0.95rem; }
+        .modal-actions .btn-secondary {
+            background: #dce6ef; border: none; color: #1f4d66; font-weight: 600;
+            font-size: 0.95rem; padding: 0.6rem 2rem; border-radius: 60px;
+            cursor: pointer; transition: 0.15s;
+        }
+        .modal-actions .btn-secondary:hover { background: #c8d4df; }
 
-    .quiz-wrapper .result-card {
-      text-align: center; padding: 1.5rem 0.5rem 0.5rem; display: none;
-    }
-    .quiz-wrapper .result-card .result-icon { font-size: 4rem; margin-bottom: 0.5rem; }
-    .quiz-wrapper .result-card h2 { font-size: 2.2rem; font-weight: 800; color: #0b2a3b; }
-    .quiz-wrapper .result-score {
-      font-size: 4rem; font-weight: 800;
-      background: linear-gradient(135deg, #1a5a7a, #48a0c7);
-      -webkit-background-clip: text; background-clip: text;
-      color: transparent; margin: 0.2rem 0 0.1rem;
-    }
-    .quiz-wrapper .result-msg { color: #1f4b61; font-size: 1.1rem; margin: 0.2rem 0 1.6rem; }
-    .quiz-wrapper .result-actions {
-      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
-    }
+        .year-select {
+            width: 100%; padding: 0.6rem 1rem; border-radius: 30px;
+            border: 1.5px solid #dce6ef; background: white;
+            font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500;
+            color: #1f4d66; outline: none; cursor: pointer; margin: 0.5rem 0 1rem;
+        }
+        .year-select:focus { border-color: #2f7b9e; }
 
-    @media (max-width: 600px) {
-      .login-wrapper { padding: 2rem 1.4rem; }
-      .login-wrapper h1 { font-size: 1.6rem; }
-      .quiz-wrapper { padding: 1.4rem 1rem; }
-      .quiz-wrapper .brand-logo { width: 38px; height: 38px; }
-      .quiz-wrapper .brand-title h1 { font-size: 1.2rem; }
-      .quiz-wrapper .question-text { font-size: 1.1rem; min-height: 3rem; }
-      .quiz-wrapper .option-btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
-      .quiz-wrapper .action-bar { flex-direction: column; align-items: stretch; }
-      .quiz-wrapper .btn-primary { width: 100%; justify-content: center; }
-      .quiz-wrapper .nav-group { width: 100%; }
-      .quiz-wrapper .grid-dot { width: 30px; height: 30px; font-size: 0.65rem; }
-      .quiz-wrapper .legend { font-size: 0.6rem; gap: 0.3rem; }
-      .quiz-wrapper .legend-item { padding: 0.1rem 0.4rem 0.1rem 0.3rem; }
-      .quiz-wrapper .user-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem 0.2rem 0.5rem; }
-      .quiz-wrapper .user-badge .avatar { width: 24px; height: 24px; font-size: 0.6rem; }
-      .toast-container { top: 0.8rem; right: 0.8rem; max-width: calc(100% - 1.6rem); }
-      .quiz-wrapper .session-restore { display: none; }
-      .quiz-wrapper .feedback-msg { min-height: auto; padding: 0.3rem 1rem; }
-      .quiz-wrapper .result-actions { flex-direction: column; align-items: center; }
-      .icon-btn { width: 32px; height: 32px; font-size: 0.9rem; }
-      .custom-confirm-box { padding: 1.5rem; }
-      .custom-confirm-box .btn-group { flex-direction: column; }
-      .custom-confirm-box .btn-group button { width: 100%; }
-    }
-
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb { background: #b0c8d8; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #8aa3b5; }
-  </style>
+        @media (max-width: 550px) {
+            .quiz-wrapper { padding: 1.4rem 0.8rem; }
+            .brand-logo { width: 36px; height: 36px; }
+            .brand-title h1 { font-size: 1.2rem; }
+            .question-card .q-text { font-size: 1rem; }
+            .options-list .option-btn { padding: 0.5rem 1rem; font-size: 0.9rem; }
+            .grid-dot { width: 28px; height: 28px; font-size: 0.65rem; }
+            .action-bar { flex-direction: column; align-items: stretch; }
+            .action-bar .left-buttons { justify-content: center; }
+            .btn-primary, .btn-success { width: 100%; justify-content: center; }
+            .top-info { font-size: 0.85rem; }
+            .user-badge span:not(.avatar) { display: none; }
+            .toast-container { top: 0.8rem; right: 0.8rem; max-width: calc(100% - 1.6rem); }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="toast-container" id="toastContainer"></div>
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
 
-  <div class="custom-confirm-overlay" id="confirmOverlay">
-    <div class="custom-confirm-box">
-      <div class="icon" id="confirmIcon">❓</div>
-      <h3 id="confirmTitle">Are you sure?</h3>
-      <p id="confirmMessage">This action cannot be undone.</p>
-      <div class="btn-group">
-        <button class="btn-cancel" id="confirmCancel">Cancel</button>
-        <button class="btn-confirm" id="confirmOk">Confirm</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="login-wrapper" id="loginScreen">
-    <img class="logo" id="loginLogo"
-         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230b2a3b'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter, sans-serif' font-size='38' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
-         alt="Logo" />
-    <h1>Self Learners</h1>
-    <p class="sub">Sign in to continue your quiz</p>
-
-    <label for="emailInput">Email / Username</label>
-    <div class="input-group">
-      <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username" />
-    </div>
-
-    <label for="passwordInput">Password</label>
-    <div class="input-group">
-      <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password" />
-      <button class="toggle-password" id="togglePasswordBtn" type="button" aria-label="Toggle password visibility">👁️</button>
-    </div>
-
-    <button class="btn-primary" id="loginBtn">Sign In</button>
-    <div class="login-footer">
-      <span id="loginStatus">Loading user data...</span>
-    </div>
-  </div>
-
-  <div class="quiz-wrapper" id="quizScreen">
-    <div class="top-bar">
-      <div class="brand">
-        <img class="brand-logo" id="quizLogo"
-             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='14' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
+    <!-- ================= LOGIN SCREEN ================= -->
+    <div class="login-wrapper" id="loginScreen">
+        <img class="logo" id="loginLogo"
+             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230b2a3b'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter, sans-serif' font-size='38' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
              alt="Logo" />
-        <div class="brand-title">
-          <h1 id="quizTitle">Loading...</h1>
-          <span class="subtitle" id="quizSubtitle">Self Learners</span>
+        <h1>Self Learners</h1>
+        <p class="sub">Sign in to continue your quiz</p>
+
+        <label for="emailInput">Email / Username</label>
+        <div class="input-group">
+            <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username" />
         </div>
-      </div>
-      <div class="top-actions">
-        <button class="icon-btn" id="refreshBtn" title="Refresh quiz data from spreadsheet">🔄</button>
-        <div class="user-badge" id="userBadge">
-          <span class="avatar" id="userAvatar">U</span>
-          <span id="userNameDisplay">User</span>
-          <span class="session-restore" id="sessionBadge"></span>
+
+        <label for="passwordInput">Password</label>
+        <div class="input-group">
+            <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password" />
+            <button class="toggle-password" id="togglePasswordBtn" type="button" aria-label="Toggle password visibility">👁️</button>
         </div>
-      </div>
+
+        <button class="btn-login" id="loginBtn">Sign In</button>
+        <div class="login-footer">
+            <span id="loginStatus">Loading...</span>
+        </div>
     </div>
 
-    <div class="timer-line">
-      ⏱️ <span class="timer" id="timerDisplay">00:00</span>
-    </div>
-
-    <div id="quizContent">
-      <div class="progress-block">
-        <div class="progress-fill" id="progressFill" style="width:0%;"></div>
-      </div>
-
-      <div id="questionArea">
-        <div class="q-meta">
-          <span class="q-label" id="qNumber">QUESTION 1 OF 0</span>
-          <span class="q-category" id="qCategory">📚 Loading...</span>
-        </div>
-        <div class="question-text" id="questionText">Loading questions from spreadsheet...</div>
-
-        <div class="options-grid" id="optionsContainer"></div>
-
-        <div class="action-bar">
-          <div class="feedback-msg" id="feedbackMessage"></div>
-          <div class="nav-group">
-            <button class="btn-primary" id="nextBtn" disabled>Next →</button>
-          </div>
-        </div>
-
-        <div class="overview-section">
-          <div class="overview-header">
-            <span>📊 OVERVIEW</span>
-            <div class="legend" id="legendContainer">
-              <span class="legend-item"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
-              <span class="legend-item"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
-              <span class="legend-item"><span class="legend-dot active"></span> Active <span class="count" id="activeCount">0</span></span>
-              <span class="legend-item"><span class="legend-dot pending"></span> Pending <span class="count" id="pendingCount">0</span></span>
+    <!-- ================= QUIZ SCREEN ================= -->
+    <div class="quiz-wrapper" id="quizApp">
+        <div class="top-bar">
+            <div class="brand">
+                <img class="brand-logo" id="brandLogo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ESL%3C/text%3E%3C/svg%3E" alt="Logo">
+                <div class="brand-title">
+                    <h1 id="quizTitle">Loading...</h1>
+                    <span class="subtitle" id="quizSubtitle">Self Learners</span>
+                </div>
             </div>
-          </div>
-          <div class="grid-dots" id="dotGrid"></div>
+            <div class="top-actions">
+                <button class="btn-icon" id="refreshBtn" title="Refresh Quiz">
+                    <span id="refreshIcon">🔄</span>
+                </button>
+                <div class="user-badge" id="userBadge" title="Click to logout">
+                    <span class="avatar" id="userAvatar">U</span>
+                    <span id="userNameDisplay">User</span>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="result-card" id="resultArea">
-        <div class="result-icon" id="resultIcon">🏆</div>
-        <h2>Quiz Complete!</h2>
-        <div class="result-score" id="finalScore">0 / 0</div>
-        <p class="result-msg" id="resultMessage">Keep learning, Self Learner!</p>
-        <div class="result-actions">
-          <button class="btn-primary" id="restartFromResult">⟳ Try Again</button>
-          <button class="btn-danger" id="logoutBtn">🚪 Logout</button>
+        <div class="top-info">
+            <span id="attemptedDisplay">Attempted: <span class="attempted" id="attemptedCount">0</span> / <span id="totalCount">0</span> <span id="yearBadge" class="category-badge"></span></span>
+            <span>⏱️ <span class="timer" id="timerDisplay">00:00</span></span>
         </div>
-      </div>
+
+        <div id="quizContent">
+            <div class="progress-block">
+                <div class="progress-fill" id="progressFill" style="width:0%;"></div>
+            </div>
+
+            <div id="singleQuestionView">
+                <div id="submittedBanner" style="display:none;" class="submitted-header">✅ Submitted — You can review. Click "End Quiz" for final score.</div>
+                <div id="questionCard" class="question-card"></div>
+                <div class="action-bar">
+                    <div class="left-buttons">
+                        <button class="btn-primary" id="prevBtn">◀ Back</button>
+                        <button class="btn-primary" id="nextBtn">Next ▶</button>
+                    </div>
+                    <div>
+                        <button class="btn-success" id="endQuizBtn">🏁 End Quiz</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-section">
+                <div class="overview-header">
+                    <span>OVERVIEW</span>
+                    <div class="legend" id="legendContainer">
+                        <span class="legend-item"><span class="legend-dot done-dot"></span> Done <span class="count" id="doneCount">0</span></span>
+                        <span class="legend-item"><span class="legend-dot pending-dot"></span> Pending <span class="count" id="pendingCount">0</span></span>
+                        <span class="legend-item" id="correctLegend"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
+                        <span class="legend-item" id="wrongLegend"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
+                        <span class="legend-item" id="invalidLegend"><span class="legend-dot invalid-dot"></span> Invalid <span class="count" id="invalidCount">0</span></span>
+                    </div>
+                </div>
+                <div class="grid-dots" id="dotGrid"></div>
+            </div>
+
+            <div class="result-card" id="resultArea">
+                <h2>🏁 Quiz Complete</h2>
+                <div class="result-score" id="finalScore">0 / 0</div>
+                <p class="result-msg" id="resultMessage">Keep learning!</p>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="btn-primary" id="restartFromResult">⟳ Try again</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="refreshModal">
+            <div class="modal-box">
+                <h3>🔄 Select Subject</h3>
+                <p>Choose a subject from column I to load questions, or select "All Subjects".</p>
+                <select class="year-select" id="modalYearSelect">
+                    <option value="all">All Subjects</option>
+                </select>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="modalCancel">Cancel</button>
+                    <button class="btn-primary" id="modalConfirm">Load &amp; Refresh</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
+    <script>
     (function() {
-      // ==============================================================
-      // 1. CONFIGURATION
-      // ==============================================================
-      const QUIZ_CSV_URL =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
+        // ============================================================
+        // CONFIG – YOUR EXACT URLs
+        // ============================================================
+        const QUIZ_CSV_URL =
+            'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
 
-      const SHEET_ID = '17yY_LUiqMsABz7tbtAXFpZIYpHN2TJTZSxo7oJWzckI';
-      const LOGIN_GID = '2076597807';
-      const LOGIN_CSV_URL =
-        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
+        const SHEET_ID = '17yY_LUiqMsABz7tbtAXFpZIYpHN2TJTZSxo7oJWzckI';
+        const LOGIN_GID = '2076597807';
+        const LOGIN_CSV_URL =
+            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
 
-      const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
+        const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
+        const STORAGE_KEY = 'selfLearnersOneByOneLogged';
+        const SESSION_KEY = 'selfLearnersSessionUser';
 
-      // ==============================================================
-      // 2. TOAST SYSTEM
-      // ==============================================================
-      const toastContainer = document.getElementById('toastContainer');
-      let toastTimeout = null;
+        // ============================================================
+        // STATE
+        // ============================================================
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let quizCompleted = false;
+        let isSubmitted = false;
+        let answerStatus = [];
+        let selectedAllAnswers = [];
+        let lockedQuestions = [];
+        let originalQuestions = [];
+        let totalQuestions = 0;
+        let quizTitleText = 'Quiz';
+        let timerInterval = null;
+        let timeRemaining = 0;
+        let allCategories = [];
+        let currentCategory = 'all';
+        let invalidQuestions = [];
 
-      function showToast(message, type = 'info', duration = 4000) {
-        if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
-        while (toastContainer.firstChild) toastContainer.removeChild(toastContainer.firstChild);
+        let users = [];
+        let isLoadingUsers = true;
+        let loggedInUser = null;
 
-        const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-          <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
-          <span>${message}</span>
-          <button class="toast-close" aria-label="Close notification">✕</button>
-        `;
-        toastContainer.appendChild(toast);
-        toast.querySelector('.toast-close').addEventListener('click', () => removeToast(toast));
-        toastTimeout = setTimeout(() => { removeToast(toast); toastTimeout = null; }, duration);
-        return toast;
-      }
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const loginScreen = document.getElementById('loginScreen');
+        const quizApp = document.getElementById('quizApp');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginStatus = document.getElementById('loginStatus');
+        const loginLogo = document.getElementById('loginLogo');
 
-      function removeToast(toast) {
-        if (toast.classList.contains('removing')) return;
-        toast.classList.add('removing');
-        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
-      }
+        const userBadge = document.getElementById('userBadge');
+        const userAvatar = document.getElementById('userAvatar');
+        const userNameDisplay = document.getElementById('userNameDisplay');
 
-      // ==============================================================
-      // 3. CUSTOM CONFIRM DIALOG
-      // ==============================================================
-      const confirmOverlay = document.getElementById('confirmOverlay');
-      const confirmIcon = document.getElementById('confirmIcon');
-      const confirmTitle = document.getElementById('confirmTitle');
-      const confirmMessage = document.getElementById('confirmMessage');
-      const confirmOk = document.getElementById('confirmOk');
-      const confirmCancel = document.getElementById('confirmCancel');
-      let confirmResolve = null;
+        const questionCard = document.getElementById('questionCard');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const endQuizBtn = document.getElementById('endQuizBtn');
+        const progressFill = document.getElementById('progressFill');
+        const attemptedCount = document.getElementById('attemptedCount');
+        const totalCount = document.getElementById('totalCount');
+        const dotGrid = document.getElementById('dotGrid');
+        const resultArea = document.getElementById('resultArea');
+        const finalScore = document.getElementById('finalScore');
+        const resultMessage = document.getElementById('resultMessage');
+        const resultDetails = document.getElementById('resultDetails');
+        const restartFromResult = document.getElementById('restartFromResult');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const refreshIcon = document.getElementById('refreshIcon');
+        const refreshModal = document.getElementById('refreshModal');
+        const modalCancel = document.getElementById('modalCancel');
+        const modalConfirm = document.getElementById('modalConfirm');
+        const doneCount = document.getElementById('doneCount');
+        const pendingCount = document.getElementById('pendingCount');
+        const correctCount = document.getElementById('correctCount');
+        const wrongCount = document.getElementById('wrongCount');
+        const invalidCount = document.getElementById('invalidCount');
+        const correctLegend = document.getElementById('correctLegend');
+        const wrongLegend = document.getElementById('wrongLegend');
+        const invalidLegend = document.getElementById('invalidLegend');
+        const submittedBanner = document.getElementById('submittedBanner');
+        const quizTitle = document.getElementById('quizTitle');
+        const brandLogo = document.getElementById('brandLogo');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const singleQuestionView = document.getElementById('singleQuestionView');
+        const modalYearSelect = document.getElementById('modalYearSelect');
+        const yearBadge = document.getElementById('yearBadge');
 
-      function showConfirm(icon, title, message, confirmClass = 'btn-confirm') {
-        return new Promise((resolve) => {
-          confirmIcon.textContent = icon || '❓';
-          confirmTitle.textContent = title || 'Are you sure?';
-          confirmMessage.textContent = message || 'This action cannot be undone.';
-          confirmOk.className = confirmClass;
-          confirmOverlay.classList.add('active');
-          confirmResolve = resolve;
+        // ============================================================
+        // TOAST
+        // ============================================================
+        const toastContainer = document.getElementById('toastContainer');
+        let toastTimeout = null;
+        function showToast(message, type = 'info', duration = 4000) {
+            if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
+            while (toastContainer.firstChild) toastContainer.removeChild(toastContainer.firstChild);
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+                <span>${message}</span>
+                <button class="toast-close">✕</button>
+            `;
+            toastContainer.appendChild(toast);
+            toast.querySelector('.toast-close').addEventListener('click', () => removeToast(toast));
+            toastTimeout = setTimeout(() => { removeToast(toast); toastTimeout = null; }, duration);
+        }
+        function removeToast(toast) {
+            if (toast.classList.contains('removing')) return;
+            toast.classList.add('removing');
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+        }
+
+        // ============================================================
+        // LOGO
+        // ============================================================
+        function loadLogo(img) {
+            const i = new Image();
+            i.onload = () => img.src = LOGO_URL;
+            i.onerror = () => {};
+            i.src = LOGO_URL;
+        }
+        loadLogo(loginLogo);
+        loadLogo(brandLogo);
+
+        // ============================================================
+        // PASSWORD TOGGLE
+        // ============================================================
+        let passwordVisible = false;
+        togglePasswordBtn.addEventListener('click', function() {
+            passwordVisible = !passwordVisible;
+            passwordInput.type = passwordVisible ? 'text' : 'password';
+            togglePasswordBtn.textContent = passwordVisible ? '🙈' : '👁️';
         });
-      }
 
-      function closeConfirm(result) {
-        confirmOverlay.classList.remove('active');
-        if (confirmResolve) { confirmResolve(result); confirmResolve = null; }
-      }
-
-      confirmCancel.addEventListener('click', () => closeConfirm(false));
-      confirmOk.addEventListener('click', () => closeConfirm(true));
-      confirmOverlay.addEventListener('click', (e) => {
-        if (e.target === confirmOverlay) closeConfirm(false);
-      });
-
-      // ==============================================================
-      // 4. DOM REFS – LOGIN
-      // ==============================================================
-      const loginScreen = document.getElementById('loginScreen');
-      const quizScreen = document.getElementById('quizScreen');
-      const emailInput = document.getElementById('emailInput');
-      const passwordInput = document.getElementById('passwordInput');
-      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-      const loginBtn = document.getElementById('loginBtn');
-      const loginStatus = document.getElementById('loginStatus');
-      const loginLogo = document.getElementById('loginLogo');
-
-      // ==============================================================
-      // 5. DOM REFS – QUIZ
-      // ==============================================================
-      const progressFill = document.getElementById('progressFill');
-      const qNumber = document.getElementById('qNumber');
-      const qCategory = document.getElementById('qCategory');
-      const questionText = document.getElementById('questionText');
-      const optionsContainer = document.getElementById('optionsContainer');
-      const feedbackMessage = document.getElementById('feedbackMessage');
-      const nextBtn = document.getElementById('nextBtn');
-      const restartFromResult = document.getElementById('restartFromResult');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const questionArea = document.getElementById('questionArea');
-      const resultArea = document.getElementById('resultArea');
-      const finalScore = document.getElementById('finalScore');
-      const resultMessage = document.getElementById('resultMessage');
-      const resultIcon = document.getElementById('resultIcon');
-      const dotGrid = document.getElementById('dotGrid');
-      const timerDisplay = document.getElementById('timerDisplay');
-      const quizTitle = document.getElementById('quizTitle');
-      const quizSubtitle = document.getElementById('quizSubtitle');
-      const correctCount = document.getElementById('correctCount');
-      const wrongCount = document.getElementById('wrongCount');
-      const activeCount = document.getElementById('activeCount');
-      const pendingCount = document.getElementById('pendingCount');
-      const quizLogo = document.getElementById('quizLogo');
-      const userBadge = document.getElementById('userBadge');
-      const userAvatar = document.getElementById('userAvatar');
-      const userNameDisplay = document.getElementById('userNameDisplay');
-      const sessionBadge = document.getElementById('sessionBadge');
-      const refreshBtn = document.getElementById('refreshBtn');
-
-      // ==============================================================
-      // 6. LOAD LOGO
-      // ==============================================================
-      function loadLogo(imgElement) {
-        if (!LOGO_URL) return;
-        const img = new Image();
-        img.onload = function() { imgElement.src = LOGO_URL; };
-        img.onerror = function() {};
-        img.src = LOGO_URL;
-      }
-      loadLogo(loginLogo);
-      loadLogo(quizLogo);
-
-      // ==============================================================
-      // 7. PASSWORD TOGGLE
-      // ==============================================================
-      let passwordVisible = false;
-      togglePasswordBtn.addEventListener('click', function() {
-        passwordVisible = !passwordVisible;
-        passwordInput.type = passwordVisible ? 'text' : 'password';
-        togglePasswordBtn.textContent = passwordVisible ? '🙈' : '👁️';
-      });
-
-      // ==============================================================
-      // 8. SESSION MANAGEMENT
-      // ==============================================================
-      const SESSION_KEY = 'quiz_session_data_v8';
-
-      function saveSession() {
-        if (!loggedInUser || quizCompleted) return;
-        const sessionData = {
-          user: loggedInUser,
-          questions: questions,
-          currentIndex: currentIndex,
-          score: score,
-          answerStatus: answerStatus,
-          quizCompleted: quizCompleted,
-          quizTimedOut: quizTimedOut,
-          timeRemaining: timeRemaining,
-          totalQuestions: totalQuestions,
-          quizTitleText: quizTitleText,
-          timestamp: new Date().toISOString()
-        };
-        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData)); }
-        catch (e) { console.warn('Could not save session:', e); }
-      }
-
-      function loadSession() {
-        try {
-          const raw = sessionStorage.getItem(SESSION_KEY);
-          if (!raw) return null;
-          const data = JSON.parse(raw);
-          const age = Date.now() - new Date(data.timestamp).getTime();
-          if (age > 24 * 60 * 60 * 1000) { sessionStorage.removeItem(SESSION_KEY); return null; }
-          return data;
-        } catch (e) { return null; }
-      }
-
-      function clearSession() {
-        sessionStorage.removeItem(SESSION_KEY);
-        sessionBadge.textContent = '';
-      }
-
-      // ==============================================================
-      // 9. LOGIN SYSTEM
-      // ==============================================================
-      let users = [];
-      let isLoadingUsers = true;
-      let loggedInUser = null;
-      let sessionRestored = false;
-
-      function fetchUsers() {
-        loginStatus.textContent = '⏳ Loading...';
-        loginBtn.disabled = true;
-
-        fetch(LOGIN_CSV_URL + '&_t=' + Date.now())
-          .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.text();
-          })
-          .then(csvText => {
-            users = parseLoginCSV(csvText);
-            isLoadingUsers = false;
-            loginStatus.textContent = '🔐 Sign in to continue';
-            loginBtn.disabled = false;
-
-            if (users.length === 0) {
-              console.warn('[Self Learners] Login sheet returned 0 users. Check sharing settings.');
-            }
-
-            checkAndRestoreSession();
-          })
-          .catch(err => {
-            console.error('Login load error:', err);
-            loginStatus.textContent = '⚠️ Unable to connect. Please try again.';
-            loginBtn.disabled = true;
-            showToast('⚠️ Unable to load user data. Please refresh.', 'error', 4000);
-          });
-      }
-
-      function parseLoginCSV(text) {
-        const lines = text.split('\n').filter(line => line.trim() !== '');
-        if (lines.length < 2) return [];
-        const result = [];
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCSVLine(lines[i]);
-          if (cols.length < 2) continue;
-          const email = cols[0] ? cols[0].trim() : '';
-          const password = cols[1] ? cols[1].trim() : '';
-          if (email && password) result.push({ email, password });
-        }
-        return result;
-      }
-
-      function handleLogin() {
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
-
-        if (!email || !password) {
-          showToast('⚠️ Please enter both email and password.', 'warning', 3000);
-          return;
-        }
-        if (isLoadingUsers) {
-          showToast('⏳ User data is still loading. Please wait.', 'warning', 2500);
-          return;
-        }
-
-        const matched = users.find(u =>
-          u.email.toLowerCase() === email.toLowerCase() &&
-          u.password === password
-        );
-
-        if (matched) {
-          loggedInUser = matched;
-          clearSession();
-          showToast(`✅ Welcome, ${matched.email}!`, 'success', 2500);
-          initQuizForUser(matched);
-        } else {
-          showToast('❌ Invalid email or password. Please try again.', 'error', 3000);
-          loginStatus.textContent = '❌ Login failed';
-        }
-      }
-
-      // ==============================================================
-      // 10. LOGOUT
-      // ==============================================================
-      function handleLogout() {
-        clearSession();
-        sessionRestored = false;
-        loggedInUser = null;
-        quizCompleted = false;
-        questions = [];
-        currentIndex = 0;
-        score = 0;
-        answerStatus = [];
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        quizScreen.style.display = 'none';
-        loginScreen.style.display = 'block';
-        loginStatus.textContent = '🔐 Sign in to continue';
-        emailInput.value = '';
-        passwordInput.value = '';
-        showToast('👋 Logged out successfully. Progress not saved.', 'info', 3000);
-      }
-
-      // ==============================================================
-      // 11. SESSION RESTORE
-      // ==============================================================
-      function checkAndRestoreSession() {
-        const session = loadSession();
-        if (!session || !session.user) return;
-
-        const userExists = users.some(u =>
-          u.email.toLowerCase() === session.user.email.toLowerCase()
-        );
-        if (!userExists) { clearSession(); return; }
-
-        loggedInUser = session.user;
-        questions = session.questions || [];
-        currentIndex = session.currentIndex || 0;
-        score = session.score || 0;
-        answerStatus = session.answerStatus || [];
-        quizCompleted = session.quizCompleted || false;
-        quizTimedOut = session.quizTimedOut || false;
-        timeRemaining = session.timeRemaining || 0;
-        totalQuestions = session.totalQuestions || 0;
-        quizTitleText = session.quizTitleText || 'Quiz';
-        sessionRestored = true;
-
-        loginScreen.style.display = 'none';
-        quizScreen.style.display = 'block';
-        updateUserBadge(loggedInUser);
-        sessionBadge.textContent = '↻ Restored';
-
-        if (quizCompleted) {
-          showResult();
-          showToast(`📊 Quiz completed: ${score}/${totalQuestions}`, 'info', 3000);
-          return;
-        }
-
-        if (questions.length > 0 && totalQuestions > 0) {
-          restoreQuiz();
-          showToast(`↻ Resumed: Question ${currentIndex + 1} of ${totalQuestions}`, 'info', 2500);
-        } else {
-          fetchQuizQuestions();
-        }
-      }
-
-      function initQuizForUser(user) {
-        loginScreen.style.display = 'none';
-        quizScreen.style.display = 'block';
-        updateUserBadge(user);
-        sessionBadge.textContent = '';
-        fetchQuizQuestions();
-      }
-
-      function updateUserBadge(user) {
-        const initial = user.email.charAt(0).toUpperCase();
-        userAvatar.textContent = initial;
-        userNameDisplay.textContent = user.email;
-      }
-
-      function restoreQuiz() {
-        quizTitle.textContent = quizTitleText;
-        quizSubtitle.textContent = 'Self Learners';
-
-        if (timeRemaining > 0 && !quizCompleted) {
-          updateTimerDisplay();
-          startTimerFrom(timeRemaining);
-        }
-
-        const progressPercent = totalQuestions > 0 ? (currentIndex / totalQuestions) * 100 : 0;
-        progressFill.style.width = progressPercent + '%';
-
-        if (currentIndex < questions.length) renderQuestion(currentIndex);
-        else showResult();
-
-        renderDots();
-        updateLegendCounts();
-      }
-
-      function startTimerFrom(seconds) {
-        timeRemaining = seconds;
-        updateTimerDisplay();
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-          timeRemaining--;
-          updateTimerDisplay();
-          if (timeRemaining % 10 === 0) saveSession();
-          if (timeRemaining <= 0) {
-            clearInterval(timerInterval); timerInterval = null;
-            handleTimeout();
-          }
-        }, 1000);
-      }
-
-      // ==============================================================
-      // 12. QUIZ SYSTEM
-      // ==============================================================
-      let questions = [];
-      let currentIndex = 0;
-      let score = 0;
-      let isAnswered = false;
-      let quizCompleted = false;
-      let quizTimedOut = false;
-      let answerStatus = [];
-      let timerInterval = null;
-      let timeRemaining = 0;
-      let totalQuestions = 0;
-      let quizTitleText = 'Quiz';
-
-      function showFeedback(message, type = 'info') {
-        feedbackMessage.textContent = message;
-        feedbackMessage.className = 'feedback-msg visible';
-        if (type === 'warning') feedbackMessage.style.background = '#fff3cd';
-        else if (type === 'error') feedbackMessage.style.background = '#f8d7da';
-        else if (type === 'success') feedbackMessage.style.background = '#d4edda';
-        else feedbackMessage.style.background = '#f0f4f9';
-      }
-
-      function hideFeedback() {
-        feedbackMessage.className = 'feedback-msg';
-        feedbackMessage.textContent = '';
-        feedbackMessage.style.background = '#f0f4f9';
-      }
-
-      function fetchQuizQuestions() {
-        questionText.textContent = '📥 Fetching questions...';
-        hideFeedback();
-
-        fetch(QUIZ_CSV_URL + '&_t=' + Date.now())
-          .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.text();
-          })
-          .then(csvText => {
-            const parsed = parseQuizCSV(csvText);
-            if (parsed.questions.length === 0) throw new Error('No questions found');
-            questions = parsed.questions;
-            quizTitleText = parsed.title || 'Quiz';
-            totalQuestions = questions.length;
-
-            if (!sessionRestored) {
-              answerStatus = new Array(totalQuestions).fill(null);
-              currentIndex = 0;
-              score = 0;
-              quizCompleted = false;
-              quizTimedOut = false;
-            } else {
-              while (answerStatus.length < totalQuestions) answerStatus.push(null);
-            }
-
-            sessionRestored = false;
-            showToast(`✅ ${totalQuestions} questions loaded!`, 'success', 2000);
-            startQuiz();
-          })
-          .catch(err => {
-            console.error('Quiz load error:', err);
-            questionText.textContent = '❌ Failed to load questions.';
-            hideFeedback();
-            showToast('❌ Failed to load quiz questions.', 'error', 4000);
-          });
-      }
-
-      // ==============================================================
-      // PARSER – WITH LETTER FALLBACK (A/B/C/D case-insensitive)
-      // --------------------------------------------------------------
-      // A: Question_Number (0)
-      // B: Question        (1)
-      // C: Option_A        (2)
-      // D: Option_B        (3)
-      // E: Option_C        (4)
-      // F: Option_D        (5)
-      // G: Correct_Answer  (6)   ← may be full text OR A/B/C/D letter
-      // H: topic           (7)
-      // I: subject         (8)
-      // J: created         (9)
-      // K: which_job       (10)
-      // L: ai_ans          (11)
-      // ==============================================================
-      function parseQuizCSV(text) {
-        const lines = text.split('\n').filter(line => line.trim() !== '');
-        if (lines.length < 2) return { questions: [], title: 'Quiz' };
-
-        let title = 'Quiz';
-        const result = [];
-        const LETTER_MAP = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
-
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCSVLine(lines[i]);
-          if (cols.length < 9) continue;
-
-          const question = cols[1] ? cols[1].trim() : '';
-          if (!question) continue;
-
-          const options = [
-            cols[2] ? cols[2].trim() : '',
-            cols[3] ? cols[3].trim() : '',
-            cols[4] ? cols[4].trim() : '',
-            cols[5] ? cols[5].trim() : ''
-          ];
-
-          const rawCorrect = cols[6] ? cols[6].trim() : '';
-          let correctIndex = -1;
-          let matchMethod = 'none';
-
-          if (rawCorrect) {
-            // 1) Exact text match
-            for (let j = 0; j < options.length; j++) {
-              if (options[j] === rawCorrect) {
-                correctIndex = j;
-                matchMethod = 'exact';
-                break;
-              }
-            }
-
-            // 2) Case-insensitive text match
-            if (correctIndex === -1) {
-              const lowerCorrect = rawCorrect.toLowerCase();
-              for (let j = 0; j < options.length; j++) {
-                if (options[j] && options[j].toLowerCase() === lowerCorrect) {
-                  correctIndex = j;
-                  matchMethod = 'case-insensitive';
-                  break;
+        // ============================================================
+        // CSV HELPERS
+        // ============================================================
+        function parseCSVLine(line) {
+            const res = [];
+            let cur = '', inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (inQuotes) {
+                    if (ch === '"' && i + 1 < line.length && line[i + 1] === '"') { cur += '"'; i++; }
+                    else if (ch === '"') inQuotes = false;
+                    else cur += ch;
+                } else {
+                    if (ch === '"') inQuotes = true;
+                    else if (ch === ',') { res.push(cur.trim()); cur = ''; }
+                    else cur += ch;
                 }
-              }
             }
-
-            // 3) Letter fallback: A/B/C/D (case-insensitive)
-            //    Only when the value is exactly one character and not yet matched
-            if (correctIndex === -1 && rawCorrect.length === 1) {
-              const letterKey = rawCorrect.toLowerCase();
-              if (letterKey in LETTER_MAP) {
-                correctIndex = LETTER_MAP[letterKey];
-                matchMethod = 'letter';
-              }
-            }
-
-            // Silent debug log
-            if (matchMethod === 'letter') {
-              console.log(`[Self Learners] Q#${i} used letter fallback: "${rawCorrect}" → option index ${correctIndex}`);
-            } else if (matchMethod === 'case-insensitive') {
-              console.log(`[Self Learners] Q#${i} matched case-insensitively: "${rawCorrect}"`);
-            } else if (matchMethod === 'none') {
-              console.warn(`[Self Learners] Q#${i} could not match answer: "${rawCorrect}"`);
-            }
-          }
-
-          const topic   = cols[7] ? cols[7].trim() : '';
-          const subject = cols[8] ? cols[8].trim() : '';
-
-          result.push({
-            question,
-            options,
-            correct: correctIndex,
-            correctText: rawCorrect || 'No answer in db',
-            topic: topic,
-            subject: subject,
-            category: subject
-          });
+            res.push(cur.trim());
+            return res;
         }
 
-        if (result.length > 0 && result[0].subject) {
-          title = result[0].subject;
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
         }
 
-        return { questions: result, title };
-      }
+        function getAttemptedCount() {
+            return selectedAllAnswers.filter(a => a !== null).length;
+        }
 
-      function parseCSVLine(line) {
-        const result = [];
-        let current = '';
-        let inQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-          const ch = line[i];
-          if (inQuotes) {
-            if (ch === '"' && (i + 1 < line.length && line[i + 1] === '"')) {
-              current += '"'; i++;
-            } else if (ch === '"') {
-              inQuotes = false;
+        // ============================================================
+        // LOGIN
+        // ============================================================
+        function parseLoginCSV(text) {
+            const lines = text.split('\n').filter(l => l.trim() !== '');
+            if (lines.length < 2) return [];
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = parseCSVLine(lines[i]);
+                if (cols.length < 2) continue;
+                const user = cols[0] ? cols[0].trim() : '';
+                const pass = cols[1] ? cols[1].trim() : '';
+                if (user && pass) result.push({ user, pass });
+            }
+            return result;
+        }
+
+        function fetchUsers() {
+            loginStatus.textContent = '⏳ Loading...';
+            loginBtn.disabled = true;
+
+            fetch(LOGIN_CSV_URL + '&_t=' + Date.now())
+                .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+                .then(csvText => {
+                    users = parseLoginCSV(csvText);
+                    isLoadingUsers = false;
+                    loginStatus.textContent = '🔐 Sign in to continue';
+                    loginBtn.disabled = false;
+
+                    if (users.length === 0) {
+                        console.warn('[Self Learners] Login sheet returned 0 users. Check sharing.');
+                    }
+                    restoreSession();
+                })
+                .catch(err => {
+                    console.error('Login load error:', err);
+                    loginStatus.textContent = '⚠️ Unable to connect. Please try again.';
+                    loginBtn.disabled = true;
+                    showToast('⚠️ Unable to load user data. Please refresh.', 'error', 4000);
+                });
+        }
+
+        function handleLogin() {
+            const u = emailInput.value.trim();
+            const p = passwordInput.value.trim();
+
+            if (!u || !p) {
+                showToast('⚠️ Please enter both username and password.', 'warning', 3000);
+                return;
+            }
+            if (isLoadingUsers) {
+                showToast('⏳ User data is still loading. Please wait.', 'warning', 2500);
+                return;
+            }
+
+            const matched = users.find(x =>
+                x.user.toLowerCase() === u.toLowerCase() && x.pass === p
+            );
+
+            if (matched) {
+                loggedInUser = matched;
+                try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(matched)); } catch(e){}
+                showToast(`✅ Welcome, ${matched.user}!`, 'success', 2500);
+                showQuiz();
             } else {
-              current += ch;
+                showToast('❌ Invalid username or password.', 'error', 3000);
+                loginStatus.textContent = '❌ Login failed';
             }
-          } else {
-            if (ch === '"') inQuotes = true;
-            else if (ch === ',') { result.push(current.trim()); current = ''; }
-            else current += ch;
-          }
-        }
-        result.push(current.trim());
-        return result;
-      }
-
-      function startTimer() {
-        timeRemaining = totalQuestions * 60;
-        updateTimerDisplay();
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-          timeRemaining--;
-          updateTimerDisplay();
-          if (timeRemaining % 10 === 0) saveSession();
-          if (timeRemaining <= 0) {
-            clearInterval(timerInterval); timerInterval = null;
-            handleTimeout();
-          }
-        }, 1000);
-      }
-
-      function updateTimerDisplay() {
-        const mins = Math.floor(timeRemaining / 60);
-        const secs = timeRemaining % 60;
-        timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        timerDisplay.classList.remove('warning', 'danger');
-        if (timeRemaining < 60) timerDisplay.classList.add('danger');
-        else if (timeRemaining < 300) timerDisplay.classList.add('warning');
-      }
-
-      function handleTimeout() {
-        quizTimedOut = true;
-        quizCompleted = true;
-        document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-        showFeedback('⏰ Time is up! Quiz submitted.', 'warning');
-        nextBtn.disabled = true;
-        showToast('⏰ Time is up! Quiz submitted.', 'warning', 3000);
-        saveSession();
-        setTimeout(showResult, 1500);
-      }
-
-      function startQuiz() {
-        if (questions.length === 0) {
-          questionText.textContent = '⚠️ No questions found.';
-          return;
-        }
-        quizTitle.textContent = quizTitleText;
-        quizSubtitle.textContent = 'Self Learners';
-
-        if (!sessionRestored) {
-          currentIndex = 0; score = 0; isAnswered = false;
-          quizCompleted = false; quizTimedOut = false;
-          answerStatus = new Array(questions.length).fill(null);
         }
 
-        resultArea.style.display = 'none';
-        questionArea.style.display = 'block';
+        function restoreSession() {
+            try {
+                const raw = sessionStorage.getItem(SESSION_KEY);
+                if (!raw) return;
+                const saved = JSON.parse(raw);
+                const exists = users.some(x =>
+                    x.user.toLowerCase() === saved.user.toLowerCase() && x.pass === saved.pass
+                );
+                if (!exists) { sessionStorage.removeItem(SESSION_KEY); return; }
+                loggedInUser = saved;
+                showToast(`↻ Welcome back, ${saved.user}!`, 'info', 2500);
+                showQuiz();
+            } catch (e) {}
+        }
 
-        renderQuestion(currentIndex);
-        renderDots();
-        updateLegendCounts();
+        function handleLogout() {
+            sessionStorage.removeItem(SESSION_KEY);
+            loggedInUser = null;
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            clearState();
+            quizCompleted = false;
+            questions = [];
+            currentIndex = 0;
+            score = 0;
+            answerStatus = [];
+            quizApp.style.display = 'none';
+            loginScreen.style.display = 'block';
+            loginStatus.textContent = '🔐 Sign in to continue';
+            emailInput.value = '';
+            passwordInput.value = '';
+            showToast('👋 Logged out successfully. Progress not saved.', 'info', 3000);
+        }
 
-        if (!sessionRestored) startTimer();
-        saveSession();
-      }
+        function showQuiz() {
+            loginScreen.style.display = 'none';
+            quizApp.style.display = 'block';
+            updateUserBadge();
+            fetchQuestions(false);
+        }
 
-      function renderQuestion(index) {
-        const q = questions[index];
-        if (!q) return;
+        function updateUserBadge() {
+            if (!loggedInUser) return;
+            const initial = loggedInUser.user.charAt(0).toUpperCase();
+            userAvatar.textContent = initial;
+            userNameDisplay.textContent = loggedInUser.user;
+        }
 
-        const total = questions.length;
-        progressFill.style.width = ((index) / total * 100) + '%';
-
-        qNumber.textContent = `QUESTION ${index+1} OF ${total}`;
-        const metaParts = [];
-        if (q.subject) metaParts.push(`📚 ${q.subject}`);
-        if (q.topic) metaParts.push(`🏷️ ${q.topic}`);
-        qCategory.textContent = metaParts.length ? metaParts.join(' · ') : `Question ${index+1}`;
-
-        questionText.textContent = q.question;
-
-        const letters = ['A', 'B', 'C', 'D'];
-        optionsContainer.innerHTML = '';
-        q.options.forEach((opt, idx) => {
-          const btn = document.createElement('button');
-          btn.className = 'option-btn';
-          btn.innerHTML = `<span class="letter">${letters[idx]}</span> ${opt || '(Empty)'}`;
-          btn.dataset.index = idx;
-          btn.addEventListener('click', () => handleOptionClick(idx));
-          if (!opt || quizTimedOut) {
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
-          }
-          optionsContainer.appendChild(btn);
+        loginBtn.addEventListener('click', handleLogin);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && loginScreen.style.display !== 'none' && !loginBtn.disabled) {
+                if (document.activeElement === emailInput || document.activeElement === passwordInput) {
+                    handleLogin();
+                }
+            }
         });
+        userBadge.addEventListener('click', handleLogout);
 
-        hideFeedback();
+        // ============================================================
+        // STATE SAVE / LOAD
+        // ============================================================
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
+                    score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions,
+                    currentIndex, timeRemaining, currentCategory, allCategories, invalidQuestions
+                }));
+            } catch (e) {}
+        }
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return null;
+                const s = JSON.parse(raw);
+                if (!s.questions || s.questions.length === 0) return null;
+                return s;
+            } catch (e) { return null; }
+        }
+        function clearState() { localStorage.removeItem(STORAGE_KEY); }
 
-        if (q.correct === -1) {
-          showFeedback(`⚠️ No answer in db (Correct_Answer doesn't match any option)`, 'warning');
-          if (!quizTimedOut && !quizCompleted) {
-            setTimeout(() => {
-              if (!isAnswered && !quizCompleted) {
-                answerStatus[currentIndex] = null;
-                isAnswered = true;
-                nextBtn.disabled = false;
-                renderDots();
-                updateLegendCounts();
-                hideFeedback();
-                saveSession();
-              }
-            }, 800);
-          }
+        // ============================================================
+        // LOADING UI
+        // ============================================================
+        function showLoading() {
+            questionCard.innerHTML =
+                '<div style="padding:2rem;text-align:center;color:#1f4d66;">🔄 Loading questions...</div>';
+            quizTitle.textContent = 'Loading...';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            endQuizBtn.disabled = true;
+            refreshBtn.disabled = true;
+            refreshIcon.textContent = '⟳';
+            refreshIcon.classList.add('refresh-spin');
+        }
+        function hideLoading() {
+            refreshBtn.disabled = false;
+            refreshIcon.textContent = '🔄';
+            refreshIcon.classList.remove('refresh-spin');
         }
 
-        isAnswered = false;
-        nextBtn.disabled = true;
-
-        document.querySelectorAll('.option-btn').forEach(btn => {
-          btn.disabled = quizTimedOut || quizCompleted;
-          btn.classList.remove('correct', 'wrong');
-        });
-
-        resultArea.style.display = 'none';
-        questionArea.style.display = 'block';
-        renderDots();
-        updateLegendCounts();
-        saveSession();
-      }
-
-      function handleOptionClick(selectedIdx) {
-        if (isAnswered || quizTimedOut || quizCompleted) return;
-        const q = questions[currentIndex];
-        if (q.correct === -1) {
-          showFeedback(`⚠️ No answer in db (No match in Correct_Answer column)`, 'warning');
-          return;
+        // ============================================================
+        // TIMER
+        // ============================================================
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!quizCompleted && !isSubmitted) {
+                    timeRemaining--;
+                    updateTimerDisplay();
+                    if (timeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        if (!quizCompleted && !isSubmitted) {
+                            gradeQuiz();
+                            quizCompleted = true;
+                            endQuizBtn.disabled = true;
+                            showResult();
+                        }
+                    }
+                    saveState();
+                }
+            }, 1000);
+        }
+        function updateTimerDisplay() {
+            const m = Math.floor(timeRemaining / 60), s = timeRemaining % 60;
+            timerDisplay.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            timerDisplay.classList.remove('warning', 'danger');
+            if (timeRemaining < 60) timerDisplay.classList.add('danger');
+            else if (timeRemaining < 300) timerDisplay.classList.add('warning');
         }
 
-        const isCorrect = (selectedIdx === q.correct);
-        const allOptions = document.querySelectorAll('.option-btn');
-
-        allOptions.forEach(btn => btn.disabled = true);
-        allOptions.forEach((btn, idx) => {
-          if (idx === q.correct) btn.classList.add('correct');
-          else if (idx === selectedIdx && !isCorrect) btn.classList.add('wrong');
-        });
-
-        if (isCorrect) { score += 1; answerStatus[currentIndex] = true; }
-        else { answerStatus[currentIndex] = false; }
-
-        hideFeedback();
-        isAnswered = true;
-        nextBtn.disabled = false;
-        renderDots();
-        updateLegendCounts();
-        saveSession();
-      }
-
-      function goToNext() {
-        if (!isAnswered || quizCompleted) return;
-        if (currentIndex + 1 < questions.length) {
-          currentIndex++;
-          renderQuestion(currentIndex);
-        } else {
-          if (!quizTimedOut) { clearInterval(timerInterval); timerInterval = null; }
-          showResult();
+        function resetToQuizView() {
+            resultArea.style.display = 'none';
+            singleQuestionView.style.display = 'block';
+            submittedBanner.style.display = 'none';
+            endQuizBtn.textContent = '🏁 End Quiz';
+            endQuizBtn.disabled = false;
         }
-      }
-
-      function showResult() {
-        quizCompleted = true;
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-
-        questionArea.style.display = 'none';
-        resultArea.style.display = 'block';
-
-        const total = questions.length;
-        const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
-        finalScore.textContent = `${score} / ${total}`;
-        progressFill.style.width = '100%';
-
-        let msg = quizTimedOut ? '⏰ Time ran out! ' : '';
-        msg += getScoreMessage(score, total);
-        resultMessage.textContent = msg;
-
-        if (percentage === 100) resultIcon.textContent = '🌟';
-        else if (percentage >= 70) resultIcon.textContent = '🎉';
-        else if (percentage >= 40) resultIcon.textContent = '📖';
-        else resultIcon.textContent = '💪';
-
-        nextBtn.disabled = true;
-        renderDots();
-        updateLegendCounts();
-        clearSession();
-        hideFeedback();
-
-        if (!sessionRestored) {
-          showToast(`🏁 Quiz complete! Score: ${score}/${total} (${percentage}%)`, 'info', 4000);
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            quizApp.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }
 
-      function getScoreMessage(score, total) {
-        const pct = total > 0 ? Math.round((score / total) * 100) : 0;
-        if (pct === 100) return '🌟 Perfect! You are a true Self Learner!';
-        else if (pct >= 70) return '👏 Great job! Keep growing every day!';
-        else if (pct >= 40) return '📖 Good effort! Review and try again.';
-        else return '💪 Learning is a journey. Keep practicing!';
-      }
+        // ============================================================
+        // CATEGORY DROPDOWN
+        // ============================================================
+        function populateCategoryDropdown(categories) {
+            allCategories = categories;
+            const cur = modalYearSelect.value;
+            modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat || 'Uncategorized';
+                modalYearSelect.appendChild(opt);
+            });
+            if (cur && categories.includes(cur)) modalYearSelect.value = cur;
+            else modalYearSelect.value = 'all';
 
-      function renderDots() {
-        dotGrid.innerHTML = '';
-        const total = questions.length;
-        for (let i = 0; i < total; i++) {
-          const dot = document.createElement('div');
-          dot.className = 'grid-dot';
-          dot.textContent = i + 1;
-
-          if (i === currentIndex && !quizCompleted && !quizTimedOut) dot.classList.add('active');
-          if (questions[i] && questions[i].correct === -1) dot.classList.add('no-answer-dot');
-          else if (answerStatus[i] === true) dot.classList.add('correct-dot');
-          else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
-          if (quizTimedOut && answerStatus[i] === null && questions[i] && questions[i].correct !== -1) {
-            dot.classList.add('timeout');
-          }
-          dotGrid.appendChild(dot);
+            if (currentCategory && currentCategory !== 'all') {
+                yearBadge.textContent = '📂 ' + currentCategory;
+                yearBadge.style.display = 'inline-block';
+            } else {
+                yearBadge.textContent = '';
+                yearBadge.style.display = 'none';
+            }
         }
-      }
 
-      function updateLegendCounts() {
-        let correct = 0, wrong = 0, active = 0, pending = 0;
-        const total = questions.length;
-        for (let i = 0; i < total; i++) {
-          if (questions[i] && questions[i].correct === -1) pending++;
-          else if (answerStatus[i] === true) correct++;
-          else if (answerStatus[i] === false) wrong++;
-          else if (i === currentIndex && !quizCompleted && !quizTimedOut) active++;
-          else pending++;
+        // ============================================================
+        // VALIDATE
+        // ============================================================
+        function validateQuestions(list) {
+            invalidQuestions = [];
+            list.forEach((q, idx) => {
+                const correctText = q.correctText || '';
+                if (correctText && q.options && q.options.length > 0) {
+                    const matchFound = q.options.some(opt => opt === correctText);
+                    if (!matchFound) invalidQuestions.push(idx);
+                }
+            });
+            return invalidQuestions;
         }
-        correctCount.textContent = correct;
-        wrongCount.textContent = wrong;
-        activeCount.textContent = active;
-        pendingCount.textContent = pending;
-      }
 
-      async function handleRefresh() {
-        const confirmed = await showConfirm(
-          '🔄', 'Refresh Quiz Data?',
-          'This will reset your current progress and load the latest questions from the spreadsheet. Your current progress will be lost.',
-          'btn-confirm-success'
-        );
-        if (!confirmed) return;
+        // ============================================================
+        // FETCH QUESTIONS
+        // ============================================================
+        function fetchQuestions(forceRefresh = false, category = null) {
+            showLoading();
+            if (category !== null) currentCategory = category;
 
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        clearSession();
-        sessionRestored = false;
-        quizCompleted = false; quizTimedOut = false;
-        questions = []; currentIndex = 0; score = 0;
-        answerStatus = []; timeRemaining = 0;
+            if (!forceRefresh) {
+                const saved = loadState();
+                if (saved && saved.questions.length > 0) {
+                    questions = saved.questions;
+                    originalQuestions = saved.originalQuestions || saved.questions.map(q => ({...q}));
+                    quizTitleText = saved.quizTitleText || 'Quiz';
+                    totalQuestions = saved.totalQuestions || questions.length;
+                    selectedAllAnswers = saved.selectedAllAnswers || new Array(questions.length).fill(null);
+                    answerStatus = saved.answerStatus || new Array(questions.length).fill(null);
+                    lockedQuestions = saved.lockedQuestions || new Array(questions.length).fill(false);
+                    isSubmitted = saved.isSubmitted || false;
+                    quizCompleted = saved.quizCompleted || false;
+                    score = saved.score || 0;
+                    currentIndex = saved.currentIndex || 0;
+                    timeRemaining = saved.timeRemaining || (totalQuestions * 60);
+                    currentCategory = saved.currentCategory || 'all';
+                    allCategories = saved.allCategories || [];
+                    invalidQuestions = saved.invalidQuestions || [];
+                    quizTitle.textContent = quizTitleText;
+                    totalCount.textContent = totalQuestions;
+                    populateCategoryDropdown(allCategories);
+                    hideLoading();
+                    updateTimerDisplay();
+                    if (quizCompleted) { showResult(); return; }
+                    resetToQuizView();
+                    startTimer();
+                    renderQuestion();
+                    renderDots();
+                    updateOverview();
+                    return;
+                }
+            }
 
-        questionText.textContent = '🔄 Refreshing data from spreadsheet...';
-        hideFeedback();
-        showToast('🔄 Refreshing quiz data...', 'info', 2000);
-        fetchQuizQuestions();
-      }
+            const url = QUIZ_CSV_URL + (forceRefresh ? '&_t=' + Date.now() : '');
+            fetch(url)
+                .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+                .then(csvText => {
+                    const parsed = parseQuizCSV(csvText);
+                    if (parsed.questions.length === 0) throw new Error('No data');
 
-      async function handleUserBadgeClick() {
-        const confirmed = await showConfirm(
-          '🚪', 'Logout?',
-          'Are you sure you want to logout? Your current progress will NOT be saved.',
-          'btn-confirm'
-        );
-        if (confirmed) handleLogout();
-      }
+                    originalQuestions = parsed.questions;
+                    quizTitleText = parsed.title || 'Quiz';
 
-      function restartQuiz() {
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        clearSession();
-        sessionRestored = false;
-        if (questions.length === 0) { fetchQuizQuestions(); return; }
-        showToast('🔄 Restarting quiz...', 'info', 1500);
-        currentIndex = 0; score = 0; isAnswered = false;
-        quizCompleted = false; quizTimedOut = false;
-        answerStatus = new Array(questions.length).fill(null);
-        resultArea.style.display = 'none';
-        questionArea.style.display = 'block';
-        hideFeedback();
-        renderQuestion(0);
-        renderDots();
-        updateLegendCounts();
-        startTimer();
-        saveSession();
-      }
+                    const cats = [...new Set(originalQuestions.map(q => q.category || '').filter(c => c && c.trim()))];
+                    populateCategoryDropdown(cats);
 
-      // ==============================================================
-      // 13. EVENT LISTENERS
-      // ==============================================================
-      loginBtn.addEventListener('click', handleLogin);
+                    let filtered = originalQuestions;
+                    const target = category || currentCategory || 'all';
+                    if (target !== 'all') {
+                        filtered = originalQuestions.filter(q => q.category === target);
+                    }
+                    if (filtered.length === 0) {
+                        filtered = originalQuestions;
+                        modalYearSelect.value = 'all';
+                        currentCategory = 'all';
+                        yearBadge.textContent = '';
+                        yearBadge.style.display = 'none';
+                    }
 
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !loginBtn.disabled) {
-          const active = document.activeElement;
-          if (active === emailInput || active === passwordInput) handleLogin();
+                    questions = filtered.map(q => {
+                        const sh = shuffleArray(q.options);
+                        const nc = sh.indexOf(q.options[q.correct]);
+                        return { ...q, options: sh, correct: nc };
+                    });
+
+                    validateQuestions(originalQuestions);
+
+                    totalQuestions = questions.length;
+                    selectedAllAnswers = new Array(questions.length).fill(null);
+                    answerStatus = new Array(questions.length).fill(null);
+                    lockedQuestions = new Array(questions.length).fill(false);
+                    isSubmitted = false;
+                    quizCompleted = false;
+                    score = 0;
+                    currentIndex = 0;
+                    timeRemaining = totalQuestions * 60;
+                    clearState();
+                    quizTitle.textContent = quizTitleText;
+                    totalCount.textContent = totalQuestions;
+                    hideLoading();
+                    resetToQuizView();
+                    updateTimerDisplay();
+                    startTimer();
+                    renderQuestion();
+                    renderDots();
+                    updateOverview();
+                    if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
+                    scrollToTop();
+                })
+                .catch(err => {
+                    console.error(err);
+                    questionCard.innerHTML =
+                        '<div style="padding:2rem;text-align:center;color:#b33c3c;">❌ Failed to load. Check CSV link.</div>';
+                    hideLoading();
+                    if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
+                });
         }
-      });
 
-      nextBtn.addEventListener('click', goToNext);
-      restartFromResult.addEventListener('click', restartQuiz);
-      logoutBtn.addEventListener('click', handleLogout);
-      refreshBtn.addEventListener('click', handleRefresh);
-      userBadge.addEventListener('click', handleUserBadgeClick);
+        // ============================================================
+        // PARSE QUIZ CSV – NEW HEADERS + LETTER FALLBACK
+        // ------------------------------------------------------------
+        // A: Question_Number (0)
+        // B: Question        (1)
+        // C: Option_A        (2)
+        // D: Option_B        (3)
+        // E: Option_C        (4)
+        // F: Option_D        (5)
+        // G: Correct_Answer  (6)
+        // H: topic           (7)
+        // I: subject         (8)
+        // ============================================================
+        function parseQuizCSV(text) {
+            const lines = text.split('\n').filter(l => l.trim() !== '');
+            if (lines.length < 2) return { questions: [], title: 'Quiz' };
 
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !nextBtn.disabled && quizScreen.style.display !== 'none') {
-          goToNext();
+            let title = 'Quiz';
+            const result = [];
+            const LETTER_MAP = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+
+            for (let i = 1; i < lines.length; i++) {
+                const cols = parseCSVLine(lines[i]);
+                if (cols.length < 9) continue;
+
+                const q = cols[1] ? cols[1].trim() : '';
+                if (!q) continue;
+
+                const opts = [
+                    cols[2] ? cols[2].trim() : '',
+                    cols[3] ? cols[3].trim() : '',
+                    cols[4] ? cols[4].trim() : '',
+                    cols[5] ? cols[5].trim() : ''
+                ];
+
+                const rawCorrect = cols[6] ? cols[6].trim() : '';
+                let correctIdx = -1;
+
+                if (rawCorrect) {
+                    // 1) exact text match
+                    for (let j = 0; j < opts.length; j++) {
+                        if (opts[j] === rawCorrect) { correctIdx = j; break; }
+                    }
+                    // 2) case-insensitive text match
+                    if (correctIdx === -1) {
+                        const low = rawCorrect.toLowerCase();
+                        for (let j = 0; j < opts.length; j++) {
+                            if (opts[j] && opts[j].toLowerCase() === low) { correctIdx = j; break; }
+                        }
+                    }
+                    // 3) single letter fallback (A/B/C/D, case-insensitive)
+                    if (correctIdx === -1 && rawCorrect.length === 1) {
+                        const k = rawCorrect.toLowerCase();
+                        if (k in LETTER_MAP) correctIdx = LETTER_MAP[k];
+                    }
+                }
+
+                const topic   = cols[7] ? cols[7].trim() : '';
+                const subject = cols[8] ? cols[8].trim() : '';
+
+                result.push({
+                    question: q,
+                    options: opts,
+                    correct: correctIdx,
+                    correctText: rawCorrect || 'No answer in db',
+                    category: subject,
+                    topic: topic,
+                    subject: subject
+                });
+            }
+
+            if (result.length > 0 && result[0].subject) title = result[0].subject;
+            return { questions: result, title };
         }
-      });
 
-      window.addEventListener('beforeunload', function() {
-        if (loggedInUser && !quizCompleted) saveSession();
-      });
+        // ============================================================
+        // RENDER QUESTION
+        // ============================================================
+        function renderQuestion() {
+            if (!questions.length) {
+                questionCard.innerHTML = '<div style="padding:2rem;text-align:center;">No questions</div>';
+                return;
+            }
+            const q = questions[currentIndex];
+            const idx = currentIndex;
+            const letters = ['A', 'B', 'C', 'D'];
 
-      // ==============================================================
-      // 14. INIT
-      // ==============================================================
-      fetchUsers();
-    })();
-  </script>
-</body>
-</html>
+            // Meta line
+            const metaParts = [];
+            if (q.subject) metaParts.push(`📚 ${q.subject}`);
+            if (q.topic) metaParts.push(`🏷️ ${q.topic}`);
+
+            let html = `<div class="q-text" data-question="${encodeURIComponent(q.question)}">${idx+1}. ${q.question}</div>`;
+            if (metaParts.length) {
+                html += `<div style="font-size:0.75rem;color:#5a7a8e;margin-bottom:0.8rem;">${metaParts.join(' · ')}</div>`;
+            }
+            html += '<div class="options-list">';
+
+            q.options.forEach((opt, oi) => {
+                let cls = 'option-btn';
+                let iconSpan = '<span class="icon-indicator"></span>';
+
+                if (selectedAllAnswers[idx] === oi) cls += ' selected-opt';
+
+                if (lockedQuestions[idx] || isSubmitted || quizCompleted) {
+                    if (q.correct !== -1 && oi === q.correct) {
+                        cls += ' correct';
+                        iconSpan = '<span class="icon-indicator">✓</span>';
+                    }
+                    if (selectedAllAnswers[idx] === oi && selectedAllAnswers[idx] !== q.correct) {
+                        cls += ' wrong';
+                        iconSpan = '<span class="icon-indicator">✗</span>';
+                    }
+                }
+
+                if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) cls += ' locked-btn';
+
+                const disabled = lockedQuestions[idx] || isSubmitted || quizCompleted ? 'disabled' : '';
+                html += `<button class="${cls}" data-optidx="${oi}" ${disabled}>
+                    <span class="letter">${letters[oi]}</span> ${opt || '(Empty)'} ${iconSpan}
+                </button>`;
+            });
+            html += '</div>';
+
+            if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) {
+                const isCorrect = selectedAllAnswers[idx] === q.correct;
+                const icon = isCorrect ? '✅' : '❌';
+                const msg = isCorrect ? 'Correct! Great job!' :
+                    `Incorrect. The correct answer is: ${q.options[q.correct] || 'Not available'}`;
+                html += `<div style="margin-top:1rem;padding:0.8rem;border-radius:12px;background:${isCorrect ? '#d8eddf' : '#f5dddd'};border:1px solid ${isCorrect ? '#1f8b4c' : '#b33c3c'};font-weight:600;color:${isCorrect ? '#1f8b4c' : '#b33c3c'};">
+                    ${icon} ${msg}
+                </div>`;
+            }
+
+            questionCard.innerHTML = html;
+
+            const qTextEl = questionCard.querySelector('.q-text');
+            if (qTextEl) {
+                qTextEl.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const t = decodeURIComponent(this.dataset.question);
+                    if (t) window.open(`https://www.google.com/search?q=${encodeURIComponent(t)}`, '_blank');
+                });
+            }
+
+            if (!isSubmitted && !quizCompleted) {
+                questionCard.querySelectorAll('.option-btn:not(.locked-btn)').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const optIdx = parseInt(this.dataset.optidx);
+                        const qIdx = currentIndex;
+                        if (lockedQuestions[qIdx] || isSubmitted || quizCompleted) return;
+                        lockedQuestions[qIdx] = true;
+                        selectedAllAnswers[qIdx] = optIdx;
+                        renderQuestion();
+                        renderDots(currentIndex);
+                        updateProgress();
+                        updateOverview();
+                        saveState();
+                    });
+                });
+            }
+
+            if (isSubmitted || quizCompleted) {
+                questionCard.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+            }
+
+            updateProgress();
+            prevBtn.disabled = currentIndex === 0 || quizCompleted;
+            nextBtn.disabled = currentIndex === totalQuestions - 1 || quizCompleted;
+            endQuizBtn.disabled = quizCompleted;
+            if (isSubmitted && !quizCompleted) {
+                submittedBanner.style.display = 'block';
+                endQuizBtn.textContent = '🏁 End Quiz';
+            } else {
+                submittedBanner.style.display = 'none';
+                endQuizBtn.textContent = '🏁 End Quiz';
+            }
+            if (quizCompleted) endQuizBtn.disabled = true;
+            saveState();
+        }
+
+        function updateProgress() {
+            const answered = getAttemptedCount();
+            attemptedCount.textContent = answered;
+            const pct = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
+            progressFill.style.width = `${pct}%`;
+            totalCount.textContent = totalQuestions;
+        }
+
+        function renderDots(activeIdx) {
+            dotGrid.innerHTML = '';
+            for (let i = 0; i < totalQuestions; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'grid-dot';
+                dot.textContent = i + 1;
+
+                const isInvalid = invalidQuestions.includes(i);
+
+                if (isInvalid) {
+                    dot.classList.add('invalid-dot');
+                } else {
+                    const hasAns = selectedAllAnswers[i] !== null;
+                    if (isSubmitted || quizCompleted) {
+                        if (answerStatus[i] === true) dot.classList.add('correct-dot');
+                        else if (answerStatus[i] === false) dot.classList.add('wrong-dot');
+                        else if (hasAns) dot.classList.add('done-dot');
+                        else dot.classList.add('pending-dot');
+                    } else {
+                        if (hasAns) {
+                            const q = questions[i];
+                            if (q && selectedAllAnswers[i] === q.correct) dot.classList.add('correct-dot');
+                            else dot.classList.add('wrong-dot');
+                        } else {
+                            dot.classList.add('pending-dot');
+                        }
+                    }
+                }
+
+                if (activeIdx !== undefined && i === activeIdx) dot.classList.add('active-dot');
+                dot.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    currentIndex = i;
+                    renderQuestion();
+                    renderDots(currentIndex);
+                    updateProgress();
+                });
+                dotGrid.appendChild(dot);
+            }
+        }
+
+        function updateOverview() {
+            let done = 0, pending = 0, correct = 0, wrong = 0, invalid = 0;
+            for (let i = 0; i < totalQuestions; i++) {
+                if (invalidQuestions.includes(i)) { invalid++; continue; }
+                if (selectedAllAnswers[i] !== null) {
+                    done++;
+                    if (isSubmitted || quizCompleted) {
+                        if (answerStatus[i] === true) correct++;
+                        else if (answerStatus[i] === false) wrong++;
+                    } else {
+                        const q = questions[i];
+                        if (q && selectedAllAnswers[i] === q.correct) correct++;
+                        else wrong++;
+                    }
+                } else {
+                    pending++;
+                }
+            }
+            doneCount.textContent = done;
+            pendingCount.textContent = pending;
+            correctCount.textContent = correct;
+            wrongCount.textContent = wrong;
+            invalidCount.textContent = invalid;
+
+            correctLegend.style.display = 'inline-flex';
+            wrongLegend.style.display = 'inline-flex';
+            invalidLegend.style.display = 'inline-flex';
+        }
+
+        // ============================================================
+        // GRADING & RESULT
+        // ============================================================
+        function gradeQuiz() {
+            let correctLocal = 0;
+            for (let i = 0; i < questions.length; i++) {
+                const q = questions[i];
+                const sel = selectedAllAnswers[i];
+                if (invalidQuestions.includes(i)) { answerStatus[i] = null; continue; }
+                if (q.correct === -1) { answerStatus[i] = null; continue; }
+                if (sel !== null && sel === q.correct) { answerStatus[i] = true; correctLocal++; }
+                else if (sel !== null) answerStatus[i] = false;
+                else answerStatus[i] = null;
+            }
+            score = correctLocal;
+            isSubmitted = true;
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            submittedBanner.style.display = 'block';
+            endQuizBtn.textContent = '🏁 End Quiz';
+            renderQuestion();
+            renderDots();
+            updateOverview();
+            saveState();
+        }
+
+        function handleEndQuiz() {
+            if (quizCompleted) return;
+            if (!isSubmitted) gradeQuiz();
+            quizCompleted = true;
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            endQuizBtn.disabled = true;
+            showResult();
+        }
+
+        function showResult() {
+            quizCompleted = true;
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            singleQuestionView.style.display = 'none';
+            resultArea.style.display = 'block';
+            finalScore.textContent = `${score} / ${totalQuestions}`;
+            let msg = (score === totalQuestions) ? '🌟 Perfect!' :
+                (score >= totalQuestions * 0.7 ? '👏 Great job!' : '💪 Keep practicing!');
+            resultMessage.textContent = msg;
+
+            resultDetails.innerHTML = '';
+            questions.forEach((q, idx) => {
+                const div = document.createElement('div');
+                div.className = 'detail-item';
+                const isInvalid = invalidQuestions.includes(idx);
+                const isCorrect = answerStatus[idx] === true;
+                const isWrong = answerStatus[idx] === false;
+
+                if (isInvalid) div.classList.add('invalid-detail');
+                else if (isCorrect) div.classList.add('correct-detail');
+                else if (isWrong) div.classList.add('wrong-detail');
+                else div.style.borderLeft = '6px solid #999';
+
+                const qText = document.createElement('div');
+                qText.className = 'detail-q';
+                qText.textContent = `${idx+1}. ${q.question}`;
+                qText.style.cursor = 'pointer';
+                qText.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const t = this.textContent.replace(/^\d+\.\s*/, '');
+                    if (t) window.open(`https://www.google.com/search?q=${encodeURIComponent(t)}`, '_blank');
+                });
+                div.appendChild(qText);
+
+                const ansDiv = document.createElement('div');
+                ansDiv.className = 'detail-answer';
+
+                if (isInvalid) {
+                    ansDiv.innerHTML = `⚠️ <span style="color:#e91e8c;font-weight:600;">Invalid: The correct answer "${q.correctText}" does not match any option.</span>`;
+                } else {
+                    const userAns = (selectedAllAnswers[idx] !== null && q.options[selectedAllAnswers[idx]])
+                        ? q.options[selectedAllAnswers[idx]] : 'Not answered';
+                    const correctAns = (q.correct !== -1 && q.options[q.correct]) ? q.options[q.correct] : 'Not available';
+                    if (q.correct === -1) {
+                        ansDiv.innerHTML = `<span style="color:#999;">⚠️ No correct answer.</span>`;
+                    } else if (isCorrect) {
+                        ansDiv.innerHTML = `✅ Your answer: <span style="color:#1f8b4c;">${userAns}</span> (Correct)`;
+                    } else if (isWrong) {
+                        ansDiv.innerHTML = `❌ Your answer: <span style="color:#b33c3c;">${userAns}</span> &nbsp; Correct: <span class="correct-ans">${correctAns}</span>`;
+                    } else {
+                        ansDiv.innerHTML = `⏭️ Skipped &nbsp; Correct: <span class="correct-ans">${correctAns}</span>`;
+                    }
+                }
+                div.appendChild(ansDiv);
+                resultDetails.appendChild(div);
+            });
+
+            updateOverview();
+            renderDots();
+            updateProgress();
+            saveState();
+            scrollToTop();
+        }
+
+        // ============================================================
+        // RESTART
+        // ============================================================
+        function restartQuiz() {
+            clearState();
+            selectedAllAnswers = new Array(questions.length).fill(null);
+            answerStatus = new Array(questions.length).fill(null);
+            lockedQuestions = new Array(questions.length).fill(false);
+            isSubmitted = false;
+            quizCompleted = false;
+            score = 0;
+            currentIndex = 0;
+            timeRemaining = totalQuestions * 60;
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            resultArea.style.display = 'none';
+            singleQuestionView.style.display = 'block';
+            submittedBanner.style.display = 'none';
+            endQuizBtn.textContent = '🏁 End Quiz';
+            endQuizBtn.disabled = false;
+
+            const currentQs = questions;
+            questions = currentQs.map(q => {
+                const sh = shuffleArray(q.options);
+                const nc = sh.indexOf(q.options[q.correct]);
+                return { ...q, options: sh, correct: nc };
+            });
+
+            updateTimerDisplay();
+            startTimer();
+            renderQuestion();
+            renderDots();
+            updateOverview();
+            saveState();
+            scrollToTop();
+        }
+
+        // ============================================================
+        // REFRESH MODAL
+        // ============================================================
+        function handleRefreshClick() {
+            modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
+            allCategories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat || 'Uncategorized';
+                modalYearSelect.appendChild(opt);
+            });
+            modalYearSelect.value = currentCategory || 'all';
+            refreshModal.classList.add('active');
+        }
+        function handleRefreshConfirm() {
+            const selected = modalYearSelect.value;
+            if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
+            if (timerInterval)
