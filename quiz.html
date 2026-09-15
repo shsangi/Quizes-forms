@@ -1441,4 +1441,45 @@
         function handleRefreshConfirm() {
             const selected = modalYearSelect.value;
             if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
-            if (timerInterval)
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            resetToQuizView();
+            fetchQuestions(true, selected);
+        }
+        function handleRefreshCancel() { refreshModal.classList.remove('active'); }
+
+        // ============================================================
+        // EVENT BINDINGS
+        // ============================================================
+        prevBtn.addEventListener('click', function() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+                renderDots(currentIndex);
+                updateProgress();
+            }
+        });
+        nextBtn.addEventListener('click', function() {
+            if (currentIndex < totalQuestions - 1) {
+                currentIndex++;
+                renderQuestion();
+                renderDots(currentIndex);
+                updateProgress();
+            }
+        });
+        endQuizBtn.addEventListener('click', handleEndQuiz);
+        restartFromResult.addEventListener('click', restartQuiz);
+        refreshBtn.addEventListener('click', handleRefreshClick);
+        modalConfirm.addEventListener('click', handleRefreshConfirm);
+        modalCancel.addEventListener('click', handleRefreshCancel);
+        refreshModal.addEventListener('click', function(e) {
+            if (e.target === this) refreshModal.classList.remove('active');
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        fetchUsers();
+    })();
+    </script>
+</body>
+</html>
