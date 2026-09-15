@@ -108,6 +108,45 @@
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-10px); } }
         .toast.removing { animation: fadeOutToast 0.3s ease forwards; }
 
+        /* ================= CONFIRM DIALOG ================= */
+        .custom-confirm-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+        }
+        .custom-confirm-overlay.active { display: flex; }
+        .custom-confirm-box {
+            background: white; border-radius: 24px; padding: 2rem 2.5rem;
+            max-width: 440px; width: 90%; box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            animation: scaleIn 0.3s ease;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .custom-confirm-box .icon { font-size: 2.8rem; text-align: center; margin-bottom: 0.5rem; }
+        .custom-confirm-box h3 {
+            font-size: 1.3rem; font-weight: 700; color: #0b2a3b;
+            text-align: center; margin-bottom: 0.5rem;
+        }
+        .custom-confirm-box p {
+            color: #5a7a8e; font-size: 0.95rem; text-align: center;
+            margin-bottom: 1.5rem; line-height: 1.5;
+        }
+        .custom-confirm-box .btn-group { display: flex; gap: 0.8rem; justify-content: center; }
+        .custom-confirm-box .btn-group button {
+            padding: 0.6rem 2rem; border-radius: 60px; font-weight: 600;
+            font-size: 0.9rem; border: none; cursor: pointer;
+            transition: 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .custom-confirm-box .btn-cancel { background: #f0f4f9; color: #1f4d66; }
+        .custom-confirm-box .btn-cancel:hover { background: #e2eaf2; }
+        .custom-confirm-box .btn-confirm { background: #dc3545; color: white; }
+        .custom-confirm-box .btn-confirm:hover {
+            background: #c82333; transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
+        }
+
         /* ================= QUIZ SCREEN ================= */
         .quiz-wrapper {
             max-width: 720px; width: 100%; background: white;
@@ -341,7 +380,7 @@
         }
         .modal-overlay.active { display: flex; }
         .modal-box {
-            background: white; max-width: 440px; width: 90%;
+            background: white; max-width: 460px; width: 90%;
             border-radius: 1.5rem; padding: 2rem 1.8rem 1.8rem;
             text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.25);
             animation: modalIn 0.3s ease;
@@ -351,7 +390,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
         .modal-box h3 { font-size: 1.3rem; color: #0b2a3b; margin-bottom: 0.5rem; }
-        .modal-box p { color: #1f4d66; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; }
+        .modal-box p { color: #1f4d66; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.2rem; }
         .modal-actions { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
         .modal-actions .btn-primary { padding: 0.6rem 2rem; font-size: 0.95rem; }
         .modal-actions .btn-secondary {
@@ -361,11 +400,15 @@
         }
         .modal-actions .btn-secondary:hover { background: #c8d4df; }
 
+        .modal-label {
+            display: block; text-align: left; font-weight: 600;
+            font-size: 0.8rem; color: #1f4d66; margin: 0.6rem 0 0.2rem;
+        }
         .year-select {
             width: 100%; padding: 0.6rem 1rem; border-radius: 30px;
             border: 1.5px solid #dce6ef; background: white;
-            font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500;
-            color: #1f4d66; outline: none; cursor: pointer; margin: 0.5rem 0 1rem;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500;
+            color: #1f4d66; outline: none; cursor: pointer; margin-bottom: 0.4rem;
         }
         .year-select:focus { border-color: #2f7b9e; }
 
@@ -382,6 +425,9 @@
             .top-info { font-size: 0.85rem; }
             .user-badge span:not(.avatar) { display: none; }
             .toast-container { top: 0.8rem; right: 0.8rem; max-width: calc(100% - 1.6rem); }
+            .custom-confirm-box { padding: 1.5rem; }
+            .custom-confirm-box .btn-group { flex-direction: column; }
+            .custom-confirm-box .btn-group button { width: 100%; }
         }
     </style>
 </head>
@@ -389,6 +435,19 @@
 
     <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toastContainer"></div>
+
+    <!-- CONFIRM DIALOG -->
+    <div class="custom-confirm-overlay" id="confirmOverlay">
+        <div class="custom-confirm-box">
+            <div class="icon" id="confirmIcon">❓</div>
+            <h3 id="confirmTitle">Are you sure?</h3>
+            <p id="confirmMessage">This action cannot be undone.</p>
+            <div class="btn-group">
+                <button class="btn-cancel" id="confirmCancel">Cancel</button>
+                <button class="btn-confirm" id="confirmOk">Confirm</button>
+            </div>
+        </div>
+    </div>
 
     <!-- ================= LOGIN SCREEN ================= -->
     <div class="login-wrapper" id="loginScreen">
@@ -483,14 +542,23 @@
             </div>
         </div>
 
+        <!-- REFRESH MODAL – now with JOB + SUBJECT dropdowns -->
         <div class="modal-overlay" id="refreshModal">
             <div class="modal-box">
-                <h3>🔄 Select Subject</h3>
-                <p>Choose a subject from column I to load questions, or select "All Subjects".</p>
+                <h3>🔄 Filter & Refresh</h3>
+                <p>Optionally filter by Job and/or Subject, then click "Load &amp; Refresh".</p>
+
+                <label class="modal-label" for="modalJobSelect">💼 Job (column K)</label>
+                <select class="year-select" id="modalJobSelect">
+                    <option value="all">All Jobs</option>
+                </select>
+
+                <label class="modal-label" for="modalYearSelect">📚 Subject (column I)</label>
                 <select class="year-select" id="modalYearSelect">
                     <option value="all">All Subjects</option>
                 </select>
-                <div class="modal-actions">
+
+                <div class="modal-actions" style="margin-top:1rem;">
                     <button class="btn-secondary" id="modalCancel">Cancel</button>
                     <button class="btn-primary" id="modalConfirm">Load &amp; Refresh</button>
                 </div>
@@ -512,7 +580,7 @@
             `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
 
         const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
-        const STORAGE_KEY = 'selfLearnersOneByOneLogged';
+        const STORAGE_KEY = 'selfLearnersOneByOneV2';
         const SESSION_KEY = 'selfLearnersSessionUser';
 
         // ============================================================
@@ -531,8 +599,10 @@
         let quizTitleText = 'Quiz';
         let timerInterval = null;
         let timeRemaining = 0;
-        let allCategories = [];
-        let currentCategory = 'all';
+        let allSubjects = [];
+        let allJobs = [];
+        let currentSubject = 'all';
+        let currentJob = 'all';
         let invalidQuestions = [];
 
         let users = [];
@@ -573,6 +643,8 @@
         const refreshModal = document.getElementById('refreshModal');
         const modalCancel = document.getElementById('modalCancel');
         const modalConfirm = document.getElementById('modalConfirm');
+        const modalJobSelect = document.getElementById('modalJobSelect');
+        const modalYearSelect = document.getElementById('modalYearSelect');
         const doneCount = document.getElementById('doneCount');
         const pendingCount = document.getElementById('pendingCount');
         const correctCount = document.getElementById('correctCount');
@@ -586,8 +658,39 @@
         const brandLogo = document.getElementById('brandLogo');
         const timerDisplay = document.getElementById('timerDisplay');
         const singleQuestionView = document.getElementById('singleQuestionView');
-        const modalYearSelect = document.getElementById('modalYearSelect');
         const yearBadge = document.getElementById('yearBadge');
+
+        // Confirm dialog
+        const confirmOverlay = document.getElementById('confirmOverlay');
+        const confirmIcon = document.getElementById('confirmIcon');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmOk = document.getElementById('confirmOk');
+        const confirmCancel = document.getElementById('confirmCancel');
+        let confirmResolve = null;
+
+        // ============================================================
+        // CONFIRM DIALOG
+        // ============================================================
+        function showConfirm(icon, title, message, confirmClass = 'btn-confirm') {
+            return new Promise(resolve => {
+                confirmIcon.textContent = icon || '❓';
+                confirmTitle.textContent = title || 'Are you sure?';
+                confirmMessage.textContent = message || 'This action cannot be undone.';
+                confirmOk.className = confirmClass;
+                confirmOverlay.classList.add('active');
+                confirmResolve = resolve;
+            });
+        }
+        function closeConfirm(result) {
+            confirmOverlay.classList.remove('active');
+            if (confirmResolve) { confirmResolve(result); confirmResolve = null; }
+        }
+        confirmCancel.addEventListener('click', () => closeConfirm(false));
+        confirmOk.addEventListener('click', () => closeConfirm(true));
+        confirmOverlay.addEventListener('click', e => {
+            if (e.target === confirmOverlay) closeConfirm(false);
+        });
 
         // ============================================================
         // TOAST
@@ -638,7 +741,7 @@
         });
 
         // ============================================================
-        // CSV HELPERS
+        // HELPERS
         // ============================================================
         function parseCSVLine(line) {
             const res = [];
@@ -757,7 +860,15 @@
             } catch (e) {}
         }
 
-        function handleLogout() {
+        async function handleLogout() {
+            const ok = await showConfirm(
+                '🚪',
+                'Logout?',
+                'Are you sure you want to logout? Your current quiz progress will NOT be saved.',
+                'btn-confirm'
+            );
+            if (!ok) return;
+
             sessionStorage.removeItem(SESSION_KEY);
             loggedInUser = null;
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
@@ -772,7 +883,7 @@
             loginStatus.textContent = '🔐 Sign in to continue';
             emailInput.value = '';
             passwordInput.value = '';
-            showToast('👋 Logged out successfully. Progress not saved.', 'info', 3000);
+            showToast('👋 Logged out successfully.', 'info', 3000);
         }
 
         function showQuiz() {
@@ -800,14 +911,15 @@
         userBadge.addEventListener('click', handleLogout);
 
         // ============================================================
-        // STATE SAVE / LOAD
+        // STATE
         // ============================================================
         function saveState() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({
                     questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
                     score, quizTitleText, totalQuestions, lockedQuestions, originalQuestions,
-                    currentIndex, timeRemaining, currentCategory, allCategories, invalidQuestions
+                    currentIndex, timeRemaining, currentSubject, currentJob,
+                    allSubjects, allJobs, invalidQuestions
                 }));
             } catch (e) {}
         }
@@ -886,23 +998,38 @@
         }
 
         // ============================================================
-        // CATEGORY DROPDOWN
+        // DROPDOWNS
         // ============================================================
-        function populateCategoryDropdown(categories) {
-            allCategories = categories;
-            const cur = modalYearSelect.value;
-            modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
-            categories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat || 'Uncategorized';
-                modalYearSelect.appendChild(opt);
-            });
-            if (cur && categories.includes(cur)) modalYearSelect.value = cur;
-            else modalYearSelect.value = 'all';
+        function populateDropdowns(subjects, jobs) {
+            allSubjects = subjects;
+            allJobs = jobs;
 
-            if (currentCategory && currentCategory !== 'all') {
-                yearBadge.textContent = '📂 ' + currentCategory;
+            const curSub = modalYearSelect.value;
+            modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
+            subjects.forEach(s => {
+                const o = document.createElement('option');
+                o.value = s; o.textContent = s || 'Uncategorized';
+                modalYearSelect.appendChild(o);
+            });
+            if (curSub && subjects.includes(curSub)) modalYearSelect.value = curSub;
+            else modalYearSelect.value = currentSubject || 'all';
+
+            const curJob = modalJobSelect.value;
+            modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
+            jobs.forEach(j => {
+                const o = document.createElement('option');
+                o.value = j; o.textContent = j || 'Uncategorized';
+                modalJobSelect.appendChild(o);
+            });
+            if (curJob && jobs.includes(curJob)) modalJobSelect.value = curJob;
+            else modalJobSelect.value = currentJob || 'all';
+
+            // Badge reflects current filter
+            const badgeParts = [];
+            if (currentSubject && currentSubject !== 'all') badgeParts.push('📂 ' + currentSubject);
+            if (currentJob && currentJob !== 'all') badgeParts.push('💼 ' + currentJob);
+            if (badgeParts.length) {
+                yearBadge.textContent = badgeParts.join(' · ');
                 yearBadge.style.display = 'inline-block';
             } else {
                 yearBadge.textContent = '';
@@ -928,9 +1055,10 @@
         // ============================================================
         // FETCH QUESTIONS
         // ============================================================
-        function fetchQuestions(forceRefresh = false, category = null) {
+        function fetchQuestions(forceRefresh = false, subject = null, job = null) {
             showLoading();
-            if (category !== null) currentCategory = category;
+            if (subject !== null) currentSubject = subject;
+            if (job !== null) currentJob = job;
 
             if (!forceRefresh) {
                 const saved = loadState();
@@ -947,12 +1075,14 @@
                     score = saved.score || 0;
                     currentIndex = saved.currentIndex || 0;
                     timeRemaining = saved.timeRemaining || (totalQuestions * 60);
-                    currentCategory = saved.currentCategory || 'all';
-                    allCategories = saved.allCategories || [];
+                    currentSubject = saved.currentSubject || 'all';
+                    currentJob = saved.currentJob || 'all';
+                    allSubjects = saved.allSubjects || [];
+                    allJobs = saved.allJobs || [];
                     invalidQuestions = saved.invalidQuestions || [];
                     quizTitle.textContent = quizTitleText;
                     totalCount.textContent = totalQuestions;
-                    populateCategoryDropdown(allCategories);
+                    populateDropdowns(allSubjects, allJobs);
                     hideLoading();
                     updateTimerDisplay();
                     if (quizCompleted) { showResult(); return; }
@@ -975,18 +1105,24 @@
                     originalQuestions = parsed.questions;
                     quizTitleText = parsed.title || 'Quiz';
 
-                    const cats = [...new Set(originalQuestions.map(q => q.category || '').filter(c => c && c.trim()))];
-                    populateCategoryDropdown(cats);
+                    const subjects = [...new Set(originalQuestions.map(q => q.subject || '').filter(c => c && c.trim()))];
+                    const jobs = [...new Set(originalQuestions.map(q => q.job || '').filter(c => c && c.trim()))];
+                    populateDropdowns(subjects, jobs);
 
+                    // Apply filters
                     let filtered = originalQuestions;
-                    const target = category || currentCategory || 'all';
-                    if (target !== 'all') {
-                        filtered = originalQuestions.filter(q => q.category === target);
-                    }
+                    const targetSubject = subject || currentSubject || 'all';
+                    const targetJob = job || currentJob || 'all';
+                    if (targetSubject !== 'all') filtered = filtered.filter(q => q.subject === targetSubject);
+                    if (targetJob !== 'all') filtered = filtered.filter(q => q.job === targetJob);
+
                     if (filtered.length === 0) {
+                        showToast('⚠️ No questions match the selected filters. Loading all.', 'warning', 3000);
                         filtered = originalQuestions;
                         modalYearSelect.value = 'all';
-                        currentCategory = 'all';
+                        modalJobSelect.value = 'all';
+                        currentSubject = 'all';
+                        currentJob = 'all';
                         yearBadge.textContent = '';
                         yearBadge.style.display = 'none';
                     }
@@ -1031,7 +1167,7 @@
         }
 
         // ============================================================
-        // PARSE QUIZ CSV – NEW HEADERS + LETTER FALLBACK
+        // PARSE QUIZ CSV
         // ------------------------------------------------------------
         // A: Question_Number (0)
         // B: Question        (1)
@@ -1042,6 +1178,9 @@
         // G: Correct_Answer  (6)
         // H: topic           (7)
         // I: subject         (8)
+        // J: created         (9)
+        // K: which_job       (10)
+        // L: ai_ans          (11)
         // ============================================================
         function parseQuizCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
@@ -1069,18 +1208,18 @@
                 let correctIdx = -1;
 
                 if (rawCorrect) {
-                    // 1) exact text match
+                    // 1) exact
                     for (let j = 0; j < opts.length; j++) {
                         if (opts[j] === rawCorrect) { correctIdx = j; break; }
                     }
-                    // 2) case-insensitive text match
+                    // 2) case-insensitive
                     if (correctIdx === -1) {
                         const low = rawCorrect.toLowerCase();
                         for (let j = 0; j < opts.length; j++) {
                             if (opts[j] && opts[j].toLowerCase() === low) { correctIdx = j; break; }
                         }
                     }
-                    // 3) single letter fallback (A/B/C/D, case-insensitive)
+                    // 3) single letter fallback
                     if (correctIdx === -1 && rawCorrect.length === 1) {
                         const k = rawCorrect.toLowerCase();
                         if (k in LETTER_MAP) correctIdx = LETTER_MAP[k];
@@ -1089,6 +1228,7 @@
 
                 const topic   = cols[7] ? cols[7].trim() : '';
                 const subject = cols[8] ? cols[8].trim() : '';
+                const job     = cols[10] ? cols[10].trim() : '';   // column K
 
                 result.push({
                     question: q,
@@ -1097,7 +1237,8 @@
                     correctText: rawCorrect || 'No answer in db',
                     category: subject,
                     topic: topic,
-                    subject: subject
+                    subject: subject,
+                    job: job
                 });
             }
 
@@ -1117,10 +1258,10 @@
             const idx = currentIndex;
             const letters = ['A', 'B', 'C', 'D'];
 
-            // Meta line
             const metaParts = [];
             if (q.subject) metaParts.push(`📚 ${q.subject}`);
             if (q.topic) metaParts.push(`🏷️ ${q.topic}`);
+            if (q.job) metaParts.push(`💼 ${q.job}`);
 
             let html = `<div class="q-text" data-question="${encodeURIComponent(q.question)}">${idx+1}. ${q.question}</div>`;
             if (metaParts.length) {
@@ -1291,7 +1432,7 @@
         }
 
         // ============================================================
-        // GRADING & RESULT
+        // GRADING
         // ============================================================
         function gradeQuiz() {
             let correctLocal = 0;
@@ -1429,21 +1570,31 @@
         // ============================================================
         function handleRefreshClick() {
             modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
-            allCategories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat || 'Uncategorized';
-                modalYearSelect.appendChild(opt);
+            allSubjects.forEach(s => {
+                const o = document.createElement('option');
+                o.value = s; o.textContent = s || 'Uncategorized';
+                modalYearSelect.appendChild(o);
             });
-            modalYearSelect.value = currentCategory || 'all';
+            modalYearSelect.value = currentSubject || 'all';
+
+            modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
+            allJobs.forEach(j => {
+                const o = document.createElement('option');
+                o.value = j; o.textContent = j || 'Uncategorized';
+                modalJobSelect.appendChild(o);
+            });
+            modalJobSelect.value = currentJob || 'all';
+
             refreshModal.classList.add('active');
         }
+
         function handleRefreshConfirm() {
-            const selected = modalYearSelect.value;
+            const selSubject = modalYearSelect.value;
+            const selJob = modalJobSelect.value;
             if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             resetToQuizView();
-            fetchQuestions(true, selected);
+            fetchQuestions(true, selSubject, selJob);
         }
         function handleRefreshCancel() { refreshModal.classList.remove('active'); }
 
