@@ -40,16 +40,22 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg);
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1.25rem;
             color: var(--text);
             -webkit-font-smoothing: antialiased;
+            overflow-y: auto;
         }
 
         /* ========== LOGIN ========== */
@@ -61,6 +67,10 @@
             padding: 2.75rem 2rem;
             box-shadow: var(--shadow-lg);
             border: 1px solid rgba(255,255,255,0.6);
+            /* allow scrolling into view when keyboard opens */
+            scroll-margin-top: 1rem;
+            scroll-margin-bottom: 1rem;
+            transition: transform 0.25s ease;
         }
         .login-wrapper .logo {
             width: 72px; height: 72px;
@@ -197,6 +207,8 @@
         .toast.warning { background: var(--warning-bg); color: #92400e; border-left: 4px solid var(--warning); }
         .toast.info    { background: #e0f2fe; color: #075985; border-left: 4px solid var(--accent); }
         .toast .toast-icon { font-size: 1.2rem; flex-shrink: 0; }
+        /* When a toast has no icon, hide any empty icon span */
+        .toast .toast-icon:empty { display: none; }
         .toast .toast-close {
             margin-left: auto;
             background: none;
@@ -241,7 +253,6 @@
             from { transform: scale(0.92); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
-        /* Single icon rendered as a circle badge */
         .custom-confirm-box .icon { 
             font-size: 2.5rem; 
             text-align: center; 
@@ -1073,6 +1084,14 @@
             .question-body { max-height: 46vh; }
             .modal-box { padding: 1.3rem 1rem; }
             .modal-user-info { flex-wrap: wrap; gap: 0.5rem; }
+
+            /* Login: reduce top padding so both fields fit when keyboard opens */
+            body { align-items: flex-start; padding-top: 1rem; padding-bottom: 1rem; }
+            .login-wrapper { padding: 1.75rem 1.25rem; border-radius: 22px; }
+            .login-wrapper .logo { width: 56px; height: 56px; margin-bottom: 0.85rem; padding: 8px; }
+            .login-wrapper h1 { font-size: 1.5rem; }
+            .login-wrapper .sub { margin-bottom: 1.25rem; }
+            .login-wrapper .input-group { margin-bottom: 0.85rem; }
         }
     </style>
 </head>
@@ -1080,7 +1099,7 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== CONFIRM DIALOG (fixed single icon) ===== -->
+    <!-- ===== CONFIRM DIALOG ===== -->
     <div class="custom-confirm-overlay" id="confirmOverlay">
         <div class="custom-confirm-box">
             <div class="icon" id="confirmIconWrap"><span id="confirmIcon">❓</span></div>
@@ -1375,7 +1394,7 @@
         }
 
         // ============================================================
-        // CONFIRM DIALOG (single icon)
+        // CONFIRM DIALOG
         // ============================================================
         function showConfirm(icon, title, message, confirmClass = 'btn-confirm') {
             return new Promise(resolve => {
@@ -1398,18 +1417,21 @@
         });
 
         // ============================================================
-        // TOAST
+        // TOAST — with optional icon (pass showIcon=false to hide)
         // ============================================================
         const toastContainer = document.getElementById('toastContainer');
         let toastTimeout = null;
-        function showToast(message, type = 'info', duration = 4000) {
+        function showToast(message, type = 'info', duration = 4000, showIcon = true) {
             if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
             while (toastContainer.firstChild) toastContainer.removeChild(toastContainer.firstChild);
             const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
+            const iconHtml = showIcon
+                ? `<span class="toast-icon">${icons[type] || 'ℹ️'}</span>`
+                : `<span class="toast-icon"></span>`;
             toast.innerHTML = `
-                <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+                ${iconHtml}
                 <span>${message}</span>
                 <button class="toast-close">✕</button>
             `;
@@ -1444,6 +1466,41 @@
             passwordInput.type = passwordVisible ? 'text' : 'password';
             togglePasswordBtn.textContent = passwordVisible ? '🙈' : '👁️';
         });
+
+        // ============================================================
+        // LOGIN INPUT — SCROLL INTO VIEW WHEN FOCUSED (keyboard)
+        // ============================================================
+        function scrollLoginInputIntoView(el) {
+            // Delay to let the keyboard finish animating
+            setTimeout(() => {
+                try {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } catch (e) {
+                    el.scrollIntoView();
+                }
+            }, 250);
+        }
+
+        emailInput.addEventListener('focus', () => {
+            scrollLoginInputIntoView(loginScreen);
+        });
+        passwordInput.addEventListener('focus', () => {
+            scrollLoginInputIntoView(loginScreen);
+        });
+
+        // On small screens, when the keyboard appears, keep both fields visible
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                if (loginScreen.style.display === 'none') return;
+                const active = document.activeElement;
+                if (active === emailInput || active === passwordInput) {
+                    // Scroll the wrapper so both fields are visible
+                    setTimeout(() => {
+                        loginScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 80);
+                }
+            });
+        }
 
         // ============================================================
         // HELPERS
@@ -1573,11 +1630,11 @@
             const p = passwordInput.value.trim();
 
             if (!u || !p) {
-                showToast('⚠️ Please enter both username and password.', 'warning', 3000);
+                showToast('Please enter both username and password.', 'warning', 3000, false);
                 return;
             }
             if (isLoadingUsers) {
-                showToast('⏳ User data is still loading. Please wait.', 'warning', 2500);
+                showToast('User data is still loading. Please wait.', 'warning', 2500, false);
                 return;
             }
 
@@ -1588,10 +1645,12 @@
             if (matched) {
                 loggedInUser = matched;
                 try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(matched)); } catch(e){}
-                showToast(`✅ Welcome, ${matched.user}!`, 'success', 2500);
+                // No icon on login welcome toast
+                showToast(`Welcome, ${matched.user}!`, 'success', 2500, false);
                 showQuiz();
             } else {
-                showToast('❌ Invalid username or password.', 'error', 3000);
+                // No icon on login error toast
+                showToast('Invalid username or password.', 'error', 3000, false);
                 loginStatus.textContent = '❌ Login failed';
             }
         }
@@ -1606,7 +1665,8 @@
                 );
                 if (!exists) { sessionStorage.removeItem(SESSION_KEY); return; }
                 loggedInUser = saved;
-                showToast(`↻ Welcome back, ${saved.user}!`, 'info', 2500);
+                // No icon on restore toast
+                showToast(`Welcome back, ${saved.user}!`, 'info', 2500, false);
                 showQuiz();
             } catch (e) {}
         }
@@ -1683,7 +1743,8 @@
             passwordInput.type = 'password';
             togglePasswordBtn.textContent = '👁️';
 
-            showToast('👋 Logged out successfully.', 'info', 3000);
+            // No icon on logout toast
+            showToast('Logged out successfully.', 'info', 3000, false);
         }
 
         function showQuiz() {
@@ -1805,7 +1866,6 @@
             if (!pool || pool.length === 0) return [];
 
             if (!jobValue || jobValue === 'all') {
-                // All subjects across all jobs
                 const set = new Set();
                 pool.forEach(q => {
                     const s = cleanCell(q.subject);
@@ -1814,7 +1874,6 @@
                 return [...set];
             }
 
-            // Subjects that exist within the selected job only
             const set = new Set();
             pool.forEach(q => {
                 if (sameValueCI(q.job, jobValue)) {
@@ -1839,13 +1898,11 @@
                 return;
             }
 
-            // "All Subjects" row
             const allRow = document.createElement('label');
             allRow.className = 'checkbox-row all-row';
             const allCb = document.createElement('input');
             allCb.type = 'checkbox';
             allCb.id = 'cbAllSubjects';
-            // "All" is checked only when no specific subject is selected
             const hasAnySpecific = selectedArr.some(s => subjects.some(sub => sameValueCI(sub, s)));
             allCb.checked = !hasAnySpecific;
             allRow.appendChild(allCb);
@@ -1860,13 +1917,11 @@
                     subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects)')
                         .forEach(cb => { cb.checked = false; });
                 } else {
-                    // If user unchecks All, and no individual ones checked, re-check it
                     const anyChecked = subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects):checked').length > 0;
                     if (!anyChecked) this.checked = true;
                 }
             });
 
-            // Individual subject rows
             subjects.forEach(subj => {
                 const row = document.createElement('label');
                 row.className = 'checkbox-row';
@@ -1900,14 +1955,10 @@
             return checked;
         }
 
-        // ============================================================
-        // REBUILD SUBJECTS WHEN JOB CHANGES (live, no refresh needed)
-        // ============================================================
         function onJobChangedInModal() {
             const selectedJob = modalJobSelect.value;
             const availableSubjects = getSubjectsForJob(selectedJob);
 
-            // Preserve currently-checked subjects that still exist in the new pool
             const currentChecked = getCheckedSubjects();
             const stillValid = currentChecked.filter(s =>
                 availableSubjects.some(as => sameValueCI(as, s))
@@ -1925,7 +1976,6 @@
             allSubjects = subjects;
             allJobs = jobs;
 
-            // Job dropdown
             const curJob = modalJobSelect.value;
             modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
             jobs.forEach(j => {
@@ -1937,7 +1987,6 @@
             if (curJob && jobs.includes(curJob)) modalJobSelect.value = curJob;
             else modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
 
-            // Subject checkbox list — filtered by currently selected job
             const jobForFilter = modalJobSelect.value || 'all';
             const filteredSubjects = getSubjectsForJob(jobForFilter);
             buildSubjectCheckboxList(filteredSubjects, currentSubjects);
@@ -2029,7 +2078,7 @@
                     }
 
                     if (filtered.length === 0) {
-                        showToast('⚠️ No questions match the selected filters. Loading all.', 'warning', 3000);
+                        showToast('No questions match the selected filters. Loading all.', 'warning', 3000, false);
                         filtered = originalQuestions;
                         currentSubjects = [];
                         currentJob = 'all';
@@ -2447,7 +2496,6 @@
         }
 
         function handleRefreshClick() {
-            // Job dropdown
             modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
             allJobs.forEach(j => {
                 const o = document.createElement('option');
@@ -2457,7 +2505,6 @@
             });
             modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
 
-            // Build subject list for the currently selected job
             const jobForFilter = modalJobSelect.value || 'all';
             const filteredSubjects = getSubjectsForJob(jobForFilter);
             buildSubjectCheckboxList(filteredSubjects, currentSubjects);
