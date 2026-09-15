@@ -209,7 +209,6 @@
       padding: 0.15rem 0.8rem; border-radius: 30px; margin-left: 0.3rem;
     }
 
-    /* Refresh/Reset Button */
     .icon-btn {
       width: 38px; height: 38px; border-radius: 50%;
       border: 2px solid #e2eaf2; background: white; color: #1f4d66;
@@ -552,15 +551,17 @@
   <script>
     (function() {
       // ==============================================================
-      // 1. CONFIGURATION – UPDATED CSV EXPORT URLs
+      // 1. CONFIGURATION – CSV EXPORT URLs (same pattern as previous working code)
       // ==============================================================
-      // Login sheet (user, password)
-      const LOGIN_CSV_URL =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
+      const SHEET_ID = '17yY_LUiqMsABz7tbtAXFpZIYpHN2TJTZSxo7oJWzckI';
 
-      // MCQs sheet (published) – see column mapping in parseQuizCSV()
+      // Login sheet  → gid=2076597807  (user, password)
+      const LOGIN_CSV_URL =
+        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=2076597807`;
+
+      // MCQs sheet   → gid=0
       const QUIZ_CSV_URL =
-        'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
+        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
 
       const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
 
@@ -697,7 +698,7 @@
       // ==============================================================
       // 8. SESSION MANAGEMENT
       // ==============================================================
-      const SESSION_KEY = 'quiz_session_data_v2';
+      const SESSION_KEY = 'quiz_session_data_v3';
 
       function saveSession() {
         if (!loggedInUser || quizCompleted) return;
@@ -735,7 +736,7 @@
       }
 
       // ==============================================================
-      // 9. LOGIN SYSTEM (user, password columns)
+      // 9. LOGIN SYSTEM  (user, password columns)
       // ==============================================================
       let users = [];
       let isLoadingUsers = true;
@@ -756,6 +757,11 @@
             isLoadingUsers = false;
             loginStatus.textContent = `🔐 ${users.length} user(s) loaded. Sign in to continue`;
             loginBtn.disabled = false;
+
+            if (users.length === 0) {
+              showToast('⚠️ No users found in login sheet. Check sharing settings.', 'warning', 5000);
+            }
+
             checkAndRestoreSession();
           })
           .catch(err => {
@@ -991,20 +997,20 @@
       }
 
       // ==============================================================
-      // UPDATED PARSER – NEW SHEET HEADERS
+      // PARSER – NEW SHEET HEADERS
       // --------------------------------------------------------------
-      // A: Question_Number  (0)
-      // B: Question         (1)  <-- question text
-      // C: Option_A         (2)
-      // D: Option_B         (3)
-      // E: Option_C         (4)
-      // F: Option_D         (5)
-      // G: Correct_Answer   (6)  <-- matched against options
-      // H: topic            (7)
-      // I: subject          (8)  <-- used as the displayed "category"
-      // J: created          (9)
-      // K: which_job        (10)
-      // L: ai_ans           (11)
+      // A: Question_Number (0)
+      // B: Question        (1)  <-- question text
+      // C: Option_A        (2)
+      // D: Option_B        (3)
+      // E: Option_C        (4)
+      // F: Option_D        (5)
+      // G: Correct_Answer  (6)  <-- matched against options
+      // H: topic           (7)
+      // I: subject         (8)  <-- shown as "category"
+      // J: created         (9)
+      // K: which_job       (10)
+      // L: ai_ans          (11)
       // ==============================================================
       function parseQuizCSV(text) {
         const lines = text.split('\n').filter(line => line.trim() !== '');
@@ -1046,11 +1052,10 @@
             correctText: correctAnswer || 'No answer in db',
             topic: topic,
             subject: subject,
-            category: subject // keep 'category' alias for existing UI
+            category: subject
           });
         }
 
-        // Use first question's subject as title if available
         if (result.length > 0 && result[0].subject) {
           title = result[0].subject;
         }
@@ -1152,7 +1157,6 @@
         progressFill.style.width = ((index) / total * 100) + '%';
 
         qNumber.textContent = `QUESTION ${index+1} OF ${total}`;
-        // Show topic + subject if available, else just question number
         const metaParts = [];
         if (q.subject) metaParts.push(`📚 ${q.subject}`);
         if (q.topic) metaParts.push(`🏷️ ${q.topic}`);
