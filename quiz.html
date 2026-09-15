@@ -573,7 +573,7 @@
             `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
 
         const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
-        const STORAGE_KEY = 'selfLearnersOneByOneV3';
+        const STORAGE_KEY = 'selfLearnersOneByOneV4';
         const SESSION_KEY = 'selfLearnersSessionUser';
 
         let questions = [];
@@ -729,10 +729,13 @@
         // ============================================================
         // HELPERS
         // ============================================================
-        // Strip BOM, zero-width chars, and trim all standard whitespace
+        // Strip BOM, zero-width chars, non-breaking spaces, and trim
         function cleanCell(v) {
             if (v == null) return '';
-            return String(v).replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+            return String(v)
+                .replace(/[\u200B-\u200D\uFEFF\u00A0\u202F]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
         }
 
         function parseCSVLine(line) {
@@ -765,6 +768,56 @@
 
         function getAttemptedCount() {
             return selectedAllAnswers.filter(a => a !== null).length;
+        }
+
+        // ============================================================
+        // ★★★ CORRECT-ANSWER RESOLVER ★★★
+        // ------------------------------------------------------------
+        // Priority order:
+        //   1) Exact text match against one of the 4 options
+        //   2) Case-insensitive text match
+        //   3) Single letter A/B/C/D (any case, with or without wrappers)
+        //   4) Numeric 1/2/3/4
+        // Returns the option index (0..3) or -1 if nothing matched.
+        // ============================================================
+        function resolveCorrectIndex(rawCorrect, options) {
+            if (!rawCorrect) return -1;
+            const raw = cleanCell(rawCorrect);
+            if (!raw) return -1;
+
+            // 1) Exact text match
+            for (let i = 0; i < options.length; i++) {
+                if (cleanCell(options[i]) === raw) return i;
+            }
+
+            // 2) Case-insensitive text match
+            const rawLower = raw.toLowerCase();
+            for (let i = 0; i < options.length; i++) {
+                if (cleanCell(options[i]).toLowerCase() === rawLower) return i;
+            }
+
+            // 3) Letter fallback — pure A/B/C/D (any case)
+            if (raw.length === 1 && /^[A-Da-d]$/.test(raw)) {
+                const idx = 'abcd'.indexOf(raw.toLowerCase());
+                if (idx >= 0 && idx < options.length) return idx;
+            }
+
+            // 3b) Letter with wrappers: "(B)", "B.", "Option B", "opt. b", "B - xyz"
+            if (raw.length <= 25) {
+                const m = raw.match(/^(?:option\s*|opt\.?\s*)?[\(\[\{\-]?\s*([A-Da-d])\s*[\)\]\}\.\-:]?(?:\s.*)?$/i);
+                if (m && m[1]) {
+                    const idx = 'abcd'.indexOf(m[1].toLowerCase());
+                    if (idx >= 0 && idx < options.length) return idx;
+                }
+            }
+
+            // 4) Numeric fallback — "1", "2", "3", "4"
+            if (/^[1-4]$/.test(raw)) {
+                const idx = parseInt(raw, 10) - 1;
+                if (idx >= 0 && idx < options.length) return idx;
+            }
+
+            return -1;
         }
 
         // ============================================================
@@ -1034,10 +1087,10 @@
         function validateQuestions(list) {
             invalidQuestions = [];
             list.forEach((q, idx) => {
-                const correctText = q.correctText || '';
-                if (correctText && q.options && q.options.length > 0) {
-                    const matchFound = q.options.some(opt => opt === correctText);
-                    if (!matchFound) invalidQuestions.push(idx);
+                // A question is invalid if we couldn't determine a correct index
+                // AND there is text in the Correct_Answer column.
+                if (q.correct === -1 && q.correctText && q.correctText.trim() !== '') {
+                    invalidQuestions.push(idx);
                 }
             });
             return invalidQuestions;
@@ -1123,7 +1176,7 @@
                         return { ...q, options: sh, correct: nc };
                     });
 
-                    validateQuestions(originalQuestions);
+                    validateQuestions(questions);
 
                     totalQuestions = questions.length;
                     selectedAllAnswers = new Array(questions.length).fill(null);
@@ -1157,7 +1210,7 @@
         }
 
         // ============================================================
-        // PARSE QUIZ CSV – WITH ROBUST LETTER FALLBACK
+        // PARSE QUIZ CSV
         // ------------------------------------------------------------
         // A: Question_Number (0)
         // B: Question        (1)
@@ -1165,7 +1218,7 @@
         // D: Option_B        (3)
         // E: Option_C        (4)
         // F: Option_D        (5)
-        // G: Correct_Answer  (6) ← may be full text OR letter A/B/C/D
+        // G: Correct_Answer  (6) ← may be full text OR A/B/C/D letter
         // H: topic           (7)
         // I: subject         (8)
         // J: created         (9)
@@ -1178,7 +1231,6 @@
 
             let title = 'Quiz';
             const result = [];
-            const LETTER_MAP = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
 
             for (let i = 1; i < lines.length; i++) {
                 const cols = parseCSVLine(lines[i]);
@@ -1195,52 +1247,17 @@
                 ];
 
                 const rawCorrect = cols[6] ? cols[6].trim() : '';
-                let correctIdx = -1;
-                let matchMethod = 'none';
+                const correctIdx = resolveCorrectIndex(rawCorrect, opts);
 
-                if (rawCorrect) {
-                    // 1) exact text match
-                    for (let j = 0; j < opts.length; j++) {
-                        if (opts[j] === rawCorrect) { correctIdx = j; matchMethod = 'exact'; break; }
-                    }
-
-                    // 2) case-insensitive text match
-                    if (correctIdx === -1) {
-                        const low = rawCorrect.toLowerCase();
-                        for (let j = 0; j < opts.length; j++) {
-                            if (opts[j] && opts[j].toLowerCase() === low) {
-                                correctIdx = j; matchMethod = 'case-insensitive'; break;
-                            }
-                        }
-                    }
-
-                    // 3) letter fallback — extracts a single A/B/C/D from various formats:
-                    //    "B"  | "b"  | " B "  | "(B)"  | "B."  | "Option B"  | "opt. B"  | "B - text"  | "B) text"
-                    if (correctIdx === -1) {
-                        const m = rawCorrect.match(
-                            /^(?:option|opt\.?)?\s*[\(\[\-]?\s*([A-Da-d])\s*[\)\]\.\-:]?\s*(?:[\-:\)].*)?$/i
-                        );
-                        if (m && m[1]) {
-                            const k = m[1].toLowerCase();
-                            if (k in LETTER_MAP) {
-                                correctIdx = LETTER_MAP[k];
-                                matchMethod = 'letter-fallback';
-                            }
-                        }
-                    }
+                if (rawCorrect && correctIdx === -1) {
+                    console.warn(`[Self Learners] Q#${i} UNMATCHED: "${rawCorrect}" | options:`, opts);
+                } else if (rawCorrect && correctIdx !== -1) {
+                    console.log(`[Self Learners] Q#${i} matched "${rawCorrect}" → option ${correctIdx}`);
                 }
 
                 const topic   = cols[7] ? cols[7].trim() : '';
                 const subject = cols[8] ? cols[8].trim() : '';
                 const job     = cols[10] ? cols[10].trim() : '';
-
-                if (matchMethod === 'letter-fallback') {
-                    console.log(`[Self Learners] Q#${i} letter fallback: "${rawCorrect}" → option ${correctIdx}`);
-                } else if (matchMethod === 'case-insensitive') {
-                    console.log(`[Self Learners] Q#${i} case-insensitive match: "${rawCorrect}"`);
-                } else if (matchMethod === 'none' && rawCorrect) {
-                    console.warn(`[Self Learners] Q#${i} could NOT match: "${rawCorrect}" | options:`, opts);
-                }
 
                 result.push({
                     question: q,
