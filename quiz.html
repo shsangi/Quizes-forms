@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Self Learners · Login & Quiz</title>
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
@@ -19,7 +21,6 @@
             padding: 1.2rem;
         }
 
-        /* ================= LOGIN SCREEN ================= */
         .login-wrapper {
             max-width: 420px; width: 100%; background: white;
             border-radius: 2.5rem; padding: 2.8rem 2.2rem;
@@ -78,7 +79,6 @@
             text-align: center; font-size: 0.8rem; color: #8aa3b5; margin-top: 1.2rem;
         }
 
-        /* ================= TOAST ================= */
         .toast-container {
             position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999;
             display: flex; flex-direction: column; gap: 0.6rem;
@@ -108,7 +108,6 @@
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-10px); } }
         .toast.removing { animation: fadeOutToast 0.3s ease forwards; }
 
-        /* ================= CONFIRM DIALOG ================= */
         .custom-confirm-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
@@ -147,7 +146,6 @@
             box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
         }
 
-        /* ================= QUIZ SCREEN ================= */
         .quiz-wrapper {
             max-width: 720px; width: 100%; background: white;
             border-radius: 2rem; padding: 2rem 2rem 1.8rem;
@@ -433,10 +431,8 @@
 </head>
 <body>
 
-    <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- CONFIRM DIALOG -->
     <div class="custom-confirm-overlay" id="confirmOverlay">
         <div class="custom-confirm-box">
             <div class="icon" id="confirmIcon">❓</div>
@@ -449,7 +445,6 @@
         </div>
     </div>
 
-    <!-- ================= LOGIN SCREEN ================= -->
     <div class="login-wrapper" id="loginScreen">
         <img class="logo" id="loginLogo"
              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230b2a3b'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter, sans-serif' font-size='38' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
@@ -474,7 +469,6 @@
         </div>
     </div>
 
-    <!-- ================= QUIZ SCREEN ================= -->
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar">
             <div class="brand">
@@ -542,7 +536,6 @@
             </div>
         </div>
 
-        <!-- REFRESH MODAL – now with JOB + SUBJECT dropdowns -->
         <div class="modal-overlay" id="refreshModal">
             <div class="modal-box">
                 <h3>🔄 Filter & Refresh</h3>
@@ -569,7 +562,7 @@
     <script>
     (function() {
         // ============================================================
-        // CONFIG – YOUR EXACT URLs
+        // CONFIG
         // ============================================================
         const QUIZ_CSV_URL =
             'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
@@ -580,12 +573,9 @@
             `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
 
         const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
-        const STORAGE_KEY = 'selfLearnersOneByOneV2';
+        const STORAGE_KEY = 'selfLearnersOneByOneV3';
         const SESSION_KEY = 'selfLearnersSessionUser';
 
-        // ============================================================
-        // STATE
-        // ============================================================
         let questions = [];
         let currentIndex = 0;
         let score = 0;
@@ -609,9 +599,6 @@
         let isLoadingUsers = true;
         let loggedInUser = null;
 
-        // ============================================================
-        // DOM REFS
-        // ============================================================
         const loginScreen = document.getElementById('loginScreen');
         const quizApp = document.getElementById('quizApp');
         const emailInput = document.getElementById('emailInput');
@@ -660,7 +647,6 @@
         const singleQuestionView = document.getElementById('singleQuestionView');
         const yearBadge = document.getElementById('yearBadge');
 
-        // Confirm dialog
         const confirmOverlay = document.getElementById('confirmOverlay');
         const confirmIcon = document.getElementById('confirmIcon');
         const confirmTitle = document.getElementById('confirmTitle');
@@ -743,6 +729,12 @@
         // ============================================================
         // HELPERS
         // ============================================================
+        // Strip BOM, zero-width chars, and trim all standard whitespace
+        function cleanCell(v) {
+            if (v == null) return '';
+            return String(v).replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+        }
+
         function parseCSVLine(line) {
             const res = [];
             let cur = '', inQuotes = false;
@@ -754,11 +746,11 @@
                     else cur += ch;
                 } else {
                     if (ch === '"') inQuotes = true;
-                    else if (ch === ',') { res.push(cur.trim()); cur = ''; }
+                    else if (ch === ',') { res.push(cleanCell(cur)); cur = ''; }
                     else cur += ch;
                 }
             }
-            res.push(cur.trim());
+            res.push(cleanCell(cur));
             return res;
         }
 
@@ -1024,7 +1016,6 @@
             if (curJob && jobs.includes(curJob)) modalJobSelect.value = curJob;
             else modalJobSelect.value = currentJob || 'all';
 
-            // Badge reflects current filter
             const badgeParts = [];
             if (currentSubject && currentSubject !== 'all') badgeParts.push('📂 ' + currentSubject);
             if (currentJob && currentJob !== 'all') badgeParts.push('💼 ' + currentJob);
@@ -1109,7 +1100,6 @@
                     const jobs = [...new Set(originalQuestions.map(q => q.job || '').filter(c => c && c.trim()))];
                     populateDropdowns(subjects, jobs);
 
-                    // Apply filters
                     let filtered = originalQuestions;
                     const targetSubject = subject || currentSubject || 'all';
                     const targetJob = job || currentJob || 'all';
@@ -1167,7 +1157,7 @@
         }
 
         // ============================================================
-        // PARSE QUIZ CSV
+        // PARSE QUIZ CSV – WITH ROBUST LETTER FALLBACK
         // ------------------------------------------------------------
         // A: Question_Number (0)
         // B: Question        (1)
@@ -1175,7 +1165,7 @@
         // D: Option_B        (3)
         // E: Option_C        (4)
         // F: Option_D        (5)
-        // G: Correct_Answer  (6)
+        // G: Correct_Answer  (6) ← may be full text OR letter A/B/C/D
         // H: topic           (7)
         // I: subject         (8)
         // J: created         (9)
@@ -1206,29 +1196,51 @@
 
                 const rawCorrect = cols[6] ? cols[6].trim() : '';
                 let correctIdx = -1;
+                let matchMethod = 'none';
 
                 if (rawCorrect) {
-                    // 1) exact
+                    // 1) exact text match
                     for (let j = 0; j < opts.length; j++) {
-                        if (opts[j] === rawCorrect) { correctIdx = j; break; }
+                        if (opts[j] === rawCorrect) { correctIdx = j; matchMethod = 'exact'; break; }
                     }
-                    // 2) case-insensitive
+
+                    // 2) case-insensitive text match
                     if (correctIdx === -1) {
                         const low = rawCorrect.toLowerCase();
                         for (let j = 0; j < opts.length; j++) {
-                            if (opts[j] && opts[j].toLowerCase() === low) { correctIdx = j; break; }
+                            if (opts[j] && opts[j].toLowerCase() === low) {
+                                correctIdx = j; matchMethod = 'case-insensitive'; break;
+                            }
                         }
                     }
-                    // 3) single letter fallback
-                    if (correctIdx === -1 && rawCorrect.length === 1) {
-                        const k = rawCorrect.toLowerCase();
-                        if (k in LETTER_MAP) correctIdx = LETTER_MAP[k];
+
+                    // 3) letter fallback — extracts a single A/B/C/D from various formats:
+                    //    "B"  | "b"  | " B "  | "(B)"  | "B."  | "Option B"  | "opt. B"  | "B - text"  | "B) text"
+                    if (correctIdx === -1) {
+                        const m = rawCorrect.match(
+                            /^(?:option|opt\.?)?\s*[\(\[\-]?\s*([A-Da-d])\s*[\)\]\.\-:]?\s*(?:[\-:\)].*)?$/i
+                        );
+                        if (m && m[1]) {
+                            const k = m[1].toLowerCase();
+                            if (k in LETTER_MAP) {
+                                correctIdx = LETTER_MAP[k];
+                                matchMethod = 'letter-fallback';
+                            }
+                        }
                     }
                 }
 
                 const topic   = cols[7] ? cols[7].trim() : '';
                 const subject = cols[8] ? cols[8].trim() : '';
-                const job     = cols[10] ? cols[10].trim() : '';   // column K
+                const job     = cols[10] ? cols[10].trim() : '';
+
+                if (matchMethod === 'letter-fallback') {
+                    console.log(`[Self Learners] Q#${i} letter fallback: "${rawCorrect}" → option ${correctIdx}`);
+                } else if (matchMethod === 'case-insensitive') {
+                    console.log(`[Self Learners] Q#${i} case-insensitive match: "${rawCorrect}"`);
+                } else if (matchMethod === 'none' && rawCorrect) {
+                    console.warn(`[Self Learners] Q#${i} could NOT match: "${rawCorrect}" | options:`, opts);
+                }
 
                 result.push({
                     question: q,
@@ -1431,9 +1443,6 @@
             invalidLegend.style.display = 'inline-flex';
         }
 
-        // ============================================================
-        // GRADING
-        // ============================================================
         function gradeQuiz() {
             let correctLocal = 0;
             for (let i = 0; i < questions.length; i++) {
@@ -1529,9 +1538,6 @@
             scrollToTop();
         }
 
-        // ============================================================
-        // RESTART
-        // ============================================================
         function restartQuiz() {
             clearState();
             selectedAllAnswers = new Array(questions.length).fill(null);
@@ -1565,9 +1571,6 @@
             scrollToTop();
         }
 
-        // ============================================================
-        // REFRESH MODAL
-        // ============================================================
         function handleRefreshClick() {
             modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
             allSubjects.forEach(s => {
@@ -1598,9 +1601,6 @@
         }
         function handleRefreshCancel() { refreshModal.classList.remove('active'); }
 
-        // ============================================================
-        // EVENT BINDINGS
-        // ============================================================
         prevBtn.addEventListener('click', function() {
             if (currentIndex > 0) {
                 currentIndex--;
@@ -1626,9 +1626,6 @@
             if (e.target === this) refreshModal.classList.remove('active');
         });
 
-        // ============================================================
-        // INIT
-        // ============================================================
         fetchUsers();
     })();
     </script>
