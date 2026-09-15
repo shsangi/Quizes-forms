@@ -325,7 +325,6 @@
             background-clip: text;
             color: transparent;
             line-height: 1.2;
-            /* Allow up to 2 lines */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -433,7 +432,7 @@
         .btn-icon .refresh-spin { display: inline-block; animation: spin 0.9s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* NOTE: .user-badge is no longer used on main screen — keep styles for safety but hide it */
+        /* .user-badge removed from main screen */
         .user-badge { display: none !important; }
 
         .progress-block {
@@ -836,14 +835,8 @@
         .modal-box h3 {
             font-size: 1.25rem;
             color: var(--text);
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.9rem;
             font-weight: 700;
-        }
-        .modal-box p {
-            color: var(--text-2);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin-bottom: 1.2rem;
         }
         .modal-actions {
             display: flex;
@@ -1088,7 +1081,6 @@
         <div class="modal-overlay" id="refreshModal">
             <div class="modal-box">
                 <h3>⚙️ Filter &amp; Refresh</h3>
-                <p>Optionally filter by Job and/or Subject, then click "Load &amp; Refresh".</p>
 
                 <div class="modal-user-info" id="modalUserInfo">
                     <div class="modal-user-left">
@@ -1203,7 +1195,6 @@
         const yearBadge = document.getElementById('yearBadge');
 
         // Modal user info elements
-        const modalUserInfo = document.getElementById('modalUserInfo');
         const modalUserAvatar = document.getElementById('modalUserAvatar');
         const modalUserName = document.getElementById('modalUserName');
         const modalLogoutBtn = document.getElementById('modalLogoutBtn');
@@ -1495,6 +1486,68 @@
             } catch (e) {}
         }
 
+        // ------------------------------------------------------------
+        // RESET EVERYTHING TO A FRESH, NEUTRAL STATE
+        // ------------------------------------------------------------
+        function resetAllState() {
+            // Stop timer
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+
+            // Clear stored quiz
+            clearState();
+
+            // Reset all quiz variables
+            questions = [];
+            originalQuestions = [];
+            currentIndex = 0;
+            score = 0;
+            quizCompleted = false;
+            isSubmitted = false;
+            answerStatus = [];
+            selectedAllAnswers = [];
+            lockedQuestions = [];
+            totalQuestions = 0;
+            timeRemaining = 0;
+            allSubjects = [];
+            allJobs = [];
+            currentSubject = 'all';
+            currentJob = 'all';
+            invalidQuestions = [];
+
+            // Reset UI elements
+            applyTitle('');
+            timerDisplay.textContent = '00:00';
+            timerPill.classList.remove('warning', 'danger');
+            attemptedCount.textContent = '0';
+            totalCount.textContent = '0';
+            progressFill.style.width = '0%';
+            yearBadge.textContent = '';
+            yearBadge.style.display = 'none';
+            dotGrid.innerHTML = '';
+            resultArea.style.display = 'none';
+            singleQuestionView.style.display = 'block';
+            submittedBanner.style.display = 'none';
+            endQuizBtn.textContent = '🏁 End Quiz';
+            endQuizBtn.disabled = false;
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            questionCard.innerHTML = '<div style="padding:2rem;text-align:center;color:#475569;">🔄 Loading questions...</div>';
+
+            // Reset dropdowns
+            modalYearSelect.innerHTML = '<option value="all">All Subjects</option>';
+            modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
+
+            // Reset modal user info
+            modalUserAvatar.textContent = 'U';
+            modalUserName.textContent = 'User';
+
+            // Close modals
+            if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
+
+            // Hide loading spinner
+            hideLoading();
+        }
+
         async function handleLogout() {
             const ok = await showConfirm(
                 '🚪',
@@ -1504,21 +1557,25 @@
             );
             if (!ok) return;
 
+            // Remove session
             sessionStorage.removeItem(SESSION_KEY);
             loggedInUser = null;
-            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-            clearState();
-            quizCompleted = false;
-            questions = [];
-            currentIndex = 0;
-            score = 0;
-            answerStatus = [];
+
+            // Fully reset all state to fresh & neutral
+            resetAllState();
+
+            // Switch screens
             quizApp.style.display = 'none';
             loginScreen.style.display = 'block';
+
+            // Reset login form
             loginStatus.textContent = '🔐 Sign in to continue';
             emailInput.value = '';
             passwordInput.value = '';
-            if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
+            passwordVisible = false;
+            passwordInput.type = 'password';
+            togglePasswordBtn.textContent = '👁️';
+
             showToast('👋 Logged out successfully.', 'info', 3000);
         }
 
