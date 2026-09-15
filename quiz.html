@@ -426,18 +426,59 @@
             transition: width 0.35s ease;
         }
 
+        /* ========== QUESTION CARD (SCROLLABLE BODY) ========== */
         .question-card {
             background: var(--surface-2);
             border: 1px solid var(--border);
             border-radius: 18px;
-            padding: 1.6rem 1.4rem 1.4rem;
-            margin: 0.5rem 0 1.25rem;
-            transition: 0.15s;
+            padding: 1.25rem 1.25rem 0.5rem;
+            margin: 0.5rem 0 1rem;
+            position: relative;
         }
+
+        .question-body {
+            max-height: 42vh;              /* scroll area height */
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 0.5rem;
+            padding-bottom: 0.5rem;
+            scroll-behavior: smooth;
+            /* subtle inner shadow at bottom as scroll hint */
+            background:
+                linear-gradient(var(--surface-2) 30%, rgba(248,250,252,0)) center top,
+                linear-gradient(rgba(248,250,252,0), var(--surface-2) 70%) center bottom,
+                radial-gradient(farthest-side at 50% 0, rgba(15,23,42,0.08), transparent) center top,
+                radial-gradient(farthest-side at 50% 100%, rgba(15,23,42,0.08), transparent) center bottom;
+            background-repeat: no-repeat;
+            background-size: 100% 24px, 100% 24px, 100% 10px, 100% 10px;
+            background-attachment: local, local, scroll, scroll;
+        }
+
+        /* Custom scrollbar for question-body */
+        .question-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .question-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .question-body::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+            border: 2px solid var(--surface-2);
+        }
+        .question-body::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Firefox */
+        .question-body {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
         .question-card .q-text {
             font-weight: 600;
             font-size: 1.15rem;
-            margin-bottom: 1.1rem;
+            margin-bottom: 0.9rem;
             color: var(--text);
             line-height: 1.45;
             cursor: pointer;
@@ -448,6 +489,12 @@
             text-decoration: underline;
             text-underline-offset: 3px;
         }
+        .question-card .q-meta {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 0.8rem;
+        }
+
         .options-list { display: flex; flex-direction: column; gap: 0.55rem; }
         .options-list .option-btn {
             background: white;
@@ -505,6 +552,24 @@
             margin-left: auto;
             font-size: 1.05rem;
             font-weight: 600;
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 0.85rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .feedback-box.correct-fb {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        .feedback-box.wrong-fb {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
         }
 
         .action-bar {
@@ -810,6 +875,7 @@
             .custom-confirm-box { padding: 1.5rem; }
             .custom-confirm-box .btn-group { flex-direction: column; }
             .custom-confirm-box .btn-group button { width: 100%; }
+            .question-body { max-height: 38vh; }
         }
     </style>
 </head>
@@ -1154,7 +1220,7 @@
         }
 
         // ============================================================
-        // ★★★ CORRECT-ANSWER RESOLVER ★★★
+        // CORRECT-ANSWER RESOLVER
         // ============================================================
         function resolveCorrectIndex(rawCorrect, options) {
             if (!rawCorrect) return -1;
@@ -1602,8 +1668,6 @@
 
                 if (rawCorrect && correctIdx === -1) {
                     console.warn(`[Self Learners] Q#${i} UNMATCHED: "${rawCorrect}" | options:`, opts);
-                } else if (rawCorrect && correctIdx !== -1) {
-                    console.log(`[Self Learners] Q#${i} matched "${rawCorrect}" → option ${correctIdx}`);
                 }
 
                 const topic   = cols[7] ? cols[7].trim() : '';
@@ -1627,7 +1691,7 @@
         }
 
         // ============================================================
-        // RENDER QUESTION
+        // RENDER QUESTION — scrollable body
         // ============================================================
         function renderQuestion() {
             if (!questions.length) {
@@ -1643,11 +1707,12 @@
             if (q.topic) metaParts.push(`🏷️ ${q.topic}`);
             if (q.job) metaParts.push(`💼 ${q.job}`);
 
-            let html = `<div class="q-text" data-question="${encodeURIComponent(q.question)}">${idx+1}. ${q.question}</div>`;
+            let bodyHtml = '';
+            bodyHtml += `<div class="q-text" data-question="${encodeURIComponent(q.question)}">${idx+1}. ${q.question}</div>`;
             if (metaParts.length) {
-                html += `<div style="font-size:0.75rem;color:#64748b;margin-bottom:0.8rem;">${metaParts.join(' · ')}</div>`;
+                bodyHtml += `<div class="q-meta">${metaParts.join(' · ')}</div>`;
             }
-            html += '<div class="options-list">';
+            bodyHtml += '<div class="options-list">';
 
             q.options.forEach((opt, oi) => {
                 let cls = 'option-btn';
@@ -1669,23 +1734,23 @@
                 if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) cls += ' locked-btn';
 
                 const disabled = lockedQuestions[idx] || isSubmitted || quizCompleted ? 'disabled' : '';
-                html += `<button class="${cls}" data-optidx="${oi}" ${disabled}>
-                    <span class="letter">${letters[oi]}</span> ${opt || '(Empty)'} ${iconSpan}
+                bodyHtml += `<button class="${cls}" data-optidx="${oi}" ${disabled}>
+                    <span class="letter">${letters[oi]}</span> <span>${opt || '(Empty)'}</span> ${iconSpan}
                 </button>`;
             });
-            html += '</div>';
+            bodyHtml += '</div>';
 
             if (lockedQuestions[idx] && !isSubmitted && !quizCompleted) {
                 const isCorrect = selectedAllAnswers[idx] === q.correct;
                 const icon = isCorrect ? '✅' : '❌';
                 const msg = isCorrect ? 'Correct! Great job!' :
                     `Incorrect. The correct answer is: ${q.options[q.correct] || 'Not available'}`;
-                html += `<div style="margin-top:1rem;padding:0.85rem;border-radius:12px;background:${isCorrect ? '#d1fae5' : '#fee2e2'};border:1px solid ${isCorrect ? '#10b981' : '#ef4444'};font-weight:600;color:${isCorrect ? '#065f46' : '#991b1b'};">
+                bodyHtml += `<div class="feedback-box ${isCorrect ? 'correct-fb' : 'wrong-fb'}">
                     ${icon} ${msg}
                 </div>`;
             }
 
-            questionCard.innerHTML = html;
+            questionCard.innerHTML = `<div class="question-body">${bodyHtml}</div>`;
 
             const qTextEl = questionCard.querySelector('.q-text');
             if (qTextEl) {
@@ -1742,7 +1807,7 @@
         }
 
         // ============================================================
-        // RENDER DOTS — zero invalid hidden
+        // RENDER DOTS
         // ============================================================
         function renderDots(activeIdx) {
             dotGrid.innerHTML = '';
@@ -1753,7 +1818,6 @@
 
                 const isInvalid = invalidQuestions.includes(i);
 
-                // Only show invalid if count > 0 (but we still style it, just not add a separate legend)
                 if (isInvalid) {
                     dot.classList.add('invalid-dot');
                 } else {
@@ -1815,7 +1879,6 @@
 
             // Hide invalid legend when zero
             invalidLegend.style.display = invalid > 0 ? 'inline-flex' : 'none';
-            // Correct/wrong legends always visible
             correctLegend.style.display = 'inline-flex';
             wrongLegend.style.display = 'inline-flex';
         }
