@@ -299,7 +299,6 @@
             border: 1px solid rgba(255,255,255,0.5);
         }
 
-        /* COMPACT TOP BAR — single row now */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -342,7 +341,6 @@
             justify-content: flex-end;
         }
 
-        /* Attempted pill — left-most of the actions row */
         .attempted-pill {
             display: inline-flex;
             align-items: center;
@@ -379,7 +377,6 @@
             display: none;
         }
 
-        /* Timer pill */
         .timer-pill {
             display: inline-flex;
             align-items: center;
@@ -478,7 +475,6 @@
             transition: width 0.35s ease;
         }
 
-        /* ========== BIGGER QUESTION CARD (SCROLLABLE BODY) ========== */
         .question-card {
             background: var(--surface-2);
             border: 1px solid var(--border);
@@ -919,6 +915,58 @@
         }
         .year-select:focus { border-color: var(--primary); }
 
+        /* user info section inside modal */
+        .modal-user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-2);
+            border-radius: 14px;
+            padding: 0.6rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+        .modal-user-left {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .modal-user-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .modal-user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        .modal-logout-btn {
+            background: transparent;
+            border: 1.5px solid var(--danger);
+            color: var(--danger);
+            font-weight: 600;
+            font-size: 0.78rem;
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .modal-logout-btn:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 640px) {
             .brand-title h1 { max-width: 160px; font-size: 0.95rem; }
@@ -944,6 +992,8 @@
             .custom-confirm-box .btn-group { flex-direction: column; }
             .custom-confirm-box .btn-group button { width: 100%; }
             .question-body { max-height: 46vh; }
+            .modal-box { padding: 1.3rem 1rem; }
+            .modal-user-info { flex-wrap: wrap; gap: 0.5rem; }
         }
     </style>
 </head>
@@ -997,7 +1047,6 @@
                 </div>
             </div>
             <div class="top-actions">
-                <!-- Attempted pill (left-most) -->
                 <span class="attempted-pill" id="attemptedPill" title="Questions attempted">
                     <span class="attempted-icon">📝</span>
                     <span>Attempted:</span>
@@ -1007,7 +1056,6 @@
                     <span class="year-badge-inline" id="yearBadge"></span>
                 </span>
 
-                <!-- Timer pill -->
                 <span class="timer-pill" id="timerPill">
                     <span class="timer-icon">⏱️</span>
                     <span class="timer" id="timerDisplay">00:00</span>
@@ -1066,10 +1114,20 @@
             </div>
         </div>
 
+        <!-- ====== REFRESH / FILTER MODAL (now with user info & logout) ====== -->
         <div class="modal-overlay" id="refreshModal">
             <div class="modal-box">
                 <h3>⚙️ Filter &amp; Refresh</h3>
                 <p>Optionally filter by Job and/or Subject, then click "Load &amp; Refresh".</p>
+
+                <!-- User info section inside modal -->
+                <div class="modal-user-info" id="modalUserInfo">
+                    <div class="modal-user-left">
+                        <span class="modal-user-avatar" id="modalUserAvatar">U</span>
+                        <span class="modal-user-name" id="modalUserName">User</span>
+                    </div>
+                    <button class="modal-logout-btn" id="modalLogoutBtn">🚪 Logout</button>
+                </div>
 
                 <label class="modal-label" for="modalJobSelect">💼 Job (column K)</label>
                 <select class="year-select" id="modalJobSelect">
@@ -1178,6 +1236,12 @@
         const timerPill = document.getElementById('timerPill');
         const singleQuestionView = document.getElementById('singleQuestionView');
         const yearBadge = document.getElementById('yearBadge');
+
+        // Modal user info elements
+        const modalUserInfo = document.getElementById('modalUserInfo');
+        const modalUserAvatar = document.getElementById('modalUserAvatar');
+        const modalUserName = document.getElementById('modalUserName');
+        const modalLogoutBtn = document.getElementById('modalLogoutBtn');
 
         const confirmOverlay = document.getElementById('confirmOverlay');
         const confirmIcon = document.getElementById('confirmIcon');
@@ -1489,6 +1553,7 @@
             loginStatus.textContent = '🔐 Sign in to continue';
             emailInput.value = '';
             passwordInput.value = '';
+            if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
             showToast('👋 Logged out successfully.', 'info', 3000);
         }
 
@@ -1504,6 +1569,10 @@
             const initial = loggedInUser.user.charAt(0).toUpperCase();
             userAvatar.textContent = initial;
             userNameDisplay.textContent = loggedInUser.user;
+
+            // Also update modal user info
+            modalUserAvatar.textContent = initial;
+            modalUserName.textContent = loggedInUser.user;
         }
 
         loginBtn.addEventListener('click', handleLogin);
@@ -1515,6 +1584,7 @@
             }
         });
         userBadge.addEventListener('click', handleLogout);
+        modalLogoutBtn.addEventListener('click', handleLogout);
 
         // ============================================================
         // STATE
@@ -1632,7 +1702,6 @@
             if (curJob && jobs.includes(curJob)) modalJobSelect.value = curJob;
             else modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
 
-            // Badge — subject shown inline next to attempted
             const badgeParts = [];
             if (currentSubject && currentSubject !== 'all') badgeParts.push('📂 ' + toTitleCase(currentSubject));
             if (badgeParts.length) {
@@ -1643,7 +1712,6 @@
                 yearBadge.style.display = 'none';
             }
 
-            // Title reflects job selection
             applyTitle(currentJob);
         }
 
@@ -2162,6 +2230,13 @@
                 modalJobSelect.appendChild(o);
             });
             modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
+
+            // Update modal user info
+            if (loggedInUser) {
+                const initial = loggedInUser.user.charAt(0).toUpperCase();
+                modalUserAvatar.textContent = initial;
+                modalUserName.textContent = loggedInUser.user;
+            }
 
             refreshModal.classList.add('active');
         }
