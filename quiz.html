@@ -537,7 +537,7 @@
   <script>
     (function() {
       // ==============================================================
-      // 1. CONFIGURATION – YOUR EXACT URLs
+      // 1. CONFIGURATION
       // ==============================================================
       const QUIZ_CSV_URL =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
@@ -682,7 +682,7 @@
       // ==============================================================
       // 8. SESSION MANAGEMENT
       // ==============================================================
-      const SESSION_KEY = 'quiz_session_data_v7';
+      const SESSION_KEY = 'quiz_session_data_v8';
 
       function saveSession() {
         if (!loggedInUser || quizCompleted) return;
@@ -720,7 +720,7 @@
       }
 
       // ==============================================================
-      // 9. LOGIN SYSTEM  (user, password columns)
+      // 9. LOGIN SYSTEM
       // ==============================================================
       let users = [];
       let isLoadingUsers = true;
@@ -742,7 +742,6 @@
             loginStatus.textContent = '🔐 Sign in to continue';
             loginBtn.disabled = false;
 
-            // Silent debug-only check (doesn't expose count to UI)
             if (users.length === 0) {
               console.warn('[Self Learners] Login sheet returned 0 users. Check sharing settings.');
             }
@@ -761,7 +760,6 @@
         const lines = text.split('\n').filter(line => line.trim() !== '');
         if (lines.length < 2) return [];
         const result = [];
-        // Header: user,password  (skip index 0)
         for (let i = 1; i < lines.length; i++) {
           const cols = parseCSVLine(lines[i]);
           if (cols.length < 2) continue;
@@ -982,7 +980,7 @@
       }
 
       // ==============================================================
-      // PARSER – NEW SHEET HEADERS
+      // PARSER – WITH LETTER FALLBACK (A/B/C/D case-insensitive)
       // --------------------------------------------------------------
       // A: Question_Number (0)
       // B: Question        (1)
@@ -990,7 +988,7 @@
       // D: Option_B        (3)
       // E: Option_C        (4)
       // F: Option_D        (5)
-      // G: Correct_Answer  (6)
+      // G: Correct_Answer  (6)   ← may be full text OR A/B/C/D letter
       // H: topic           (7)
       // I: subject         (8)
       // J: created         (9)
@@ -1003,6 +1001,7 @@
 
         let title = 'Quiz';
         const result = [];
+        const LETTER_MAP = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
 
         for (let i = 1; i < lines.length; i++) {
           const cols = parseCSVLine(lines[i]);
@@ -1018,11 +1017,49 @@
             cols[5] ? cols[5].trim() : ''
           ];
 
-          const correctAnswer = cols[6] ? cols[6].trim() : '';
+          const rawCorrect = cols[6] ? cols[6].trim() : '';
           let correctIndex = -1;
-          if (correctAnswer) {
+          let matchMethod = 'none';
+
+          if (rawCorrect) {
+            // 1) Exact text match
             for (let j = 0; j < options.length; j++) {
-              if (options[j] === correctAnswer) { correctIndex = j; break; }
+              if (options[j] === rawCorrect) {
+                correctIndex = j;
+                matchMethod = 'exact';
+                break;
+              }
+            }
+
+            // 2) Case-insensitive text match
+            if (correctIndex === -1) {
+              const lowerCorrect = rawCorrect.toLowerCase();
+              for (let j = 0; j < options.length; j++) {
+                if (options[j] && options[j].toLowerCase() === lowerCorrect) {
+                  correctIndex = j;
+                  matchMethod = 'case-insensitive';
+                  break;
+                }
+              }
+            }
+
+            // 3) Letter fallback: A/B/C/D (case-insensitive)
+            //    Only when the value is exactly one character and not yet matched
+            if (correctIndex === -1 && rawCorrect.length === 1) {
+              const letterKey = rawCorrect.toLowerCase();
+              if (letterKey in LETTER_MAP) {
+                correctIndex = LETTER_MAP[letterKey];
+                matchMethod = 'letter';
+              }
+            }
+
+            // Silent debug log
+            if (matchMethod === 'letter') {
+              console.log(`[Self Learners] Q#${i} used letter fallback: "${rawCorrect}" → option index ${correctIndex}`);
+            } else if (matchMethod === 'case-insensitive') {
+              console.log(`[Self Learners] Q#${i} matched case-insensitively: "${rawCorrect}"`);
+            } else if (matchMethod === 'none') {
+              console.warn(`[Self Learners] Q#${i} could not match answer: "${rawCorrect}"`);
             }
           }
 
@@ -1033,7 +1070,7 @@
             question,
             options,
             correct: correctIndex,
-            correctText: correctAnswer || 'No answer in db',
+            correctText: rawCorrect || 'No answer in db',
             topic: topic,
             subject: subject,
             category: subject
