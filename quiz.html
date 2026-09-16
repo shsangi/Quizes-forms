@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -438,7 +437,6 @@
             position: relative;
         }
 
-        /* ===== STICKY TOP BAR ===== */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -524,7 +522,6 @@
             flex-shrink: 0;
         }
 
-        /* ===== MODE TOGGLE (top right) ===== */
         .mode-toggle {
             display: inline-flex;
             align-items: center;
@@ -651,7 +648,7 @@
             transition: width 0.35s ease;
         }
 
-        /* ===== READ (SOLVED) MODE STYLES ===== */
+        /* ===== READ MODE ===== */
         .read-container {
             margin-top: 0.75rem;
             display: flex;
@@ -781,7 +778,6 @@
         .read-item .read-meta .rm-topic   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
         .read-item .read-meta .rm-job     { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
 
-        /* M-col badge inside read item */
         .read-item .read-mcol {
             position: absolute;
             top: 10px;
@@ -815,7 +811,6 @@
             font-style: italic;
         }
 
-        /* hide quiz view when read mode active */
         .read-mode-active #singleQuestionView,
         .read-mode-active .progress-block,
         .read-mode-active .overview-section {
@@ -1076,7 +1071,17 @@
             gap: 0.4rem;
             justify-content: center;
             margin-top: 0.3rem;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 4px;
         }
+        .grid-dots::-webkit-scrollbar { width: 6px; }
+        .grid-dots::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 6px;
+        }
+        .grid-dots::-webkit-scrollbar-track { background: transparent; }
+
         .grid-dot {
             width: 30px; height: 30px;
             border-radius: 50%;
@@ -1103,6 +1108,19 @@
             border-color: #0f172a;
             transform: scale(1.12);
             box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+        }
+        .grid-dot.ellipsis-dot {
+            background: transparent;
+            color: var(--text-3);
+            font-weight: 700;
+            border: 1px dashed var(--border);
+            width: auto;
+            padding: 0 10px;
+            border-radius: var(--radius-full);
+        }
+        .grid-dot.ellipsis-dot:hover {
+            background: var(--surface-2);
+            transform: none;
         }
 
         .result-card {
@@ -1230,7 +1248,6 @@
         }
         .modal-actions .btn-secondary:hover { background: var(--border); }
 
-        /* Reset filters button */
         .modal-reset-row {
             display: flex;
             justify-content: flex-end;
@@ -1400,7 +1417,7 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
         }
 
-        /* ========== M‑COL BADGE (quiz) ========== */
+        /* ========== M‑COL BADGE ========== */
         .m-col-badge {
             position: absolute;
             top: 8px;
@@ -1495,7 +1512,6 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== INSTALL BANNER ===== -->
     <div class="install-banner" id="installBanner">
         <div class="ib-icon">
             <img src="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27" alt="SL" id="installIconImg">
@@ -1508,7 +1524,6 @@
         <button class="ib-close" id="installClose">✕</button>
     </div>
 
-    <!-- ===== CONFIRM DIALOG ===== -->
     <div class="custom-confirm-overlay" id="confirmOverlay">
         <div class="custom-confirm-box">
             <div class="icon" id="confirmIconWrap"><span id="confirmIcon">❓</span></div>
@@ -1556,7 +1571,6 @@
                 </div>
             </div>
             <div class="top-actions">
-                <!-- MODE TOGGLE (top right) -->
                 <div class="mode-toggle" id="modeToggle" role="radiogroup" aria-label="Display mode">
                     <label id="modeMcqLabel" class="active">
                         <input type="radio" name="displayMode" id="modeMcqRadio" value="mcq" checked />
@@ -1605,7 +1619,6 @@
                 </div>
             </div>
 
-            <!-- ===== READ (SOLVED) VIEW ===== -->
             <div id="readView">
                 <div class="read-container" id="readContainer"></div>
             </div>
@@ -1633,7 +1646,6 @@
             </div>
         </div>
 
-        <!-- ====== REFRESH / FILTER MODAL ====== -->
         <div class="modal-overlay" id="refreshModal">
             <div class="modal-box">
                 <h3>⚙️ Filter &amp; Refresh</h3>
@@ -1646,7 +1658,6 @@
                     <button class="modal-logout-btn" id="modalLogoutBtn">🚪 Logout</button>
                 </div>
 
-                <!-- Reset Filters row -->
                 <div class="modal-reset-row">
                     <button class="btn-reset-filters" id="modalResetBtn" title="Reset all filters to default">
                         ⟲ Reset Filters
@@ -1671,14 +1682,8 @@
 
     <script>
     (function() {
-        // ============================================================
-        // LOGO URL
-        // ============================================================
         const APP_LOGO_URL = 'https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27';
 
-        // ============================================================
-        // PWA INSTALL LOGIC
-        // ============================================================
         let deferredPrompt = null;
         const installBanner = document.getElementById('installBanner');
         const installBtn = document.getElementById('installBtn');
@@ -1813,9 +1818,6 @@
         registerServiceWorker();
         setFavicon();
 
-        // ============================================================
-        // CONFIG
-        // ============================================================
         const QUIZ_CSV_URL =
             'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
 
@@ -1830,8 +1832,6 @@
         const MODE_KEY = 'selfLearnersDisplayMode';
 
         const DEFAULT_TITLE = 'All Jobs MCQs';
-
-        // Column N (0-based index 13) = show_on_quiz_or_notshow
         const SHOW_COL_INDEX = 13;
 
         let questions = [];
@@ -1855,7 +1855,10 @@
         let users = [];
         let isLoadingUsers = true;
         let loggedInUser = null;
-        let displayMode = 'mcq'; // 'mcq' | 'read'
+        let displayMode = 'mcq';
+
+        let readRenderCount = 50;
+        const READ_BATCH = 50;
 
         const loginScreen = document.getElementById('loginScreen');
         const quizApp = document.getElementById('quizApp');
@@ -1922,9 +1925,6 @@
         const confirmCancel = document.getElementById('confirmCancel');
         let confirmResolve = null;
 
-        // ============================================================
-        // STICKY TOP BAR SHADOW ON SCROLL
-        // ============================================================
         function updateTopBarShadow() {
             if (!topBar) return;
             if (window.scrollY > 10 || (document.documentElement.scrollTop > 10)) {
@@ -1935,11 +1935,6 @@
         }
         window.addEventListener('scroll', updateTopBarShadow, { passive: true });
 
-        // ============================================================
-        // SHOW FLAG HELPER
-        // Empty / missing / 1 / true / yes → SHOW
-        // 0 / false / no → HIDE
-        // ============================================================
         function shouldShowQuestion(rawFlag) {
             if (rawFlag === null || rawFlag === undefined) return true;
             const v = String(rawFlag).trim().toLowerCase();
@@ -1947,9 +1942,6 @@
             return true;
         }
 
-        // ============================================================
-        // M‑COL RENDERER (quiz card)
-        // ============================================================
         function renderMColBadge(rawValue) {
             if (rawValue === null || rawValue === undefined || String(rawValue).trim() === '') {
                 return `<div class="m-col-badge empty" title="empty"><span class="q-mark">?</span></div>`;
@@ -1990,9 +1982,6 @@
             return `<div class="read-mcol empty" title="unknown: ${rawValue}"><span class="q-mark">?</span></div>`;
         }
 
-        // ============================================================
-        // TITLE CASE HELPER
-        // ============================================================
         const SMALL_WORDS = new Set(['a','an','and','as','at','but','by','for','from','in','into','nor','of','on','onto','or','per','the','to','vs','via','with']);
 
         function toTitleCase(str) {
@@ -2037,9 +2026,6 @@
             selectedSubjectsLine.style.display = '-webkit-box';
         }
 
-        // ============================================================
-        // CONFIRM DIALOG
-        // ============================================================
         function showConfirm(icon, title, message, confirmClass = 'btn-confirm') {
             return new Promise(resolve => {
                 confirmIcon.textContent = icon || '❓';
@@ -2060,9 +2046,6 @@
             if (e.target === confirmOverlay) closeConfirm(false);
         });
 
-        // ============================================================
-        // TOAST
-        // ============================================================
         const toastContainer = document.getElementById('toastContainer');
         let toastTimeout = null;
         function showToast(message, type = 'info', duration = 4000, showIcon = true) {
@@ -2085,9 +2068,6 @@
             setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
         }
 
-        // ============================================================
-        // LOGO
-        // ============================================================
         function loadLogo(img) {
             const i = new Image();
             i.onload = () => img.src = LOGO_URL;
@@ -2097,9 +2077,6 @@
         loadLogo(loginLogo);
         loadLogo(brandLogo);
 
-        // ============================================================
-        // PASSWORD TOGGLE
-        // ============================================================
         let passwordVisible = false;
         togglePasswordBtn.addEventListener('click', function() {
             passwordVisible = !passwordVisible;
@@ -2128,9 +2105,6 @@
             });
         }
 
-        // ============================================================
-        // HELPERS
-        // ============================================================
         function cleanCell(v) {
             if (v == null) return '';
             return String(v)
@@ -2176,9 +2150,6 @@
             return cleanCell(a).toLowerCase() === cleanCell(b).toLowerCase();
         }
 
-        // ============================================================
-        // CORRECT-ANSWER RESOLVER
-        // ============================================================
         function resolveCorrectIndex(rawCorrect, options) {
             if (!rawCorrect) return -1;
             const raw = cleanCell(rawCorrect);
@@ -2209,9 +2180,6 @@
             return -1;
         }
 
-        // ============================================================
-        // DISPLAY MODE
-        // ============================================================
         function setDisplayMode(mode) {
             displayMode = (mode === 'read') ? 'read' : 'mcq';
 
@@ -2242,19 +2210,22 @@
         modeMcqRadio.addEventListener('change', () => setDisplayMode('mcq'));
         modeReadRadio.addEventListener('change', () => setDisplayMode('read'));
 
-        // ============================================================
-        // RENDER READ MODE
-        // ============================================================
         function renderReadMode() {
             if (!questions || questions.length === 0) {
                 readContainer.innerHTML = '<div class="read-empty">No questions loaded yet.</div>';
                 return;
             }
+            readRenderCount = Math.min(READ_BATCH, questions.length);
+            renderReadBatch();
+        }
 
+        function renderReadBatch() {
             const letters = ['A', 'B', 'C', 'D'];
             let html = '';
+            const end = Math.min(readRenderCount, questions.length);
 
-            questions.forEach((q, idx) => {
+            for (let idx = 0; idx < end; idx++) {
+                const q = questions[idx];
                 const srno = idx + 1;
                 const qText = q.question || '';
                 const isInvalid = invalidQuestions.includes(idx);
@@ -2291,9 +2262,13 @@
                         ${metaChips.length ? `<div class="read-meta">${metaChips.join('')}</div>` : ''}
                     </div>
                 `;
-            });
+            }
 
-            readContainer.innerHTML = html;
+            const loadMoreHtml = (end < questions.length)
+                ? `<button id="loadMoreRead" class="btn-primary" style="margin:14px auto 6px;display:block;">Load more (${end} / ${questions.length})</button>`
+                : `<div style="text-align:center;color:#94a3b8;font-size:0.8rem;padding:10px;">— End of list —</div>`;
+
+            readContainer.innerHTML = html + loadMoreHtml;
 
             readContainer.querySelectorAll('.read-q').forEach(el => {
                 el.addEventListener('click', function(e) {
@@ -2313,11 +2288,16 @@
                     window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
                 });
             });
+
+            const loadMoreBtn = document.getElementById('loadMoreRead');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function() {
+                    readRenderCount = Math.min(readRenderCount + READ_BATCH, questions.length);
+                    renderReadBatch();
+                });
+            }
         }
 
-        // ============================================================
-        // LOGIN
-        // ============================================================
         function parseLoginCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
             if (lines.length < 2) return [];
@@ -2505,9 +2485,6 @@
         });
         modalLogoutBtn.addEventListener('click', handleLogout);
 
-        // ============================================================
-        // STATE
-        // ============================================================
         function saveState() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -2529,9 +2506,6 @@
         }
         function clearState() { localStorage.removeItem(STORAGE_KEY); }
 
-        // ============================================================
-        // LOADING UI
-        // ============================================================
         function showLoading() {
             questionCard.innerHTML =
                 '<div style="padding:2rem;text-align:center;color:#475569;">🔄 Loading questions...</div>';
@@ -2549,9 +2523,6 @@
             refreshIcon.classList.remove('refresh-spin');
         }
 
-        // ============================================================
-        // TIMER
-        // ============================================================
         function startTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -2692,26 +2663,15 @@
 
         modalJobSelect.addEventListener('change', onJobChangedInModal);
 
-        // ============================================================
-        // RESET FILTERS (in modal)
-        // ============================================================
         function resetFiltersInModal() {
-            // Reset job dropdown to "All Jobs"
             modalJobSelect.value = 'all';
-
-            // Rebuild subject list with all subjects (unfiltered by job)
-            // and no specific subject selected (i.e. "All Subjects" checked)
             const allSubjectsForAllJobs = getSubjectsForJob('all');
             buildSubjectCheckboxList(allSubjectsForAllJobs, []);
-
             showToast('Filters reset to defaults.', 'info', 2000, false);
         }
 
         modalResetBtn.addEventListener('click', resetFiltersInModal);
 
-        // ============================================================
-        // DROPDOWNS / JOB
-        // ============================================================
         function populateDropdowns(subjects, jobs) {
             allSubjects = subjects;
             allJobs = jobs;
@@ -2735,9 +2695,6 @@
             renderSelectedSubjectsLine();
         }
 
-        // ============================================================
-        // VALIDATE
-        // ============================================================
         function validateQuestions(list) {
             invalidQuestions = [];
             list.forEach((q, idx) => {
@@ -2748,9 +2705,6 @@
             return invalidQuestions;
         }
 
-        // ============================================================
-        // FETCH QUESTIONS
-        // ============================================================
         function fetchQuestions(forceRefresh = false, subjectArr = null, job = null) {
             showLoading();
             if (subjectArr !== null) currentSubjects = subjectArr;
@@ -2880,10 +2834,6 @@
                     if (displayMode === 'read') renderReadMode();
                     if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
                     scrollToTop();
-
-                    if (forceRefresh) {
-                        showToast(`Refreshed! Loaded ${totalQuestions} questions from sheet.`, 'success', 2500, false);
-                    }
                 })
                 .catch(err => {
                     console.error(err);
@@ -2895,9 +2845,6 @@
                 });
         }
 
-        // ============================================================
-        // PARSE QUIZ CSV
-        // ============================================================
         function parseQuizCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
             if (lines.length < 2) return { questions: [] };
@@ -2945,9 +2892,6 @@
             return { questions: result };
         }
 
-        // ============================================================
-        // RENDER QUESTION (quiz mode)
-        // ============================================================
         function renderQuestion() {
             if (!questions.length) {
                 questionCard.innerHTML = '<div style="padding:2rem;text-align:center;">No questions</div>';
@@ -3073,12 +3017,40 @@
             totalCount.textContent = totalQuestions;
         }
 
-        // ============================================================
-        // RENDER DOTS
-        // ============================================================
+        // ===== FIXED renderDots: cap at 60 dots with jump buttons =====
         function renderDots(activeIdx) {
             dotGrid.innerHTML = '';
-            for (let i = 0; i < totalQuestions; i++) {
+            if (totalQuestions === 0) return;
+
+            const MAX_DOTS = 60;
+            const WINDOW = Math.floor(MAX_DOTS / 2);
+            const center = (activeIdx !== undefined && activeIdx !== null) ? activeIdx : currentIndex;
+
+            let start = 0;
+            let end = totalQuestions;
+
+            if (totalQuestions > MAX_DOTS) {
+                start = Math.max(0, center - WINDOW);
+                end   = Math.min(totalQuestions, start + MAX_DOTS);
+                if (end - start < MAX_DOTS) start = Math.max(0, end - MAX_DOTS);
+            }
+
+            if (start > 0) {
+                const left = document.createElement('button');
+                left.className = 'grid-dot ellipsis-dot';
+                left.textContent = '«';
+                left.title = 'Jump to first';
+                left.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    currentIndex = 0;
+                    renderQuestion();
+                    renderDots(0);
+                    updateProgress();
+                });
+                dotGrid.appendChild(left);
+            }
+
+            for (let i = start; i < end; i++) {
                 const dot = document.createElement('button');
                 dot.className = 'grid-dot';
                 dot.textContent = i + 1;
@@ -3105,7 +3077,8 @@
                     }
                 }
 
-                if (activeIdx !== undefined && i === activeIdx) dot.classList.add('active-dot');
+                if (i === center) dot.classList.add('active-dot');
+
                 dot.addEventListener('click', function(e) {
                     e.stopPropagation();
                     currentIndex = i;
@@ -3115,11 +3088,23 @@
                 });
                 dotGrid.appendChild(dot);
             }
+
+            if (end < totalQuestions) {
+                const right = document.createElement('button');
+                right.className = 'grid-dot ellipsis-dot';
+                right.textContent = '»';
+                right.title = 'Jump to last';
+                right.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    currentIndex = totalQuestions - 1;
+                    renderQuestion();
+                    renderDots(totalQuestions - 1);
+                    updateProgress();
+                });
+                dotGrid.appendChild(right);
+            }
         }
 
-        // ============================================================
-        // UPDATE OVERVIEW
-        // ============================================================
         function updateOverview() {
             let done = 0, pending = 0, correct = 0, wrong = 0, invalid = 0;
             for (let i = 0; i < totalQuestions; i++) {
@@ -3285,9 +3270,6 @@
             scrollToTop();
         }
 
-        // ============================================================
-        // REFRESH / FILTER HANDLERS
-        // ============================================================
         function handleRefreshClick() {
             modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
             allJobs.forEach(j => {
