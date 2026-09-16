@@ -12,8 +12,6 @@
     <meta name="msapplication-TileColor" content="#0f766e" />
     <meta name="msapplication-tap-highlight" content="no" />
     <title>Self Learners · Quiz</title>
-
-    <!-- Favicon with fallback to your logo -->
     <link rel="icon" type="image/png" sizes="192x192" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27" id="faviconLink">
     <link rel="shortcut icon" type="image/png" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
     <link rel="apple-touch-icon" sizes="180x180" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
@@ -614,6 +612,158 @@
             border-radius: var(--radius-full);
             transition: width 0.35s ease;
         }
+
+        /* ===== FACTS MODE STYLES ===== */
+        .facts-toggle-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-2);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-full);
+            padding: 0.4rem 1rem 0.4rem 1.25rem;
+            margin: 0.5rem 0 0.25rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .facts-toggle-bar .facts-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text-2);
+            cursor: pointer;
+            user-select: none;
+        }
+        .facts-toggle-bar .facts-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .facts-toggle-bar .facts-hint {
+            font-size: 0.7rem;
+            color: var(--text-3);
+            font-weight: 500;
+        }
+        .facts-toggle-bar .facts-count {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 0.2rem 0.65rem;
+            border-radius: var(--radius-full);
+        }
+
+        .facts-container {
+            margin-top: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            max-height: 62vh;
+            overflow-y: auto;
+            padding-right: 0.4rem;
+            scroll-behavior: smooth;
+        }
+        .facts-container::-webkit-scrollbar { width: 8px; }
+        .facts-container::-webkit-scrollbar-track { background: transparent; }
+        .facts-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+            border: 2px solid var(--surface);
+        }
+        .facts-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .facts-container {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .fact-item {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: 14px;
+            padding: 0.8rem 1rem 0.7rem;
+            transition: 0.15s;
+            cursor: default;
+        }
+        .fact-item:hover {
+            border-color: #5eead4;
+            background: #f0fdfa;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.08);
+        }
+        .fact-item .fact-line {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: var(--text);
+            font-weight: 500;
+            word-break: break-word;
+        }
+        .fact-item .fact-line .fact-srno {
+            font-weight: 800;
+            color: var(--primary);
+            margin-right: 0.35rem;
+        }
+        .fact-item .fact-line .fact-q {
+            font-weight: 600;
+            color: var(--text);
+        }
+        .fact-item .fact-line .fact-arrow {
+            color: var(--primary);
+            font-weight: 700;
+            margin: 0 0.3rem;
+        }
+        .fact-item .fact-line .fact-answer {
+            color: #0d9488;
+            font-weight: 700;
+            background: #ccfbf1;
+            padding: 0.1rem 0.5rem;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .fact-item .fact-meta {
+            margin-top: 0.35rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            font-size: 0.68rem;
+            font-weight: 600;
+        }
+        .fact-item .fact-meta .fm-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: var(--radius-full);
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-3);
+        }
+        .fact-item .fact-meta .fm-subject { background: #ecfeff; color: #0e7490; border-color: #a5f3fc; }
+        .fact-item .fact-meta .fm-topic   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .fact-item .fact-meta .fm-job     { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+
+        .facts-empty {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-3);
+            font-size: 0.95rem;
+            font-style: italic;
+        }
+
+        /* hide quiz view when facts mode active */
+        .facts-mode-active #singleQuestionView,
+        .facts-mode-active .progress-block,
+        .facts-mode-active .overview-section {
+            display: none !important;
+        }
+        .facts-mode-active #factsView {
+            display: block !important;
+        }
+
+        #factsView { display: none; }
 
         .question-card {
             background: var(--surface-2);
@@ -1242,6 +1392,12 @@
             .login-wrapper h1 { font-size: 1.5rem; }
             .login-wrapper .sub { margin-bottom: 1.25rem; }
             .login-wrapper .input-group { margin-bottom: 0.85rem; }
+
+            .facts-toggle-bar { padding: 0.4rem 0.75rem 0.4rem 0.9rem; }
+            .facts-toggle-bar .facts-label { font-size: 0.8rem; }
+            .facts-toggle-bar .facts-hint { display: none; }
+            .fact-item .fact-line { font-size: 0.85rem; }
+            .facts-container { max-height: 56vh; }
         }
 
         @media (display-mode: standalone) {
@@ -1338,6 +1494,16 @@
             </div>
         </div>
 
+        <!-- ===== FACTS TOGGLE BAR ===== -->
+        <div class="facts-toggle-bar" id="factsToggleBar">
+            <label class="facts-label">
+                <input type="checkbox" id="factsModeCheckbox" />
+                <span>📖 Read as Facts (one-liner mode)</span>
+            </label>
+            <span class="facts-hint">Show all Q &amp; A together</span>
+            <span class="facts-count" id="factsCountBadge">0 facts</span>
+        </div>
+
         <div id="quizContent">
             <div class="progress-block">
                 <div class="progress-fill" id="progressFill" style="width:0%;"></div>
@@ -1355,6 +1521,11 @@
                         <button class="btn-success" id="endQuizBtn">🏁 End Quiz</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- ===== FACTS VIEW ===== -->
+            <div id="factsView">
+                <div class="facts-container" id="factsContainer"></div>
             </div>
 
             <div class="overview-section">
@@ -1424,35 +1595,12 @@
         const installBtn = document.getElementById('installBtn');
         const installClose = document.getElementById('installClose');
 
-        // Create manifest dynamically with proper icon URLs
         function createManifest() {
-            // Build icon array — use the real logo for best quality
             const icons = [
-                {
-                    src: APP_LOGO_URL,
-                    sizes: '192x192',
-                    type: 'image/png',
-                    purpose: 'any'
-                },
-                {
-                    src: APP_LOGO_URL,
-                    sizes: '512x512',
-                    type: 'image/png',
-                    purpose: 'any'
-                },
-                {
-                    src: APP_LOGO_URL,
-                    sizes: '192x192',
-                    type: 'image/png',
-                    purpose: 'maskable'
-                },
-                {
-                    src: APP_LOGO_URL,
-                    sizes: '512x512',
-                    type: 'image/png',
-                    purpose: 'maskable'
-                },
-                // SVG fallback for broad compatibility
+                { src: APP_LOGO_URL, sizes: '192x192', type: 'image/png', purpose: 'any' },
+                { src: APP_LOGO_URL, sizes: '512x512', type: 'image/png', purpose: 'any' },
+                { src: APP_LOGO_URL, sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+                { src: APP_LOGO_URL, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
                 {
                     src: 'data:image/svg+xml,' + encodeURIComponent(
                         `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
@@ -1487,27 +1635,15 @@
             document.getElementById('appManifest').setAttribute('href', url);
         }
 
-        // Register service worker from inline
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 const swCode = `
                     const CACHE_NAME = 'self-learners-v2';
-                    self.addEventListener('install', (event) => {
-                        self.skipWaiting();
-                    });
-                    self.addEventListener('activate', (event) => {
-                        event.waitUntil(self.clients.claim());
-                    });
+                    self.addEventListener('install', (event) => { self.skipWaiting(); });
+                    self.addEventListener('activate', (event) => { event.waitUntil(self.clients.claim()); });
                     self.addEventListener('fetch', (event) => {
-                        // Skip cross-origin requests from caching
-                        if (!event.request.url.startsWith(self.location.origin)) {
-                            return;
-                        }
-                        event.respondWith(
-                            fetch(event.request).catch(() => {
-                                return caches.match(event.request);
-                            })
-                        );
+                        if (!event.request.url.startsWith(self.location.origin)) return;
+                        event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
                     });
                 `;
                 const blob = new Blob([swCode], { type: 'application/javascript' });
@@ -1516,38 +1652,26 @@
             }
         }
 
-        // Set favicon dynamically to ensure it shows
         function setFavicon() {
-            // Remove old favicons
             document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(el => {
-                // keep the ones we added
-                if (!el.id || el.id !== 'faviconLink') {
-                    el.parentNode.removeChild(el);
-                }
+                if (!el.id || el.id !== 'faviconLink') el.parentNode.removeChild(el);
             });
-
-            // Create a new favicon from the logo
             const link = document.createElement('link');
             link.rel = 'icon';
             link.type = 'image/png';
             link.href = APP_LOGO_URL;
             document.head.appendChild(link);
-
-            // Apple touch icon
             const appleLink = document.createElement('link');
             appleLink.rel = 'apple-touch-icon';
             appleLink.href = APP_LOGO_URL;
             document.head.appendChild(appleLink);
         }
 
-        // Install prompt handling
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             setTimeout(() => {
-                if (!localStorage.getItem('installDismissed')) {
-                    installBanner.classList.add('show');
-                }
+                if (!localStorage.getItem('installDismissed')) installBanner.classList.add('show');
             }, 3000);
         });
 
@@ -1558,9 +1682,7 @@
             }
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                showToast('App installed successfully! 🎉', 'success', 3000, false);
-            }
+            if (outcome === 'accepted') showToast('App installed successfully! 🎉', 'success', 3000, false);
             deferredPrompt = null;
             installBanner.classList.remove('show');
         });
@@ -1570,22 +1692,16 @@
             localStorage.setItem('installDismissed', 'true');
         });
 
-        // Detect if already installed
         window.addEventListener('appinstalled', () => {
             installBanner.classList.remove('show');
             deferredPrompt = null;
             showToast('App installed! Open from home screen. 📱', 'success', 3000, false);
         });
 
-        // Check if running as standalone
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                              window.navigator.standalone === true;
+        if (isStandalone) installBanner.style.display = 'none';
 
-        if (isStandalone) {
-            installBanner.style.display = 'none';
-        }
-
-        // iOS detection
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         if (isIOS && !isStandalone) {
             setTimeout(() => {
@@ -1617,6 +1733,7 @@
         const LOGO_URL = APP_LOGO_URL;
         const STORAGE_KEY = 'selfLearnersOneByOneV4';
         const SESSION_KEY = 'selfLearnersSessionUser';
+        const FACTS_MODE_KEY = 'selfLearnersFactsMode';
 
         const DEFAULT_TITLE = 'All Jobs MCQs';
 
@@ -1641,6 +1758,7 @@
         let users = [];
         let isLoadingUsers = true;
         let loggedInUser = null;
+        let factsModeActive = false;
 
         const loginScreen = document.getElementById('loginScreen');
         const quizApp = document.getElementById('quizApp');
@@ -1687,6 +1805,10 @@
         const timerPill = document.getElementById('timerPill');
         const singleQuestionView = document.getElementById('singleQuestionView');
 
+        const factsModeCheckbox = document.getElementById('factsModeCheckbox');
+        const factsCountBadge = document.getElementById('factsCountBadge');
+        const factsContainer = document.getElementById('factsContainer');
+
         const modalUserAvatar = document.getElementById('modalUserAvatar');
         const modalUserName = document.getElementById('modalUserName');
         const modalLogoutBtn = document.getElementById('modalLogoutBtn');
@@ -1706,29 +1828,19 @@
             if (rawValue === null || rawValue === undefined || String(rawValue).trim() === '') {
                 return `<div class="m-col-badge empty" title="empty"><span class="q-mark">?</span></div>`;
             }
-
             const v = String(rawValue).trim().toLowerCase();
-
             if (v === 'true') {
-                return `
-                    <div class="m-col-badge true" title="true">
+                return `<div class="m-col-badge true" title="true">
                         <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M13.5 4.5L6 12L2.5 8.5" stroke="#0969da" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                `;
+                        </svg></div>`;
             }
-
             if (v === 'false') {
-                return `
-                    <div class="m-col-badge false" title="false">
+                return `<div class="m-col-badge false" title="false">
                         <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M4 4L12 12M12 4L4 12" stroke="#cf222e" stroke-width="2.8" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                `;
+                        </svg></div>`;
             }
-
             return `<div class="m-col-badge empty" title="unknown: ${rawValue}"><span class="q-mark">?</span></div>`;
         }
 
@@ -1748,9 +1860,7 @@
                     if (/^[\s\/-]+$/.test(chunk)) return chunk;
                     const lower = chunk.toLowerCase();
                     if (/^[A-Z]{2,5}$/.test(chunk)) return chunk;
-                    if (/\d/.test(chunk)) {
-                        return chunk.charAt(0).toUpperCase() + chunk.slice(1).toLowerCase();
-                    }
+                    if (/\d/.test(chunk)) return chunk.charAt(0).toUpperCase() + chunk.slice(1).toLowerCase();
                     if (i > 0 && SMALL_WORDS.has(lower)) return lower;
                     return lower.charAt(0).toUpperCase() + lower.slice(1);
                 })
@@ -1762,9 +1872,7 @@
         // ============================================================
         function resolveTitle(jobValue) {
             const raw = cleanCell(jobValue);
-            if (!raw || raw.toLowerCase() === 'all') {
-                return DEFAULT_TITLE;
-            }
+            if (!raw || raw.toLowerCase() === 'all') return DEFAULT_TITLE;
             return toTitleCase(raw) + ' MCQs';
         }
 
@@ -1784,9 +1892,8 @@
                 return;
             }
             const names = currentSubjects.map(s => toTitleCase(s));
-            const joined = names.join(', ');
             selectedSubjectsLine.innerHTML =
-                `<span class="subj-label">Subjects:</span> <span class="subj-list">${joined}</span>`;
+                `<span class="subj-label">Subjects:</span> <span class="subj-list">${names.join(', ')}</span>`;
             selectedSubjectsLine.style.display = '-webkit-box';
         }
 
@@ -1827,11 +1934,7 @@
             const iconHtml = showIcon
                 ? `<span class="toast-icon">${icons[type] || 'ℹ️'}</span>`
                 : `<span class="toast-icon"></span>`;
-            toast.innerHTML = `
-                ${iconHtml}
-                <span>${message}</span>
-                <button class="toast-close">✕</button>
-            `;
+            toast.innerHTML = `${iconHtml}<span>${message}</span><button class="toast-close">✕</button>`;
             toastContainer.appendChild(toast);
             toast.querySelector('.toast-close').addEventListener('click', () => removeToast(toast));
             toastTimeout = setTimeout(() => { removeToast(toast); toastTimeout = null; }, duration);
@@ -1869,20 +1972,12 @@
         // ============================================================
         function scrollLoginInputIntoView(el) {
             setTimeout(() => {
-                try {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } catch (e) {
-                    el.scrollIntoView();
-                }
+                try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+                catch (e) { el.scrollIntoView(); }
             }, 250);
         }
-
-        emailInput.addEventListener('focus', () => {
-            scrollLoginInputIntoView(loginScreen);
-        });
-        passwordInput.addEventListener('focus', () => {
-            scrollLoginInputIntoView(loginScreen);
-        });
+        emailInput.addEventListener('focus', () => scrollLoginInputIntoView(loginScreen));
+        passwordInput.addEventListener('focus', () => scrollLoginInputIntoView(loginScreen));
 
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
@@ -1978,6 +2073,66 @@
         }
 
         // ============================================================
+        // FACTS MODE
+        // ============================================================
+        function setFactsMode(active) {
+            factsModeActive = active;
+            if (active) {
+                quizApp.classList.add('facts-mode-active');
+                renderFacts();
+                try { localStorage.setItem(FACTS_MODE_KEY, 'true'); } catch(e) {}
+            } else {
+                quizApp.classList.remove('facts-mode-active');
+                try { localStorage.setItem(FACTS_MODE_KEY, 'false'); } catch(e) {}
+            }
+            factsModeCheckbox.checked = active;
+        }
+
+        function renderFacts() {
+            if (!questions || questions.length === 0) {
+                factsContainer.innerHTML = '<div class="facts-empty">No questions loaded yet.</div>';
+                factsCountBadge.textContent = '0 facts';
+                return;
+            }
+
+            factsCountBadge.textContent = `${questions.length} fact${questions.length !== 1 ? 's' : ''}`;
+
+            let html = '';
+            questions.forEach((q, idx) => {
+                const srno = idx + 1;
+                const questionText = q.question || '';
+                const correctAns = (q.correct !== -1 && q.options[q.correct]) ? q.options[q.correct] : (q.correctText || 'N/A');
+
+                const subject = cleanCell(q.subject);
+                const topic = cleanCell(q.topic);
+                const job = cleanCell(q.job);
+
+                const metaChips = [];
+                if (subject) metaChips.push(`<span class="fm-chip fm-subject">📚 ${toTitleCase(subject)}</span>`);
+                if (topic)   metaChips.push(`<span class="fm-chip fm-topic">🏷️ ${toTitleCase(topic)}</span>`);
+                if (job)     metaChips.push(`<span class="fm-chip fm-job">💼 ${toTitleCase(job)}</span>`);
+
+                html += `
+                    <div class="fact-item">
+                        <div class="fact-line">
+                            <span class="fact-srno">${srno}.</span>
+                            <span class="fact-q">${questionText}</span>
+                            <span class="fact-arrow">→</span>
+                            <span class="fact-answer">${correctAns}</span>
+                        </div>
+                        ${metaChips.length ? `<div class="fact-meta">${metaChips.join('')}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            factsContainer.innerHTML = html;
+        }
+
+        factsModeCheckbox.addEventListener('change', function() {
+            setFactsMode(this.checked);
+        });
+
+        // ============================================================
         // LOGIN
         // ============================================================
         function parseLoginCSV(text) {
@@ -2005,10 +2160,7 @@
                     isLoadingUsers = false;
                     loginStatus.textContent = '🔐 Sign in to continue';
                     loginBtn.disabled = false;
-
-                    if (users.length === 0) {
-                        console.warn('[Self Learners] Login sheet returned 0 users. Check sharing.');
-                    }
+                    if (users.length === 0) console.warn('[Self Learners] Login sheet returned 0 users.');
                     restoreSession();
                 })
                 .catch(err => {
@@ -2106,6 +2258,10 @@
             modalUserAvatar.textContent = 'U';
             modalUserName.textContent = 'User';
 
+            setFactsMode(false);
+            factsContainer.innerHTML = '';
+            factsCountBadge.textContent = '0 facts';
+
             if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
             hideLoading();
         }
@@ -2142,6 +2298,12 @@
             quizApp.style.display = 'block';
             updateModalUserInfo();
             fetchQuestions(false);
+
+            // restore facts mode preference
+            try {
+                const saved = localStorage.getItem(FACTS_MODE_KEY);
+                if (saved === 'true') setFactsMode(true);
+            } catch(e) {}
         }
 
         function updateModalUserInfo() {
@@ -2328,9 +2490,7 @@
                 subjectCheckboxList.appendChild(row);
 
                 cb.addEventListener('change', function() {
-                    if (this.checked) {
-                        allCb.checked = false;
-                    }
+                    if (this.checked) allCb.checked = false;
                     const anyChecked = subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects):checked').length > 0;
                     if (!anyChecked) allCb.checked = true;
                 });
@@ -2348,12 +2508,10 @@
         function onJobChangedInModal() {
             const selectedJob = modalJobSelect.value;
             const availableSubjects = getSubjectsForJob(selectedJob);
-
             const currentChecked = getCheckedSubjects();
             const stillValid = currentChecked.filter(s =>
                 availableSubjects.some(as => sameValueCI(as, s))
             );
-
             buildSubjectCheckboxList(availableSubjects, stillValid);
         }
 
@@ -2438,6 +2596,8 @@
                     renderQuestion();
                     renderDots();
                     updateOverview();
+                    // render facts if mode active
+                    if (factsModeActive) renderFacts();
                     return;
                 }
             }
@@ -2506,6 +2666,7 @@
                     renderQuestion();
                     renderDots();
                     updateOverview();
+                    if (factsModeActive) renderFacts();
                     if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
                     scrollToTop();
                 })
@@ -2632,9 +2793,7 @@
 
             questionCard.innerHTML = `${mBadgeHtml}<div class="question-body">${bodyHtml}</div>`;
 
-            // ============================================================
-            // QUESTION CLICK → GOOGLE SEARCH WITH SUBJECT + TOPIC
-            // ============================================================
+            // question click -> google search
             const qTextEl = questionCard.querySelector('.q-text');
             if (qTextEl) {
                 qTextEl.addEventListener('click', function(e) {
@@ -2646,12 +2805,8 @@
                     const parts = [];
                     if (q.subject && q.subject.trim()) parts.push(q.subject.trim());
                     if (q.topic && q.topic.trim()) parts.push(q.topic.trim());
-                    if (parts.length > 0) {
-                        searchQuery = t + ' ' + parts.join(' ');
-                    }
-
+                    if (parts.length > 0) searchQuery = t + ' ' + parts.join(' ');
                     searchQuery = searchQuery.substring(0, 2000);
-
                     window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
                 });
             }
@@ -2843,9 +2998,7 @@
                     const parts = [];
                     if (q.subject && q.subject.trim()) parts.push(q.subject.trim());
                     if (q.topic && q.topic.trim()) parts.push(q.topic.trim());
-                    if (parts.length > 0) {
-                        searchQuery = t + ' ' + parts.join(' ');
-                    }
+                    if (parts.length > 0) searchQuery = t + ' ' + parts.join(' ');
                     searchQuery = searchQuery.substring(0, 2000);
                     window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
                 });
@@ -2910,6 +3063,7 @@
             renderQuestion();
             renderDots();
             updateOverview();
+            if (factsModeActive) renderFacts();
             saveState();
             scrollToTop();
         }
@@ -2929,7 +3083,6 @@
             buildSubjectCheckboxList(filteredSubjects, currentSubjects);
 
             updateModalUserInfo();
-
             refreshModal.classList.add('active');
         }
 
