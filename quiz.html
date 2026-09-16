@@ -66,7 +66,7 @@
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: 1.25rem;
             color: var(--text);
@@ -430,20 +430,34 @@
             width: 100%;
             background: var(--surface);
             border-radius: 24px;
-            padding: 1.5rem 1.75rem 1.5rem;
+            padding: 0 1.75rem 1.5rem;
             box-shadow: var(--shadow-lg);
             display: none;
             border: 1px solid rgba(255,255,255,0.5);
+            position: relative;
         }
 
+        /* ===== STICKY TOP BAR ===== */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
             gap: 0.5rem 0.9rem;
+            padding: 1.1rem 0 0.55rem;
             margin-bottom: 0.55rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--surface);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
+        .top-bar.scrolled {
+            border-bottom-color: var(--border);
+            box-shadow: 0 4px 12px -8px rgba(15, 23, 42, 0.15);
+        }
+
         .brand { display: flex; align-items: flex-start; gap: 0.55rem; min-width: 0; flex: 1 1 auto; }
         .brand-logo {
             width: 34px; height: 34px;
@@ -1398,7 +1412,7 @@
             .m-col-badge .q-mark { font-size: 0.72rem; }
         }
         @media (max-width: 560px) {
-            .quiz-wrapper { padding: 1.15rem 0.85rem; }
+            .quiz-wrapper { padding: 0 0.85rem 1.15rem; }
             .brand-logo { width: 30px; height: 30px; }
             .brand-title h1 { font-size: 0.88rem; max-width: 150px; }
             .selected-subjects { max-width: 150px; font-size: 0.68rem; }
@@ -1500,7 +1514,7 @@
     </div>
 
     <div class="quiz-wrapper" id="quizApp">
-        <div class="top-bar">
+        <div class="top-bar" id="topBar">
             <div class="brand">
                 <img class="brand-logo" id="brandLogo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230f766e'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='700' fill='white'%3ESL%3C/text%3E%3C/svg%3E" alt="Logo">
                 <div class="brand-title">
@@ -1805,6 +1819,7 @@
         const loginStatus = document.getElementById('loginStatus');
         const loginLogo = document.getElementById('loginLogo');
 
+        const topBar = document.getElementById('topBar');
         const questionCard = document.getElementById('questionCard');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
@@ -1858,6 +1873,19 @@
         const confirmOk = document.getElementById('confirmOk');
         const confirmCancel = document.getElementById('confirmCancel');
         let confirmResolve = null;
+
+        // ============================================================
+        // STICKY TOP BAR SHADOW ON SCROLL
+        // ============================================================
+        function updateTopBarShadow() {
+            if (!topBar) return;
+            if (window.scrollY > 10 || (document.documentElement.scrollTop > 10)) {
+                topBar.classList.add('scrolled');
+            } else {
+                topBar.classList.remove('scrolled');
+            }
+        }
+        window.addEventListener('scroll', updateTopBarShadow, { passive: true });
 
         // ============================================================
         // M‑COL RENDERER (quiz card)
@@ -2515,7 +2543,6 @@
         }
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            quizApp.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // ============================================================
@@ -3227,6 +3254,9 @@
         refreshModal.addEventListener('click', function(e) {
             if (e.target === this) refreshModal.classList.remove('active');
         });
+
+        // initial top bar shadow check
+        updateTopBarShadow();
 
         fetchUsers();
     })();
