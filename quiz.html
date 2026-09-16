@@ -1787,6 +1787,9 @@
 
         const DEFAULT_TITLE = 'All Jobs MCQs';
 
+        // Column index for the "show_on_quiz_or_notshow" flag (Column N = index 13)
+        const SHOW_COL_INDEX = 13;
+
         let questions = [];
         let currentIndex = 0;
         let score = 0;
@@ -1886,6 +1889,21 @@
             }
         }
         window.addEventListener('scroll', updateTopBarShadow, { passive: true });
+
+        // ============================================================
+        // SHOW FLAG HELPER
+        // - Returns true if the question should be shown
+        // - 1 or empty/missing  → show
+        // - 0                   → hide
+        // ============================================================
+        function shouldShowQuestion(rawFlag) {
+            if (rawFlag === null || rawFlag === undefined) return true;
+            const v = String(rawFlag).trim().toLowerCase();
+            if (v === '' || v === '1' || v === 'true' || v === 'yes' || v === 'y') return true;
+            if (v === '0' || v === 'false' || v === 'no' || v === 'n') return false;
+            // Unknown value → default to showing (safer)
+            return true;
+        }
 
         // ============================================================
         // M‑COL RENDERER (quiz card)
@@ -2743,7 +2761,17 @@
                     const parsed = parseQuizCSV(csvText);
                     if (parsed.questions.length === 0) throw new Error('No data');
 
-                    originalQuestions = parsed.questions;
+                    // ---------- FILTER BY SHOW FLAG (Column N) ----------
+                    // Keep only questions where show flag is 1 / empty / true / yes
+                    // Drop where show flag is 0 / false / no
+                    const visibleQuestions = parsed.questions.filter(q => shouldShowQuestion(q.showFlag));
+
+                    if (visibleQuestions.length === 0) {
+                        showToast('All questions are hidden (show flag = 0). Showing all instead.', 'warning', 3500, false);
+                        originalQuestions = parsed.questions;
+                    } else {
+                        originalQuestions = visibleQuestions;
+                    }
 
                     const subjects = [...new Set(originalQuestions.map(q => q.subject || '').filter(c => c && c.trim()))];
                     const jobs = [...new Set(originalQuestions.map(q => q.job || '').filter(c => c && c.trim()))];
@@ -2815,6 +2843,7 @@
 
         // ============================================================
         // PARSE QUIZ CSV
+        // Reads Column N (index 13) as "show_on_quiz_or_notshow"
         // ============================================================
         function parseQuizCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
@@ -2845,6 +2874,9 @@
 
                 const mcolRaw = cols[12] !== undefined ? cols[12] : '';
 
+                // Column N (index 13) → show_on_quiz_or_notshow
+                const showFlagRaw = cols[SHOW_COL_INDEX] !== undefined ? cols[SHOW_COL_INDEX] : '';
+
                 result.push({
                     question: q,
                     options: opts,
@@ -2854,7 +2886,8 @@
                     topic: topic,
                     subject: subject,
                     job: job,
-                    mcol: mcolRaw
+                    mcol: mcolRaw,
+                    showFlag: showFlagRaw
                 });
             }
 
