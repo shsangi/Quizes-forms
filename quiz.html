@@ -12,8 +12,14 @@
     <meta name="msapplication-TileColor" content="#0f766e" />
     <meta name="msapplication-tap-highlight" content="no" />
     <title>Self Learners · Quiz</title>
-    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
+
+    <!-- Favicon with fallback to your logo -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27" id="faviconLink">
+    <link rel="shortcut icon" type="image/png" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
+    <link rel="apple-touch-icon" sizes="120x120" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
+    <link rel="apple-touch-icon" sizes="76x76" href="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27">
     <link rel="manifest" id="appManifest">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -109,6 +115,13 @@
             font-weight: 800;
             font-size: 1.1rem;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+        .install-banner .ib-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
         }
         .install-banner .ib-text {
             flex: 1;
@@ -1247,7 +1260,9 @@
 
     <!-- ===== INSTALL BANNER ===== -->
     <div class="install-banner" id="installBanner">
-        <div class="ib-icon">SL</div>
+        <div class="ib-icon">
+            <img src="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27" alt="SL" id="installIconImg">
+        </div>
         <div class="ib-text">
             <strong>Install Self Learners</strong>
             <span>Add to home screen for quick access</span>
@@ -1397,6 +1412,11 @@
     <script>
     (function() {
         // ============================================================
+        // LOGO URL
+        // ============================================================
+        const APP_LOGO_URL = 'https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27';
+
+        // ============================================================
         // PWA INSTALL LOGIC
         // ============================================================
         let deferredPrompt = null;
@@ -1404,42 +1424,62 @@
         const installBtn = document.getElementById('installBtn');
         const installClose = document.getElementById('installClose');
 
-        // Create manifest dynamically
+        // Create manifest dynamically with proper icon URLs
         function createManifest() {
+            // Build icon array — use the real logo for best quality
+            const icons = [
+                {
+                    src: APP_LOGO_URL,
+                    sizes: '192x192',
+                    type: 'image/png',
+                    purpose: 'any'
+                },
+                {
+                    src: APP_LOGO_URL,
+                    sizes: '512x512',
+                    type: 'image/png',
+                    purpose: 'any'
+                },
+                {
+                    src: APP_LOGO_URL,
+                    sizes: '192x192',
+                    type: 'image/png',
+                    purpose: 'maskable'
+                },
+                {
+                    src: APP_LOGO_URL,
+                    sizes: '512x512',
+                    type: 'image/png',
+                    purpose: 'maskable'
+                },
+                // SVG fallback for broad compatibility
+                {
+                    src: 'data:image/svg+xml,' + encodeURIComponent(
+                        `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+                            <rect width="512" height="512" rx="112" fill="#0f766e"/>
+                            <text x="256" y="330" text-anchor="middle" font-family="Inter, sans-serif" font-size="240" font-weight="800" fill="white">SL</text>
+                        </svg>`
+                    ),
+                    sizes: '512x512',
+                    type: 'image/svg+xml',
+                    purpose: 'any'
+                }
+            ];
+
             const manifest = {
                 name: 'Self Learners Quiz',
                 short_name: 'Self Learners',
                 description: 'Practice MCQs for various jobs and subjects',
-                start_url: window.location.href,
+                start_url: window.location.href.split('?')[0],
+                scope: './',
                 display: 'standalone',
-                orientation: 'portrait',
+                orientation: 'any',
                 background_color: '#f0f4f8',
                 theme_color: '#0f766e',
-                scope: './',
-                icons: [
-                    {
-                        src: 'data:image/svg+xml,' + encodeURIComponent(
-                            `<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-                                <rect width="192" height="192" rx="42" fill="#0f766e"/>
-                                <text x="96" y="125" text-anchor="middle" font-family="Inter, sans-serif" font-size="90" font-weight="800" fill="white">SL</text>
-                            </svg>`
-                        ),
-                        sizes: '192x192',
-                        type: 'image/svg+xml',
-                        purpose: 'any'
-                    },
-                    {
-                        src: 'data:image/svg+xml,' + encodeURIComponent(
-                            `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-                                <rect width="512" height="512" rx="112" fill="#0f766e"/>
-                                <text x="256" y="330" text-anchor="middle" font-family="Inter, sans-serif" font-size="240" font-weight="800" fill="white">SL</text>
-                            </svg>`
-                        ),
-                        sizes: '512x512',
-                        type: 'image/svg+xml',
-                        purpose: 'any maskable'
-                    }
-                ]
+                lang: 'en',
+                dir: 'ltr',
+                categories: ['education', 'productivity'],
+                icons: icons
             };
 
             const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
@@ -1451,7 +1491,7 @@
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 const swCode = `
-                    const CACHE_NAME = 'self-learners-v1';
+                    const CACHE_NAME = 'self-learners-v2';
                     self.addEventListener('install', (event) => {
                         self.skipWaiting();
                     });
@@ -1459,6 +1499,10 @@
                         event.waitUntil(self.clients.claim());
                     });
                     self.addEventListener('fetch', (event) => {
+                        // Skip cross-origin requests from caching
+                        if (!event.request.url.startsWith(self.location.origin)) {
+                            return;
+                        }
                         event.respondWith(
                             fetch(event.request).catch(() => {
                                 return caches.match(event.request);
@@ -1470,6 +1514,30 @@
                 const swUrl = URL.createObjectURL(blob);
                 navigator.serviceWorker.register(swUrl).catch(() => {});
             }
+        }
+
+        // Set favicon dynamically to ensure it shows
+        function setFavicon() {
+            // Remove old favicons
+            document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(el => {
+                // keep the ones we added
+                if (!el.id || el.id !== 'faviconLink') {
+                    el.parentNode.removeChild(el);
+                }
+            });
+
+            // Create a new favicon from the logo
+            const link = document.createElement('link');
+            link.rel = 'icon';
+            link.type = 'image/png';
+            link.href = APP_LOGO_URL;
+            document.head.appendChild(link);
+
+            // Apple touch icon
+            const appleLink = document.createElement('link');
+            appleLink.rel = 'apple-touch-icon';
+            appleLink.href = APP_LOGO_URL;
+            document.head.appendChild(appleLink);
         }
 
         // Install prompt handling
@@ -1533,6 +1601,7 @@
 
         createManifest();
         registerServiceWorker();
+        setFavicon();
 
         // ============================================================
         // CONFIG
@@ -1545,7 +1614,7 @@
         const LOGIN_CSV_URL =
             `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
 
-        const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
+        const LOGO_URL = APP_LOGO_URL;
         const STORAGE_KEY = 'selfLearnersOneByOneV4';
         const SESSION_KEY = 'selfLearnersSessionUser';
 
