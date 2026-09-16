@@ -1229,6 +1229,37 @@
         }
         .modal-actions .btn-secondary:hover { background: var(--border); }
 
+        /* Reset filters button */
+        .modal-reset-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 0.35rem;
+        }
+        .btn-reset-filters {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: transparent;
+            border: 1.5px dashed var(--border);
+            color: var(--text-3);
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .btn-reset-filters:hover {
+            background: var(--surface-2);
+            border-color: var(--primary);
+            border-style: solid;
+            color: var(--primary);
+        }
+        .btn-reset-filters:active {
+            transform: scale(0.97);
+        }
+
         .modal-label {
             display: block;
             text-align: left;
@@ -1614,6 +1645,13 @@
                     <button class="modal-logout-btn" id="modalLogoutBtn">🚪 Logout</button>
                 </div>
 
+                <!-- Reset Filters row -->
+                <div class="modal-reset-row">
+                    <button class="btn-reset-filters" id="modalResetBtn" title="Reset all filters to default">
+                        ⟲ Reset Filters
+                    </button>
+                </div>
+
                 <label class="modal-label" for="modalJobSelect">💼 Job</label>
                 <select class="year-select" id="modalJobSelect">
                     <option value="all">All Jobs</option>
@@ -1692,7 +1730,6 @@
                     self.addEventListener('install', (event) => { self.skipWaiting(); });
                     self.addEventListener('activate', (event) => { event.waitUntil(self.clients.claim()); });
                     self.addEventListener('fetch', (event) => {
-                        // Never cache the CSV/quiz data - always fetch fresh
                         if (event.request.url.includes('docs.google.com') ||
                             event.request.url.includes('output=csv') ||
                             event.request.url.includes('export?format=csv')) {
@@ -1847,6 +1884,7 @@
         const refreshModal = document.getElementById('refreshModal');
         const modalCancel = document.getElementById('modalCancel');
         const modalConfirm = document.getElementById('modalConfirm');
+        const modalResetBtn = document.getElementById('modalResetBtn');
         const modalJobSelect = document.getElementById('modalJobSelect');
         const subjectCheckboxList = document.getElementById('subjectCheckboxList');
         const doneCount = document.getElementById('doneCount');
@@ -1898,16 +1936,13 @@
 
         // ============================================================
         // SHOW FLAG HELPER
-        // - Empty / missing / 1 / true / yes / y  → SHOW
-        // - 0 / false / no / n                    → HIDE
-        // - Unknown                                → SHOW (safe default)
+        // Empty / missing / 1 / true / yes → SHOW
+        // 0 / false / no → HIDE
         // ============================================================
         function shouldShowQuestion(rawFlag) {
             if (rawFlag === null || rawFlag === undefined) return true;
             const v = String(rawFlag).trim().toLowerCase();
-            // Hide ONLY on explicit zero
             if (v === '0' || v === 'false' || v === 'no' || v === 'n') return false;
-            // Everything else (empty, 1, true, yes, y, unknown) → show
             return true;
         }
 
@@ -1934,7 +1969,6 @@
             return `<div class="m-col-badge empty" title="unknown: ${rawValue}"><span class="q-mark">?</span></div>`;
         }
 
-        // m-col inside read item (smaller)
         function renderMColRead(rawValue) {
             if (rawValue === null || rawValue === undefined || String(rawValue).trim() === '') {
                 return `<div class="read-mcol empty" title="empty"><span class="q-mark">?</span></div>`;
@@ -1978,9 +2012,6 @@
                 .join('');
         }
 
-        // ============================================================
-        // TITLE RESOLVER
-        // ============================================================
         function resolveTitle(jobValue) {
             const raw = cleanCell(jobValue);
             if (!raw || raw.toLowerCase() === 'all') return DEFAULT_TITLE;
@@ -1993,9 +2024,6 @@
             quizTitle.title = t;
         }
 
-        // ============================================================
-        // SELECTED SUBJECTS LINE
-        // ============================================================
         function renderSelectedSubjectsLine() {
             if (!currentSubjects || currentSubjects.length === 0) {
                 selectedSubjectsLine.innerHTML = '';
@@ -2078,9 +2106,6 @@
             togglePasswordBtn.textContent = passwordVisible ? '🙈' : '👁️';
         });
 
-        // ============================================================
-        // LOGIN INPUT SCROLL
-        // ============================================================
         function scrollLoginInputIntoView(el) {
             setTimeout(() => {
                 try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
@@ -2184,7 +2209,7 @@
         }
 
         // ============================================================
-        // DISPLAY MODE (MCQ / READ)
+        // DISPLAY MODE
         // ============================================================
         function setDisplayMode(mode) {
             displayMode = (mode === 'read') ? 'read' : 'mcq';
@@ -2217,7 +2242,7 @@
         modeReadRadio.addEventListener('change', () => setDisplayMode('read'));
 
         // ============================================================
-        // RENDER READ (SOLVED) MODE
+        // RENDER READ MODE
         // ============================================================
         function renderReadMode() {
             if (!questions || questions.length === 0) {
@@ -2565,9 +2590,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ============================================================
-        // GET SUBJECTS FOR JOB
-        // ============================================================
         function getSubjectsForJob(jobValue) {
             const pool = originalQuestions.length ? originalQuestions : questions;
             if (!pool || pool.length === 0) return [];
@@ -2591,9 +2613,6 @@
             return [...set];
         }
 
-        // ============================================================
-        // BUILD SUBJECT CHECKBOX LIST
-        // ============================================================
         function buildSubjectCheckboxList(subjects, selectedArr) {
             subjectCheckboxList.innerHTML = '';
 
@@ -2673,6 +2692,23 @@
         modalJobSelect.addEventListener('change', onJobChangedInModal);
 
         // ============================================================
+        // RESET FILTERS (in modal)
+        // ============================================================
+        function resetFiltersInModal() {
+            // Reset job dropdown to "All Jobs"
+            modalJobSelect.value = 'all';
+
+            // Rebuild subject list with all subjects (unfiltered by job)
+            // and no specific subject selected (i.e. "All Subjects" checked)
+            const allSubjectsForAllJobs = getSubjectsForJob('all');
+            buildSubjectCheckboxList(allSubjectsForAllJobs, []);
+
+            showToast('Filters reset to defaults.', 'info', 2000, false);
+        }
+
+        modalResetBtn.addEventListener('click', resetFiltersInModal);
+
+        // ============================================================
         // DROPDOWNS / JOB
         // ============================================================
         function populateDropdowns(subjects, jobs) {
@@ -2713,14 +2749,12 @@
 
         // ============================================================
         // FETCH QUESTIONS
-        // When forceRefresh=true, ALWAYS fetches fresh sheet data (bypasses cache + local state)
         // ============================================================
         function fetchQuestions(forceRefresh = false, subjectArr = null, job = null) {
             showLoading();
             if (subjectArr !== null) currentSubjects = subjectArr;
             if (job !== null) currentJob = job;
 
-            // Only use local cached state if NOT forcing a refresh
             if (!forceRefresh) {
                 const saved = loadState();
                 if (saved && saved.questions.length > 0) {
@@ -2758,13 +2792,11 @@
                 }
             }
 
-            // When forcing refresh: clear local state so we rebuild from scratch
             if (forceRefresh) {
                 clearState();
                 if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             }
 
-            // Cache-busting URL with multiple params + no-store
             const sep = QUIZ_CSV_URL.includes('?') ? '&' : '?';
             const url = QUIZ_CSV_URL + sep + '_t=' + Date.now() + '&_r=' + Math.random().toString(36).slice(2);
 
@@ -2781,9 +2813,6 @@
                     const parsed = parseQuizCSV(csvText);
                     if (parsed.questions.length === 0) throw new Error('No data');
 
-                    // ---------- FILTER BY SHOW FLAG (Column N) ----------
-                    // Empty / missing / 1 / true / yes → show
-                    // Only 0 / false / no → hide
                     const visibleQuestions = parsed.questions.filter(q => shouldShowQuestion(q.showFlag));
 
                     if (visibleQuestions.length === 0) {
@@ -2867,7 +2896,6 @@
 
         // ============================================================
         // PARSE QUIZ CSV
-        // Reads Column N (index 13) as "show_on_quiz_or_notshow"
         // ============================================================
         function parseQuizCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
@@ -2897,8 +2925,6 @@
                 const job     = cols[10] ? cols[10].trim() : '';
 
                 const mcolRaw = cols[12] !== undefined ? cols[12] : '';
-
-                // Column N (index 13) → show_on_quiz_or_notshow
                 const showFlagRaw = cols[SHOW_COL_INDEX] !== undefined ? cols[SHOW_COL_INDEX] : '';
 
                 result.push({
@@ -3279,15 +3305,12 @@
             refreshModal.classList.add('active');
         }
 
-        // When user clicks "Load & Refresh" → ALWAYS fetch fresh sheet data
         function handleRefreshConfirm() {
             const selSubjects = getCheckedSubjects();
             const selJob = modalJobSelect.value;
             if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             resetToQuizView();
-
-            // forceRefresh = true → always fetch fresh sheet data
             fetchQuestions(true, selSubjects, selJob);
         }
 
@@ -3318,7 +3341,6 @@
             if (e.target === this) refreshModal.classList.remove('active');
         });
 
-        // initial top bar shadow check
         updateTopBarShadow();
 
         fetchUsers();
