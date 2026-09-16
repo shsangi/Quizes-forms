@@ -2309,14 +2309,36 @@
 
             questionCard.innerHTML = `${mBadgeHtml}<div class="question-body">${bodyHtml}</div>`;
 
+            // ============================================================
+            // QUESTION CLICK → GOOGLE SEARCH WITH SUBJECT + TOPIC
+            // ============================================================
             const qTextEl = questionCard.querySelector('.q-text');
             if (qTextEl) {
                 qTextEl.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const t = decodeURIComponent(this.dataset.question);
-                    if (t) window.open(`https://www.google.com/search?q=${encodeURIComponent(t)}`, '_blank');
+                    if (!t) return;
+
+                    // Build search query: question + subject + topic
+                    let searchQuery = t;
+                    const parts = [];
+                    if (q.subject && q.subject.trim()) parts.push(q.subject.trim());
+                    if (q.topic && q.topic.trim()) parts.push(q.topic.trim());
+                    if (parts.length > 0) {
+                        searchQuery = t + ' ' + parts.join(' ');
+                    }
+
+                    // Trim and limit length (Google max ~2048 chars, keep it safe)
+                    searchQuery = searchQuery.substring(0, 2000);
+
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
                 });
             }
+
+            // ============================================================
+            // RESULT DETAILS CLICK → GOOGLE SEARCH WITH SUBJECT + TOPIC
+            // ============================================================
+            // (handled in showResult() below)
 
             if (!isSubmitted && !quizCompleted) {
                 questionCard.querySelectorAll('.option-btn:not(.locked-btn)').forEach(btn => {
@@ -2497,10 +2519,20 @@
                 qText.className = 'detail-q';
                 qText.textContent = `${idx+1}. ${q.question}`;
                 qText.style.cursor = 'pointer';
+                // ---- GOOGLE SEARCH WITH SUBJECT + TOPIC ----
                 qText.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const t = this.textContent.replace(/^\d+\.\s*/, '');
-                    if (t) window.open(`https://www.google.com/search?q=${encodeURIComponent(t)}`, '_blank');
+                    if (!t) return;
+                    let searchQuery = t;
+                    const parts = [];
+                    if (q.subject && q.subject.trim()) parts.push(q.subject.trim());
+                    if (q.topic && q.topic.trim()) parts.push(q.topic.trim());
+                    if (parts.length > 0) {
+                        searchQuery = t + ' ' + parts.join(' ');
+                    }
+                    searchQuery = searchQuery.substring(0, 2000);
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
                 });
                 div.appendChild(qText);
 
