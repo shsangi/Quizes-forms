@@ -1692,6 +1692,12 @@
                     self.addEventListener('install', (event) => { self.skipWaiting(); });
                     self.addEventListener('activate', (event) => { event.waitUntil(self.clients.claim()); });
                     self.addEventListener('fetch', (event) => {
+                        // Never cache the CSV/quiz data - always fetch fresh
+                        if (event.request.url.includes('docs.google.com') ||
+                            event.request.url.includes('output=csv') ||
+                            event.request.url.includes('export?format=csv')) {
+                            return;
+                        }
                         if (!event.request.url.startsWith(self.location.origin)) return;
                         event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
                     });
@@ -1787,7 +1793,7 @@
 
         const DEFAULT_TITLE = 'All Jobs MCQs';
 
-        // Column index for the "show_on_quiz_or_notshow" flag (Column N = index 13)
+        // Column N (0-based index 13) = show_on_quiz_or_notshow
         const SHOW_COL_INDEX = 13;
 
         let questions = [];
@@ -1892,16 +1898,16 @@
 
         // ============================================================
         // SHOW FLAG HELPER
-        // - Returns true if the question should be shown
-        // - 1 or empty/missing  → show
-        // - 0                   → hide
+        // - Empty / missing / 1 / true / yes / y  → SHOW
+        // - 0 / false / no / n                    → HIDE
+        // - Unknown                                → SHOW (safe default)
         // ============================================================
         function shouldShowQuestion(rawFlag) {
             if (rawFlag === null || rawFlag === undefined) return true;
             const v = String(rawFlag).trim().toLowerCase();
-            if (v === '' || v === '1' || v === 'true' || v === 'yes' || v === 'y') return true;
+            // Hide ONLY on explicit zero
             if (v === '0' || v === 'false' || v === 'no' || v === 'n') return false;
-            // Unknown value → default to showing (safer)
+            // Everything else (empty, 1, true, yes, y, unknown) → show
             return true;
         }
 
@@ -2227,7 +2233,6 @@
                 const qText = q.question || '';
                 const isInvalid = invalidQuestions.includes(idx);
 
-                // build options
                 let optsHtml = '';
                 q.options.forEach((opt, oi) => {
                     const isCorrect = (!isInvalid && q.correct !== -1 && oi === q.correct);
@@ -2240,7 +2245,6 @@
                     </div>`;
                 });
 
-                // meta chips
                 const metaChips = [];
                 const subject = cleanCell(q.subject);
                 const topic = cleanCell(q.topic);
@@ -2265,7 +2269,6 @@
 
             readContainer.innerHTML = html;
 
-            // attach search click handlers
             readContainer.querySelectorAll('.read-q').forEach(el => {
                 el.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -2452,7 +2455,6 @@
             updateModalUserInfo();
             fetchQuestions(false);
 
-            // restore display mode
             try {
                 const saved = localStorage.getItem(MODE_KEY);
                 if (saved === 'read') setDisplayMode('read');
@@ -2711,12 +2713,14 @@
 
         // ============================================================
         // FETCH QUESTIONS
+        // When forceRefresh=true, ALWAYS fetches fresh sheet data (bypasses cache + local state)
         // ============================================================
         function fetchQuestions(forceRefresh = false, subjectArr = null, job = null) {
             showLoading();
             if (subjectArr !== null) currentSubjects = subjectArr;
             if (job !== null) currentJob = job;
 
+            // Only use local cached state if NOT forcing a refresh
             if (!forceRefresh) {
                 const saved = loadState();
                 if (saved && saved.questions.length > 0) {
@@ -2754,20 +2758,36 @@
                 }
             }
 
-            const url = QUIZ_CSV_URL + (forceRefresh ? '&_t=' + Date.now() : '');
-            fetch(url, { referrerPolicy: 'no-referrer' })
+            // When forcing refresh: clear local state so we rebuild from scratch
+            if (forceRefresh) {
+                clearState();
+                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            }
+
+            // Cache-busting URL with multiple params + no-store
+            const sep = QUIZ_CSV_URL.includes('?') ? '&' : '?';
+            const url = QUIZ_CSV_URL + sep + '_t=' + Date.now() + '&_r=' + Math.random().toString(36).slice(2);
+
+            fetch(url, {
+                referrerPolicy: 'no-referrer',
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache'
+                }
+            })
                 .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
                 .then(csvText => {
                     const parsed = parseQuizCSV(csvText);
                     if (parsed.questions.length === 0) throw new Error('No data');
 
                     // ---------- FILTER BY SHOW FLAG (Column N) ----------
-                    // Keep only questions where show flag is 1 / empty / true / yes
-                    // Drop where show flag is 0 / false / no
+                    // Empty / missing / 1 / true / yes → show
+                    // Only 0 / false / no → hide
                     const visibleQuestions = parsed.questions.filter(q => shouldShowQuestion(q.showFlag));
 
                     if (visibleQuestions.length === 0) {
-                        showToast('All questions are hidden (show flag = 0). Showing all instead.', 'warning', 3500, false);
+                        showToast('All questions are hidden (column N = 0). Showing all instead.', 'warning', 3500, false);
                         originalQuestions = parsed.questions;
                     } else {
                         originalQuestions = visibleQuestions;
@@ -2813,7 +2833,6 @@
                     score = 0;
                     currentIndex = 0;
                     timeRemaining = totalQuestions * 60;
-                    clearState();
 
                     applyTitle(currentJob);
                     renderSelectedSubjectsLine();
@@ -2831,6 +2850,10 @@
                     if (displayMode === 'read') renderReadMode();
                     if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
                     scrollToTop();
+
+                    if (forceRefresh) {
+                        showToast(`Refreshed! Loaded ${totalQuestions} questions from sheet.`, 'success', 2500, false);
+                    }
                 })
                 .catch(err => {
                     console.error(err);
@@ -2838,6 +2861,7 @@
                         '<div style="padding:2rem;text-align:center;color:#ef4444;">❌ Failed to load. Check CSV link.</div>';
                     hideLoading();
                     if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
+                    showToast('Failed to load questions. Please try again.', 'error', 3500, false);
                 });
         }
 
@@ -2960,7 +2984,6 @@
 
             questionCard.innerHTML = `${mBadgeHtml}<div class="question-body">${bodyHtml}</div>`;
 
-            // question click -> google search
             const qTextEl = questionCard.querySelector('.q-text');
             if (qTextEl) {
                 qTextEl.addEventListener('click', function(e) {
@@ -3235,6 +3258,9 @@
             scrollToTop();
         }
 
+        // ============================================================
+        // REFRESH / FILTER HANDLERS
+        // ============================================================
         function handleRefreshClick() {
             modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
             allJobs.forEach(j => {
@@ -3253,14 +3279,18 @@
             refreshModal.classList.add('active');
         }
 
+        // When user clicks "Load & Refresh" → ALWAYS fetch fresh sheet data
         function handleRefreshConfirm() {
             const selSubjects = getCheckedSubjects();
             const selJob = modalJobSelect.value;
             if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             resetToQuizView();
+
+            // forceRefresh = true → always fetch fresh sheet data
             fetchQuestions(true, selSubjects, selJob);
         }
+
         function handleRefreshCancel() { refreshModal.classList.remove('active'); }
 
         prevBtn.addEventListener('click', function() {
