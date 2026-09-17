@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2377,7 +2376,6 @@
                 renderJobDropdown();
                 renderSubjectChips();
                 renderSubjectDropdown();
-                // Keep dropdown open after "Select All" (user may want to see result)
             });
             jobMsDropdown.appendChild(selAllRow);
 
@@ -2406,7 +2404,7 @@
                     renderJobDropdown();
                     renderSubjectChips();
                     renderSubjectDropdown();
-                    // Close the job dropdown after selection
+                    // Close the job dropdown after a single selection
                     jobMsContainer.classList.remove('open');
                 });
                 jobMsDropdown.appendChild(opt);
@@ -2432,7 +2430,6 @@
                 }
                 renderSubjectChips();
                 renderSubjectDropdown();
-                // Keep dropdown open after "Select All" (user may want to see result)
             });
             subjMsDropdown.appendChild(selAllRow);
 
@@ -2458,7 +2455,7 @@
                     }
                     renderSubjectChips();
                     renderSubjectDropdown();
-                    // Close the subject dropdown after selection
+                    // Close the subject dropdown after a single selection
                     subjMsContainer.classList.remove('open');
                 });
                 subjMsDropdown.appendChild(opt);
@@ -3315,6 +3312,8 @@
                     renderQuestion();
                     renderDots(currentIndex);
                     updateProgress();
+                    // Scroll to top so the question is visible
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
                 dotGrid.appendChild(dot);
             }
@@ -3557,4 +3556,3 @@
     </script>
 </body>
 </html>
-```
