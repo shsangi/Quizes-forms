@@ -652,13 +652,14 @@
             transition: width 0.35s ease;
         }
 
-        /* ===== SOLVED MODE STYLES ===== */
+        /* ===== SOLVED MODE STYLES - BIGGER VERTICAL ===== */
         .read-container {
             margin-top: 0.65rem;
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
-            max-height: 66vh;
+            max-height: 78vh;
+            min-height: 55vh;
             overflow-y: auto;
             padding-right: 0.4rem;
             scroll-behavior: smooth;
@@ -1199,7 +1200,7 @@
             text-align: center;
             box-shadow: var(--shadow-lg);
             animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 90vh;
+            max-height: 92vh;
             overflow-y: auto;
         }
         .modal-box h3 {
@@ -1268,7 +1269,7 @@
             margin: 0.6rem 0 0.2rem;
         }
 
-        /* ===== SEARCHABLE MULTI-SELECT ===== */
+        /* ===== SEARCHABLE MULTI-SELECT - TALLER DROPDOWN ===== */
         .ms-container {
             position: relative;
             width: 100%;
@@ -1370,7 +1371,7 @@
             border: 1.5px solid var(--border);
             border-radius: 12px;
             box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.25);
-            max-height: 200px;
+            max-height: 380px;
             overflow-y: auto;
             z-index: 200;
             display: none;
@@ -1600,7 +1601,8 @@
             .read-item .read-q { font-size: 0.85rem; }
             .read-item .read-opt { font-size: 0.78rem; }
             .read-item .read-meta { font-size: 0.58rem; }
-            .read-container { max-height: 60vh; }
+            .read-container { max-height: 72vh; min-height: 50vh; }
+            .ms-dropdown { max-height: 300px; }
         }
 
         @media (display-mode: standalone) {
@@ -1963,7 +1965,6 @@
 
         const DEFAULT_TITLE = 'All Jobs MCQs';
 
-        // Column N (0-based index 13) = show_on_quiz_or_notshow
         const SHOW_COL_INDEX = 13;
 
         let questions = [];
@@ -1980,19 +1981,18 @@
         let timeRemaining = 0;
         let allSubjects = [];
         let allJobs = [];
-        let currentSubjects = [];      // selected subjects
-        let currentJobs = [];          // selected jobs (multi)
+        let currentSubjects = [];
+        let currentJobs = [];
         let invalidQuestions = [];
 
         let users = [];
         let isLoadingUsers = true;
         let loggedInUser = null;
-        let displayMode = 'mcq'; // 'mcq' | 'read' (read = solved)
+        let displayMode = 'mcq';
 
-        // Multi-select state
-        let selectedJobs = [];          // array of job strings
-        let selectedSubjects = [];      // array of subject strings
-        let availableSubjects = [];     // dynamically computed based on selected jobs
+        let selectedJobs = [];
+        let selectedSubjects = [];
+        let availableSubjects = [];
         let jobSearchText = '';
         let subjSearchText = '';
 
@@ -2059,7 +2059,6 @@
         const confirmCancel = document.getElementById('confirmCancel');
         let confirmResolve = null;
 
-        // Multi-select DOM
         const jobMsContainer = document.getElementById('jobMsContainer');
         const jobMsWrapper = document.getElementById('jobMsWrapper');
         const jobMsChips = document.getElementById('jobMsChips');
@@ -2072,9 +2071,6 @@
         const subjMsSearch = document.getElementById('subjMsSearch');
         const subjMsDropdown = document.getElementById('subjMsDropdown');
 
-        // ============================================================
-        // STICKY TOP BAR SHADOW ON SCROLL
-        // ============================================================
         function updateTopBarShadow() {
             if (!topBar) return;
             if (window.scrollY > 10 || (document.documentElement.scrollTop > 10)) {
@@ -2085,9 +2081,6 @@
         }
         window.addEventListener('scroll', updateTopBarShadow, { passive: true });
 
-        // ============================================================
-        // SHOW FLAG HELPER
-        // ============================================================
         function shouldShowQuestion(rawFlag) {
             if (rawFlag === null || rawFlag === undefined) return true;
             const v = String(rawFlag).trim().toLowerCase();
@@ -2095,9 +2088,6 @@
             return true;
         }
 
-        // ============================================================
-        // M‑COL RENDERER (quiz card)
-        // ============================================================
         function renderMColBadge(rawValue) {
             if (rawValue === null || rawValue === undefined || String(rawValue).trim() === '') {
                 return `<div class="m-col-badge empty" title="empty"><span class="q-mark">?</span></div>`;
@@ -2138,9 +2128,6 @@
             return `<div class="read-mcol empty" title="unknown: ${rawValue}"><span class="q-mark">?</span></div>`;
         }
 
-        // ============================================================
-        // TITLE CASE HELPER
-        // ============================================================
         const SMALL_WORDS = new Set(['a','an','and','as','at','but','by','for','from','in','into','nor','of','on','onto','or','per','the','to','vs','via','with']);
 
         function toTitleCase(str) {
@@ -2190,9 +2177,6 @@
             selectedSubjectsLine.style.display = '-webkit-box';
         }
 
-        // ============================================================
-        // CONFIRM DIALOG
-        // ============================================================
         function showConfirm(icon, title, message, confirmClass = 'btn-confirm') {
             return new Promise(resolve => {
                 confirmIcon.textContent = icon || '❓';
@@ -2213,9 +2197,6 @@
             if (e.target === confirmOverlay) closeConfirm(false);
         });
 
-        // ============================================================
-        // TOAST
-        // ============================================================
         const toastContainer = document.getElementById('toastContainer');
         let toastTimeout = null;
         function showToast(message, type = 'info', duration = 4000, showIcon = true) {
@@ -2238,9 +2219,6 @@
             setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
         }
 
-        // ============================================================
-        // LOGO
-        // ============================================================
         function loadLogo(img) {
             const i = new Image();
             i.onload = () => img.src = LOGO_URL;
@@ -2250,9 +2228,6 @@
         loadLogo(loginLogo);
         loadLogo(brandLogo);
 
-        // ============================================================
-        // PASSWORD TOGGLE
-        // ============================================================
         let passwordVisible = false;
         togglePasswordBtn.addEventListener('click', function() {
             passwordVisible = !passwordVisible;
@@ -2281,9 +2256,6 @@
             });
         }
 
-        // ============================================================
-        // HELPERS
-        // ============================================================
         function cleanCell(v) {
             if (v == null) return '';
             return String(v)
@@ -2329,9 +2301,6 @@
             return cleanCell(a).toLowerCase() === cleanCell(b).toLowerCase();
         }
 
-        // ============================================================
-        // CORRECT-ANSWER RESOLVER
-        // ============================================================
         function resolveCorrectIndex(rawCorrect, options) {
             if (!rawCorrect) return -1;
             const raw = cleanCell(rawCorrect);
@@ -2362,9 +2331,6 @@
             return -1;
         }
 
-        // ============================================================
-        // MULTI-SELECT RENDERING
-        // ============================================================
         function renderChips(container, items, onRemove) {
             container.innerHTML = '';
             items.forEach(item => {
@@ -2394,7 +2360,6 @@
             
             jobMsDropdown.innerHTML = '';
             
-            // Select All row
             const allSelected = selectedJobs.length === allJobs.length && allJobs.length > 0;
             const selAllRow = document.createElement('div');
             selAllRow.className = 'ms-select-all-row' + (allSelected ? ' selected' : '');
@@ -2450,7 +2415,6 @@
             
             subjMsDropdown.innerHTML = '';
             
-            // Select All row
             const allSelected = availableSubjects.length > 0 && selectedSubjects.length === availableSubjects.length;
             const selAllRow = document.createElement('div');
             selAllRow.className = 'ms-select-all-row' + (allSelected ? ' selected' : '');
@@ -2514,9 +2478,7 @@
         }
 
         function updateAvailableSubjects() {
-            // Compute subjects available based on selected jobs
             if (selectedJobs.length === 0) {
-                // All subjects
                 const set = new Set();
                 originalQuestions.forEach(q => {
                     const s = cleanCell(q.subject);
@@ -2533,13 +2495,11 @@
                 });
                 availableSubjects = [...set];
             }
-            // Remove selected subjects that are no longer available
             selectedSubjects = selectedSubjects.filter(s =>
                 availableSubjects.some(as => sameValueCI(as, s))
             );
         }
 
-        // Multi-select event listeners
         jobMsWrapper.addEventListener('click', (e) => {
             if (e.target.closest('.ms-chip-remove')) return;
             jobMsContainer.classList.toggle('open');
@@ -2573,9 +2533,6 @@
             if (!subjMsContainer.contains(e.target)) subjMsContainer.classList.remove('open');
         });
 
-        // ============================================================
-        // DISPLAY MODE
-        // ============================================================
         function setDisplayMode(mode) {
             displayMode = (mode === 'read') ? 'read' : 'mcq';
 
@@ -2606,9 +2563,6 @@
         modeMcqRadio.addEventListener('change', () => setDisplayMode('mcq'));
         modeReadRadio.addEventListener('change', () => setDisplayMode('read'));
 
-        // ============================================================
-        // RENDER SOLVED MODE
-        // ============================================================
         function renderReadMode() {
             if (!questions || questions.length === 0) {
                 readContainer.innerHTML = '<div class="read-empty">No questions loaded yet.</div>';
@@ -2679,9 +2633,6 @@
             });
         }
 
-        // ============================================================
-        // LOGIN (with persistent storage)
-        // ============================================================
         function parseLoginCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
             if (lines.length < 2) return [];
@@ -2750,7 +2701,6 @@
         }
 
         function restoreSession() {
-            // First, try persistent localStorage (survives browser close)
             try {
                 const rawPersist = localStorage.getItem(PERSIST_KEY);
                 if (rawPersist) {
@@ -2770,7 +2720,6 @@
                 }
             } catch (e) {}
 
-            // Fallback to sessionStorage (same tab session)
             try {
                 const rawSession = sessionStorage.getItem(SESSION_KEY);
                 if (rawSession) {
@@ -2907,9 +2856,6 @@
         });
         modalLogoutBtn.addEventListener('click', handleLogout);
 
-        // ============================================================
-        // STATE
-        // ============================================================
         function saveState() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -2932,9 +2878,6 @@
         }
         function clearState() { localStorage.removeItem(STORAGE_KEY); }
 
-        // ============================================================
-        // LOADING UI
-        // ============================================================
         function showLoading() {
             questionCard.innerHTML =
                 '<div style="padding:2rem;text-align:center;color:#475569;">🔄 Loading questions...</div>';
@@ -2952,9 +2895,6 @@
             refreshIcon.classList.remove('refresh-spin');
         }
 
-        // ============================================================
-        // TIMER
-        // ============================================================
         function startTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -2994,9 +2934,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ============================================================
-        // VALIDATE
-        // ============================================================
         function validateQuestions(list) {
             invalidQuestions = [];
             list.forEach((q, idx) => {
@@ -3007,9 +2944,6 @@
             return invalidQuestions;
         }
 
-        // ============================================================
-        // FETCH QUESTIONS
-        // ============================================================
         function fetchQuestions(forceRefresh = false, subjArr = null, jobArr = null) {
             showLoading();
 
@@ -3089,19 +3023,15 @@
                     allSubjects = subjects;
                     allJobs = jobs;
 
-                    // Apply passed filters if any
                     if (jobArr !== null) selectedJobs = [...jobArr];
                     if (subjArr !== null) selectedSubjects = [...subjArr];
 
-                    // Compute available subjects based on selected jobs
                     updateAvailableSubjects();
 
-                    // Ensure selected subjects are within available
                     selectedSubjects = selectedSubjects.filter(s =>
                         availableSubjects.some(as => sameValueCI(as, s))
                     );
 
-                    // If no jobs selected, all jobs are used; if no subjects, all subjects
                     let filtered = originalQuestions;
                     if (selectedJobs.length > 0) {
                         filtered = filtered.filter(q =>
@@ -3170,9 +3100,6 @@
                 });
         }
 
-        // ============================================================
-        // PARSE QUIZ CSV
-        // ============================================================
         function parseQuizCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
             if (lines.length < 2) return { questions: [] };
@@ -3220,9 +3147,6 @@
             return { questions: result };
         }
 
-        // ============================================================
-        // RENDER QUESTION (quiz mode)
-        // ============================================================
         function renderQuestion() {
             if (!questions.length) {
                 questionCard.innerHTML = '<div style="padding:2rem;text-align:center;">No questions</div>';
@@ -3348,9 +3272,6 @@
             totalCount.textContent = totalQuestions;
         }
 
-        // ============================================================
-        // RENDER DOTS
-        // ============================================================
         function renderDots(activeIdx) {
             dotGrid.innerHTML = '';
             for (let i = 0; i < totalQuestions; i++) {
@@ -3392,9 +3313,6 @@
             }
         }
 
-        // ============================================================
-        // UPDATE OVERVIEW
-        // ============================================================
         function updateOverview() {
             let done = 0, pending = 0, correct = 0, wrong = 0, invalid = 0;
             for (let i = 0; i < totalQuestions; i++) {
@@ -3560,11 +3478,7 @@
             scrollToTop();
         }
 
-        // ============================================================
-        // REFRESH / FILTER HANDLERS
-        // ============================================================
         function handleRefreshClick() {
-            // Populate multi-selects with current data
             jobSearchText = '';
             subjSearchText = '';
             jobMsSearch.value = '';
@@ -3614,7 +3528,6 @@
             if (e.target === this) refreshModal.classList.remove('active');
         });
 
-        // Reset filters in modal
         modalResetBtn.addEventListener('click', function() {
             selectedJobs = [];
             selectedSubjects = [];
