@@ -283,6 +283,17 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .timer-pill.danger{background:var(--erb);border-color:var(--er);color:#991b1b;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 
+/* Facts progress pill — only shown in facts mode */
+.facts-pill{
+  display:none;align-items:center;gap:.2rem;
+  background:linear-gradient(135deg,#fef3c7,#fffbeb);
+  border:1.5px solid #fcd34d;padding:.18rem .5rem;
+  border-radius:var(--rf);font-size:.66rem;font-weight:600;color:#92400e;
+  white-space:nowrap;
+}
+.facts-pill .facts-done{color:#b45309;font-weight:800}
+.facts-mode-active .facts-pill{display:inline-flex}
+
 .btn-icon{
   background:0 0;border:none;font-size:.85rem;cursor:pointer;
   padding:.2rem;border-radius:7px;width:26px;height:26px;
@@ -292,7 +303,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .btn-icon .refresh-spin{display:inline-block;animation:spin .9s linear infinite}
 @keyframes spin{100%{transform:rotate(360deg)}}
 
-/* Hamburger button (mobile only — opens drawer) */
 .btn-drawer{
   display:none;background:0 0;border:none;font-size:1rem;cursor:pointer;
   padding:.2rem;border-radius:7px;width:26px;height:26px;
@@ -555,6 +565,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .fact-card:hover{background:#f0f9ff;border-color:#bae6fd;transform:translateY(-1px)}
 .fact-card:active{background:#e0f2fe}
+.fact-card.read-flag{background:#f0fdf4;border-left-color:var(--ok)}
+
 .fact-card .fact-head{
   display:flex;align-items:flex-start;gap:.5rem;
   font-size:.92rem;line-height:1.5;color:var(--tx);
@@ -585,9 +597,32 @@ input,textarea{-webkit-user-select:text;user-select:text}
   padding:.12rem .45rem;border-radius:var(--rf);
   background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;
 }
-.facts-empty{text-align:center;padding:2.5rem 1rem;color:var(--tx3);font-size:.95rem;font-style:italic}
+.fact-card .fact-meta .fm-chip.topic{background:#fef3c7;color:#92400e;border-color:#fde68a}
 
-/* ----- Mode switching (updated for 3 modes) ----- */
+/* ----- Tiny corner verification icon (fact cards) ----- */
+.verify-corner{
+  position:absolute;
+  top:6px;
+  right:6px;
+  width:14px;
+  height:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:9px;
+  font-weight:700;
+  line-height:1;
+  border-radius:50%;
+  pointer-events:none;
+  user-select:none;
+  box-shadow:0 0 0 1px white;
+  z-index:2;
+}
+.verify-corner.true    { background:#2563eb; color:#fff; }
+.verify-corner.false   { background:#dc2626; color:#fff; }
+.verify-corner.unknown { background:#e5e7eb; color:#6b7280; }
+
+/* ----- Mode switching ----- */
 .read-mode-active #singleQuestionView,
 .read-mode-active .progress-block,
 .read-mode-active .overview-section,
@@ -603,11 +638,13 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .facts-mode-active #factsView{display:block!important}
 #factsView{display:none}
 
-/* Hide pills when not in MCQ mode */
-.read-mode-active .attempted-pill,
-.read-mode-active .timer-pill,
+/* Hide MCQ pills and timer when in facts mode */
 .facts-mode-active .attempted-pill,
 .facts-mode-active .timer-pill{display:none!important}
+
+/* Hide facts-pill when not in facts mode (default already display:none) */
+.attempted-pill,
+.timer-pill{display:inline-flex}
 
 /* ============================================================
    FILTER PANEL — shared styles for modal + drawer
@@ -751,15 +788,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
   overscroll-behavior:contain;
   display:flex;flex-direction:column;
 }
-
-/* ----- Drawer bottom section (user info + logout) ----- */
 .drawer-bottom{
   margin-top:auto;
   padding-top:1.25rem;
   border-top:1px solid var(--bd);
 }
-
-/* ----- Drawer footer (title + close button, below logout) ----- */
 .drawer-footer{
   display:flex;align-items:center;justify-content:space-between;
   margin-top:.85rem;
@@ -779,8 +812,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   flex-shrink:0;
 }
 .drawer-footer .drawer-close:hover{background:var(--bd);color:var(--tx)}
-
-/* ----- Drawer action buttons (full width, stacked) ----- */
 .drawer-actions{
   display:flex;flex-direction:column;gap:.55rem;
   margin-top:1rem;
@@ -841,7 +872,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .action-bar .left-buttons{justify-content:center}
   .btn-primary,.btn-success{width:100%;justify-content:center;font-size:.85rem;padding:.55rem 1.2rem}
   .end-quiz-bottom .btn-success{padding:.65rem 2rem;font-size:.9rem}
-  .timer-pill,.attempted-pill{padding:.15rem .4rem;font-size:.6rem}
+  .timer-pill,.attempted-pill,.facts-pill{padding:.15rem .4rem;font-size:.6rem}
   .mode-toggle label{padding:.2rem .5rem;font-size:.6rem}
   .mode-toggle label .mode-emoji{display:none}
   .toast-container{top:.75rem;right:.75rem;max-width:calc(100% - 1.5rem)}
@@ -984,6 +1015,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
       <span class="timer-pill" id="timerPill">
         <span class="timer" id="timerDisplay">00:00</span>
       </span>
+      <span class="facts-pill" id="factsPill">
+        💡 <span class="facts-done" id="factsDoneCount">0</span>
+        <span>/</span>
+        <span id="factsTotalCount">0</span>
+      </span>
       <!-- Desktop: opens modal -->
       <button class="btn-icon" id="refreshBtn" title="Filter &amp; Refresh">
         <span id="refreshIcon">⚙️</span>
@@ -1025,7 +1061,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
 
-    <!-- Facts mode view (NEW) -->
+    <!-- Facts mode view -->
     <div id="factsView">
       <div class="facts-container" id="factsContainer"></div>
       <div class="guest-lock" id="factsGuestLock" style="display:none">
@@ -1122,7 +1158,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
     <div class="drawer-body filter-panel">
 
-      <!-- 1. Jobs -->
       <label class="panel-label">💼 Jobs</label>
       <div class="ms-container" id="drawerJobMsContainer">
         <div class="ms-input-wrapper" id="drawerJobMsWrapper">
@@ -1133,7 +1168,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
         <div class="ms-dropdown" id="drawerJobMsDropdown"></div>
       </div>
 
-      <!-- 2. Subjects -->
       <label class="panel-label">📚 Subjects</label>
       <div class="ms-container" id="drawerSubjMsContainer">
         <div class="ms-input-wrapper" id="drawerSubjMsWrapper">
@@ -1144,14 +1178,12 @@ input,textarea{-webkit-user-select:text;user-select:text}
         <div class="ms-dropdown" id="drawerSubjMsDropdown"></div>
       </div>
 
-      <!-- 3. Load & Refresh / 4. Reset / 5. Cancel -->
       <div class="drawer-actions">
         <button class="btn-primary"     id="drawerConfirm">Load &amp; Refresh</button>
         <button class="btn-secondary"   id="drawerResetBtn">⟲ Reset Filters</button>
         <button class="btn-cancel-full" id="drawerCancel">Cancel</button>
       </div>
 
-      <!-- 6. User info + Logout (pushed to bottom) -->
       <div class="drawer-bottom">
         <div class="panel-user-info" style="margin-bottom:0">
           <div class="panel-user-left">
@@ -1161,7 +1193,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
           <button class="panel-logout-btn" id="drawerLogoutBtn">🚪 Logout</button>
         </div>
 
-        <!-- 7. Title + close (now below logout) -->
         <div class="drawer-footer">
           <h3><span>⚙️</span> Filters &amp; Options</h3>
           <button class="drawer-close" id="drawerCloseBtn" aria-label="Close">✕</button>
@@ -1190,6 +1221,7 @@ const GUEST_LIMIT = 15;
 const KEY_QUIZ = 'slQuizV4';
 const KEY_USER = 'slUser';
 const KEY_MODE = 'slMode';
+const KEY_FACTS_READ = 'slFactsRead';
 
 /* ============================================================
    DOM CACHE
@@ -1209,6 +1241,8 @@ const ui = {
   mMcqR: $('modeMcqRadio'), mReadR: $('modeReadRadio'), mFactsR: $('modeFactsRadio'),
   att: $('attemptedCount'), tot: $('totalCount'),
   timer: $('timerDisplay'), timerPill: $('timerPill'),
+  factsPill: $('factsPill'),
+  factsDone: $('factsDoneCount'), factsTotal: $('factsTotalCount'),
   refresh: $('refreshBtn'), refreshIcon: $('refreshIcon'),
   drawerBtn: $('drawerBtn'),
 
@@ -1283,10 +1317,11 @@ let availSubjs        = [];
 let jobSearchText     = '';
 let subjSearchText    = '';
 
-/* ----- FACTS state (NEW) ----- */
-let facts             = [];         // array of {srno, question, answer, category}
+/* ----- FACTS state ----- */
+let facts             = [];         // {srno, question, answer, topic, subject, verify, created}
 let factsLoaded       = false;
 let factsLoading      = false;
+let factsReadSet      = new Set();  // set of "read" fact keys (srno based)
 
 let passwordVisible   = false;
 let toastTimer        = null;
@@ -1433,6 +1468,16 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+/* Interprets verification value to 'true' | 'false' | 'unknown' */
+function interpretVerify(raw) {
+  if (raw === undefined || raw === null) return 'unknown';
+  const v = String(raw).trim().toLowerCase();
+  if (v === '') return 'unknown';
+  if (v === 'true' || v === 'yes' || v === '1' || v === 'y' || v === 't') return 'true';
+  if (v === 'false' || v === 'no' || v === '0' || v === 'n' || v === 'f') return 'false';
+  return 'unknown';
 }
 
 function resolveCorrectIndex(raw, options) {
@@ -1589,6 +1634,12 @@ function showQuiz() {
   ui.quizApp.style.display = 'block';
   updateUserLabels();
 
+  // restore facts read set from localStorage
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY_FACTS_READ) || '[]');
+    factsReadSet = new Set(saved);
+  } catch (e) { factsReadSet = new Set(); }
+
   fetchQuestions(false);
 
   try {
@@ -1630,6 +1681,12 @@ function loadState() {
 
 function clearSavedState() {
   localStorage.removeItem(KEY_QUIZ);
+}
+
+function saveFactsReadSet() {
+  try {
+    localStorage.setItem(KEY_FACTS_READ, JSON.stringify([...factsReadSet]));
+  } catch (e) { /* ignore */ }
 }
 
 /* ============================================================
@@ -1826,7 +1883,10 @@ function fetchQuestions(forceRefresh) {
 }
 
 /* ============================================================
-   FETCH FACTS (NEW)
+   FETCH FACTS
+   Reads columns from header:
+   Srno | question | answer | Question topic | subject |
+   verify question and answer is true or false | created_date
    ============================================================ */
 function fetchFacts(callback) {
   if (factsLoaded) { if (callback) callback(); return; }
@@ -1844,7 +1904,6 @@ function fetchFacts(callback) {
       const lines = text.split('\n').filter((l) => l.trim());
       facts = [];
 
-      // Detect header row to find column indexes
       if (lines.length < 2) {
         factsLoaded = true;
         factsLoading = false;
@@ -1853,24 +1912,23 @@ function fetchFacts(callback) {
       }
 
       const headerCols = parseCSVLine(lines[0]).map((h) => h.toLowerCase());
-      const findIdx = (keywords) => {
+
+      // match header to index using multiple keyword candidates
+      const findIdx = (keywords, fallback) => {
         for (let k = 0; k < headerCols.length; k++) {
           const h = headerCols[k];
           if (keywords.some((kw) => h.includes(kw))) return k;
         }
-        return -1;
+        return fallback;
       };
 
-      let srnoIdx = findIdx(['srno', 'sr no', 's.no', 'serial']);
-      let qIdx    = findIdx(['question']);
-      let aIdx    = findIdx(['answer']);
-      let cIdx    = findIdx(['question category', 'category', 'tag_beloging', 'tag_belonging', 'subject']);
-
-      // Fallbacks if header not matched
-      if (srnoIdx === -1) srnoIdx = 0;
-      if (qIdx === -1)    qIdx = 1;
-      if (aIdx === -1)    aIdx = 2;
-      if (cIdx === -1)    cIdx = 3;
+      const srnoIdx    = findIdx(['srno', 'sr no', 's.no', 'serial'], 0);
+      const qIdx       = findIdx(['question'], 1);
+      const aIdx       = findIdx(['answer'], 2);
+      const topicIdx   = findIdx(['question topic', 'topic'], 3);
+      const subjIdx    = findIdx(['subject'], 4);
+      const verifyIdx  = findIdx(['verify'], 5);
+      const createdIdx = findIdx(['created'], 6);
 
       for (let i = 1; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
@@ -1879,11 +1937,17 @@ function fetchFacts(callback) {
         const question = cols[qIdx] ? cols[qIdx].trim() : '';
         if (!question) continue;
 
+        const rawVerify = cols[verifyIdx] ? cols[verifyIdx].trim() : '';
+        const verify = interpretVerify(rawVerify);
+
         facts.push({
           srno:     cols[srnoIdx] ? cols[srnoIdx].trim() : String(i),
           question: question,
           answer:   cols[aIdx] ? cols[aIdx].trim() : '',
-          category: cols[cIdx] ? cols[cIdx].trim() : '',
+          topic:    cols[topicIdx] ? cols[topicIdx].trim() : '',
+          subject:  cols[subjIdx] ? cols[subjIdx].trim() : '',
+          verify:   verify,
+          created:  cols[createdIdx] ? cols[createdIdx].trim() : '',
         });
       }
 
@@ -2310,15 +2374,13 @@ function restartQuiz() {
 }
 
 /* ============================================================
-   MODE TOGGLE (updated for 3 modes)
+   MODE TOGGLE (3 modes)
    ============================================================ */
 function setMode(newMode) {
   mode = (newMode === 'read' || newMode === 'facts') ? newMode : 'mcq';
 
-  // Reset classes
   ui.quizApp.classList.remove('read-mode-active', 'facts-mode-active');
 
-  // Reset labels
   ui.mMcqL.classList.remove('active');
   ui.mReadL.classList.remove('active');
   ui.mFactsL.classList.remove('active');
@@ -2326,11 +2388,14 @@ function setMode(newMode) {
   if (mode === 'mcq') {
     ui.mMcqR.checked = true;
     ui.mMcqL.classList.add('active');
-    // Show overview / progress / end-quiz (default CSS)
+    applyQuizTitle();
+    renderSelectedSubjectsLine();
   } else if (mode === 'read') {
     ui.mReadR.checked = true;
     ui.mReadL.classList.add('active');
     ui.quizApp.classList.add('read-mode-active');
+    applyQuizTitle();
+    renderSelectedSubjectsLine();
     renderReadMode();
   } else if (mode === 'facts') {
     ui.mFactsR.checked = true;
@@ -2338,18 +2403,11 @@ function setMode(newMode) {
     ui.quizApp.classList.add('facts-mode-active');
     applyQuizTitle();
     renderSelectedSubjectsLine();
-    // Fetch facts if not loaded
     if (!factsLoaded && !factsLoading) {
       fetchFacts(() => renderFactsMode());
     } else {
       renderFactsMode();
     }
-  }
-
-  if (mode !== 'facts') {
-    // restore title when leaving facts
-    applyQuizTitle();
-    renderSelectedSubjectsLine();
   }
 
   try { localStorage.setItem(KEY_MODE, mode); } catch (e) { /* ignore */ }
@@ -2428,7 +2486,7 @@ function renderReadMode() {
 ui.readLockLoginBtn.onclick = logoutToLogin;
 
 /* ============================================================
-   FACTS MODE (NEW)
+   FACTS MODE — with verify corner icon + solved counter
    ============================================================ */
 function renderFactsMode() {
   if (!factsLoaded) {
@@ -2439,23 +2497,40 @@ function renderFactsMode() {
   if (!facts.length) {
     ui.factsBox.innerHTML = '<div class="facts-empty">No facts available</div>';
     ui.factsGuestLock.style.display = 'none';
+    ui.factsDone.textContent = '0';
+    ui.factsTotal.textContent = '0';
     return;
   }
 
   const limit = isGuest ? GUEST_LIMIT : facts.length;
   let html = '';
 
-  facts.slice(0, limit).forEach((f, i) => {
+  facts.slice(0, limit).forEach((f) => {
     const hasAnswer = f.answer && f.answer.trim() !== '';
-    const metaChips = [];
-    if (f.category) {
-      metaChips.push(`<span class="fm-chip">🏷️ ${escapeHtml(f.category)}</span>`);
+    const key = String(f.srno || f.question).trim();
+    const isRead = factsReadSet.has(key);
+
+    // verification corner icon
+    let cornerHtml = '';
+    if (f.verify === 'true') {
+      cornerHtml = '<span class="verify-corner true" title="Verified: true">✔</span>';
+    } else if (f.verify === 'false') {
+      cornerHtml = '<span class="verify-corner false" title="Verified: false">✘</span>';
+    } else {
+      cornerHtml = '<span class="verify-corner unknown" title="Unverified">?</span>';
     }
 
+    // meta chips
+    const metaChips = [];
+    if (f.topic)   metaChips.push(`<span class="fm-chip topic">🏷️ ${escapeHtml(f.topic)}</span>`);
+    if (f.subject) metaChips.push(`<span class="fm-chip">📚 ${escapeHtml(f.subject)}</span>`);
+
     html += `
-      <div class="fact-card"
+      <div class="fact-card${isRead ? ' read-flag' : ''}"
+           data-key="${encodeURIComponent(key)}"
            data-q="${encodeURIComponent(f.question)}"
-           data-c="${encodeURIComponent(f.category || '')}">
+           data-c="${encodeURIComponent(f.subject || f.topic || '')}">
+        ${cornerHtml}
         <div class="fact-head">
           <span class="fact-srno">${escapeHtml(f.srno)}</span>
           <span class="fact-question">${escapeHtml(f.question)}
@@ -2474,13 +2549,34 @@ function renderFactsMode() {
   ui.factsBox.querySelectorAll('.fact-card').forEach((card) => {
     card.onclick = (e) => {
       e.stopPropagation();
+      const key = decodeURIComponent(card.dataset.key);
       const q = decodeURIComponent(card.dataset.q);
       const c = decodeURIComponent(card.dataset.c);
+
+      // mark as read (solved)
+      if (!factsReadSet.has(key)) {
+        factsReadSet.add(key);
+        saveFactsReadSet();
+        card.classList.add('read-flag');
+        updateFactsCounter();
+      }
       openGoogleSearch(q, c, '');
     };
   });
 
   ui.factsGuestLock.style.display = isGuest && facts.length > GUEST_LIMIT ? 'block' : 'none';
+  updateFactsCounter();
+}
+
+function updateFactsCounter() {
+  const limit = isGuest ? Math.min(GUEST_LIMIT, facts.length) : facts.length;
+  let done = 0;
+  for (let i = 0; i < limit; i++) {
+    const key = String(facts[i].srno || facts[i].question).trim();
+    if (factsReadSet.has(key)) done++;
+  }
+  ui.factsDone.textContent = done;
+  ui.factsTotal.textContent = limit;
 }
 
 if (ui.factsLockLoginBtn) {
@@ -2743,7 +2839,7 @@ function confirmAndRefresh() {
   if (timerHandle) clearInterval(timerHandle);
   resetToQuizView();
   fetchQuestions(true);
-  // Refresh facts too
+  // refresh facts too
   factsLoaded = false;
   if (mode === 'facts') fetchFacts(() => renderFactsMode());
 }
