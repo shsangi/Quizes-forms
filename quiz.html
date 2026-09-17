@@ -32,20 +32,12 @@
   --sh:0 10px 40px -12px rgba(15,23,42,.12);
   --shl:0 25px 50px -12px rgba(15,23,42,.18);
 }
-
-/* ============================================================
-   BASE
-   ============================================================ */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 body{
-  font-family:Inter,system-ui,sans-serif;
-  background:var(--bg);
-  min-height:100dvh;
-  display:flex;align-items:flex-start;justify-content:center;
-  padding:1.25rem;
-  color:var(--tx);
-  -webkit-font-smoothing:antialiased;
+  font-family:Inter,system-ui,sans-serif;background:var(--bg);
+  min-height:100dvh;display:flex;align-items:flex-start;justify-content:center;
+  padding:1.25rem;color:var(--tx);-webkit-font-smoothing:antialiased;
   overscroll-behavior:contain;
 }
 input,textarea{-webkit-user-select:text;user-select:text}
@@ -56,8 +48,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .install-banner{
   position:fixed;bottom:1rem;left:50%;
   transform:translateX(-50%) translateY(200%);
-  background:var(--sf);border-radius:18px;
-  padding:.85rem 1.15rem;
+  background:var(--sf);border-radius:18px;padding:.85rem 1.15rem;
   box-shadow:0 20px 50px -12px rgba(15,23,42,.3);
   display:flex;align-items:center;gap:.85rem;
   z-index:9998;max-width:420px;width:calc(100% - 2rem);
@@ -76,10 +67,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .install-banner .ib-text strong{display:block;font-size:.88rem;font-weight:700;margin-bottom:.1rem}
 .install-banner .ib-text span{font-size:.75rem;color:var(--tx3)}
 .install-banner .ib-btn{
-  background:var(--pr);color:#fff;border:none;
-  font-weight:600;font-size:.8rem;padding:.55rem 1.1rem;
-  border-radius:var(--rf);cursor:pointer;font-family:inherit;
-  white-space:nowrap;flex-shrink:0;
+  background:var(--pr);color:#fff;border:none;font-weight:600;font-size:.8rem;
+  padding:.55rem 1.1rem;border-radius:var(--rf);cursor:pointer;
+  font-family:inherit;white-space:nowrap;flex-shrink:0;
 }
 .install-banner .ib-close{
   background:0 0;border:none;font-size:1rem;color:var(--tx3);
@@ -92,8 +82,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .login-wrapper{
   max-width:400px;width:100%;background:var(--sf);
   border-radius:28px;padding:2.75rem 2rem;
-  box-shadow:var(--shl);border:1px solid rgba(255,255,255,.6);
-  scroll-margin:1rem;
+  box-shadow:var(--shl);border:1px solid rgba(255,255,255,.6);scroll-margin:1rem;
 }
 .login-wrapper .logo{
   width:72px;height:72px;border-radius:18px;object-fit:contain;
@@ -123,8 +112,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .login-wrapper .btn-login{
   width:100%;background:linear-gradient(135deg,#0f766e,#0d9488);
-  border:none;color:#fff;font-weight:600;font-size:1rem;
-  padding:.95rem;border-radius:var(--rf);cursor:pointer;
+  border:none;color:#fff;font-weight:600;font-size:1rem;padding:.95rem;
+  border-radius:var(--rf);cursor:pointer;
   box-shadow:0 8px 20px rgba(15,118,110,.25);margin-top:.5rem;
 }
 .login-wrapper .btn-login:disabled{opacity:.5;cursor:not-allowed}
@@ -148,15 +137,12 @@ input,textarea{-webkit-user-select:text;user-select:text}
    ============================================================ */
 .toast-container{
   position:fixed;top:1.25rem;right:1.25rem;z-index:9999;
-  display:flex;flex-direction:column;gap:.6rem;
-  max-width:360px;width:100%;
+  display:flex;flex-direction:column;gap:.6rem;max-width:360px;width:100%;
 }
 .toast{
-  padding:.9rem 1.1rem;border-radius:14px;
-  font-size:.875rem;font-weight:500;box-shadow:var(--shl);
-  animation:slideIn .35s cubic-bezier(.16,1,.3,1);
-  display:flex;align-items:center;gap:.7rem;
-  border:1px solid rgba(255,255,255,.2);
+  padding:.9rem 1.1rem;border-radius:14px;font-size:.875rem;font-weight:500;
+  box-shadow:var(--shl);animation:slideIn .35s cubic-bezier(.16,1,.3,1);
+  display:flex;align-items:center;gap:.7rem;border:1px solid rgba(255,255,255,.2);
 }
 .toast.success{background:var(--okb);color:#065f46;border-left:4px solid var(--ok)}
 .toast.error  {background:var(--erb);color:#991b1b;border-left:4px solid var(--er)}
@@ -180,9 +166,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .confirm-overlay.active{display:flex}
 .confirm-box{
-  background:var(--sf);border-radius:24px;
-  padding:2rem 2.25rem;max-width:420px;width:90%;
-  box-shadow:var(--shl);animation:scaleIn .3s cubic-bezier(.16,1,.3,1);
+  background:var(--sf);border-radius:24px;padding:2rem 2.25rem;
+  max-width:420px;width:90%;box-shadow:var(--shl);
+  animation:scaleIn .3s cubic-bezier(.16,1,.3,1);
 }
 @keyframes scaleIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 .confirm-box .icon{text-align:center;margin-bottom:.4rem}
@@ -194,8 +180,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .confirm-box p{color:var(--tx2);font-size:.925rem;text-align:center;margin-bottom:1.5rem;line-height:1.5}
 .confirm-box .btn-group{display:flex;gap:.75rem;justify-content:center}
 .confirm-box .btn-group button{
-  padding:.65rem 1.75rem;border-radius:var(--rf);
-  font-weight:600;font-size:.9rem;border:none;cursor:pointer;font-family:inherit;
+  padding:.65rem 1.75rem;border-radius:var(--rf);font-weight:600;
+  font-size:.9rem;border:none;cursor:pointer;font-family:inherit;
 }
 .confirm-box .btn-cancel {background:var(--sf2);color:var(--tx2);border:1px solid var(--bd)}
 .confirm-box .btn-confirm{background:var(--er);color:#fff}
@@ -207,21 +193,16 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .quiz-wrapper{
   max-width:860px;width:100%;background:var(--sf);
   border-radius:24px;padding:0 1.75rem 1.5rem;
-  box-shadow:var(--shl);display:none;
-  border:1px solid rgba(255,255,255,.5);
+  box-shadow:var(--shl);display:none;border:1px solid rgba(255,255,255,.5);
 }
 .top-bar{
   display:flex;justify-content:space-between;align-items:flex-start;
-  flex-wrap:wrap;gap:.4rem .6rem;
-  padding:.85rem 0 .45rem;margin-bottom:.45rem;
-  position:sticky;top:0;z-index:50;background:var(--sf);
-  border-bottom:1px solid transparent;
+  flex-wrap:wrap;gap:.4rem .6rem;padding:.85rem 0 .45rem;
+  margin-bottom:.45rem;position:sticky;top:0;z-index:50;
+  background:var(--sf);border-bottom:1px solid transparent;
   transition:border-color .2s,box-shadow .2s;
 }
-.top-bar.scrolled{
-  border-bottom-color:var(--bd);
-  box-shadow:0 4px 12px -8px rgba(15,23,42,.15);
-}
+.top-bar.scrolled{border-bottom-color:var(--bd);box-shadow:0 4px 12px -8px rgba(15,23,42,.15)}
 .brand{display:flex;align-items:flex-start;gap:.45rem;min-width:0;flex:1 1 auto}
 .brand-logo{
   width:30px;height:30px;border-radius:8px;object-fit:contain;
@@ -247,52 +228,41 @@ input,textarea{-webkit-user-select:text;user-select:text}
   display:flex;align-items:center;gap:.3rem;
   flex-wrap:wrap;justify-content:flex-end;flex-shrink:0;
 }
-
-/* ----- Mode toggle ----- */
 .mode-toggle{
-  display:inline-flex;align-items:center;
-  background:var(--sf2);border:1.5px solid var(--bd);
-  border-radius:var(--rf);padding:2px;gap:1px;
+  display:inline-flex;align-items:center;background:var(--sf2);
+  border:1.5px solid var(--bd);border-radius:var(--rf);padding:2px;gap:1px;
 }
 .mode-toggle label{
-  display:inline-flex;align-items:center;gap:.2rem;
-  padding:.22rem .55rem;border-radius:var(--rf);
-  font-size:.66rem;font-weight:600;color:var(--tx2);
+  display:inline-flex;align-items:center;gap:.2rem;padding:.22rem .55rem;
+  border-radius:var(--rf);font-size:.66rem;font-weight:600;color:var(--tx2);
   cursor:pointer;white-space:nowrap;
 }
 .mode-toggle label input{display:none}
 .mode-toggle label.active{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff}
-
-/* ----- Pills ----- */
 .attempted-pill{
   display:inline-flex;align-items:center;gap:.2rem;
   background:linear-gradient(135deg,#ecfeff,#f0fdfa);
   border:1.5px solid #99f6e4;padding:.18rem .5rem;
-  border-radius:var(--rf);font-size:.66rem;font-weight:600;color:#0e7490;
-  white-space:nowrap;
+  border-radius:var(--rf);font-size:.66rem;font-weight:600;color:#0e7490;white-space:nowrap;
 }
 .attempted-pill .attempted{color:var(--pr);font-weight:800}
 .timer-pill{
-  display:inline-flex;align-items:center;gap:.15rem;
-  background:var(--sf2);border:1.5px solid var(--bd);
-  padding:.18rem .5rem;border-radius:var(--rf);
+  display:inline-flex;align-items:center;gap:.15rem;background:var(--sf2);
+  border:1.5px solid var(--bd);padding:.18rem .5rem;border-radius:var(--rf);
   font-size:.66rem;font-weight:600;color:var(--tx2);white-space:nowrap;
 }
 .timer-pill .timer{color:var(--tx);font-weight:700}
 .timer-pill.warning{background:var(--wnb);border-color:var(--wn);color:#92400e}
 .timer-pill.danger{background:var(--erb);border-color:var(--er);color:#991b1b;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
-
 .btn-icon{
-  background:0 0;border:none;font-size:.85rem;cursor:pointer;
-  padding:.2rem;border-radius:7px;width:26px;height:26px;
-  display:flex;align-items:center;justify-content:center;color:var(--tx2);
+  background:0 0;border:none;font-size:.85rem;cursor:pointer;padding:.2rem;
+  border-radius:7px;width:26px;height:26px;display:flex;
+  align-items:center;justify-content:center;color:var(--tx2);
 }
 .btn-icon:disabled{opacity:.4;cursor:not-allowed}
 .btn-icon .refresh-spin{display:inline-block;animation:spin .9s linear infinite}
 @keyframes spin{100%{transform:rotate(360deg)}}
-
-/* Hamburger button (mobile only — opens drawer) */
 .btn-drawer{
   display:none;background:0 0;border:none;font-size:1rem;cursor:pointer;
   padding:.2rem;border-radius:7px;width:26px;height:26px;
@@ -305,11 +275,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
    ============================================================ */
 .progress-block{background:#e2e8f0;height:5px;border-radius:var(--rf);margin:.25rem 0 .35rem;overflow:hidden}
 .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#0f766e,#0ea5e9);border-radius:var(--rf);transition:width .35s}
-
 .question-card{
-  background:var(--sf2);border:1px solid var(--bd);
-  border-radius:20px;padding:1.5rem 1.5rem .85rem;
-  margin:.6rem 0 .95rem;position:relative;
+  background:var(--sf2);border:1px solid var(--bd);border-radius:20px;
+  padding:1.5rem 1.5rem .85rem;margin:.6rem 0 .95rem;position:relative;
 }
 .question-body{
   max-height:52vh;overflow-y:auto;overflow-x:hidden;
@@ -323,8 +291,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   color:var(--tx);line-height:1.5;cursor:pointer;
 }
 .question-card .q-text:hover{color:var(--pr);text-decoration:underline;text-underline-offset:3px}
-
-/* ----- Options ----- */
 .options-list{display:flex;flex-direction:column;gap:.55rem}
 .options-list .option-btn{
   background:#fff;border:1.5px solid var(--bd);border-radius:var(--rf);
@@ -334,9 +300,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .options-list .option-btn:hover:not(:disabled){background:#f0fdfa;border-color:#5eead4}
 .options-list .option-btn .letter{
-  background:#e0f2fe;color:#0369a1;font-weight:700;
-  width:28px;height:28px;border-radius:50%;
-  display:inline-flex;align-items:center;justify-content:center;
+  background:#e0f2fe;color:#0369a1;font-weight:700;width:28px;height:28px;
+  border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
   flex-shrink:0;font-size:.78rem;
 }
 .options-list .option-btn.correct{background:var(--okb);border-color:var(--ok)}
@@ -346,8 +311,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .options-list .option-btn.selected-opt{border-color:var(--pr);background:#f0fdfa}
 .options-list .option-btn:disabled{cursor:default;opacity:.85}
 .options-list .option-btn .icon-indicator{margin-left:auto;font-size:1.1rem;font-weight:600}
-
-/* ----- Feedback + meta chips ----- */
 .feedback-box{
   margin-top:.95rem;padding:.85rem 1rem;border-radius:14px;
   font-weight:600;font-size:.88rem;line-height:1.45;
@@ -356,9 +319,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .feedback-box.wrong-fb  {background:#fee2e2;border:1.5px solid #ef4444;color:#991b1b}
 .q-meta-block{margin-top:.75rem;display:flex;flex-wrap:wrap;gap:.4rem}
 .meta-chip{
-  display:inline-flex;align-items:center;gap:.3rem;
-  background:#fff;border:1px solid var(--bd);padding:.28rem .65rem;
-  border-radius:var(--rf);font-size:.68rem;font-weight:600;color:var(--tx2);
+  display:inline-flex;align-items:center;gap:.3rem;background:#fff;
+  border:1px solid var(--bd);padding:.28rem .65rem;border-radius:var(--rf);
+  font-size:.68rem;font-weight:600;color:var(--tx2);
 }
 .meta-chip.subject-chip{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
 .meta-chip.topic-chip  {background:#fef3c7;color:#92400e;border-color:#fde68a}
@@ -372,7 +335,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   gap:.8rem;margin:.85rem 0 .1rem;
 }
 .action-bar .left-buttons{display:flex;gap:.5rem}
-
 .btn-primary{
   background:#0f766e;border:none;color:#fff;font-weight:600;font-size:.9rem;
   padding:.6rem 1.5rem;border-radius:var(--rf);cursor:pointer;font-family:inherit;
@@ -383,7 +345,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   padding:.6rem 1.5rem;border-radius:var(--rf);cursor:pointer;font-family:inherit;
 }
 .btn-success:disabled{opacity:.4;cursor:not-allowed}
-
 .end-quiz-bottom{
   margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--bd);
   display:flex;justify-content:center;
@@ -412,7 +373,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .legend-dot.correct-dot{background:var(--ok)}
 .legend-dot.wrong-dot  {background:var(--er)}
 .legend-dot.invalid-dot{background:var(--iv)}
-
 .grid-dots{display:flex;flex-wrap:wrap;gap:.35rem;justify-content:center;margin-top:.25rem}
 .grid-dot{
   width:28px;height:28px;border-radius:50%;background:#e2e8f0;
@@ -442,13 +402,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .result-msg{color:var(--tx2);font-size:1rem;margin:.2rem 0 1.25rem}
 .result-details{
-  text-align:left;margin:1.2rem 0 .85rem;
-  display:flex;flex-direction:column;gap:.8rem;
-  max-height:380px;overflow-y:auto;padding-right:.4rem;
+  text-align:left;margin:1.2rem 0 .85rem;display:flex;flex-direction:column;
+  gap:.8rem;max-height:380px;overflow-y:auto;padding-right:.4rem;
 }
 .result-details .detail-item{
-  background:var(--sf2);border:1px solid var(--bd);
-  border-radius:14px;padding:.75rem .9rem;
+  background:var(--sf2);border:1px solid var(--bd);border-radius:14px;padding:.75rem .9rem;
 }
 .result-details .detail-item.correct-detail{border-left:5px solid var(--ok)}
 .result-details .detail-item.wrong-detail  {border-left:5px solid var(--er)}
@@ -456,7 +414,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .result-details .detail-q{font-weight:600;font-size:.85rem;color:var(--tx);margin-bottom:.2rem;cursor:pointer}
 .result-details .detail-answer{font-size:.82rem;color:var(--tx2)}
 .result-details .detail-answer .correct-ans{color:var(--ok);font-weight:600}
-
 .submitted-header{
   text-align:center;padding:.5rem 1rem;background:var(--okb);
   border-radius:var(--rf);margin-bottom:.85rem;
@@ -486,10 +443,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .read-item .read-q .read-srno{font-weight:800;color:var(--pr);margin-right:.4rem}
 .read-item .read-options{margin-top:.45rem;display:flex;flex-direction:column;gap:.28rem}
 .read-item .read-opt{
-  display:flex;align-items:flex-start;gap:.45rem;
-  padding:.35rem .6rem;border-radius:10px;
-  font-size:.82rem;line-height:1.45;color:var(--tx2);font-weight:500;
-  background:#fff;border:1px solid var(--bd);word-break:break-word;
+  display:flex;align-items:flex-start;gap:.45rem;padding:.35rem .6rem;
+  border-radius:10px;font-size:.82rem;line-height:1.45;color:var(--tx2);
+  font-weight:500;background:#fff;border:1px solid var(--bd);word-break:break-word;
 }
 .read-item .read-opt .ro-letter{
   flex-shrink:0;width:20px;height:20px;border-radius:50%;
@@ -501,9 +457,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .read-item .read-opt.correct-opt .ro-check{margin-left:auto;font-weight:700;color:#065f46}
 .read-item .read-meta{margin-top:.45rem;display:flex;flex-wrap:wrap;gap:.3rem;font-size:.6rem;font-weight:600}
 .read-item .read-meta .rm-chip{
-  display:inline-flex;align-items:center;gap:.15rem;
-  padding:.12rem .45rem;border-radius:var(--rf);
-  background:#fff;border:1px solid var(--bd);color:var(--tx3);
+  display:inline-flex;align-items:center;gap:.15rem;padding:.12rem .45rem;
+  border-radius:var(--rf);background:#fff;border:1px solid var(--bd);color:var(--tx3);
 }
 .read-item .read-meta .rm-subject{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
 .read-item .read-meta .rm-topic  {background:#fef3c7;color:#92400e;border-color:#fde68a}
@@ -519,8 +474,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .read-item .read-mcol.false{background:#fee2e2}
 .read-item .read-mcol.empty{background:#f1f5f9}
 .read-empty{text-align:center;padding:2.5rem 1rem;color:var(--tx3);font-size:.95rem;font-style:italic}
-
-/* ----- Guest lock card ----- */
 .guest-lock{
   text-align:center;padding:2rem 1.5rem;
   background:linear-gradient(135deg,#fef3c7,#fef9c3);
@@ -530,13 +483,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .guest-lock h3{color:#92400e;font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
 .guest-lock p{color:#78350f;font-size:.85rem;line-height:1.5;margin-bottom:1rem}
 .guest-lock .gl-btn{
-  background:linear-gradient(135deg,#0f766e,#0d9488);
-  border:none;color:#fff;font-weight:600;font-size:.9rem;
-  padding:.65rem 1.75rem;border-radius:var(--rf);cursor:pointer;font-family:inherit;
-  box-shadow:0 4px 12px rgba(15,118,110,.3);
+  background:linear-gradient(135deg,#0f766e,#0d9488);border:none;color:#fff;
+  font-weight:600;font-size:.9rem;padding:.65rem 1.75rem;border-radius:var(--rf);
+  cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(15,118,110,.3);
 }
-
-/* ----- Mode switching ----- */
 .read-mode-active #singleQuestionView,
 .read-mode-active .progress-block,
 .read-mode-active .overview-section,
@@ -545,11 +495,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 #readView{display:none}
 
 /* ============================================================
-   FILTER MODAL (desktop) + RIGHT DRAWER (mobile)
-   Shared styles for both containers
+   FILTER PANELS — shared between modal + drawer
    ============================================================ */
-
-/* ----- Shared filter UI styles ----- */
 .filter-panel h3{font-size:1.05rem;margin-bottom:.7rem;font-weight:700;text-align:left}
 .filter-panel .panel-user-info{
   display:flex;align-items:center;justify-content:space-between;
@@ -559,8 +506,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .filter-panel .panel-user-left{display:flex;align-items:center;gap:.5rem}
 .filter-panel .panel-user-avatar{
   width:32px;height:32px;border-radius:50%;
-  background:linear-gradient(135deg,#0f766e,#0ea5e9);
-  color:#fff;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#0f766e,#0ea5e9);color:#fff;
+  display:flex;align-items:center;justify-content:center;
   font-weight:700;font-size:.82rem;
 }
 .filter-panel .panel-user-name{font-weight:600;font-size:.85rem}
@@ -569,7 +516,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   font-weight:600;font-size:.72rem;padding:.35rem .85rem;
   border-radius:var(--rf);cursor:pointer;font-family:inherit;white-space:nowrap;
 }
-.filter-panel .panel-reset-row{display:flex;justify-content:flex-end;margin-bottom:.2rem}
 .filter-panel .btn-reset-filters{
   background:0 0;border:1.5px dashed var(--bd);color:var(--tx3);
   font-weight:600;font-size:.7rem;padding:.35rem .8rem;
@@ -586,13 +532,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
   background:var(--sf2);border:1px solid var(--bd);color:var(--tx2);
   font-weight:600;border-radius:var(--rf);cursor:pointer;font-family:inherit;
 }
-
-/* ----- Multi-select (shared) ----- */
 .filter-panel .ms-container{position:relative;width:100%;text-align:left}
 .filter-panel .ms-input-wrapper{
-  display:flex;align-items:center;background:#fff;
-  border:1.5px solid var(--bd);border-radius:12px;
-  padding:.4rem .6rem;min-height:42px;cursor:text;
+  display:flex;align-items:center;background:#fff;border:1.5px solid var(--bd);
+  border-radius:12px;padding:.4rem .6rem;min-height:42px;cursor:text;
 }
 .filter-panel .ms-input-wrapper:focus-within{border-color:var(--pr);box-shadow:0 0 0 3px rgba(15,118,110,.1)}
 .filter-panel .ms-chips{display:flex;flex-wrap:wrap;gap:.25rem;flex:1;min-width:0}
@@ -615,16 +558,15 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .filter-panel .ms-arrow{font-size:.6rem;color:var(--tx3);margin-left:.3rem;transition:transform .2s}
 .filter-panel .ms-container.open .ms-arrow{transform:rotate(180deg)}
 .filter-panel .ms-dropdown{
-  position:absolute;top:calc(100% + 4px);left:0;right:0;
-  background:#fff;border:1.5px solid var(--bd);border-radius:12px;
+  position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;
+  border:1.5px solid var(--bd);border-radius:12px;
   box-shadow:0 12px 32px -8px rgba(15,23,42,.25);
   max-height:280px;overflow-y:auto;z-index:200;display:none;padding:.3rem;
 }
 .filter-panel .ms-container.open .ms-dropdown{display:block}
 .filter-panel .ms-option{
-  display:flex;align-items:center;gap:.5rem;
-  padding:.4rem .6rem;border-radius:8px;cursor:pointer;
-  font-size:.8rem;color:var(--tx);
+  display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;
+  border-radius:8px;cursor:pointer;font-size:.8rem;color:var(--tx);
 }
 .filter-panel .ms-option:hover{background:var(--sf2)}
 .filter-panel .ms-option.selected{background:#ecfeff;color:#0e7490;font-weight:600}
@@ -636,8 +578,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .filter-panel .ms-option.selected .ms-check{background:var(--pr);border-color:var(--pr)}
 .filter-panel .ms-no-results{text-align:center;padding:.8rem;font-size:.78rem;color:var(--tx3);font-style:italic}
 .filter-panel .ms-select-all-row{
-  display:flex;align-items:center;gap:.5rem;
-  padding:.4rem .6rem;border-bottom:1px dashed var(--bd);margin-bottom:.2rem;
+  display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;
+  border-bottom:1px dashed var(--bd);margin-bottom:.2rem;
   cursor:pointer;font-size:.78rem;font-weight:700;color:var(--pr);border-radius:8px;
 }
 .filter-panel .ms-select-all-row .ms-check{
@@ -647,7 +589,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .filter-panel .ms-select-all-row.selected .ms-check{background:var(--pr);border-color:var(--pr)}
 
-/* ----- Desktop: modal ----- */
+/* ----- Desktop modal ----- */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(15,23,42,.45);
   display:none;align-items:center;justify-content:center;
@@ -657,50 +599,61 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .modal-box{
   background:var(--sf);max-width:480px;width:92%;
   border-radius:22px;padding:1.7rem 1.5rem 1.4rem;
-  box-shadow:var(--shl);animation:scaleIn .3s;
-  max-height:92vh;overflow-y:auto;
+  box-shadow:var(--shl);animation:scaleIn .3s;max-height:92vh;overflow-y:auto;
 }
 
-/* ----- Mobile: right drawer ----- */
+/* ----- Mobile right drawer ----- */
 .drawer-overlay{
   position:fixed;inset:0;background:rgba(15,23,42,.45);
   backdrop-filter:blur(4px);z-index:1100;
-  opacity:0;pointer-events:none;
-  transition:opacity .25s ease;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
 }
 .drawer-overlay.active{opacity:1;pointer-events:auto}
-
 .drawer{
-  position:fixed;top:0;right:0;bottom:0;
-  width:min(92vw,380px);
-  background:var(--sf);
-  box-shadow:-20px 0 50px -12px rgba(15,23,42,.3);
-  z-index:1101;
-  transform:translateX(105%);
+  position:fixed;top:0;right:0;bottom:0;width:min(92vw,380px);
+  background:var(--sf);box-shadow:-20px 0 50px -12px rgba(15,23,42,.3);
+  z-index:1101;transform:translateX(105%);
   transition:transform .3s cubic-bezier(.16,1,.3,1);
-  display:flex;flex-direction:column;
-  overflow:hidden;
+  display:flex;flex-direction:column;overflow:hidden;
 }
 .drawer.open{transform:translateX(0)}
 .drawer-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:1rem 1.25rem;
-  border-bottom:1px solid var(--bd);
-  background:var(--sf);
-  flex-shrink:0;
+  padding:1rem 1.25rem;border-bottom:1px solid var(--bd);
+  background:var(--sf);flex-shrink:0;
 }
 .drawer-header h3{font-size:1rem;font-weight:700;margin:0}
 .drawer-close{
-  background:var(--sf2);border:none;
-  width:32px;height:32px;border-radius:50%;
+  background:var(--sf2);border:none;width:32px;height:32px;border-radius:50%;
   font-size:1rem;cursor:pointer;color:var(--tx2);
   display:flex;align-items:center;justify-content:center;
 }
 .drawer-body{
-  padding:1rem 1.25rem 1.25rem;
-  overflow-y:auto;flex:1;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
+  padding:1rem 1.25rem 1.25rem;overflow-y:auto;flex:1;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:.15rem;
+}
+
+/* Drawer-specific full-width buttons */
+.drawer-body .btn-reset-filters{
+  width:100%;text-align:center;justify-content:center;
+  padding:.6rem 1rem;font-size:.78rem;margin-top:.35rem;
+}
+.drawer-body .drawer-cta{
+  width:100%;padding:.75rem 1rem;font-size:.9rem;
+  border-radius:var(--rf);font-weight:600;font-family:inherit;
+  border:none;cursor:pointer;margin-top:.5rem;
+}
+.drawer-body .drawer-cta.primary{
+  background:linear-gradient(135deg,#0f766e,#0d9488);
+  color:#fff;box-shadow:0 6px 16px rgba(15,118,110,.25);
+}
+.drawer-body .drawer-cta.secondary{
+  background:var(--sf2);color:var(--tx2);border:1.5px solid var(--bd);
+  box-shadow:none;
+}
+.drawer-body .drawer-user-footer{
+  margin-top:auto;padding-top:1rem;border-top:1px solid var(--bd);
 }
 
 /* ============================================================
@@ -728,12 +681,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .m-col-badge svg{width:10px;height:10px}
   .m-col-badge .q-mark{font-size:.65rem}
 }
-
-/* Mobile: show drawer button, hide the modal-triggering gear */
 @media(max-width:560px){
   .btn-drawer{display:flex}
-  .btn-icon#refreshBtn{display:none} /* Mobile uses drawer instead of modal */
-
+  .btn-icon#refreshBtn{display:none}
   .quiz-wrapper{padding:0 .75rem 1rem}
   .brand-logo{width:26px;height:26px}
   .brand-title h1{font-size:.8rem;max-width:130px}
@@ -781,14 +731,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 </head>
 <body>
 
-<!-- ============================================================
-     TOAST CONTAINER
-     ============================================================ -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ============================================================
-     INSTALL BANNER (PWA)
-     ============================================================ -->
 <div class="install-banner" id="installBanner">
   <div class="ib-icon"><img src="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27" alt="SL"></div>
   <div class="ib-text">
@@ -799,9 +743,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <button class="ib-close" id="installClose">✕</button>
 </div>
 
-<!-- ============================================================
-     CONFIRM DIALOG
-     ============================================================ -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <div class="icon"><span id="confirmIcon">❓</span></div>
@@ -814,9 +755,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   </div>
 </div>
 
-<!-- ============================================================
-     LOGIN SCREEN
-     ============================================================ -->
 <div class="login-wrapper" id="loginScreen">
   <img class="logo" id="loginLogo"
        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230f766e'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter,sans-serif' font-size='38' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
@@ -847,12 +785,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div class="login-footer"><span id="loginStatus">Loading...</span></div>
 </div>
 
-<!-- ============================================================
-     QUIZ APP
-     ============================================================ -->
 <div class="quiz-wrapper" id="quizApp">
-
-  <!-- ----- Top bar (sticky) ----- -->
   <div class="top-bar" id="topBar">
     <div class="brand">
       <img class="brand-logo" id="brandLogo"
@@ -882,23 +815,18 @@ input,textarea{-webkit-user-select:text;user-select:text}
       <span class="timer-pill" id="timerPill">
         <span class="timer" id="timerDisplay">00:00</span>
       </span>
-      <!-- Desktop: opens modal -->
       <button class="btn-icon" id="refreshBtn" title="Filter &amp; Refresh">
         <span id="refreshIcon">⚙️</span>
       </button>
-      <!-- Mobile: opens drawer -->
       <button class="btn-drawer" id="drawerBtn" title="Filters &amp; options">☰</button>
     </div>
   </div>
 
-  <!-- ----- Quiz content ----- -->
   <div id="quizContent">
-
     <div class="progress-block">
       <div class="progress-fill" id="progressFill"></div>
     </div>
 
-    <!-- MCQ mode view -->
     <div id="singleQuestionView">
       <div id="submittedBanner" style="display:none" class="submitted-header">
         ✅ Submitted — Click "End Quiz" for final score.
@@ -912,7 +840,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
 
-    <!-- Solved (read) mode view -->
     <div id="readView">
       <div class="read-container" id="readContainer"></div>
       <div class="guest-lock" id="readGuestLock" style="display:none">
@@ -923,7 +850,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
 
-    <!-- Overview grid -->
     <div class="overview-section">
       <div class="overview-header">
         <span>OVERVIEW</span>
@@ -940,12 +866,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
       <div class="grid-dots" id="dotGrid"></div>
     </div>
 
-    <!-- End Quiz (bottom) -->
     <div class="end-quiz-bottom" id="endQuizBottom">
       <button class="btn-success" id="endQuizBtn">🏁 End Quiz</button>
     </div>
 
-    <!-- Result card -->
     <div class="result-card" id="resultArea">
       <h2>🏁 Quiz Complete</h2>
       <div class="result-score" id="finalScore">0 / 0</div>
@@ -956,7 +880,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   </div>
 
   <!-- ============================================================
-       FILTER — Desktop modal (hidden on mobile via CSS)
+       DESKTOP MODAL — unchanged order (user, reset, jobs, subj, buttons)
        ============================================================ -->
   <div class="modal-overlay" id="refreshModal">
     <div class="modal-box filter-panel">
@@ -970,7 +894,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
         <button class="panel-logout-btn" id="modalLogoutBtn">🚪 Logout</button>
       </div>
 
-      <div class="panel-reset-row">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:.2rem">
         <button class="btn-reset-filters" id="modalResetBtn">⟲ Reset Filters</button>
       </div>
 
@@ -1002,7 +926,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
   </div>
 
   <!-- ============================================================
-       FILTER — Mobile right drawer (hidden on desktop via CSS)
+       MOBILE DRAWER — new order:
+       Jobs → Subjects → Reset → Load & Refresh → Cancel → User + Logout
        ============================================================ -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <aside class="drawer" id="drawer" aria-hidden="true">
@@ -1012,18 +937,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
     </div>
     <div class="drawer-body filter-panel">
 
-      <div class="panel-user-info">
-        <div class="panel-user-left">
-          <span class="panel-user-avatar" id="drawerUserAvatar">U</span>
-          <span class="panel-user-name" id="drawerUserName">User</span>
-        </div>
-        <button class="panel-logout-btn" id="drawerLogoutBtn">🚪 Logout</button>
-      </div>
-
-      <div class="panel-reset-row">
-        <button class="btn-reset-filters" id="drawerResetBtn">⟲ Reset Filters</button>
-      </div>
-
+      <!-- 1) Jobs -->
       <label class="panel-label">💼 Jobs</label>
       <div class="ms-container" id="drawerJobMsContainer">
         <div class="ms-input-wrapper" id="drawerJobMsWrapper">
@@ -1034,6 +948,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
         <div class="ms-dropdown" id="drawerJobMsDropdown"></div>
       </div>
 
+      <!-- 2) Subjects -->
       <label class="panel-label">📚 Subjects</label>
       <div class="ms-container" id="drawerSubjMsContainer">
         <div class="ms-input-wrapper" id="drawerSubjMsWrapper">
@@ -1044,13 +959,27 @@ input,textarea{-webkit-user-select:text;user-select:text}
         <div class="ms-dropdown" id="drawerSubjMsDropdown"></div>
       </div>
 
-      <div class="panel-actions">
-        <button class="btn-secondary" id="drawerCancel">Cancel</button>
-        <button class="btn-primary"   id="drawerConfirm">Load &amp; Refresh</button>
+      <!-- 3) Reset filters -->
+      <button class="btn-reset-filters" id="drawerResetBtn">⟲ Reset Filters</button>
+
+      <!-- 4) Load & Refresh -->
+      <button class="drawer-cta primary" id="drawerConfirm">Load &amp; Refresh</button>
+
+      <!-- 5) Cancel -->
+      <button class="drawer-cta secondary" id="drawerCancel">Cancel</button>
+
+      <!-- 6) User + Logout at the bottom -->
+      <div class="drawer-user-footer">
+        <div class="panel-user-info">
+          <div class="panel-user-left">
+            <span class="panel-user-avatar" id="drawerUserAvatar">U</span>
+            <span class="panel-user-name" id="drawerUserName">User</span>
+          </div>
+          <button class="panel-logout-btn" id="drawerLogoutBtn">🚪 Logout</button>
+        </div>
       </div>
     </div>
   </aside>
-
 </div>
 
 <script>
@@ -1075,13 +1004,11 @@ const KEY_MODE = 'slMode';
    ============================================================ */
 const $ = (id) => document.getElementById(id);
 const ui = {
-  // Login
   loginScreen: $('loginScreen'), loginLogo: $('loginLogo'),
   email: $('emailInput'), pass: $('passwordInput'),
   tglPw: $('togglePasswordBtn'), loginBtn: $('loginBtn'),
   guestBtn: $('guestBtn'), loginStat: $('loginStatus'),
 
-  // Top bar
   quizApp: $('quizApp'), topBar: $('topBar'), brandLogo: $('brandLogo'),
   qTitle: $('quizTitle'), subjLine: $('selectedSubjectsLine'),
   mMcqL: $('modeMcqLabel'), mReadL: $('modeReadLabel'),
@@ -1091,41 +1018,34 @@ const ui = {
   refresh: $('refreshBtn'), refreshIcon: $('refreshIcon'),
   drawerBtn: $('drawerBtn'),
 
-  // Body
   prog: $('progressFill'), single: $('singleQuestionView'),
   subBanner: $('submittedBanner'), qCard: $('questionCard'),
   prev: $('prevBtn'), next: $('nextBtn'), endBtn: $('endQuizBtn'),
   readBox: $('readContainer'), readGuestLock: $('readGuestLock'),
   readLockLoginBtn: $('readLockLoginBtn'),
 
-  // Overview
   dots: $('dotGrid'),
   doneC: $('doneCount'), pendC: $('pendingCount'),
   corrC: $('correctCount'), wrongC: $('wrongCount'),
   invC: $('invalidCount'), invLeg: $('invalidLegend'),
 
-  // Result
   result: $('resultArea'), score: $('finalScore'),
   rmsg: $('resultMessage'), rdetails: $('resultDetails'),
   restart: $('restartFromResult'),
 
-  // Desktop modal
   modal: $('refreshModal'),
   mCancel: $('modalCancel'), mConfirm: $('modalConfirm'), mReset: $('modalResetBtn'),
   mUserAv: $('modalUserAvatar'), mUserName: $('modalUserName'), mLogout: $('modalLogoutBtn'),
 
-  // Mobile drawer
   drawer: $('drawer'), drawerOverlay: $('drawerOverlay'),
   drawerCloseBtn: $('drawerCloseBtn'),
   dCancel: $('drawerCancel'), dConfirm: $('drawerConfirm'), dReset: $('drawerResetBtn'),
   dUserAv: $('drawerUserAvatar'), dUserName: $('drawerUserName'), dLogout: $('drawerLogoutBtn'),
 
-  // Confirm
   cOverlay: $('confirmOverlay'), cIcon: $('confirmIcon'),
   cTitle: $('confirmTitle'), cMsg: $('confirmMessage'),
   cOk: $('confirmOk'), cCancel: $('confirmCancel'),
 
-  // PWA
   installBanner: $('installBanner'),
   installBtn: $('installBtn'),
   installClose: $('installClose'),
@@ -1350,10 +1270,7 @@ function confirmBox(icon, title, message, okText) {
 }
 function closeConfirm(result) {
   ui.cOverlay.classList.remove('active');
-  if (confirmResolve) {
-    confirmResolve(result);
-    confirmResolve = null;
-  }
+  if (confirmResolve) { confirmResolve(result); confirmResolve = null; }
 }
 ui.cCancel.onclick = () => closeConfirm(false);
 ui.cOk.onclick     = () => closeConfirm(true);
@@ -1450,9 +1367,7 @@ function showQuiz() {
   ui.loginScreen.style.display = 'none';
   ui.quizApp.style.display = 'block';
   updateUserLabels();
-
   fetchQuestions(false);
-
   try {
     const savedMode = localStorage.getItem(KEY_MODE);
     setMode(savedMode === 'read' ? 'read' : 'mcq');
@@ -1481,7 +1396,6 @@ function saveState() {
     }));
   } catch (e) { /* ignore */ }
 }
-
 function loadState() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY_QUIZ) || 'null');
@@ -1489,10 +1403,7 @@ function loadState() {
   } catch (e) { /* ignore */ }
   return null;
 }
-
-function clearSavedState() {
-  localStorage.removeItem(KEY_QUIZ);
-}
+function clearSavedState() { localStorage.removeItem(KEY_QUIZ); }
 
 /* ============================================================
    TIMER
@@ -1504,17 +1415,14 @@ function startTimer() {
     timeLeft--;
     updateTimerDisplay();
     if (timeLeft <= 0) {
-      clearInterval(timerHandle);
-      timerHandle = null;
-      gradeQuiz();
-      finished = true;
+      clearInterval(timerHandle); timerHandle = null;
+      gradeQuiz(); finished = true;
       ui.endBtn.disabled = true;
       showResult();
     }
     saveState();
   }, 1000);
 }
-
 function updateTimerDisplay() {
   const m = Math.floor(timeLeft / 60);
   const s = timeLeft % 60;
@@ -1563,7 +1471,6 @@ function fetchQuestions(forceRefresh) {
       ui.refreshIcon.textContent = '⚙️';
       ui.refreshIcon.classList.remove('refresh-spin');
       updateTimerDisplay();
-
       if (finished) { showResult(); return; }
       resetToQuizView();
       startTimer();
@@ -1591,27 +1498,19 @@ function fetchQuestions(forceRefresh) {
       for (let i = 1; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
         if (cols.length < 9) continue;
-
         const qText = cols[1] ? cols[1].trim() : '';
         if (!qText) continue;
-
         const options = [cols[2] || '', cols[3] || '', cols[4] || '', cols[5] || '']
           .map((x) => x.trim());
         const rawCorrect = cols[6] ? cols[6].trim() : '';
         const correctIdx = resolveCorrectIndex(rawCorrect, options);
-
         const showFlag = cols[13] ? cols[13].trim().toLowerCase() : '';
         if (showFlag === '0' || showFlag === 'false' || showFlag === 'no') continue;
-
         originalQuestions.push({
-          question:    qText,
-          options,
-          correct:     correctIdx,
+          question: qText, options, correct: correctIdx,
           correctText: rawCorrect || 'No answer',
-          topic:       cols[7] || '',
-          subject:     cols[8] || '',
-          job:         cols[10] || '',
-          mcol:        cols[12] || '',
+          topic: cols[7] || '', subject: cols[8] || '',
+          job: cols[10] || '', mcol: cols[12] || '',
         });
       }
 
@@ -1642,15 +1541,12 @@ function fetchQuestions(forceRefresh) {
         }
       });
 
-      total     = questions.length;
-      answers   = new Array(total).fill(null);
-      status    = new Array(total).fill(null);
-      locked    = new Array(total).fill(false);
-      submitted = false;
-      finished  = false;
-      score     = 0;
-      currentQ  = 0;
-      timeLeft  = total * 60;
+      total = questions.length;
+      answers = new Array(total).fill(null);
+      status = new Array(total).fill(null);
+      locked = new Array(total).fill(false);
+      submitted = false; finished = false;
+      score = 0; currentQ = 0; timeLeft = total * 60;
 
       applyQuizTitle();
       renderSelectedSubjectsLine();
@@ -1666,11 +1562,9 @@ function fetchQuestions(forceRefresh) {
       renderQuestion();
       renderDots();
       updateOverview();
-
       if (mode === 'read') renderReadMode();
       closeBothPanels();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
       if (forceRefresh) toast(`Loaded ${total} questions`, 'success', 2500, false);
     })
     .catch((err) => {
@@ -1694,7 +1588,6 @@ function applyQuizTitle() {
   else if (selJobs.length > 1) title = selJobs.length + ' Jobs MCQs';
   ui.qTitle.textContent = title;
 }
-
 function renderSelectedSubjectsLine() {
   const parts = [];
   if (selJobs.length) {
@@ -1708,7 +1601,6 @@ function renderSelectedSubjectsLine() {
   ui.subjLine.innerHTML = parts.join(' &nbsp;·&nbsp; ');
   ui.subjLine.style.display = parts.length ? '-webkit-box' : 'none';
 }
-
 function resetToQuizView() {
   ui.result.style.display = 'none';
   ui.single.style.display = 'block';
@@ -1723,21 +1615,16 @@ function resetToQuizView() {
    ============================================================ */
 function promptGuestLock() {
   confirmBox(
-    '🔒',
-    'Login Required',
-    `You have reached the ${GUEST_LIMIT}-MCQ guest limit. ` +
-    `Please login to unlock all questions and full features.`,
+    '🔒', 'Login Required',
+    `You have reached the ${GUEST_LIMIT}-MCQ guest limit. Please login to unlock all questions and full features.`,
     '🔐 Login Now'
   ).then((ok) => { if (ok) logoutToLogin(); });
 }
-
 function logoutToLogin() {
   if (timerHandle) clearInterval(timerHandle);
-  isGuest = false;
-  user = null;
+  isGuest = false; user = null;
   localStorage.removeItem(KEY_USER);
   localStorage.removeItem(KEY_QUIZ);
-
   ui.quizApp.style.display = 'none';
   ui.loginScreen.style.display = 'block';
   ui.loginStat.textContent = '🔐 Sign in to continue';
@@ -1745,7 +1632,6 @@ function logoutToLogin() {
   passwordVisible = false;
   ui.pass.type = 'password';
   ui.tglPw.textContent = '👁️';
-
   closeBothPanels();
   toast('Please login to continue', 'info', 3000, false);
 }
@@ -1755,33 +1641,21 @@ function logoutToLogin() {
    ============================================================ */
 function renderQuestion() {
   if (!questions.length) return;
-
   const q = questions[currentQ];
   const isAnswered = locked[currentQ] || submitted || finished;
   const letters = ['A', 'B', 'C', 'D'];
-
   const badge = renderMColBadge(q.mcol);
 
-  let html = `<div class="q-text" data-q="${encodeURIComponent(q.question)}">${currentQ + 1}. ${q.question}</div>`;
-  html += '<div class="options-list">';
+  let html = `<div class="q-text" data-q="${encodeURIComponent(q.question)}">${currentQ + 1}. ${q.question}</div><div class="options-list">`;
 
   q.options.forEach((opt, i) => {
     let cls = 'option-btn';
     let icon = '';
-
     if (answers[currentQ] === i) cls += ' selected-opt';
-
     if (isAnswered) {
-      if (q.correct !== -1 && i === q.correct) {
-        cls += ' correct';
-        icon = '<span class="icon-indicator">✓</span>';
-      }
-      if (answers[currentQ] === i && answers[currentQ] !== q.correct) {
-        cls += ' wrong';
-        icon = '<span class="icon-indicator">✗</span>';
-      }
+      if (q.correct !== -1 && i === q.correct) { cls += ' correct'; icon = '<span class="icon-indicator">✓</span>'; }
+      if (answers[currentQ] === i && answers[currentQ] !== q.correct) { cls += ' wrong'; icon = '<span class="icon-indicator">✗</span>'; }
     }
-
     html += `<button class="${cls}" data-i="${i}" ${isAnswered ? 'disabled' : ''}>
       <span class="letter">${letters[i]}</span>
       <span>${opt || '(Empty)'}</span>
@@ -1795,7 +1669,6 @@ function renderQuestion() {
     html += `<div class="feedback-box ${ok ? 'correct-fb' : 'wrong-fb'}">
       ${ok ? '✅ Correct!' : '❌ Correct: ' + (q.options[q.correct] || 'N/A')}
     </div>`;
-
     const metaChips = [];
     if (q.subject) metaChips.push(`<span class="meta-chip subject-chip">📚 ${titleCase(q.subject)}</span>`);
     if (q.topic)   metaChips.push(`<span class="meta-chip topic-chip">🏷️ ${titleCase(q.topic)}</span>`);
@@ -1804,7 +1677,6 @@ function renderQuestion() {
   }
 
   ui.qCard.innerHTML = badge + '<div class="question-body">' + html + '</div>';
-
   ui.qCard.querySelector('.q-text').onclick = (e) => {
     e.stopPropagation();
     openGoogleSearch(q.question, q.subject, q.topic);
@@ -1842,16 +1714,10 @@ function renderMColBadge(value) {
   }
   const v = String(value).trim().toLowerCase();
   if (v === 'true') {
-    return `<div class="m-col-badge true">
-      <svg viewBox="0 0 16 16" fill="none">
-        <path d="M13.5 4.5L6 12L2.5 8.5" stroke="#0969da" stroke-width="2.8" stroke-linecap="round"/>
-      </svg></div>`;
+    return `<div class="m-col-badge true"><svg viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5L6 12L2.5 8.5" stroke="#0969da" stroke-width="2.8" stroke-linecap="round"/></svg></div>`;
   }
   if (v === 'false') {
-    return `<div class="m-col-badge false">
-      <svg viewBox="0 0 16 16" fill="none">
-        <path d="M4 4L12 12M12 4L4 12" stroke="#cf222e" stroke-width="2.8" stroke-linecap="round"/>
-      </svg></div>`;
+    return `<div class="m-col-badge false"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="#cf222e" stroke-width="2.8" stroke-linecap="round"/></svg></div>`;
   }
   return '<div class="m-col-badge empty"><span class="q-mark">?</span></div>';
 }
@@ -1864,21 +1730,16 @@ function updateProgress() {
   ui.prog.style.width = (total ? (attemptedCount() / total) * 100 : 0) + '%';
   ui.tot.textContent = total;
 }
-
 function renderDots(activeIndex) {
   ui.dots.innerHTML = '';
   for (let i = 0; i < total; i++) {
     const d = document.createElement('button');
     d.className = 'grid-dot';
     d.textContent = i + 1;
-
     const isLocked = isGuest && i >= GUEST_LIMIT;
-
-    if (isLocked) {
-      d.classList.add('locked-dot');
-    } else if (invalidQs.includes(i)) {
-      d.classList.add('invalid-dot');
-    } else if (answers[i] !== null) {
+    if (isLocked) d.classList.add('locked-dot');
+    else if (invalidQs.includes(i)) d.classList.add('invalid-dot');
+    else if (answers[i] !== null) {
       if (submitted || finished) {
         if (status[i] === true)       d.classList.add('correct-dot');
         else if (status[i] === false) d.classList.add('wrong-dot');
@@ -1887,23 +1748,16 @@ function renderDots(activeIndex) {
         const q = questions[i];
         d.classList.add(answers[i] === q.correct ? 'correct-dot' : 'wrong-dot');
       }
-    } else {
-      d.classList.add('pending-dot');
-    }
-
+    } else d.classList.add('pending-dot');
     if (activeIndex !== undefined && i === activeIndex) d.classList.add('active-dot');
-
     d.onclick = () => {
       if (isLocked) { promptGuestLock(); return; }
-      currentQ = i;
-      renderQuestion();
-      renderDots(i);
+      currentQ = i; renderQuestion(); renderDots(i);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     ui.dots.appendChild(d);
   }
 }
-
 function updateOverview() {
   let done = 0, pending = 0, correct = 0, wrong = 0, invalid = 0;
   for (let i = 0; i < total; i++) {
@@ -1949,7 +1803,6 @@ function gradeQuiz() {
   updateOverview();
   saveState();
 }
-
 function handleEndQuiz() {
   if (finished) return;
   if (!submitted) gradeQuiz();
@@ -1958,11 +1811,9 @@ function handleEndQuiz() {
   ui.endBtn.disabled = true;
   showResult();
 }
-
 function showResult() {
   finished = true;
   if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
-
   ui.single.style.display = 'none';
   ui.result.style.display = 'block';
   $('endQuizBottom').style.display = 'none';
@@ -1971,15 +1822,10 @@ function showResult() {
   const displayTotal = isGuest ? Math.min(total, GUEST_LIMIT) : total;
   ui.score.textContent = score + ' / ' + displayTotal;
 
-  if (isGuest) {
-    ui.rmsg.textContent = `👤 Guest mode: limited to ${GUEST_LIMIT} questions. Login for full access!`;
-  } else if (score === displayTotal) {
-    ui.rmsg.textContent = '🌟 Perfect!';
-  } else if (score >= displayTotal * 0.7) {
-    ui.rmsg.textContent = '👏 Great job!';
-  } else {
-    ui.rmsg.textContent = '💪 Keep practicing!';
-  }
+  if (isGuest) ui.rmsg.textContent = `👤 Guest mode: limited to ${GUEST_LIMIT} questions. Login for full access!`;
+  else if (score === displayTotal) ui.rmsg.textContent = '🌟 Perfect!';
+  else if (score >= displayTotal * 0.7) ui.rmsg.textContent = '👏 Great job!';
+  else ui.rmsg.textContent = '💪 Keep practicing!';
 
   ui.rdetails.innerHTML = '';
   const displayQs = isGuest ? questions.slice(0, GUEST_LIMIT) : questions;
@@ -1987,11 +1833,9 @@ function showResult() {
   displayQs.forEach((q, i) => {
     const div = document.createElement('div');
     div.className = 'detail-item';
-
     const inv = invalidQs.includes(i);
     const ok  = status[i] === true;
     const wr  = status[i] === false;
-
     if (inv)      div.classList.add('invalid-detail');
     else if (ok)  div.classList.add('correct-detail');
     else if (wr)  div.classList.add('wrong-detail');
@@ -2005,24 +1849,15 @@ function showResult() {
 
     const aEl = document.createElement('div');
     aEl.className = 'detail-answer';
-
     if (inv) {
       aEl.innerHTML = `⚠️ Invalid: "${q.correctText}" not in options.`;
     } else {
-      const userAns = answers[i] !== null && q.options[answers[i]]
-        ? q.options[answers[i]] : 'Not answered';
-      const correctAns = q.correct !== -1 && q.options[q.correct]
-        ? q.options[q.correct] : 'N/A';
-
-      if (q.correct === -1) {
-        aEl.innerHTML = '⚠️ No correct answer.';
-      } else if (ok) {
-        aEl.innerHTML = `✅ Your answer: <span style="color:#10b981;">${userAns}</span> (Correct)`;
-      } else if (wr) {
-        aEl.innerHTML = `❌ Yours: <span style="color:#ef4444;">${userAns}</span> &nbsp; Correct: <span class="correct-ans">${correctAns}</span>`;
-      } else {
-        aEl.innerHTML = `⏭️ Skipped &nbsp; Correct: <span class="correct-ans">${correctAns}</span>`;
-      }
+      const userAns = answers[i] !== null && q.options[answers[i]] ? q.options[answers[i]] : 'Not answered';
+      const correctAns = q.correct !== -1 && q.options[q.correct] ? q.options[q.correct] : 'N/A';
+      if (q.correct === -1) aEl.innerHTML = '⚠️ No correct answer.';
+      else if (ok) aEl.innerHTML = `✅ Your answer: <span style="color:#10b981;">${userAns}</span> (Correct)`;
+      else if (wr) aEl.innerHTML = `❌ Yours: <span style="color:#ef4444;">${userAns}</span> &nbsp; Correct: <span class="correct-ans">${correctAns}</span>`;
+      else aEl.innerHTML = `⏭️ Skipped &nbsp; Correct: <span class="correct-ans">${correctAns}</span>`;
     }
     div.appendChild(aEl);
     ui.rdetails.appendChild(div);
@@ -2048,32 +1883,24 @@ function showResult() {
   saveState();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function restartQuiz() {
   clearSavedState();
-  answers   = new Array(questions.length).fill(null);
-  status    = new Array(questions.length).fill(null);
-  locked    = new Array(questions.length).fill(false);
-  submitted = false;
-  finished  = false;
-  score     = 0;
-  currentQ  = 0;
-  timeLeft  = total * 60;
+  answers = new Array(questions.length).fill(null);
+  status  = new Array(questions.length).fill(null);
+  locked  = new Array(questions.length).fill(false);
+  submitted = false; finished = false; score = 0; currentQ = 0; timeLeft = total * 60;
   if (timerHandle) clearInterval(timerHandle);
-
   ui.result.style.display = 'none';
   ui.single.style.display = 'block';
   ui.subBanner.style.display = 'none';
   ui.endBtn.disabled = false;
   $('endQuizBottom').style.display = 'flex';
   ui.quizApp.classList.remove('result-active');
-
   questions = questions.map((q) => {
     const sh = shuffleArray(q.options);
     const nc = sh.indexOf(q.options[q.correct]);
     return { ...q, options: sh, correct: nc };
   });
-
   updateTimerDisplay();
   startTimer();
   renderQuestion();
@@ -2089,7 +1916,6 @@ function restartQuiz() {
    ============================================================ */
 function setMode(newMode) {
   mode = newMode === 'read' ? 'read' : 'mcq';
-
   if (mode === 'mcq') {
     ui.mMcqR.checked = true;
     ui.mMcqL.classList.add('active');
@@ -2104,7 +1930,6 @@ function setMode(newMode) {
   }
   try { localStorage.setItem(KEY_MODE, mode); } catch (e) { /* ignore */ }
 }
-
 ui.mMcqL.onclick  = (e) => { if (e.target.tagName !== 'INPUT') setMode('mcq'); };
 ui.mReadL.onclick = (e) => { if (e.target.tagName !== 'INPUT') setMode('read'); };
 ui.mMcqR.onchange = () => setMode('mcq');
@@ -2119,14 +1944,12 @@ function renderReadMode() {
     ui.readGuestLock.style.display = 'none';
     return;
   }
-
   const letters = ['A', 'B', 'C', 'D'];
   const limit = isGuest ? GUEST_LIMIT : questions.length;
   let html = '';
 
   questions.slice(0, limit).forEach((q, i) => {
     const inv = invalidQs.includes(i);
-
     let optsHtml = '';
     q.options.forEach((opt, oi) => {
       const isCorrect = !inv && q.correct !== -1 && oi === q.correct;
@@ -2137,7 +1960,6 @@ function renderReadMode() {
           ${isCorrect ? '<span class="ro-check">✓</span>' : ''}
         </div>`;
     });
-
     const metaChips = [];
     if (q.subject) metaChips.push(`<span class="rm-chip rm-subject">📚 ${titleCase(q.subject)}</span>`);
     if (q.topic)   metaChips.push(`<span class="rm-chip rm-topic">🏷️ ${titleCase(q.topic)}</span>`);
@@ -2156,9 +1978,7 @@ function renderReadMode() {
         ${metaChips.length ? '<div class="read-meta">' + metaChips.join('') + '</div>' : ''}
       </div>`;
   });
-
   ui.readBox.innerHTML = html;
-
   ui.readBox.querySelectorAll('.read-q').forEach((el) => {
     el.onclick = (e) => {
       e.stopPropagation();
@@ -2169,50 +1989,30 @@ function renderReadMode() {
       );
     };
   });
-
   ui.readGuestLock.style.display = isGuest ? 'block' : 'none';
 }
-
 ui.readLockLoginBtn.onclick = logoutToLogin;
 
 /* ============================================================
-   FILTER PANEL — shared multi-select logic
-   Panels: modal (desktop) and drawer (mobile) use identical HTML
-   structure. Only the IDs differ. We keep refs to the ACTIVE
-   panel's elements and re-render both so state stays in sync.
+   FILTER PANELS (shared)
    ============================================================ */
-
-// Element caches for each panel
 const panels = {
   modal: {
-    root:      ui.modal,
-    jobC:      $('modalJobMsContainer'),
-    jobW:      $('modalJobMsWrapper'),
-    jobChips:  $('modalJobMsChips'),
-    jobSearch: $('modalJobMsSearch'),
-    jobDrop:   $('modalJobMsDropdown'),
-    subjC:     $('modalSubjMsContainer'),
-    subjW:     $('modalSubjMsWrapper'),
-    subjChips: $('modalSubjMsChips'),
-    subjSearch:$('modalSubjMsSearch'),
-    subjDrop:  $('modalSubjMsDropdown'),
+    root: ui.modal,
+    jobC: $('modalJobMsContainer'), jobW: $('modalJobMsWrapper'),
+    jobChips: $('modalJobMsChips'), jobSearch: $('modalJobMsSearch'), jobDrop: $('modalJobMsDropdown'),
+    subjC: $('modalSubjMsContainer'), subjW: $('modalSubjMsWrapper'),
+    subjChips: $('modalSubjMsChips'), subjSearch: $('modalSubjMsSearch'), subjDrop: $('modalSubjMsDropdown'),
   },
   drawer: {
-    root:      ui.drawer,
-    jobC:      $('drawerJobMsContainer'),
-    jobW:      $('drawerJobMsWrapper'),
-    jobChips:  $('drawerJobMsChips'),
-    jobSearch: $('drawerJobMsSearch'),
-    jobDrop:   $('drawerJobMsDropdown'),
-    subjC:     $('drawerSubjMsContainer'),
-    subjW:     $('drawerSubjMsWrapper'),
-    subjChips: $('drawerSubjMsChips'),
-    subjSearch:$('drawerSubjMsSearch'),
-    subjDrop:  $('drawerSubjMsDropdown'),
+    root: ui.drawer,
+    jobC: $('drawerJobMsContainer'), jobW: $('drawerJobMsWrapper'),
+    jobChips: $('drawerJobMsChips'), jobSearch: $('drawerJobMsSearch'), jobDrop: $('drawerJobMsDropdown'),
+    subjC: $('drawerSubjMsContainer'), subjW: $('drawerSubjMsWrapper'),
+    subjChips: $('drawerSubjMsChips'), subjSearch: $('drawerSubjMsSearch'), subjDrop: $('drawerSubjMsDropdown'),
   },
 };
 
-// Track which dropdown (per panel) is open
 function closeAllDropdowns() {
   ['modal', 'drawer'].forEach((key) => {
     panels[key].jobC.classList.remove('open');
@@ -2220,7 +2020,6 @@ function closeAllDropdowns() {
   });
 }
 
-// Generic chip renderer (works for either panel)
 function renderChipsInto(container, items, onRemove) {
   container.innerHTML = '';
   items.forEach((item) => {
@@ -2229,15 +2028,11 @@ function renderChipsInto(container, items, onRemove) {
     chip.innerHTML = `
       <span class="ms-chip-text">${titleCase(item)}</span>
       <button class="ms-chip-remove">×</button>`;
-    chip.querySelector('.ms-chip-remove').onclick = (e) => {
-      e.stopPropagation();
-      onRemove(item);
-    };
+    chip.querySelector('.ms-chip-remove').onclick = (e) => { e.stopPropagation(); onRemove(item); };
     container.appendChild(chip);
   });
 }
 
-// Render both panels' job dropdowns
 function renderJobDropdowns() {
   ['modal', 'drawer'].forEach((key) => {
     const p = panels[key];
@@ -2250,10 +2045,8 @@ function renderJobDropdowns() {
         if (titleCase(q.job).toLowerCase().includes(search)) filtered.push(q.job);
       }
     });
-
     p.jobDrop.innerHTML = '';
     const allSelected = selJobs.length > 0 && selJobs.length === filtered.length;
-
     const selectAll = document.createElement('div');
     selectAll.className = 'ms-select-all-row' + (allSelected ? ' selected' : '');
     selectAll.innerHTML = `<span class="ms-check">${allSelected ? '✓' : ''}</span><span>Select All Jobs</span>`;
@@ -2261,18 +2054,14 @@ function renderJobDropdowns() {
       e.stopPropagation();
       selJobs = allSelected ? [] : [...filtered];
       updateAvailableSubjects();
-      renderJobChipsBoth();
-      renderJobDropdowns();
-      renderSubjectChipsBoth();
-      renderSubjectDropdowns();
+      renderJobChipsBoth(); renderJobDropdowns();
+      renderSubjectChipsBoth(); renderSubjectDropdowns();
     };
     p.jobDrop.appendChild(selectAll);
-
     if (!filtered.length) {
       p.jobDrop.innerHTML += '<div class="ms-no-results">No jobs found</div>';
       return;
     }
-
     filtered.forEach((job) => {
       const isSel = selJobs.some((j) => sameText(j, job));
       const opt = document.createElement('div');
@@ -2280,14 +2069,10 @@ function renderJobDropdowns() {
       opt.innerHTML = `<span class="ms-check">${isSel ? '✓' : ''}</span><span class="ms-opt-label">${titleCase(job)}</span>`;
       opt.onclick = (e) => {
         e.stopPropagation();
-        selJobs = isSel
-          ? selJobs.filter((j) => !sameText(j, job))
-          : [...selJobs, job];
+        selJobs = isSel ? selJobs.filter((j) => !sameText(j, job)) : [...selJobs, job];
         updateAvailableSubjects();
-        renderJobChipsBoth();
-        renderJobDropdowns();
-        renderSubjectChipsBoth();
-        renderSubjectDropdowns();
+        renderJobChipsBoth(); renderJobDropdowns();
+        renderSubjectChipsBoth(); renderSubjectDropdowns();
         p.jobC.classList.remove('open');
       };
       p.jobDrop.appendChild(opt);
@@ -2295,33 +2080,26 @@ function renderJobDropdowns() {
   });
 }
 
-// Render both panels' subject dropdowns
 function renderSubjectDropdowns() {
   ['modal', 'drawer'].forEach((key) => {
     const p = panels[key];
     const search = subjSearchText.toLowerCase();
     const filtered = availSubjs.filter((x) => titleCase(x).toLowerCase().includes(search));
-
     p.subjDrop.innerHTML = '';
     const allSelected = availSubjs.length > 0 && selSubjs.length === availSubjs.length;
-
     const selectAll = document.createElement('div');
     selectAll.className = 'ms-select-all-row' + (allSelected ? ' selected' : '');
     selectAll.innerHTML = `<span class="ms-check">${allSelected ? '✓' : ''}</span><span>Select All Subjects</span>`;
     selectAll.onclick = (e) => {
       e.stopPropagation();
       selSubjs = allSelected ? [] : [...availSubjs];
-      renderSubjectChipsBoth();
-      renderSubjectDropdowns();
+      renderSubjectChipsBoth(); renderSubjectDropdowns();
     };
     p.subjDrop.appendChild(selectAll);
-
     if (!filtered.length) {
-      p.subjDrop.innerHTML +=
-        `<div class="ms-no-results">${availSubjs.length ? 'No subjects found' : 'No subjects available'}</div>`;
+      p.subjDrop.innerHTML += `<div class="ms-no-results">${availSubjs.length ? 'No subjects found' : 'No subjects available'}</div>`;
       return;
     }
-
     filtered.forEach((subj) => {
       const isSel = selSubjs.some((s) => sameText(s, subj));
       const opt = document.createElement('div');
@@ -2329,11 +2107,8 @@ function renderSubjectDropdowns() {
       opt.innerHTML = `<span class="ms-check">${isSel ? '✓' : ''}</span><span class="ms-opt-label">${titleCase(subj)}</span>`;
       opt.onclick = (e) => {
         e.stopPropagation();
-        selSubjs = isSel
-          ? selSubjs.filter((s) => !sameText(s, subj))
-          : [...selSubjs, subj];
-        renderSubjectChipsBoth();
-        renderSubjectDropdowns();
+        selSubjs = isSel ? selSubjs.filter((s) => !sameText(s, subj)) : [...selSubjs, subj];
+        renderSubjectChipsBoth(); renderSubjectDropdowns();
         p.subjC.classList.remove('open');
       };
       p.subjDrop.appendChild(opt);
@@ -2341,30 +2116,24 @@ function renderSubjectDropdowns() {
   });
 }
 
-// Render chips for both panels
 function renderJobChipsBoth() {
   const handler = (job) => {
     selJobs = selJobs.filter((j) => !sameText(j, job));
     updateAvailableSubjects();
-    renderJobChipsBoth();
-    renderJobDropdowns();
-    renderSubjectChipsBoth();
-    renderSubjectDropdowns();
+    renderJobChipsBoth(); renderJobDropdowns();
+    renderSubjectChipsBoth(); renderSubjectDropdowns();
   };
   renderChipsInto(panels.modal.jobChips, selJobs, handler);
   renderChipsInto(panels.drawer.jobChips, selJobs, handler);
 }
-
 function renderSubjectChipsBoth() {
   const handler = (subj) => {
     selSubjs = selSubjs.filter((s) => !sameText(s, subj));
-    renderSubjectChipsBoth();
-    renderSubjectDropdowns();
+    renderSubjectChipsBoth(); renderSubjectDropdowns();
   };
   renderChipsInto(panels.modal.subjChips, selSubjs, handler);
   renderChipsInto(panels.drawer.subjChips, selSubjs, handler);
 }
-
 function updateAvailableSubjects() {
   const set = new Set();
   originalQuestions.forEach((q) => {
@@ -2376,10 +2145,8 @@ function updateAvailableSubjects() {
   selSubjs = selSubjs.filter((s) => availSubjs.some((a) => sameText(a, s)));
 }
 
-// Wire up multi-select interactions for both panels
 ['modal', 'drawer'].forEach((key) => {
   const p = panels[key];
-
   p.jobW.onclick = (e) => {
     if (e.target.closest('.ms-chip-remove')) return;
     const wasOpen = p.jobC.classList.contains('open');
@@ -2408,7 +2175,6 @@ function updateAvailableSubjects() {
   };
 });
 
-// Close dropdowns when clicking outside any panel
 document.addEventListener('click', (e) => {
   ['modal', 'drawer'].forEach((key) => {
     const p = panels[key];
@@ -2420,55 +2186,35 @@ document.addEventListener('click', (e) => {
 });
 
 /* ============================================================
-   PANEL OPEN/CLOSE — modal (desktop) + drawer (mobile)
+   PANEL OPEN/CLOSE
    ============================================================ */
-
-// Shared reset logic
 function resetFilters() {
-  selJobs = [];
-  selSubjs = [];
+  selJobs = []; selSubjs = [];
   jobSearchText = subjSearchText = '';
   panels.modal.jobSearch.value = '';
   panels.modal.subjSearch.value = '';
   panels.drawer.jobSearch.value = '';
   panels.drawer.subjSearch.value = '';
   updateAvailableSubjects();
-  renderJobChipsBoth();
-  renderJobDropdowns();
-  renderSubjectChipsBoth();
-  renderSubjectDropdowns();
+  renderJobChipsBoth(); renderJobDropdowns();
+  renderSubjectChipsBoth(); renderSubjectDropdowns();
   toast('Filters reset', 'info', 2000, false);
 }
-
-// Shared confirm logic (Load & Refresh)
 function confirmAndRefresh() {
   closeBothPanels();
   if (timerHandle) clearInterval(timerHandle);
   resetToQuizView();
   fetchQuestions(true);
 }
-
-// Populate both panels from current state when opening
 function populatePanels() {
   updateUserLabels();
-  renderJobChipsBoth();
-  renderJobDropdowns();
+  renderJobChipsBoth(); renderJobDropdowns();
   updateAvailableSubjects();
-  renderSubjectChipsBoth();
-  renderSubjectDropdowns();
+  renderSubjectChipsBoth(); renderSubjectDropdowns();
 }
 
-// ----- Desktop: modal -----
-function openModal() {
-  populatePanels();
-  ui.modal.classList.add('active');
-}
-function closeModal() {
-  ui.modal.classList.remove('active');
-  closeAllDropdowns();
-}
-
-// ----- Mobile: drawer -----
+function openModal() { populatePanels(); ui.modal.classList.add('active'); }
+function closeModal() { ui.modal.classList.remove('active'); closeAllDropdowns(); }
 function openDrawer() {
   populatePanels();
   ui.drawer.classList.add('open');
@@ -2483,19 +2229,14 @@ function closeDrawer() {
   document.body.style.overflow = '';
   closeAllDropdowns();
 }
-function closeBothPanels() {
-  closeModal();
-  closeDrawer();
-}
+function closeBothPanels() { closeModal(); closeDrawer(); }
 
-// ----- Buttons: desktop modal -----
 ui.refresh.onclick = openModal;
 ui.mCancel.onclick  = closeModal;
 ui.mConfirm.onclick = confirmAndRefresh;
 ui.mReset.onclick   = resetFilters;
 ui.modal.onclick = (e) => { if (e.target === ui.modal) closeModal(); };
 
-// ----- Buttons: mobile drawer -----
 ui.drawerBtn.onclick     = openDrawer;
 ui.drawerCloseBtn.onclick = closeDrawer;
 ui.drawerOverlay.onclick  = closeDrawer;
@@ -2503,7 +2244,6 @@ ui.dCancel.onclick  = closeDrawer;
 ui.dConfirm.onclick = confirmAndRefresh;
 ui.dReset.onclick   = resetFilters;
 
-// Close drawer on Escape key
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (ui.drawer.classList.contains('open')) closeDrawer();
@@ -2511,16 +2251,13 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ----- Logout (both panels) -----
 async function doLogout() {
   const ok = await confirmBox('🚪', 'Logout?', 'Your quiz progress will NOT be saved.', 'Logout');
   if (!ok) return;
   localStorage.removeItem(KEY_USER);
   localStorage.removeItem(KEY_QUIZ);
-  user = null;
-  isGuest = false;
+  user = null; isGuest = false;
   if (timerHandle) clearInterval(timerHandle);
-
   ui.quizApp.style.display = 'none';
   ui.loginScreen.style.display = 'block';
   ui.loginStat.textContent = '🔐 Sign in to continue';
@@ -2528,7 +2265,6 @@ async function doLogout() {
   passwordVisible = false;
   ui.pass.type = 'password';
   ui.tglPw.textContent = '👁️';
-
   closeBothPanels();
   toast('Logged out', 'info', 3000, false);
 }
@@ -2539,38 +2275,19 @@ ui.dLogout.onclick = doLogout;
    NAVIGATION BUTTONS
    ============================================================ */
 ui.prev.onclick = () => {
-  if (currentQ > 0) {
-    currentQ--;
-    renderQuestion();
-    renderDots(currentQ);
-  }
+  if (currentQ > 0) { currentQ--; renderQuestion(); renderDots(currentQ); }
 };
-
 ui.next.onclick = () => {
   if (isGuest && currentQ >= GUEST_LIMIT - 1) { promptGuestLock(); return; }
-  if (currentQ < total - 1) {
-    currentQ++;
-    renderQuestion();
-    renderDots(currentQ);
-  }
+  if (currentQ < total - 1) { currentQ++; renderQuestion(); renderDots(currentQ); }
 };
-
 ui.endBtn.onclick = handleEndQuiz;
-ui.restart.onclick = () => {
-  if (isGuest) { promptGuestLock(); return; }
-  restartQuiz();
-};
+ui.restart.onclick = () => { if (isGuest) { promptGuestLock(); return; } restartQuiz(); };
 
-/* ============================================================
-   STICKY TOP BAR SHADOW
-   ============================================================ */
 window.addEventListener('scroll', () => {
   ui.topBar.classList.toggle('scrolled', window.scrollY > 10);
 }, { passive: true });
 
-/* ============================================================
-   BOOT
-   ============================================================ */
 fetchUsers();
 
 })();
