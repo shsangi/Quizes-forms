@@ -501,7 +501,6 @@ if(locked[idx]&&!submitted&&!done){const ok=answers[idx]===q.correct;h+=`<div cl
 el.qCard.innerHTML=badge+'<div class="question-body">'+h+'</div>';
 el.qCard.querySelector('.q-text').onclick=e=>{e.stopPropagation();googleSearch(q.question,q.subject,q.topic)};
 if(!submitted&&!done){el.qCard.querySelectorAll('.option-btn:not([disabled])').forEach(b=>b.onclick=e=>{e.stopPropagation();if(locked[idx]||submitted||done)return;locked[idx]=true;answers[idx]=+b.dataset.i;renderQ();renderDots(idx);updateProg();updateOverview();save()})}
-// Guest limit: disable Next on last allowed question
 const atGuestLimit=isGuest&&idx>=GUEST_LIMIT-1;
 el.prev.disabled=idx===0||done;
 el.next.disabled=idx===total-1||done||atGuestLimit;
