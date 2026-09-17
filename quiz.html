@@ -97,7 +97,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .btn-icon:disabled{opacity:.4;cursor:not-allowed}
 .btn-icon .refresh-spin{display:inline-block;animation:spin .9s linear infinite}
 @keyframes spin{100%{transform:rotate(360deg)}}
-.guest-badge{display:inline-flex;align-items:center;gap:.25rem;background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #f59e0b;padding:.18rem .5rem;border-radius:var(--rf);font-size:.66rem;font-weight:700;color:#92400e;white-space:nowrap}
 .progress-block{background:#e2e8f0;height:5px;border-radius:var(--rf);margin:.25rem 0 .35rem;overflow:hidden}
 .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#0f766e,#0ea5e9);border-radius:var(--rf);transition:width .35s}
 .read-container{margin-top:.65rem;display:flex;flex-direction:column;gap:.75rem;max-height:78vh;min-height:55vh;overflow-y:auto;padding-right:.4rem;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
@@ -296,7 +295,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 </div>
 </div>
 <div class="top-actions">
-<span class="guest-badge" id="guestBadge" style="display:none">👤 Guest · <span id="guestLeft">15</span> left</span>
 <div class="mode-toggle" id="modeToggle">
 <label id="modeMcqLabel" class="active"><input type="radio" name="displayMode" id="modeMcqRadio" value="mcq" checked/><span class="mode-emoji">📝</span> MCQs</label>
 <label id="modeReadLabel"><input type="radio" name="displayMode" id="modeReadRadio" value="read"/><span class="mode-emoji">📖</span> Solved</label>
@@ -418,7 +416,7 @@ cOverlay:$('confirmOverlay'),cIcon:$('confirmIcon'),cTitle:$('confirmTitle'),cMs
 jobC:$('jobMsContainer'),jobW:$('jobMsWrapper'),jobChips:$('jobMsChips'),jobSearch:$('jobMsSearch'),jobDrop:$('jobMsDropdown'),
 subjC:$('subjMsContainer'),subjW:$('subjMsWrapper'),subjChips:$('subjMsChips'),subjSearch:$('subjMsSearch'),subjDrop:$('subjMsDropdown'),
 installBanner:$('installBanner'),installBtn:$('installBtn'),installClose:$('installClose'),
-guestBadge:$('guestBadge'),guestLeft:$('guestLeft'),readGuestLock:$('readGuestLock'),readLockLoginBtn:$('readLockLoginBtn')
+readGuestLock:$('readGuestLock'),readLockLoginBtn:$('readLockLoginBtn')
 };
 let qs=[],idx=0,score=0,done=false,submitted=false,status=[],answers=[],locked=[],orig=[],total=0,timer=null,timeLeft=0,invQ=[],users=[],user=null,isGuest=false,mode='mcq',selJobs=[],selSubjs=[],availSubjs=[],jobSearchTxt='',subjSearchTxt='',confRes=null,toastT=null,deferredPrompt=null,pwVis=false;
 
@@ -438,10 +436,6 @@ function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Ma
 function same(a,b){return a&&b&&clean(a).toLowerCase()===clean(b).toLowerCase()}
 function titleCase(s){if(!s)return'';return clean(s).split(/(\s+|\/|-)/).map(c=>{if(/^[\s\/-]+$/.test(c))return c;if(/^[A-Z]{2,5}$/.test(c))return c;return c.charAt(0).toUpperCase()+c.slice(1).toLowerCase()}).join('')}
 function attempted(){return answers.filter(a=>a!==null).length}
-
-// Guest limit helper — returns number of allowed questions
-function effectiveTotal(){return isGuest?Math.min(total,GUEST_LIMIT):total}
-function guestRemaining(){return Math.max(0,GUEST_LIMIT-(idx+1))}
 
 // ============ Toast ============
 function toast(msg,type='info',dur=4000,icon=true){if(toastT)clearTimeout(toastT);const tc=$('toastContainer');while(tc.firstChild)tc.removeChild(tc.firstChild);const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};const t=document.createElement('div');t.className='toast '+type;t.innerHTML=(icon?`<span class="toast-icon">${icons[type]}</span>`:'')+`<span>${msg}</span><button class="toast-close">✕</button>`;tc.appendChild(t);t.querySelector('.toast-close').onclick=()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300)};toastT=setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300)},dur)}
@@ -468,8 +462,7 @@ el.loginBtn.onclick=handleLogin;
 el.guestBtn.onclick=handleGuest;
 el.email.onkeydown=el.pass.onkeydown=e=>{if(e.key==='Enter')handleLogin()};
 
-function showQuiz(){el.login.style.display='none';el.quiz.style.display='block';el.mUserAv.textContent=user.user[0].toUpperCase();el.mUserName.textContent=user.user;el.guestBadge.style.display=isGuest?'inline-flex':'none';updateGuestBadge();fetchQs(false);try{const m=localStorage.getItem(MKEY);setMode(m==='read'?'read':'mcq')}catch(e){}}
-function updateGuestBadge(){if(!isGuest)return;const rem=Math.max(0,GUEST_LIMIT-(idx+1));el.guestLeft.textContent=rem}
+function showQuiz(){el.login.style.display='none';el.quiz.style.display='block';el.mUserAv.textContent=user.user[0].toUpperCase();el.mUserName.textContent=user.user;fetchQs(false);try{const m=localStorage.getItem(MKEY);setMode(m==='read'?'read':'mcq')}catch(e){}}
 
 // ============ Save/Load ============
 function save(){try{if(isGuest)return;localStorage.setItem(SKEY,JSON.stringify({qs,answers,status,submitted,done,score,total,locked,orig,idx,timeLeft,invQ,selJobs,selSubjs}))}catch(e){}}
@@ -496,8 +489,8 @@ function applyTitle(){let t='All Jobs MCQs';if(selJobs.length===1)t=titleCase(se
 function renderSubjLine(){const p=[];if(selJobs.length)p.push('<span class="subj-label">Jobs:</span> <span class="subj-list">'+selJobs.map(titleCase).join(', ')+'</span>');if(selSubjs.length)p.push('<span class="subj-label">Subjects:</span> <span class="subj-list">'+selSubjs.map(titleCase).join(', ')+'</span>');el.subjLine.innerHTML=p.join(' &nbsp;·&nbsp; ');el.subjLine.style.display=p.length?'-webkit-box':'none'}
 function resetView(){el.result.style.display='none';el.single.style.display='block';el.subBanner.style.display='none';el.endBtn.disabled=false;el.endQuizBottom=$('endQuizBottom');el.endQuizBottom.style.display='flex';el.quiz.classList.remove('result-active')}
 
-// ============ Guest lock in MCQ ============
-function promptGuestLock(){confirmBox('🔒','Login Required','You have reached the '+GUEST_LIMIT+'-MCQ guest limit. Please login to unlock all questions and full features.','🔐 Login Now').then(ok=>{if(ok){logoutToLogin()}})}
+// ============ Guest lock ============
+function promptGuestLock(){confirmBox('🔒','Login Required','You have reached the '+GUEST_LIMIT+'-MCQ guest limit. Please login to unlock all questions and full features.','🔐 Login Now').then(ok=>{if(ok)logoutToLogin()})}
 function logoutToLogin(){if(timer)clearInterval(timer);isGuest=false;user=null;localStorage.removeItem(UKEY);localStorage.removeItem(SKEY);el.quiz.style.display='none';el.login.style.display='block';el.loginStat.textContent='🔐 Sign in to continue';el.email.value=el.pass.value='';pwVis=false;el.pass.type='password';el.tglPw.textContent='👁️';toast('Please login to continue','info',3000,false)}
 
 // ============ Render question ============
@@ -514,7 +507,6 @@ el.prev.disabled=idx===0||done;
 el.next.disabled=idx===total-1||done||atGuestLimit;
 el.endBtn.disabled=done;
 el.subBanner.style.display=(submitted&&!done)?'block':'none';
-updateGuestBadge();
 updateProg();save()}
 
 function renderBadge(v){if(v==null||String(v).trim()==='')return'<div class="m-col-badge empty"><span class="q-mark">?</span></div>';const s=String(v).trim().toLowerCase();if(s==='true')return'<div class="m-col-badge true"><svg viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5L6 12L2.5 8.5" stroke="#0969da" stroke-width="2.8" stroke-linecap="round"/></svg></div>';if(s==='false')return'<div class="m-col-badge false"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="#cf222e" stroke-width="2.8" stroke-linecap="round"/></svg></div>';return'<div class="m-col-badge empty"><span class="q-mark">?</span></div>'}
@@ -597,7 +589,6 @@ el.mLogout.onclick=async()=>{if(!await confirmBox('🚪','Logout?','Your quiz pr
 
 el.prev.onclick=()=>{if(idx>0){idx--;renderQ();renderDots(idx)}};
 el.next.onclick=()=>{
-// Guest limit check
 if(isGuest&&idx>=GUEST_LIMIT-1){promptGuestLock();return}
 if(idx<total-1){idx++;renderQ();renderDots(idx)}};
 el.endBtn.onclick=handleEnd;
