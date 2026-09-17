@@ -536,13 +536,78 @@ input,textarea{-webkit-user-select:text;user-select:text}
   box-shadow:0 4px 12px rgba(15,118,110,.3);
 }
 
-/* ----- Mode switching ----- */
+/* ============================================================
+   FACTS MODE
+   ============================================================ */
+.facts-container{
+  margin-top:.65rem;display:flex;flex-direction:column;gap:.6rem;
+  max-height:78vh;min-height:55vh;overflow-y:auto;padding-right:.4rem;
+  scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent;
+}
+.facts-container::-webkit-scrollbar{width:8px}
+.facts-container::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px;border:2px solid var(--sf)}
+
+.fact-card{
+  background:var(--sf2);border:1px solid var(--bd);
+  border-left:4px solid #0ea5e9;border-radius:16px;
+  padding:.85rem 1rem .8rem;position:relative;
+  cursor:pointer;transition:background .15s,border-color .15s,transform .15s;
+}
+.fact-card:hover{background:#f0f9ff;border-color:#bae6fd;transform:translateY(-1px)}
+.fact-card:active{background:#e0f2fe}
+.fact-card .fact-head{
+  display:flex;align-items:flex-start;gap:.5rem;
+  font-size:.92rem;line-height:1.5;color:var(--tx);
+  word-break:break-word;padding-right:1.6rem;
+}
+.fact-card .fact-srno{
+  flex-shrink:0;background:#0ea5e9;color:#fff;font-weight:700;
+  font-size:.68rem;padding:.15rem .5rem;border-radius:var(--rf);
+  margin-top:2px;min-width:24px;text-align:center;
+}
+.fact-card .fact-question{font-weight:600;flex:1}
+.fact-card .fact-search-hint{
+  font-size:.55rem;color:#9ca3af;margin-left:.35rem;opacity:.6;
+}
+.fact-card .fact-answer{
+  margin-top:.45rem;padding-top:.45rem;
+  border-top:1px dashed #e5e7eb;
+  font-size:.82rem;line-height:1.45;color:#047857;font-weight:500;
+  word-break:break-word;
+}
+.fact-card .fact-answer.empty{color:#9ca3af;font-style:italic;font-weight:400}
+.fact-card .fact-meta{
+  margin-top:.45rem;display:flex;flex-wrap:wrap;gap:.3rem;
+  font-size:.6rem;font-weight:600;
+}
+.fact-card .fact-meta .fm-chip{
+  display:inline-flex;align-items:center;gap:.15rem;
+  padding:.12rem .45rem;border-radius:var(--rf);
+  background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;
+}
+.facts-empty{text-align:center;padding:2.5rem 1rem;color:var(--tx3);font-size:.95rem;font-style:italic}
+
+/* ----- Mode switching (updated for 3 modes) ----- */
 .read-mode-active #singleQuestionView,
 .read-mode-active .progress-block,
 .read-mode-active .overview-section,
 .read-mode-active .end-quiz-bottom{display:none!important}
 .read-mode-active #readView{display:block!important}
 #readView{display:none}
+
+.facts-mode-active #singleQuestionView,
+.facts-mode-active .progress-block,
+.facts-mode-active .overview-section,
+.facts-mode-active .end-quiz-bottom,
+.facts-mode-active #readView{display:none!important}
+.facts-mode-active #factsView{display:block!important}
+#factsView{display:none}
+
+/* Hide pills when not in MCQ mode */
+.read-mode-active .attempted-pill,
+.read-mode-active .timer-pill,
+.facts-mode-active .attempted-pill,
+.facts-mode-active .timer-pill{display:none!important}
 
 /* ============================================================
    FILTER PANEL — shared styles for modal + drawer
@@ -793,6 +858,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .read-item .read-q{font-size:.85rem}
   .read-item .read-opt{font-size:.78rem}
   .read-container{max-height:72vh;min-height:50vh}
+  .facts-container{max-height:72vh;min-height:50vh}
+  .fact-card .fact-head{font-size:.85rem}
+  .fact-card .fact-answer{font-size:.78rem}
   .filter-panel .ms-dropdown{max-height:220px}
 }
 @media(display-mode:standalone){
@@ -903,6 +971,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
           <input type="radio" name="displayMode" id="modeReadRadio" value="read"/>
           <span class="mode-emoji">📖</span> Solved
         </label>
+        <label id="modeFactsLabel">
+          <input type="radio" name="displayMode" id="modeFactsRadio" value="facts"/>
+          <span class="mode-emoji">💡</span> Facts
+        </label>
       </div>
       <span class="attempted-pill" id="attemptedPill">
         <span class="attempted" id="attemptedCount">0</span>
@@ -950,6 +1022,17 @@ input,textarea{-webkit-user-select:text;user-select:text}
         <h3>Login Required</h3>
         <p>You've reached the 15‑MCQ guest limit in Solved mode. Please login to view all questions.</p>
         <button class="gl-btn" id="readLockLoginBtn">🔐 Login to Continue</button>
+      </div>
+    </div>
+
+    <!-- Facts mode view (NEW) -->
+    <div id="factsView">
+      <div class="facts-container" id="factsContainer"></div>
+      <div class="guest-lock" id="factsGuestLock" style="display:none">
+        <div class="gl-icon">🔒</div>
+        <h3>Login Required</h3>
+        <p>You've reached the 15‑fact guest limit in Facts mode. Please login to view all facts.</p>
+        <button class="gl-btn" id="factsLockLoginBtn">🔐 Login to Continue</button>
       </div>
     </div>
 
@@ -1033,7 +1116,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
   <!-- ============================================================
        FILTER — Mobile right drawer
-       Header removed → title + close now appear BELOW logout
        ============================================================ -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <aside class="drawer" id="drawer" aria-hidden="true">
@@ -1098,6 +1180,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 const LOGO = 'https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27';
 const QUIZ_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
+const FACTS_URL =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRO-FPemOqN9exgEgDyt_x1KfNgTAxf0mOeg16c7THfRaaHg0mbgwuTrObcbIwJKSx2dWtrQCNcrCV/pub?output=csv';
 const SHEET_ID = '17yY_LUiqMsABz7tbtAXFpZIYpHN2TJTZSxo7oJWzckI';
 const LOGIN_GID = '2076597807';
 const LOGIN_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
@@ -1121,8 +1205,8 @@ const ui = {
   // Top bar
   quizApp: $('quizApp'), topBar: $('topBar'), brandLogo: $('brandLogo'),
   qTitle: $('quizTitle'), subjLine: $('selectedSubjectsLine'),
-  mMcqL: $('modeMcqLabel'), mReadL: $('modeReadLabel'),
-  mMcqR: $('modeMcqRadio'), mReadR: $('modeReadRadio'),
+  mMcqL: $('modeMcqLabel'), mReadL: $('modeReadLabel'), mFactsL: $('modeFactsLabel'),
+  mMcqR: $('modeMcqRadio'), mReadR: $('modeReadRadio'), mFactsR: $('modeFactsRadio'),
   att: $('attemptedCount'), tot: $('totalCount'),
   timer: $('timerDisplay'), timerPill: $('timerPill'),
   refresh: $('refreshBtn'), refreshIcon: $('refreshIcon'),
@@ -1134,6 +1218,8 @@ const ui = {
   prev: $('prevBtn'), next: $('nextBtn'), endBtn: $('endQuizBtn'),
   readBox: $('readContainer'), readGuestLock: $('readGuestLock'),
   readLockLoginBtn: $('readLockLoginBtn'),
+  factsBox: $('factsContainer'), factsGuestLock: $('factsGuestLock'),
+  factsLockLoginBtn: $('factsLockLoginBtn'),
 
   // Overview
   dots: $('dotGrid'),
@@ -1196,6 +1282,11 @@ let selSubjs          = [];
 let availSubjs        = [];
 let jobSearchText     = '';
 let subjSearchText    = '';
+
+/* ----- FACTS state (NEW) ----- */
+let facts             = [];         // array of {srno, question, answer, category}
+let factsLoaded       = false;
+let factsLoading      = false;
 
 let passwordVisible   = false;
 let toastTimer        = null;
@@ -1332,6 +1423,16 @@ function openGoogleSearch(question, subject, topic) {
     'https://www.google.com/search?q=' + encodeURIComponent(query.substring(0, 2000)),
     '_blank'
   );
+}
+
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function resolveCorrectIndex(raw, options) {
@@ -1492,7 +1593,7 @@ function showQuiz() {
 
   try {
     const savedMode = localStorage.getItem(KEY_MODE);
-    setMode(savedMode === 'read' ? 'read' : 'mcq');
+    setMode(savedMode === 'read' ? 'read' : savedMode === 'facts' ? 'facts' : 'mcq');
   } catch (e) { /* ignore */ }
 }
 
@@ -1608,6 +1709,7 @@ function fetchQuestions(forceRefresh) {
       renderDots();
       updateOverview();
       if (mode === 'read') renderReadMode();
+      if (mode === 'facts') renderFactsMode();
       return;
     }
   }
@@ -1705,6 +1807,7 @@ function fetchQuestions(forceRefresh) {
       updateOverview();
 
       if (mode === 'read') renderReadMode();
+      if (mode === 'facts') renderFactsMode();
       closeBothPanels();
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -1723,9 +1826,88 @@ function fetchQuestions(forceRefresh) {
 }
 
 /* ============================================================
+   FETCH FACTS (NEW)
+   ============================================================ */
+function fetchFacts(callback) {
+  if (factsLoaded) { if (callback) callback(); return; }
+  if (factsLoading) return;
+  factsLoading = true;
+
+  ui.factsBox.innerHTML =
+    '<div class="facts-empty">🔄 Loading facts...</div>';
+
+  fetch(FACTS_URL + (FACTS_URL.includes('?') ? '&' : '?') + '_t=' + Date.now(), {
+    cache: 'no-store',
+  })
+    .then((r) => r.text())
+    .then((text) => {
+      const lines = text.split('\n').filter((l) => l.trim());
+      facts = [];
+
+      // Detect header row to find column indexes
+      if (lines.length < 2) {
+        factsLoaded = true;
+        factsLoading = false;
+        if (callback) callback();
+        return;
+      }
+
+      const headerCols = parseCSVLine(lines[0]).map((h) => h.toLowerCase());
+      const findIdx = (keywords) => {
+        for (let k = 0; k < headerCols.length; k++) {
+          const h = headerCols[k];
+          if (keywords.some((kw) => h.includes(kw))) return k;
+        }
+        return -1;
+      };
+
+      let srnoIdx = findIdx(['srno', 'sr no', 's.no', 'serial']);
+      let qIdx    = findIdx(['question']);
+      let aIdx    = findIdx(['answer']);
+      let cIdx    = findIdx(['question category', 'category', 'tag_beloging', 'tag_belonging', 'subject']);
+
+      // Fallbacks if header not matched
+      if (srnoIdx === -1) srnoIdx = 0;
+      if (qIdx === -1)    qIdx = 1;
+      if (aIdx === -1)    aIdx = 2;
+      if (cIdx === -1)    cIdx = 3;
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (!cols.length) continue;
+
+        const question = cols[qIdx] ? cols[qIdx].trim() : '';
+        if (!question) continue;
+
+        facts.push({
+          srno:     cols[srnoIdx] ? cols[srnoIdx].trim() : String(i),
+          question: question,
+          answer:   cols[aIdx] ? cols[aIdx].trim() : '',
+          category: cols[cIdx] ? cols[cIdx].trim() : '',
+        });
+      }
+
+      factsLoaded = true;
+      factsLoading = false;
+      if (callback) callback();
+    })
+    .catch((err) => {
+      console.error('Facts fetch error:', err);
+      factsLoading = false;
+      ui.factsBox.innerHTML =
+        '<div class="facts-empty" style="color:#ef4444;">❌ Failed to load facts</div>';
+      toast('Failed to load facts', 'error');
+    });
+}
+
+/* ============================================================
    TITLES / SUBTITLE
    ============================================================ */
 function applyQuizTitle() {
+  if (mode === 'facts') {
+    ui.qTitle.textContent = '💡 Facts';
+    return;
+  }
   let title = 'All Jobs MCQs';
   if (selJobs.length === 1)    title = titleCase(selJobs[0]) + ' MCQs';
   else if (selJobs.length > 1) title = selJobs.length + ' Jobs MCQs';
@@ -1733,6 +1915,11 @@ function applyQuizTitle() {
 }
 
 function renderSelectedSubjectsLine() {
+  if (mode === 'facts') {
+    ui.subjLine.innerHTML = '<span class="subj-label">💡</span> <span class="subj-list">Random facts &amp; general knowledge</span>';
+    ui.subjLine.style.display = '-webkit-box';
+    return;
+  }
   const parts = [];
   if (selJobs.length) {
     parts.push('<span class="subj-label">Jobs:</span> <span class="subj-list">' +
@@ -2117,35 +2304,63 @@ function restartQuiz() {
   renderDots();
   updateOverview();
   if (mode === 'read') renderReadMode();
+  if (mode === 'facts') renderFactsMode();
   saveState();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /* ============================================================
-   MODE TOGGLE
+   MODE TOGGLE (updated for 3 modes)
    ============================================================ */
 function setMode(newMode) {
-  mode = newMode === 'read' ? 'read' : 'mcq';
+  mode = (newMode === 'read' || newMode === 'facts') ? newMode : 'mcq';
+
+  // Reset classes
+  ui.quizApp.classList.remove('read-mode-active', 'facts-mode-active');
+
+  // Reset labels
+  ui.mMcqL.classList.remove('active');
+  ui.mReadL.classList.remove('active');
+  ui.mFactsL.classList.remove('active');
 
   if (mode === 'mcq') {
     ui.mMcqR.checked = true;
     ui.mMcqL.classList.add('active');
-    ui.mReadL.classList.remove('active');
-    ui.quizApp.classList.remove('read-mode-active');
-  } else {
+    // Show overview / progress / end-quiz (default CSS)
+  } else if (mode === 'read') {
     ui.mReadR.checked = true;
     ui.mReadL.classList.add('active');
-    ui.mMcqL.classList.remove('active');
     ui.quizApp.classList.add('read-mode-active');
     renderReadMode();
+  } else if (mode === 'facts') {
+    ui.mFactsR.checked = true;
+    ui.mFactsL.classList.add('active');
+    ui.quizApp.classList.add('facts-mode-active');
+    applyQuizTitle();
+    renderSelectedSubjectsLine();
+    // Fetch facts if not loaded
+    if (!factsLoaded && !factsLoading) {
+      fetchFacts(() => renderFactsMode());
+    } else {
+      renderFactsMode();
+    }
   }
+
+  if (mode !== 'facts') {
+    // restore title when leaving facts
+    applyQuizTitle();
+    renderSelectedSubjectsLine();
+  }
+
   try { localStorage.setItem(KEY_MODE, mode); } catch (e) { /* ignore */ }
 }
 
 ui.mMcqL.onclick  = (e) => { if (e.target.tagName !== 'INPUT') setMode('mcq'); };
 ui.mReadL.onclick = (e) => { if (e.target.tagName !== 'INPUT') setMode('read'); };
+ui.mFactsL.onclick = (e) => { if (e.target.tagName !== 'INPUT') setMode('facts'); };
 ui.mMcqR.onchange = () => setMode('mcq');
 ui.mReadR.onchange = () => setMode('read');
+ui.mFactsR.onchange = () => setMode('facts');
 
 /* ============================================================
    READ (SOLVED) MODE
@@ -2211,6 +2426,66 @@ function renderReadMode() {
 }
 
 ui.readLockLoginBtn.onclick = logoutToLogin;
+
+/* ============================================================
+   FACTS MODE (NEW)
+   ============================================================ */
+function renderFactsMode() {
+  if (!factsLoaded) {
+    if (!factsLoading) fetchFacts(() => renderFactsMode());
+    return;
+  }
+
+  if (!facts.length) {
+    ui.factsBox.innerHTML = '<div class="facts-empty">No facts available</div>';
+    ui.factsGuestLock.style.display = 'none';
+    return;
+  }
+
+  const limit = isGuest ? GUEST_LIMIT : facts.length;
+  let html = '';
+
+  facts.slice(0, limit).forEach((f, i) => {
+    const hasAnswer = f.answer && f.answer.trim() !== '';
+    const metaChips = [];
+    if (f.category) {
+      metaChips.push(`<span class="fm-chip">🏷️ ${escapeHtml(f.category)}</span>`);
+    }
+
+    html += `
+      <div class="fact-card"
+           data-q="${encodeURIComponent(f.question)}"
+           data-c="${encodeURIComponent(f.category || '')}">
+        <div class="fact-head">
+          <span class="fact-srno">${escapeHtml(f.srno)}</span>
+          <span class="fact-question">${escapeHtml(f.question)}
+            <span class="fact-search-hint">🔍</span>
+          </span>
+        </div>
+        <div class="fact-answer${hasAnswer ? '' : ' empty'}">
+          <strong style="color:#047857;">Answer:</strong> ${hasAnswer ? escapeHtml(f.answer) : '—'}
+        </div>
+        ${metaChips.length ? '<div class="fact-meta">' + metaChips.join('') + '</div>' : ''}
+      </div>`;
+  });
+
+  ui.factsBox.innerHTML = html;
+
+  ui.factsBox.querySelectorAll('.fact-card').forEach((card) => {
+    card.onclick = (e) => {
+      e.stopPropagation();
+      const q = decodeURIComponent(card.dataset.q);
+      const c = decodeURIComponent(card.dataset.c);
+      openGoogleSearch(q, c, '');
+    };
+  });
+
+  ui.factsGuestLock.style.display = isGuest && facts.length > GUEST_LIMIT ? 'block' : 'none';
+}
+
+if (ui.factsLockLoginBtn) {
+  ui.factsLockLoginBtn.onclick = logoutToLogin;
+}
 
 /* ============================================================
    FILTER PANEL — shared multi-select logic
@@ -2468,6 +2743,9 @@ function confirmAndRefresh() {
   if (timerHandle) clearInterval(timerHandle);
   resetToQuizView();
   fetchQuestions(true);
+  // Refresh facts too
+  factsLoaded = false;
+  if (mode === 'facts') fetchFacts(() => renderFactsMode());
 }
 
 function populatePanels() {
