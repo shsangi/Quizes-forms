@@ -679,21 +679,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   overflow:hidden;
 }
 .drawer.open{transform:translateX(0)}
-.drawer-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:1rem 1.25rem;
-  border-bottom:1px solid var(--bd);
-  background:var(--sf);
-  flex-shrink:0;
-}
-.drawer-header h3{font-size:1rem;font-weight:700;margin:0}
-.drawer-close{
-  background:var(--sf2);border:none;
-  width:32px;height:32px;border-radius:50%;
-  font-size:1rem;cursor:pointer;color:var(--tx2);
-  display:flex;align-items:center;justify-content:center;
-}
-.drawer-close:hover{background:var(--bd);color:var(--tx)}
 .drawer-body{
   padding:1rem 1.25rem 1.25rem;
   overflow-y:auto;flex:1;
@@ -708,6 +693,27 @@ input,textarea{-webkit-user-select:text;user-select:text}
   padding-top:1.25rem;
   border-top:1px solid var(--bd);
 }
+
+/* ----- Drawer footer (title + close button, below logout) ----- */
+.drawer-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:.85rem;
+  padding-top:.85rem;
+  border-top:1px solid var(--bd);
+}
+.drawer-footer h3{
+  font-size:.9rem;font-weight:700;margin:0;
+  color:var(--tx2);
+  display:flex;align-items:center;gap:.4rem;
+}
+.drawer-footer .drawer-close{
+  background:var(--sf2);border:none;
+  width:34px;height:34px;border-radius:50%;
+  font-size:1rem;cursor:pointer;color:var(--tx2);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.drawer-footer .drawer-close:hover{background:var(--bd);color:var(--tx)}
 
 /* ----- Drawer action buttons (full width, stacked) ----- */
 .drawer-actions{
@@ -754,7 +760,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .m-col-badge .q-mark{font-size:.65rem}
 }
 
-/* Mobile: show drawer button, hide the modal-triggering gear */
 @media(max-width:560px){
   .btn-drawer{display:flex}
   .btn-icon#refreshBtn{display:none}
@@ -1027,18 +1032,12 @@ input,textarea{-webkit-user-select:text;user-select:text}
   </div>
 
   <!-- ============================================================
-       FILTER — Mobile right drawer (NEW ORDER)
+       FILTER — Mobile right drawer
+       Header removed → title + close now appear BELOW logout
        ============================================================ -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <aside class="drawer" id="drawer" aria-hidden="true">
 
-    <!-- Header with title + close icon -->
-    <div class="drawer-header">
-      <h3>⚙️ Filters &amp; Options</h3>
-      <button class="drawer-close" id="drawerCloseBtn" aria-label="Close">✕</button>
-    </div>
-
-    <!-- Body: Jobs → Subjects → Actions → User info (bottom) -->
     <div class="drawer-body filter-panel">
 
       <!-- 1. Jobs -->
@@ -1063,11 +1062,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
         <div class="ms-dropdown" id="drawerSubjMsDropdown"></div>
       </div>
 
-      <!-- 3. Load & Refresh / 4. Reset / 5. Cancel (stacked full-width) -->
+      <!-- 3. Load & Refresh / 4. Reset / 5. Cancel -->
       <div class="drawer-actions">
-        <button class="btn-primary"       id="drawerConfirm">Load &amp; Refresh</button>
-        <button class="btn-secondary"     id="drawerResetBtn">⟲ Reset Filters</button>
-        <button class="btn-cancel-full"   id="drawerCancel">Cancel</button>
+        <button class="btn-primary"     id="drawerConfirm">Load &amp; Refresh</button>
+        <button class="btn-secondary"   id="drawerResetBtn">⟲ Reset Filters</button>
+        <button class="btn-cancel-full" id="drawerCancel">Cancel</button>
       </div>
 
       <!-- 6. User info + Logout (pushed to bottom) -->
@@ -1078,6 +1077,12 @@ input,textarea{-webkit-user-select:text;user-select:text}
             <span class="panel-user-name" id="drawerUserName">User</span>
           </div>
           <button class="panel-logout-btn" id="drawerLogoutBtn">🚪 Logout</button>
+        </div>
+
+        <!-- 7. Title + close (now below logout) -->
+        <div class="drawer-footer">
+          <h3><span>⚙️</span> Filters &amp; Options</h3>
+          <button class="drawer-close" id="drawerCloseBtn" aria-label="Close">✕</button>
         </div>
       </div>
     </div>
