@@ -31,6 +31,7 @@
   --r:20px; --rf:9999px;
   --sh:0 10px 40px -12px rgba(15,23,42,.12);
   --shl:0 25px 50px -12px rgba(15,23,42,.18);
+  --kb-offset:0px; /* set by JS when on-screen keyboard opens */
 }
 
 /* ============================================================
@@ -604,6 +605,16 @@ input,textarea{-webkit-user-select:text;user-select:text}
   max-height:380px;overflow-y:auto;z-index:200;display:none;padding:.3rem;
 }
 .ms-container.open .ms-dropdown{display:block}
+
+/* ----- Keyboard-aware dropdown (mobile) ----- */
+.ms-container.open .ms-dropdown{
+  /* Lift the dropdown above the on-screen keyboard */
+  max-height:min(380px, calc(100vh - var(--kb-offset) - 180px));
+}
+.modal-box.kb-active{
+  padding-bottom:calc(1.4rem + var(--kb-offset));
+}
+
 .ms-option{
   display:flex;align-items:center;gap:.5rem;
   padding:.4rem .6rem;border-radius:8px;cursor:pointer;
@@ -706,7 +717,19 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .read-item .read-q{font-size:.85rem}
   .read-item .read-opt{font-size:.78rem}
   .read-container{max-height:72vh;min-height:50vh}
-  .ms-dropdown{max-height:300px}
+
+  /* On small screens, pin the dropdown to the visual viewport so it
+     always sits above the keyboard and never clips off-screen. */
+  .ms-container.open .ms-dropdown{
+    position:fixed;
+    top:auto;
+    bottom:calc(var(--kb-offset) + 1rem);
+    left:.75rem;
+    right:.75rem;
+    max-height:min(45vh, calc(100vh - var(--kb-offset) - 140px));
+    transform:none;
+    z-index:1500;
+  }
 }
 @media(display-mode:standalone){
   body{
@@ -893,7 +916,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
   <!-- ----- Filter modal ----- -->
   <div class="modal-overlay" id="refreshModal">
-    <div class="modal-box">
+    <div class="modal-box" id="refreshModalBox">
       <h3>⚙️ Filter &amp; Refresh</h3>
 
       <div class="modal-user-info">
@@ -994,7 +1017,8 @@ const ui = {
   restart: $('restartFromResult'),
 
   // Filter modal
-  modal: $('refreshModal'), mCancel: $('modalCancel'),
+  modal: $('refreshModal'), modalBox: $('refreshModalBox'),
+  mCancel: $('modalCancel'),
   mConfirm: $('modalConfirm'), mReset: $('modalResetBtn'),
   mUserAv: $('modalUserAvatar'), mUserName: $('modalUserName'),
   mLogout: $('modalLogoutBtn'),
@@ -1013,6 +1037,30 @@ const ui = {
   installBtn: $('installBtn'),
   installClose: $('installClose'),
 };
+
+/* ============================================================
+   KEYBOARD AWARENESS
+   On mobile, when the soft keyboard opens, visualViewport.height
+   shrinks. The delta is the keyboard height. We expose it as a
+   CSS variable (--kb-offset) so the dropdown can lift above it,
+   and pad the modal so its content stays scrollable.
+   ============================================================ */
+(function setupKeyboardAwareness() {
+  if (!window.visualViewport) return;
+  const vv = window.visualViewport;
+  const root = document.documentElement;
+
+  function update() {
+    const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    root.style.setProperty('--kb-offset', offset + 'px');
+    // Mark modal active for extra bottom padding when keyboard is open
+    if (ui.modalBox) ui.modalBox.classList.toggle('kb-active', offset > 80);
+  }
+
+  vv.addEventListener('resize', update);
+  vv.addEventListener('scroll', update);
+  update();
+})();
 
 /* ============================================================
    STATE
@@ -1207,6 +1255,18 @@ function resolveCorrectIndex(raw, options) {
   if (m && m[1]) return 'abcd'.indexOf(m[1].toLowerCase());
 
   return -1;
+}
+
+// Scroll an input into the center of the visual viewport so the keyboard
+// doesn't hide it. Called on focus + on every keystroke.
+function scrollInputIntoView(input) {
+  setTimeout(() => {
+    try {
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (e) {
+      input.scrollIntoView();
+    }
+  }, 250);
 }
 
 /* ============================================================
@@ -2260,18 +2320,26 @@ ui.subjW.onclick = (e) => {
   ui.jobC.classList.remove('open');
   ui.subjSearch.focus();
 };
+
+// When the user types, filter results AND keep the input visible above the keyboard
 ui.jobSearch.oninput  = () => {
   jobSearchText = ui.jobSearch.value;
   renderJobDropdown();
   ui.jobC.classList.add('open');
   ui.subjC.classList.remove('open');
+  scrollInputIntoView(ui.jobSearch);
 };
 ui.subjSearch.oninput = () => {
   subjSearchText = ui.subjSearch.value;
   renderSubjectDropdown();
   ui.subjC.classList.add('open');
   ui.jobC.classList.remove('open');
+  scrollInputIntoView(ui.subjSearch);
 };
+
+// Also trigger scroll on focus, so the keyboard opening doesn't hide the input
+ui.jobSearch.onfocus  = () => scrollInputIntoView(ui.jobSearch);
+ui.subjSearch.onfocus = () => scrollInputIntoView(ui.subjSearch);
 
 document.addEventListener('click', (e) => {
   if (!ui.jobC.contains(e.target))  ui.jobC.classList.remove('open');
