@@ -523,7 +523,7 @@
             flex-shrink: 0;
         }
 
-        /* ===== MODE TOGGLE (top right) - more compact ===== */
+        /* ===== MODE TOGGLE ===== */
         .mode-toggle {
             display: inline-flex;
             align-items: center;
@@ -560,7 +560,6 @@
             box-shadow: 0 3px 8px rgba(15, 118, 110, 0.25);
         }
 
-        /* Compact attempted pill */
         .attempted-pill {
             display: inline-flex;
             align-items: center;
@@ -585,7 +584,6 @@
         }
         .attempted-pill .total { color: #0e7490; }
 
-        /* Compact timer pill */
         .timer-pill {
             display: inline-flex;
             align-items: center;
@@ -620,7 +618,6 @@
         .timer-pill.danger .timer { color: #991b1b; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
 
-        /* Compact filter button */
         .btn-icon {
             background: transparent;
             border: none;
@@ -785,7 +782,6 @@
         .read-item .read-meta .rm-topic   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
         .read-item .read-meta .rm-job     { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
 
-        /* M-col badge inside read item */
         .read-item .read-mcol {
             position: absolute;
             top: 8px;
@@ -819,7 +815,6 @@
             font-style: italic;
         }
 
-        /* hide quiz view when solved mode active */
         .read-mode-active #singleQuestionView,
         .read-mode-active .progress-block,
         .read-mode-active .overview-section {
@@ -1197,8 +1192,8 @@
         .modal-overlay.active { display: flex; }
         .modal-box {
             background: var(--surface);
-            max-width: 440px;
-            width: 90%;
+            max-width: 480px;
+            width: 92%;
             border-radius: 22px;
             padding: 1.7rem 1.5rem 1.4rem;
             text-align: center;
@@ -1234,7 +1229,6 @@
         }
         .modal-actions .btn-secondary:hover { background: var(--border); }
 
-        /* Reset filters button */
         .modal-reset-row {
             display: flex;
             justify-content: flex-end;
@@ -1273,84 +1267,208 @@
             color: var(--text-2);
             margin: 0.6rem 0 0.2rem;
         }
-        .year-select {
+
+        /* ===== SEARCHABLE MULTI-SELECT ===== */
+        .ms-container {
+            position: relative;
             width: 100%;
-            padding: 0.6rem 0.9rem;
-            border-radius: var(--radius-full);
-            border: 1.5px solid var(--border);
-            background: white;
-            font-family: inherit;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text);
-            outline: none;
-            cursor: pointer;
-            margin-bottom: 0.3rem;
-            transition: 0.15s;
-        }
-        .year-select:focus { border-color: var(--primary); }
-
-        .checkbox-list-wrapper {
-            border: 1.5px solid var(--border);
-            border-radius: 14px;
-            background: white;
-            max-height: 160px;
-            overflow-y: auto;
-            padding: 0.4rem;
-            margin-bottom: 0.3rem;
             text-align: left;
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 transparent;
         }
-        .checkbox-list-wrapper::-webkit-scrollbar { width: 8px; }
-        .checkbox-list-wrapper::-webkit-scrollbar-track { background: transparent; }
-        .checkbox-list-wrapper::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 8px;
-            border: 2px solid white;
-        }
-        .checkbox-list-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .checkbox-row {
+        .ms-input-wrapper {
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 0.45rem;
-            padding: 0.35rem 0.5rem;
-            border-radius: 10px;
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 0.4rem 0.6rem;
+            min-height: 42px;
+            cursor: text;
+            transition: 0.15s;
+        }
+        .ms-input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+        }
+        .ms-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            flex: 1;
+            min-width: 0;
+        }
+        .ms-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #ecfeff;
+            color: #0e7490;
+            border: 1px solid #a5f3fc;
+            padding: 0.15rem 0.4rem 0.15rem 0.55rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 600;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ms-chip .ms-chip-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+        }
+        .ms-chip .ms-chip-remove {
+            background: none;
+            border: none;
             cursor: pointer;
-            transition: 0.12s;
-            user-select: none;
+            font-size: 0.85rem;
+            line-height: 1;
+            color: #0e7490;
+            padding: 0 0.1rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+        }
+        .ms-chip .ms-chip-remove:hover {
+            background: rgba(14, 116, 144, 0.15);
+        }
+        .ms-search-input {
+            border: none;
+            outline: none;
+            font-family: inherit;
             font-size: 0.8rem;
+            padding: 0.25rem;
+            min-width: 60px;
+            flex: 1;
+            background: transparent;
             color: var(--text);
         }
-        .checkbox-row:hover { background: var(--surface-2); }
-        .checkbox-row input[type="checkbox"] {
-            width: 15px; height: 15px;
-            accent-color: var(--primary);
-            cursor: pointer;
+        .ms-search-input::placeholder {
+            color: var(--text-3);
+            font-size: 0.75rem;
+        }
+        .ms-arrow {
+            font-size: 0.6rem;
+            color: var(--text-3);
+            margin-left: 0.3rem;
+            transition: transform 0.2s;
             flex-shrink: 0;
         }
-        .checkbox-row.all-row {
-            font-weight: 700;
-            color: var(--primary);
-            border-bottom: 1px dashed var(--border);
-            border-radius: 10px 10px 0 0;
-            margin-bottom: 0.15rem;
-            padding-bottom: 0.45rem;
+        .ms-container.open .ms-arrow {
+            transform: rotate(180deg);
         }
-        .checkbox-row .cb-label {
+        .ms-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.25);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 200;
+            display: none;
+            padding: 0.3rem;
+        }
+        .ms-container.open .ms-dropdown {
+            display: block;
+        }
+        .ms-dropdown::-webkit-scrollbar { width: 6px; }
+        .ms-dropdown::-webkit-scrollbar-track { background: transparent; }
+        .ms-dropdown::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 6px;
+        }
+        .ms-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text);
+            transition: 0.1s;
+            user-select: none;
+        }
+        .ms-option:hover {
+            background: var(--surface-2);
+        }
+        .ms-option.selected {
+            background: #ecfeff;
+            color: #0e7490;
+            font-weight: 600;
+        }
+        .ms-option .ms-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.7rem;
+            color: white;
+            transition: 0.12s;
+        }
+        .ms-option.selected .ms-check {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .ms-option .ms-opt-label {
             flex: 1;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-
-        .checkbox-empty {
-            font-size: 0.75rem;
-            color: var(--text-3);
+        .ms-no-results {
             text-align: center;
-            padding: 0.9rem 0.5rem;
+            padding: 0.8rem;
+            font-size: 0.78rem;
+            color: var(--text-3);
             font-style: italic;
+        }
+
+        .ms-select-all-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.6rem;
+            border-bottom: 1px dashed var(--border);
+            margin-bottom: 0.2rem;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary);
+            user-select: none;
+            border-radius: 8px;
+        }
+        .ms-select-all-row:hover {
+            background: var(--surface-2);
+        }
+        .ms-select-all-row .ms-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.7rem;
+            color: white;
+            transition: 0.12s;
+        }
+        .ms-select-all-row.selected .ms-check {
+            background: var(--primary);
+            border-color: var(--primary);
         }
 
         .modal-user-info {
@@ -1560,7 +1678,6 @@
                 </div>
             </div>
             <div class="top-actions">
-                <!-- MODE TOGGLE (top right) - compact with "Solved" instead of "Read" -->
                 <div class="mode-toggle" id="modeToggle" role="radiogroup" aria-label="Display mode">
                     <label id="modeMcqLabel" class="active">
                         <input type="radio" name="displayMode" id="modeMcqRadio" value="mcq" checked />
@@ -1609,7 +1726,6 @@
                 </div>
             </div>
 
-            <!-- ===== SOLVED VIEW ===== -->
             <div id="readView">
                 <div class="read-container" id="readContainer"></div>
             </div>
@@ -1650,20 +1766,31 @@
                     <button class="modal-logout-btn" id="modalLogoutBtn">🚪 Logout</button>
                 </div>
 
-                <!-- Reset Filters row -->
                 <div class="modal-reset-row">
                     <button class="btn-reset-filters" id="modalResetBtn" title="Reset all filters to default">
                         ⟲ Reset Filters
                     </button>
                 </div>
 
-                <label class="modal-label" for="modalJobSelect">💼 Job</label>
-                <select class="year-select" id="modalJobSelect">
-                    <option value="all">All Jobs</option>
-                </select>
+                <label class="modal-label">💼 Jobs (searchable, multi-select)</label>
+                <div class="ms-container" id="jobMsContainer">
+                    <div class="ms-input-wrapper" id="jobMsWrapper">
+                        <div class="ms-chips" id="jobMsChips"></div>
+                        <input type="text" class="ms-search-input" id="jobMsSearch" placeholder="Search jobs..." />
+                        <span class="ms-arrow">▼</span>
+                    </div>
+                    <div class="ms-dropdown" id="jobMsDropdown"></div>
+                </div>
 
-                <label class="modal-label">📚 Subjects (select multiple)</label>
-                <div class="checkbox-list-wrapper" id="subjectCheckboxList"></div>
+                <label class="modal-label">📚 Subjects (searchable, multi-select — filtered by jobs)</label>
+                <div class="ms-container" id="subjMsContainer">
+                    <div class="ms-input-wrapper" id="subjMsWrapper">
+                        <div class="ms-chips" id="subjMsChips"></div>
+                        <input type="text" class="ms-search-input" id="subjMsSearch" placeholder="Search subjects..." />
+                        <span class="ms-arrow">▼</span>
+                    </div>
+                    <div class="ms-dropdown" id="subjMsDropdown"></div>
+                </div>
 
                 <div class="modal-actions" style="margin-top:0.85rem;">
                     <button class="btn-secondary" id="modalCancel">Cancel</button>
@@ -1831,6 +1958,7 @@
         const LOGO_URL = APP_LOGO_URL;
         const STORAGE_KEY = 'selfLearnersOneByOneV4';
         const SESSION_KEY = 'selfLearnersSessionUser';
+        const PERSIST_KEY = 'selfLearnersPersistentUser';
         const MODE_KEY = 'selfLearnersDisplayMode';
 
         const DEFAULT_TITLE = 'All Jobs MCQs';
@@ -1852,14 +1980,21 @@
         let timeRemaining = 0;
         let allSubjects = [];
         let allJobs = [];
-        let currentSubjects = [];
-        let currentJob = 'all';
+        let currentSubjects = [];      // selected subjects
+        let currentJobs = [];          // selected jobs (multi)
         let invalidQuestions = [];
 
         let users = [];
         let isLoadingUsers = true;
         let loggedInUser = null;
         let displayMode = 'mcq'; // 'mcq' | 'read' (read = solved)
+
+        // Multi-select state
+        let selectedJobs = [];          // array of job strings
+        let selectedSubjects = [];      // array of subject strings
+        let availableSubjects = [];     // dynamically computed based on selected jobs
+        let jobSearchText = '';
+        let subjSearchText = '';
 
         const loginScreen = document.getElementById('loginScreen');
         const quizApp = document.getElementById('quizApp');
@@ -1890,8 +2025,6 @@
         const modalCancel = document.getElementById('modalCancel');
         const modalConfirm = document.getElementById('modalConfirm');
         const modalResetBtn = document.getElementById('modalResetBtn');
-        const modalJobSelect = document.getElementById('modalJobSelect');
-        const subjectCheckboxList = document.getElementById('subjectCheckboxList');
         const doneCount = document.getElementById('doneCount');
         const pendingCount = document.getElementById('pendingCount');
         const correctCount = document.getElementById('correctCount');
@@ -1925,6 +2058,19 @@
         const confirmOk = document.getElementById('confirmOk');
         const confirmCancel = document.getElementById('confirmCancel');
         let confirmResolve = null;
+
+        // Multi-select DOM
+        const jobMsContainer = document.getElementById('jobMsContainer');
+        const jobMsWrapper = document.getElementById('jobMsWrapper');
+        const jobMsChips = document.getElementById('jobMsChips');
+        const jobMsSearch = document.getElementById('jobMsSearch');
+        const jobMsDropdown = document.getElementById('jobMsDropdown');
+
+        const subjMsContainer = document.getElementById('subjMsContainer');
+        const subjMsWrapper = document.getElementById('subjMsWrapper');
+        const subjMsChips = document.getElementById('subjMsChips');
+        const subjMsSearch = document.getElementById('subjMsSearch');
+        const subjMsDropdown = document.getElementById('subjMsDropdown');
 
         // ============================================================
         // STICKY TOP BAR SHADOW ON SCROLL
@@ -2015,27 +2161,32 @@
                 .join('');
         }
 
-        function resolveTitle(jobValue) {
-            const raw = cleanCell(jobValue);
-            if (!raw || raw.toLowerCase() === 'all') return DEFAULT_TITLE;
-            return toTitleCase(raw) + ' MCQs';
+        function resolveTitle() {
+            if (selectedJobs.length === 0) return DEFAULT_TITLE;
+            if (selectedJobs.length === 1) return toTitleCase(selectedJobs[0]) + ' MCQs';
+            return selectedJobs.length + ' Jobs MCQs';
         }
 
-        function applyTitle(jobValue) {
-            const t = resolveTitle(jobValue);
+        function applyTitle() {
+            const t = resolveTitle();
             quizTitle.textContent = t;
             quizTitle.title = t;
         }
 
         function renderSelectedSubjectsLine() {
-            if (!currentSubjects || currentSubjects.length === 0) {
+            const parts = [];
+            if (selectedJobs.length > 0) {
+                parts.push(`<span class="subj-label">Jobs:</span> <span class="subj-list">${selectedJobs.map(j => toTitleCase(j)).join(', ')}</span>`);
+            }
+            if (selectedSubjects.length > 0) {
+                parts.push(`<span class="subj-label">Subjects:</span> <span class="subj-list">${selectedSubjects.map(s => toTitleCase(s)).join(', ')}</span>`);
+            }
+            if (parts.length === 0) {
                 selectedSubjectsLine.innerHTML = '';
                 selectedSubjectsLine.style.display = 'none';
                 return;
             }
-            const names = currentSubjects.map(s => toTitleCase(s));
-            selectedSubjectsLine.innerHTML =
-                `<span class="subj-label">Subjects:</span> <span class="subj-list">${names.join(', ')}</span>`;
+            selectedSubjectsLine.innerHTML = parts.join(' &nbsp;·&nbsp; ');
             selectedSubjectsLine.style.display = '-webkit-box';
         }
 
@@ -2212,6 +2363,217 @@
         }
 
         // ============================================================
+        // MULTI-SELECT RENDERING
+        // ============================================================
+        function renderChips(container, items, onRemove) {
+            container.innerHTML = '';
+            items.forEach(item => {
+                const chip = document.createElement('span');
+                chip.className = 'ms-chip';
+                const text = document.createElement('span');
+                text.className = 'ms-chip-text';
+                text.textContent = toTitleCase(item);
+                text.title = item;
+                chip.appendChild(text);
+                const btn = document.createElement('button');
+                btn.className = 'ms-chip-remove';
+                btn.type = 'button';
+                btn.textContent = '×';
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    onRemove(item);
+                });
+                chip.appendChild(btn);
+                container.appendChild(chip);
+            });
+        }
+
+        function renderJobDropdown() {
+            const search = jobSearchText.toLowerCase();
+            const filtered = allJobs.filter(j => toTitleCase(j).toLowerCase().includes(search) || j.toLowerCase().includes(search));
+            
+            jobMsDropdown.innerHTML = '';
+            
+            // Select All row
+            const allSelected = selectedJobs.length === allJobs.length && allJobs.length > 0;
+            const selAllRow = document.createElement('div');
+            selAllRow.className = 'ms-select-all-row' + (allSelected ? ' selected' : '');
+            selAllRow.innerHTML = `<span class="ms-check">${allSelected ? '✓' : ''}</span><span>Select All Jobs</span>`;
+            selAllRow.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (allSelected) {
+                    selectedJobs = [];
+                } else {
+                    selectedJobs = [...allJobs];
+                }
+                updateAvailableSubjects();
+                renderJobChips();
+                renderJobDropdown();
+                renderSubjectChips();
+                renderSubjectDropdown();
+            });
+            jobMsDropdown.appendChild(selAllRow);
+
+            if (filtered.length === 0) {
+                const noRes = document.createElement('div');
+                noRes.className = 'ms-no-results';
+                noRes.textContent = 'No jobs found';
+                jobMsDropdown.appendChild(noRes);
+                return;
+            }
+
+            filtered.forEach(job => {
+                const isSelected = selectedJobs.some(j => sameValueCI(j, job));
+                const opt = document.createElement('div');
+                opt.className = 'ms-option' + (isSelected ? ' selected' : '');
+                opt.innerHTML = `<span class="ms-check">${isSelected ? '✓' : ''}</span><span class="ms-opt-label">${toTitleCase(job)}</span>`;
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (isSelected) {
+                        selectedJobs = selectedJobs.filter(j => !sameValueCI(j, job));
+                    } else {
+                        selectedJobs.push(job);
+                    }
+                    updateAvailableSubjects();
+                    renderJobChips();
+                    renderJobDropdown();
+                    renderSubjectChips();
+                    renderSubjectDropdown();
+                });
+                jobMsDropdown.appendChild(opt);
+            });
+        }
+
+        function renderSubjectDropdown() {
+            const search = subjSearchText.toLowerCase();
+            const filtered = availableSubjects.filter(s => toTitleCase(s).toLowerCase().includes(search) || s.toLowerCase().includes(search));
+            
+            subjMsDropdown.innerHTML = '';
+            
+            // Select All row
+            const allSelected = availableSubjects.length > 0 && selectedSubjects.length === availableSubjects.length;
+            const selAllRow = document.createElement('div');
+            selAllRow.className = 'ms-select-all-row' + (allSelected ? ' selected' : '');
+            selAllRow.innerHTML = `<span class="ms-check">${allSelected ? '✓' : ''}</span><span>Select All Subjects</span>`;
+            selAllRow.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (allSelected) {
+                    selectedSubjects = [];
+                } else {
+                    selectedSubjects = [...availableSubjects];
+                }
+                renderSubjectChips();
+                renderSubjectDropdown();
+            });
+            subjMsDropdown.appendChild(selAllRow);
+
+            if (filtered.length === 0) {
+                const noRes = document.createElement('div');
+                noRes.className = 'ms-no-results';
+                noRes.textContent = availableSubjects.length === 0 ? 'No subjects available for selected jobs' : 'No subjects found';
+                subjMsDropdown.appendChild(noRes);
+                return;
+            }
+
+            filtered.forEach(subj => {
+                const isSelected = selectedSubjects.some(s => sameValueCI(s, subj));
+                const opt = document.createElement('div');
+                opt.className = 'ms-option' + (isSelected ? ' selected' : '');
+                opt.innerHTML = `<span class="ms-check">${isSelected ? '✓' : ''}</span><span class="ms-opt-label">${toTitleCase(subj)}</span>`;
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (isSelected) {
+                        selectedSubjects = selectedSubjects.filter(s => !sameValueCI(s, subj));
+                    } else {
+                        selectedSubjects.push(subj);
+                    }
+                    renderSubjectChips();
+                    renderSubjectDropdown();
+                });
+                subjMsDropdown.appendChild(opt);
+            });
+        }
+
+        function renderJobChips() {
+            renderChips(jobMsChips, selectedJobs, (job) => {
+                selectedJobs = selectedJobs.filter(j => !sameValueCI(j, job));
+                updateAvailableSubjects();
+                renderJobChips();
+                renderJobDropdown();
+                renderSubjectChips();
+                renderSubjectDropdown();
+            });
+        }
+
+        function renderSubjectChips() {
+            renderChips(subjMsChips, selectedSubjects, (subj) => {
+                selectedSubjects = selectedSubjects.filter(s => !sameValueCI(s, subj));
+                renderSubjectChips();
+                renderSubjectDropdown();
+            });
+        }
+
+        function updateAvailableSubjects() {
+            // Compute subjects available based on selected jobs
+            if (selectedJobs.length === 0) {
+                // All subjects
+                const set = new Set();
+                originalQuestions.forEach(q => {
+                    const s = cleanCell(q.subject);
+                    if (s) set.add(s);
+                });
+                availableSubjects = [...set];
+            } else {
+                const set = new Set();
+                originalQuestions.forEach(q => {
+                    if (selectedJobs.some(j => sameValueCI(q.job, j))) {
+                        const s = cleanCell(q.subject);
+                        if (s) set.add(s);
+                    }
+                });
+                availableSubjects = [...set];
+            }
+            // Remove selected subjects that are no longer available
+            selectedSubjects = selectedSubjects.filter(s =>
+                availableSubjects.some(as => sameValueCI(as, s))
+            );
+        }
+
+        // Multi-select event listeners
+        jobMsWrapper.addEventListener('click', (e) => {
+            if (e.target.closest('.ms-chip-remove')) return;
+            jobMsContainer.classList.toggle('open');
+            subjMsContainer.classList.remove('open');
+            jobMsSearch.focus();
+        });
+        subjMsWrapper.addEventListener('click', (e) => {
+            if (e.target.closest('.ms-chip-remove')) return;
+            subjMsContainer.classList.toggle('open');
+            jobMsContainer.classList.remove('open');
+            subjMsSearch.focus();
+        });
+        jobMsSearch.addEventListener('input', function() {
+            jobSearchText = this.value;
+            renderJobDropdown();
+            if (!jobMsContainer.classList.contains('open')) {
+                jobMsContainer.classList.add('open');
+                subjMsContainer.classList.remove('open');
+            }
+        });
+        subjMsSearch.addEventListener('input', function() {
+            subjSearchText = this.value;
+            renderSubjectDropdown();
+            if (!subjMsContainer.classList.contains('open')) {
+                subjMsContainer.classList.add('open');
+                jobMsContainer.classList.remove('open');
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (!jobMsContainer.contains(e.target)) jobMsContainer.classList.remove('open');
+            if (!subjMsContainer.contains(e.target)) subjMsContainer.classList.remove('open');
+        });
+
+        // ============================================================
         // DISPLAY MODE
         // ============================================================
         function setDisplayMode(mode) {
@@ -2318,7 +2680,7 @@
         }
 
         // ============================================================
-        // LOGIN
+        // LOGIN (with persistent storage)
         // ============================================================
         function parseLoginCSV(text) {
             const lines = text.split('\n').filter(l => l.trim() !== '');
@@ -2375,7 +2737,10 @@
 
             if (matched) {
                 loggedInUser = matched;
-                try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(matched)); } catch(e){}
+                try {
+                    localStorage.setItem(PERSIST_KEY, JSON.stringify(matched));
+                    sessionStorage.setItem(SESSION_KEY, JSON.stringify(matched));
+                } catch(e){}
                 showToast(`Welcome, ${matched.user}!`, 'success', 2500, false);
                 showQuiz();
             } else {
@@ -2385,17 +2750,42 @@
         }
 
         function restoreSession() {
+            // First, try persistent localStorage (survives browser close)
             try {
-                const raw = sessionStorage.getItem(SESSION_KEY);
-                if (!raw) return;
-                const saved = JSON.parse(raw);
-                const exists = users.some(x =>
-                    x.user.toLowerCase() === saved.user.toLowerCase() && x.pass === saved.pass
-                );
-                if (!exists) { sessionStorage.removeItem(SESSION_KEY); return; }
-                loggedInUser = saved;
-                showToast(`Welcome back, ${saved.user}!`, 'info', 2500, false);
-                showQuiz();
+                const rawPersist = localStorage.getItem(PERSIST_KEY);
+                if (rawPersist) {
+                    const saved = JSON.parse(rawPersist);
+                    const exists = users.some(x =>
+                        x.user.toLowerCase() === saved.user.toLowerCase() && x.pass === saved.pass
+                    );
+                    if (exists) {
+                        loggedInUser = saved;
+                        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(saved)); } catch(e){}
+                        showToast(`Welcome back, ${saved.user}!`, 'info', 2500, false);
+                        showQuiz();
+                        return;
+                    } else {
+                        localStorage.removeItem(PERSIST_KEY);
+                    }
+                }
+            } catch (e) {}
+
+            // Fallback to sessionStorage (same tab session)
+            try {
+                const rawSession = sessionStorage.getItem(SESSION_KEY);
+                if (rawSession) {
+                    const saved = JSON.parse(rawSession);
+                    const exists = users.some(x =>
+                        x.user.toLowerCase() === saved.user.toLowerCase() && x.pass === saved.pass
+                    );
+                    if (exists) {
+                        loggedInUser = saved;
+                        try { localStorage.setItem(PERSIST_KEY, JSON.stringify(saved)); } catch(e){}
+                        showToast(`Welcome back, ${saved.user}!`, 'info', 2500, false);
+                        showQuiz();
+                        return;
+                    }
+                }
             } catch (e) {}
         }
 
@@ -2417,10 +2807,13 @@
             allSubjects = [];
             allJobs = [];
             currentSubjects = [];
-            currentJob = 'all';
+            currentJobs = [];
+            selectedJobs = [];
+            selectedSubjects = [];
+            availableSubjects = [];
             invalidQuestions = [];
 
-            applyTitle('');
+            applyTitle();
             renderSelectedSubjectsLine();
             timerDisplay.textContent = '00:00';
             timerPill.classList.remove('warning', 'danger');
@@ -2437,9 +2830,15 @@
             nextBtn.disabled = true;
             questionCard.innerHTML = '<div style="padding:2rem;text-align:center;color:#475569;">🔄 Loading questions...</div>';
 
-            modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
-            subjectCheckboxList.innerHTML = '';
             readContainer.innerHTML = '';
+            jobMsChips.innerHTML = '';
+            subjMsChips.innerHTML = '';
+            jobMsDropdown.innerHTML = '';
+            subjMsDropdown.innerHTML = '';
+            jobMsSearch.value = '';
+            subjMsSearch.value = '';
+            jobSearchText = '';
+            subjSearchText = '';
 
             modalUserAvatar.textContent = 'U';
             modalUserName.textContent = 'User';
@@ -2459,6 +2858,7 @@
             );
             if (!ok) return;
 
+            localStorage.removeItem(PERSIST_KEY);
             sessionStorage.removeItem(SESSION_KEY);
             loggedInUser = null;
 
@@ -2515,8 +2915,9 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({
                     questions, selectedAllAnswers, answerStatus, isSubmitted, quizCompleted,
                     score, totalQuestions, lockedQuestions, originalQuestions,
-                    currentIndex, timeRemaining, currentSubjects, currentJob,
-                    allSubjects, allJobs, invalidQuestions
+                    currentIndex, timeRemaining, currentSubjects, currentJobs,
+                    allSubjects, allJobs, invalidQuestions,
+                    selectedJobs, selectedSubjects
                 }));
             } catch (e) {}
         }
@@ -2537,7 +2938,7 @@
         function showLoading() {
             questionCard.innerHTML =
                 '<div style="padding:2rem;text-align:center;color:#475569;">🔄 Loading questions...</div>';
-            applyTitle(currentJob === 'all' ? '' : currentJob);
+            applyTitle();
             prevBtn.disabled = true;
             nextBtn.disabled = true;
             endQuizBtn.disabled = true;
@@ -2593,145 +2994,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function getSubjectsForJob(jobValue) {
-            const pool = originalQuestions.length ? originalQuestions : questions;
-            if (!pool || pool.length === 0) return [];
-
-            if (!jobValue || jobValue === 'all') {
-                const set = new Set();
-                pool.forEach(q => {
-                    const s = cleanCell(q.subject);
-                    if (s) set.add(s);
-                });
-                return [...set];
-            }
-
-            const set = new Set();
-            pool.forEach(q => {
-                if (sameValueCI(q.job, jobValue)) {
-                    const s = cleanCell(q.subject);
-                    if (s) set.add(s);
-                }
-            });
-            return [...set];
-        }
-
-        function buildSubjectCheckboxList(subjects, selectedArr) {
-            subjectCheckboxList.innerHTML = '';
-
-            if (!subjects || subjects.length === 0) {
-                const empty = document.createElement('div');
-                empty.className = 'checkbox-empty';
-                empty.textContent = 'No subjects available for this job.';
-                subjectCheckboxList.appendChild(empty);
-                return;
-            }
-
-            const allRow = document.createElement('label');
-            allRow.className = 'checkbox-row all-row';
-            const allCb = document.createElement('input');
-            allCb.type = 'checkbox';
-            allCb.id = 'cbAllSubjects';
-            const hasAnySpecific = selectedArr.some(s => subjects.some(sub => sameValueCI(sub, s)));
-            allCb.checked = !hasAnySpecific;
-            allRow.appendChild(allCb);
-            const allLbl = document.createElement('span');
-            allLbl.className = 'cb-label';
-            allLbl.textContent = 'All Subjects';
-            allRow.appendChild(allLbl);
-            subjectCheckboxList.appendChild(allRow);
-
-            allCb.addEventListener('change', function() {
-                if (this.checked) {
-                    subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects)')
-                        .forEach(cb => { cb.checked = false; });
-                } else {
-                    const anyChecked = subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects):checked').length > 0;
-                    if (!anyChecked) this.checked = true;
-                }
-            });
-
-            subjects.forEach(subj => {
-                const row = document.createElement('label');
-                row.className = 'checkbox-row';
-                const cb = document.createElement('input');
-                cb.type = 'checkbox';
-                cb.value = subj;
-                cb.checked = selectedArr.some(s => sameValueCI(s, subj));
-                row.appendChild(cb);
-                const lbl = document.createElement('span');
-                lbl.className = 'cb-label';
-                lbl.textContent = toTitleCase(subj) || 'Uncategorized';
-                lbl.title = subj;
-                row.appendChild(lbl);
-                subjectCheckboxList.appendChild(row);
-
-                cb.addEventListener('change', function() {
-                    if (this.checked) allCb.checked = false;
-                    const anyChecked = subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects):checked').length > 0;
-                    if (!anyChecked) allCb.checked = true;
-                });
-            });
-        }
-
-        function getCheckedSubjects() {
-            const checked = [];
-            subjectCheckboxList.querySelectorAll('input[type="checkbox"]:not(#cbAllSubjects)').forEach(cb => {
-                if (cb.checked) checked.push(cb.value);
-            });
-            return checked;
-        }
-
-        function onJobChangedInModal() {
-            const selectedJob = modalJobSelect.value;
-            const availableSubjects = getSubjectsForJob(selectedJob);
-            const currentChecked = getCheckedSubjects();
-            const stillValid = currentChecked.filter(s =>
-                availableSubjects.some(as => sameValueCI(as, s))
-            );
-            buildSubjectCheckboxList(availableSubjects, stillValid);
-        }
-
-        modalJobSelect.addEventListener('change', onJobChangedInModal);
-
-        // ============================================================
-        // RESET FILTERS (in modal)
-        // ============================================================
-        function resetFiltersInModal() {
-            modalJobSelect.value = 'all';
-            const allSubjectsForAllJobs = getSubjectsForJob('all');
-            buildSubjectCheckboxList(allSubjectsForAllJobs, []);
-            showToast('Filters reset to defaults.', 'info', 2000, false);
-        }
-
-        modalResetBtn.addEventListener('click', resetFiltersInModal);
-
-        // ============================================================
-        // DROPDOWNS / JOB
-        // ============================================================
-        function populateDropdowns(subjects, jobs) {
-            allSubjects = subjects;
-            allJobs = jobs;
-
-            const curJob = modalJobSelect.value;
-            modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
-            jobs.forEach(j => {
-                const o = document.createElement('option');
-                o.value = j;
-                o.textContent = toTitleCase(j) || 'Uncategorized';
-                modalJobSelect.appendChild(o);
-            });
-            if (curJob && jobs.includes(curJob)) modalJobSelect.value = curJob;
-            else modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
-
-            const jobForFilter = modalJobSelect.value || 'all';
-            const filteredSubjects = getSubjectsForJob(jobForFilter);
-            buildSubjectCheckboxList(filteredSubjects, currentSubjects);
-
-            applyTitle(currentJob);
-            renderSelectedSubjectsLine();
-        }
-
         // ============================================================
         // VALIDATE
         // ============================================================
@@ -2748,10 +3010,8 @@
         // ============================================================
         // FETCH QUESTIONS
         // ============================================================
-        function fetchQuestions(forceRefresh = false, subjectArr = null, job = null) {
+        function fetchQuestions(forceRefresh = false, subjArr = null, jobArr = null) {
             showLoading();
-            if (subjectArr !== null) currentSubjects = subjectArr;
-            if (job !== null) currentJob = job;
 
             if (!forceRefresh) {
                 const saved = loadState();
@@ -2768,15 +3028,18 @@
                     currentIndex = saved.currentIndex || 0;
                     timeRemaining = saved.timeRemaining || (totalQuestions * 60);
                     currentSubjects = saved.currentSubjects || [];
-                    currentJob = saved.currentJob || 'all';
+                    currentJobs = saved.currentJobs || [];
+                    selectedJobs = saved.selectedJobs || [];
+                    selectedSubjects = saved.selectedSubjects || [];
                     allSubjects = saved.allSubjects || [];
                     allJobs = saved.allJobs || [];
                     invalidQuestions = saved.invalidQuestions || [];
-                    applyTitle(currentJob);
+                    
+                    updateAvailableSubjects();
+                    applyTitle();
                     renderSelectedSubjectsLine();
                     totalCount.textContent = totalQuestions;
                     attemptedCount.textContent = getAttemptedCount();
-                    populateDropdowns(allSubjects, allJobs);
                     hideLoading();
                     updateTimerDisplay();
                     if (quizCompleted) { showResult(); return; }
@@ -2823,24 +3086,40 @@
                     const subjects = [...new Set(originalQuestions.map(q => q.subject || '').filter(c => c && c.trim()))];
                     const jobs = [...new Set(originalQuestions.map(q => q.job || '').filter(c => c && c.trim()))];
 
-                    let filtered = originalQuestions;
-                    const targetSubjects = subjectArr || currentSubjects || [];
-                    const targetJob = job || currentJob || 'all';
+                    allSubjects = subjects;
+                    allJobs = jobs;
 
-                    if (targetSubjects.length > 0) {
+                    // Apply passed filters if any
+                    if (jobArr !== null) selectedJobs = [...jobArr];
+                    if (subjArr !== null) selectedSubjects = [...subjArr];
+
+                    // Compute available subjects based on selected jobs
+                    updateAvailableSubjects();
+
+                    // Ensure selected subjects are within available
+                    selectedSubjects = selectedSubjects.filter(s =>
+                        availableSubjects.some(as => sameValueCI(as, s))
+                    );
+
+                    // If no jobs selected, all jobs are used; if no subjects, all subjects
+                    let filtered = originalQuestions;
+                    if (selectedJobs.length > 0) {
                         filtered = filtered.filter(q =>
-                            targetSubjects.some(ts => sameValueCI(q.subject, ts))
+                            selectedJobs.some(j => sameValueCI(q.job, j))
                         );
                     }
-                    if (targetJob !== 'all') {
-                        filtered = filtered.filter(q => sameValueCI(q.job, targetJob));
+                    if (selectedSubjects.length > 0) {
+                        filtered = filtered.filter(q =>
+                            selectedSubjects.some(s => sameValueCI(q.subject, s))
+                        );
                     }
 
                     if (filtered.length === 0) {
                         showToast('No questions match the selected filters. Loading all.', 'warning', 3000, false);
                         filtered = originalQuestions;
-                        currentSubjects = [];
-                        currentJob = 'all';
+                        selectedJobs = [];
+                        selectedSubjects = [];
+                        updateAvailableSubjects();
                     }
 
                     questions = filtered.map(q => {
@@ -2861,9 +3140,8 @@
                     currentIndex = 0;
                     timeRemaining = totalQuestions * 60;
 
-                    applyTitle(currentJob);
+                    applyTitle();
                     renderSelectedSubjectsLine();
-                    populateDropdowns(subjects, jobs);
                     totalCount.textContent = totalQuestions;
                     attemptedCount.textContent = 0;
 
@@ -3286,30 +3564,27 @@
         // REFRESH / FILTER HANDLERS
         // ============================================================
         function handleRefreshClick() {
-            modalJobSelect.innerHTML = '<option value="all">All Jobs</option>';
-            allJobs.forEach(j => {
-                const o = document.createElement('option');
-                o.value = j;
-                o.textContent = toTitleCase(j) || 'Uncategorized';
-                modalJobSelect.appendChild(o);
-            });
-            modalJobSelect.value = (currentJob && currentJob !== 'all') ? currentJob : 'all';
+            // Populate multi-selects with current data
+            jobSearchText = '';
+            subjSearchText = '';
+            jobMsSearch.value = '';
+            subjMsSearch.value = '';
 
-            const jobForFilter = modalJobSelect.value || 'all';
-            const filteredSubjects = getSubjectsForJob(jobForFilter);
-            buildSubjectCheckboxList(filteredSubjects, currentSubjects);
+            renderJobChips();
+            renderJobDropdown();
+            updateAvailableSubjects();
+            renderSubjectChips();
+            renderSubjectDropdown();
 
             updateModalUserInfo();
             refreshModal.classList.add('active');
         }
 
         function handleRefreshConfirm() {
-            const selSubjects = getCheckedSubjects();
-            const selJob = modalJobSelect.value;
             if (refreshModal.classList.contains('active')) refreshModal.classList.remove('active');
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             resetToQuizView();
-            fetchQuestions(true, selSubjects, selJob);
+            fetchQuestions(true, [...selectedSubjects], [...selectedJobs]);
         }
 
         function handleRefreshCancel() { refreshModal.classList.remove('active'); }
@@ -3337,6 +3612,22 @@
         modalCancel.addEventListener('click', handleRefreshCancel);
         refreshModal.addEventListener('click', function(e) {
             if (e.target === this) refreshModal.classList.remove('active');
+        });
+
+        // Reset filters in modal
+        modalResetBtn.addEventListener('click', function() {
+            selectedJobs = [];
+            selectedSubjects = [];
+            jobSearchText = '';
+            subjSearchText = '';
+            jobMsSearch.value = '';
+            subjMsSearch.value = '';
+            updateAvailableSubjects();
+            renderJobChips();
+            renderJobDropdown();
+            renderSubjectChips();
+            renderSubjectDropdown();
+            showToast('Filters reset to defaults.', 'info', 2000, false);
         });
 
         updateTopBarShadow();
