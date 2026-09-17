@@ -622,11 +622,14 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .verify-corner.false   { background:#dc2626; color:#fff; }
 .verify-corner.unknown { background:#e5e7eb; color:#6b7280; }
 
-/* ----- Mode switching ----- */
+/* ============================================================
+   MODE SWITCHING
+   ============================================================ */
 .read-mode-active #singleQuestionView,
 .read-mode-active .progress-block,
 .read-mode-active .overview-section,
-.read-mode-active .end-quiz-bottom{display:none!important}
+.read-mode-active .end-quiz-bottom,
+.read-mode-active #resultArea{display:none!important}
 .read-mode-active #readView{display:block!important}
 #readView{display:none}
 
@@ -634,7 +637,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .facts-mode-active .progress-block,
 .facts-mode-active .overview-section,
 .facts-mode-active .end-quiz-bottom,
-.facts-mode-active #readView{display:none!important}
+.facts-mode-active #readView,
+.facts-mode-active #resultArea{display:none!important}
 .facts-mode-active #factsView{display:block!important}
 #factsView{display:none}
 
@@ -642,7 +646,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .facts-mode-active .attempted-pill,
 .facts-mode-active .timer-pill{display:none!important}
 
-/* Hide facts-pill when not in facts mode (default already display:none) */
 .attempted-pill,
 .timer-pill{display:inline-flex}
 
@@ -1913,7 +1916,6 @@ function fetchFacts(callback) {
 
       const headerCols = parseCSVLine(lines[0]).map((h) => h.toLowerCase());
 
-      // match header to index using multiple keyword candidates
       const findIdx = (keywords, fallback) => {
         for (let k = 0; k < headerCols.length; k++) {
           const h = headerCols[k];
@@ -2381,6 +2383,13 @@ function setMode(newMode) {
 
   ui.quizApp.classList.remove('read-mode-active', 'facts-mode-active');
 
+  // Clear the result-view state so the score card does not leak
+  // into Solved / Facts mode. If we later return to MCQ, we
+  // restore it (if the quiz was already finished).
+  ui.quizApp.classList.remove('result-active');
+  ui.result.style.display = 'none';
+  $('endQuizBottom').style.display = 'flex';
+
   ui.mMcqL.classList.remove('active');
   ui.mReadL.classList.remove('active');
   ui.mFactsL.classList.remove('active');
@@ -2390,6 +2399,16 @@ function setMode(newMode) {
     ui.mMcqL.classList.add('active');
     applyQuizTitle();
     renderSelectedSubjectsLine();
+
+    // If the quiz was already finished, restore the result view
+    if (finished) {
+      ui.single.style.display = 'none';
+      ui.result.style.display = 'block';
+      $('endQuizBottom').style.display = 'none';
+      ui.quizApp.classList.add('result-active');
+    } else {
+      ui.single.style.display = 'block';
+    }
   } else if (mode === 'read') {
     ui.mReadR.checked = true;
     ui.mReadL.classList.add('active');
@@ -2510,7 +2529,6 @@ function renderFactsMode() {
     const key = String(f.srno || f.question).trim();
     const isRead = factsReadSet.has(key);
 
-    // verification corner icon
     let cornerHtml = '';
     if (f.verify === 'true') {
       cornerHtml = '<span class="verify-corner true" title="Verified: true">✔</span>';
@@ -2520,7 +2538,6 @@ function renderFactsMode() {
       cornerHtml = '<span class="verify-corner unknown" title="Unverified">?</span>';
     }
 
-    // meta chips
     const metaChips = [];
     if (f.topic)   metaChips.push(`<span class="fm-chip topic">🏷️ ${escapeHtml(f.topic)}</span>`);
     if (f.subject) metaChips.push(`<span class="fm-chip">📚 ${escapeHtml(f.subject)}</span>`);
@@ -2553,7 +2570,6 @@ function renderFactsMode() {
       const q = decodeURIComponent(card.dataset.q);
       const c = decodeURIComponent(card.dataset.c);
 
-      // mark as read (solved)
       if (!factsReadSet.has(key)) {
         factsReadSet.add(key);
         saveFactsReadSet();
@@ -2839,7 +2855,6 @@ function confirmAndRefresh() {
   if (timerHandle) clearInterval(timerHandle);
   resetToQuizView();
   fetchQuestions(true);
-  // refresh facts too
   factsLoaded = false;
   if (mode === 'facts') fetchFacts(() => renderFactsMode());
 }
