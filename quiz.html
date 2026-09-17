@@ -818,7 +818,8 @@
 
         .read-mode-active #singleQuestionView,
         .read-mode-active .progress-block,
-        .read-mode-active .overview-section {
+        .read-mode-active .overview-section,
+        .read-mode-active .end-quiz-bottom {
             display: none !important;
         }
         .read-mode-active #readView {
@@ -1039,6 +1040,10 @@
         }
         .end-quiz-bottom .btn-success:hover:not(:disabled) {
             box-shadow: 0 10px 28px rgba(16, 185, 129, 0.4);
+        }
+        /* Hide End Quiz when result is shown */
+        .result-active .end-quiz-bottom {
+            display: none !important;
         }
 
         .overview-section {
@@ -1761,7 +1766,7 @@
                 <div class="grid-dots" id="dotGrid"></div>
             </div>
 
-            <!-- ===== END QUIZ BUTTON - MOVED TO BOTTOM ===== -->
+            <!-- ===== END QUIZ BUTTON - ONLY ON QUIZ SCREEN ===== -->
             <div class="end-quiz-bottom" id="endQuizBottom">
                 <button class="btn-success" id="endQuizBtnBottom">🏁 End Quiz</button>
             </div>
@@ -2029,7 +2034,7 @@
         const questionCard = document.getElementById('questionCard');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
-        const endQuizBtn = document.getElementById('endQuizBtnBottom'); // NEW: bottom button
+        const endQuizBtn = document.getElementById('endQuizBtnBottom'); // bottom button
         const progressFill = document.getElementById('progressFill');
         const attemptedCount = document.getElementById('attemptedCount');
         const totalCount = document.getElementById('totalCount');
@@ -2953,6 +2958,9 @@
             submittedBanner.style.display = 'none';
             endQuizBtn.textContent = '🏁 End Quiz';
             endQuizBtn.disabled = false;
+            // Ensure End Quiz bottom is visible
+            document.getElementById('endQuizBottom').style.display = 'flex';
+            quizApp.classList.remove('result-active');
         }
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3404,6 +3412,9 @@
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             singleQuestionView.style.display = 'none';
             resultArea.style.display = 'block';
+            // Hide End Quiz bottom button when result is shown
+            document.getElementById('endQuizBottom').style.display = 'none';
+            quizApp.classList.add('result-active');
             finalScore.textContent = `${score} / ${totalQuestions}`;
             let msg = (score === totalQuestions) ? '🌟 Perfect!' :
                 (score >= totalQuestions * 0.7 ? '👏 Great job!' : '💪 Keep practicing!');
@@ -3486,6 +3497,9 @@
             submittedBanner.style.display = 'none';
             endQuizBtn.textContent = '🏁 End Quiz';
             endQuizBtn.disabled = false;
+            // Show End Quiz bottom button again
+            document.getElementById('endQuizBottom').style.display = 'flex';
+            quizApp.classList.remove('result-active');
 
             const currentQs = questions;
             questions = currentQs.map(q => {
