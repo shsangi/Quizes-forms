@@ -530,21 +530,43 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .read-item .read-mcol.empty{background:#f1f5f9}
 .read-empty{text-align:center;padding:2.5rem 1rem;color:var(--tx3);font-size:.95rem;font-style:italic}
 
-/* ----- Guest lock card ----- */
-.guest-lock{
-  text-align:center;padding:2rem 1.5rem;
-  background:linear-gradient(135deg,#fef3c7,#fef9c3);
-  border:2px dashed #f59e0b;border-radius:18px;margin-top:.75rem;
+/* ============================================================
+   SEARCH BAR (Solved + Facts)
+   ============================================================ */
+.mode-search-bar{
+  display:flex;align-items:center;gap:.5rem;
+  margin:.6rem 0 .25rem;
+  background:var(--sf2);border:1.5px solid var(--bd);
+  border-radius:var(--rf);padding:.35rem .75rem;
+  transition:border-color .15s,box-shadow .15s;
 }
-.guest-lock .gl-icon{font-size:2.5rem;margin-bottom:.5rem}
-.guest-lock h3{color:#92400e;font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
-.guest-lock p{color:#78350f;font-size:.85rem;line-height:1.5;margin-bottom:1rem}
-.guest-lock .gl-btn{
-  background:linear-gradient(135deg,#0f766e,#0d9488);
-  border:none;color:#fff;font-weight:600;font-size:.9rem;
-  padding:.65rem 1.75rem;border-radius:var(--rf);cursor:pointer;font-family:inherit;
-  box-shadow:0 4px 12px rgba(15,118,110,.3);
+.mode-search-bar:focus-within{
+  border-color:var(--pr);background:#fff;
+  box-shadow:0 0 0 3px rgba(15,118,110,.1);
 }
+.mode-search-bar .msb-icon{
+  font-size:.85rem;color:var(--tx3);flex-shrink:0;line-height:1;
+}
+.mode-search-bar input{
+  flex:1;border:none;background:0 0;outline:0;
+  font-family:inherit;font-size:.85rem;color:var(--tx);
+  padding:.35rem .15rem;min-width:60px;
+}
+.mode-search-bar input::placeholder{color:var(--tx3)}
+.mode-search-bar .msb-clear{
+  background:0 0;border:none;cursor:pointer;
+  color:var(--tx3);font-size:.9rem;padding:.15rem .3rem;
+  border-radius:50%;line-height:1;flex-shrink:0;display:none;
+}
+.mode-search-bar .msb-clear:hover{color:var(--tx);background:var(--bd)}
+.mode-search-bar.has-text .msb-clear{display:block}
+.mode-search-bar .msb-count{
+  font-size:.65rem;font-weight:700;color:var(--pr);
+  background:#ecfeff;border:1px solid #a5f3fc;
+  padding:.1rem .4rem;border-radius:var(--rf);
+  white-space:nowrap;flex-shrink:0;
+}
+.mode-search-bar .msb-count:empty{display:none}
 
 /* ============================================================
    FACTS MODE
@@ -895,6 +917,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .facts-container{max-height:72vh;min-height:50vh}
   .fact-card .fact-head{font-size:.85rem}
   .fact-card .fact-answer{font-size:.78rem}
+  .mode-search-bar input{font-size:.8rem}
   .filter-panel .ms-dropdown{max-height:220px}
 }
 @media(display-mode:standalone){
@@ -1055,6 +1078,13 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
     <!-- Solved (read) mode view -->
     <div id="readView">
+      <!-- Search bar for Solved mode -->
+      <div class="mode-search-bar" id="readSearchBar">
+        <span class="msb-icon">🔍</span>
+        <input type="text" id="readSearchInput" placeholder="Search questions, options, topics... (case-insensitive)" autocomplete="off"/>
+        <span class="msb-count" id="readSearchCount"></span>
+        <button class="msb-clear" id="readSearchClear" aria-label="Clear">✕</button>
+      </div>
       <div class="read-container" id="readContainer"></div>
       <div class="guest-lock" id="readGuestLock" style="display:none">
         <div class="gl-icon">🔒</div>
@@ -1066,6 +1096,13 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
     <!-- Facts mode view -->
     <div id="factsView">
+      <!-- Search bar for Facts mode -->
+      <div class="mode-search-bar" id="factsSearchBar">
+        <span class="msb-icon">🔍</span>
+        <input type="text" id="factsSearchInput" placeholder="Search facts, answers, topics, subjects... (case-insensitive)" autocomplete="off"/>
+        <span class="msb-count" id="factsSearchCount"></span>
+        <button class="msb-clear" id="factsSearchClear" aria-label="Clear">✕</button>
+      </div>
       <div class="facts-container" id="factsContainer"></div>
       <div class="guest-lock" id="factsGuestLock" style="display:none">
         <div class="gl-icon">🔒</div>
@@ -1258,6 +1295,16 @@ const ui = {
   factsBox: $('factsContainer'), factsGuestLock: $('factsGuestLock'),
   factsLockLoginBtn: $('factsLockLoginBtn'),
 
+  // Search bars (Solved + Facts)
+  readSearchBar: $('readSearchBar'),
+  readSearchInput: $('readSearchInput'),
+  readSearchClear: $('readSearchClear'),
+  readSearchCount: $('readSearchCount'),
+  factsSearchBar: $('factsSearchBar'),
+  factsSearchInput: $('factsSearchInput'),
+  factsSearchClear: $('factsSearchClear'),
+  factsSearchCount: $('factsSearchCount'),
+
   // Overview
   dots: $('dotGrid'),
   doneC: $('doneCount'), pendC: $('pendingCount'),
@@ -1324,7 +1371,11 @@ let subjSearchText    = '';
 let facts             = [];         // {srno, question, answer, topic, subject, verify, created}
 let factsLoaded       = false;
 let factsLoading      = false;
-let factsReadSet      = new Set();  // set of "read" fact keys (srno based)
+let factsReadSet      = new Set();
+
+/* ----- Mode-search query (case-insensitive) ----- */
+let readSearchQuery   = '';
+let factsSearchQuery  = '';
 
 let passwordVisible   = false;
 let toastTimer        = null;
@@ -1473,7 +1524,13 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-/* Interprets verification value to 'true' | 'false' | 'unknown' */
+/* Case-insensitive "does haystack include needle" */
+function includesCI(haystack, needle) {
+  if (!needle) return true;
+  if (!haystack) return false;
+  return String(haystack).toLowerCase().includes(String(needle).toLowerCase());
+}
+
 function interpretVerify(raw) {
   if (raw === undefined || raw === null) return 'unknown';
   const v = String(raw).trim().toLowerCase();
@@ -1637,7 +1694,6 @@ function showQuiz() {
   ui.quizApp.style.display = 'block';
   updateUserLabels();
 
-  // restore facts read set from localStorage
   try {
     const saved = JSON.parse(localStorage.getItem(KEY_FACTS_READ) || '[]');
     factsReadSet = new Set(saved);
@@ -1887,9 +1943,6 @@ function fetchQuestions(forceRefresh) {
 
 /* ============================================================
    FETCH FACTS
-   Reads columns from header:
-   Srno | question | answer | Question topic | subject |
-   verify question and answer is true or false | created_date
    ============================================================ */
 function fetchFacts(callback) {
   if (factsLoaded) { if (callback) callback(); return; }
@@ -2383,9 +2436,6 @@ function setMode(newMode) {
 
   ui.quizApp.classList.remove('read-mode-active', 'facts-mode-active');
 
-  // Clear the result-view state so the score card does not leak
-  // into Solved / Facts mode. If we later return to MCQ, we
-  // restore it (if the quiz was already finished).
   ui.quizApp.classList.remove('result-active');
   ui.result.style.display = 'none';
   $('endQuizBottom').style.display = 'flex';
@@ -2400,7 +2450,6 @@ function setMode(newMode) {
     applyQuizTitle();
     renderSelectedSubjectsLine();
 
-    // If the quiz was already finished, restore the result view
     if (finished) {
       ui.single.style.display = 'none';
       ui.result.style.display = 'block';
@@ -2440,20 +2489,43 @@ ui.mReadR.onchange = () => setMode('read');
 ui.mFactsR.onchange = () => setMode('facts');
 
 /* ============================================================
-   READ (SOLVED) MODE
+   READ (SOLVED) MODE — with case-insensitive search
    ============================================================ */
+function readItemMatchesSearch(q, query) {
+  if (!query) return true;
+  const nq = query.toLowerCase();
+
+  if (q.question && q.question.toLowerCase().includes(nq)) return true;
+  if (q.subject  && q.subject.toLowerCase().includes(nq))  return true;
+  if (q.topic    && q.topic.toLowerCase().includes(nq))    return true;
+  if (q.job      && q.job.toLowerCase().includes(nq))      return true;
+
+  // also search in options
+  if (Array.isArray(q.options)) {
+    for (const opt of q.options) {
+      if (opt && String(opt).toLowerCase().includes(nq)) return true;
+    }
+  }
+  return false;
+}
+
 function renderReadMode() {
   if (!questions.length) {
     ui.readBox.innerHTML = '<div class="read-empty">No questions</div>';
     ui.readGuestLock.style.display = 'none';
+    ui.readSearchCount.textContent = '';
     return;
   }
 
   const letters = ['A', 'B', 'C', 'D'];
   const limit = isGuest ? GUEST_LIMIT : questions.length;
   let html = '';
+  let shownCount = 0;
 
   questions.slice(0, limit).forEach((q, i) => {
+    if (!readItemMatchesSearch(q, readSearchQuery)) return;
+    shownCount++;
+
     const inv = invalidQs.includes(i);
 
     let optsHtml = '';
@@ -2486,27 +2558,66 @@ function renderReadMode() {
       </div>`;
   });
 
-  ui.readBox.innerHTML = html;
+  if (shownCount === 0) {
+    ui.readBox.innerHTML =
+      '<div class="read-empty">🔍 No questions match "' + escapeHtml(readSearchQuery) + '"</div>';
+    ui.readSearchCount.textContent = '0';
+  } else {
+    ui.readBox.innerHTML = html;
+    ui.readSearchCount.textContent = readSearchQuery ? (shownCount + ' found') : '';
 
-  ui.readBox.querySelectorAll('.read-q').forEach((el) => {
-    el.onclick = (e) => {
-      e.stopPropagation();
-      openGoogleSearch(
-        decodeURIComponent(el.dataset.q),
-        decodeURIComponent(el.dataset.s),
-        decodeURIComponent(el.dataset.t)
-      );
-    };
-  });
+    ui.readBox.querySelectorAll('.read-q').forEach((el) => {
+      el.onclick = (e) => {
+        e.stopPropagation();
+        openGoogleSearch(
+          decodeURIComponent(el.dataset.q),
+          decodeURIComponent(el.dataset.s),
+          decodeURIComponent(el.dataset.t)
+        );
+      };
+    });
+  }
 
   ui.readGuestLock.style.display = isGuest ? 'block' : 'none';
+  updateSearchBarState(ui.readSearchBar, ui.readSearchInput);
 }
 
 ui.readLockLoginBtn.onclick = logoutToLogin;
 
+/* Search input listeners */
+ui.readSearchInput.addEventListener('input', () => {
+  readSearchQuery = ui.readSearchInput.value.trim();
+  renderReadMode();
+});
+ui.readSearchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    ui.readSearchInput.value = '';
+    readSearchQuery = '';
+    renderReadMode();
+    ui.readSearchInput.blur();
+  }
+});
+ui.readSearchClear.onclick = () => {
+  ui.readSearchInput.value = '';
+  readSearchQuery = '';
+  renderReadMode();
+  ui.readSearchInput.focus();
+};
+
 /* ============================================================
-   FACTS MODE — with verify corner icon + solved counter
+   FACTS MODE — with verify corner icon + solved counter + search
    ============================================================ */
+function factMatchesSearch(f, query) {
+  if (!query) return true;
+  const nq = query.toLowerCase();
+
+  if (f.question && f.question.toLowerCase().includes(nq)) return true;
+  if (f.answer   && f.answer.toLowerCase().includes(nq))   return true;
+  if (f.topic    && f.topic.toLowerCase().includes(nq))    return true;
+  if (f.subject  && f.subject.toLowerCase().includes(nq))  return true;
+  return false;
+}
+
 function renderFactsMode() {
   if (!factsLoaded) {
     if (!factsLoading) fetchFacts(() => renderFactsMode());
@@ -2518,13 +2629,18 @@ function renderFactsMode() {
     ui.factsGuestLock.style.display = 'none';
     ui.factsDone.textContent = '0';
     ui.factsTotal.textContent = '0';
+    ui.factsSearchCount.textContent = '';
     return;
   }
 
   const limit = isGuest ? GUEST_LIMIT : facts.length;
   let html = '';
+  let shownCount = 0;
 
   facts.slice(0, limit).forEach((f) => {
+    if (!factMatchesSearch(f, factsSearchQuery)) return;
+    shownCount++;
+
     const hasAnswer = f.answer && f.answer.trim() !== '';
     const key = String(f.srno || f.question).trim();
     const isRead = factsReadSet.has(key);
@@ -2561,27 +2677,35 @@ function renderFactsMode() {
       </div>`;
   });
 
-  ui.factsBox.innerHTML = html;
+  if (shownCount === 0) {
+    ui.factsBox.innerHTML =
+      '<div class="facts-empty">🔍 No facts match "' + escapeHtml(factsSearchQuery) + '"</div>';
+    ui.factsSearchCount.textContent = '0';
+  } else {
+    ui.factsBox.innerHTML = html;
+    ui.factsSearchCount.textContent = factsSearchQuery ? (shownCount + ' found') : '';
 
-  ui.factsBox.querySelectorAll('.fact-card').forEach((card) => {
-    card.onclick = (e) => {
-      e.stopPropagation();
-      const key = decodeURIComponent(card.dataset.key);
-      const q = decodeURIComponent(card.dataset.q);
-      const c = decodeURIComponent(card.dataset.c);
+    ui.factsBox.querySelectorAll('.fact-card').forEach((card) => {
+      card.onclick = (e) => {
+        e.stopPropagation();
+        const key = decodeURIComponent(card.dataset.key);
+        const q = decodeURIComponent(card.dataset.q);
+        const c = decodeURIComponent(card.dataset.c);
 
-      if (!factsReadSet.has(key)) {
-        factsReadSet.add(key);
-        saveFactsReadSet();
-        card.classList.add('read-flag');
-        updateFactsCounter();
-      }
-      openGoogleSearch(q, c, '');
-    };
-  });
+        if (!factsReadSet.has(key)) {
+          factsReadSet.add(key);
+          saveFactsReadSet();
+          card.classList.add('read-flag');
+          updateFactsCounter();
+        }
+        openGoogleSearch(q, c, '');
+      };
+    });
+  }
 
   ui.factsGuestLock.style.display = isGuest && facts.length > GUEST_LIMIT ? 'block' : 'none';
   updateFactsCounter();
+  updateSearchBarState(ui.factsSearchBar, ui.factsSearchInput);
 }
 
 function updateFactsCounter() {
@@ -2597,6 +2721,33 @@ function updateFactsCounter() {
 
 if (ui.factsLockLoginBtn) {
   ui.factsLockLoginBtn.onclick = logoutToLogin;
+}
+
+/* Facts search input listeners */
+ui.factsSearchInput.addEventListener('input', () => {
+  factsSearchQuery = ui.factsSearchInput.value.trim();
+  renderFactsMode();
+});
+ui.factsSearchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    ui.factsSearchInput.value = '';
+    factsSearchQuery = '';
+    renderFactsMode();
+    ui.factsSearchInput.blur();
+  }
+});
+ui.factsSearchClear.onclick = () => {
+  ui.factsSearchInput.value = '';
+  factsSearchQuery = '';
+  renderFactsMode();
+  ui.factsSearchInput.focus();
+};
+
+/* small helper to toggle 'has-text' class on search bar (for clear button visibility) */
+function updateSearchBarState(bar, input) {
+  if (!bar || !input) return;
+  if (input.value && input.value.length > 0) bar.classList.add('has-text');
+  else bar.classList.remove('has-text');
 }
 
 /* ============================================================
