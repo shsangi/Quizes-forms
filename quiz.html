@@ -33,6 +33,9 @@
   --shl:0 25px 50px -12px rgba(15,23,42,.18);
 }
 
+/* ============================================================
+   BASE
+   ============================================================ */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 body{
@@ -245,6 +248,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   flex-wrap:wrap;justify-content:flex-end;flex-shrink:0;
 }
 
+/* ----- Mode toggle ----- */
 .mode-toggle{
   display:inline-flex;align-items:center;
   background:var(--sf2);border:1.5px solid var(--bd);
@@ -259,6 +263,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .mode-toggle label input{display:none}
 .mode-toggle label.active{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff}
 
+/* ----- Pills ----- */
 .attempted-pill{
   display:inline-flex;align-items:center;gap:.2rem;
   background:linear-gradient(135deg,#ecfeff,#f0fdfa);
@@ -278,6 +283,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .timer-pill.danger{background:var(--erb);border-color:var(--er);color:#991b1b;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 
+/* Facts progress pill — only shown in facts mode */
 .facts-pill{
   display:none;align-items:center;gap:.2rem;
   background:linear-gradient(135deg,#fef3c7,#fffbeb);
@@ -305,18 +311,18 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .btn-drawer:hover{background:var(--sf2)}
 
 /* ============================================================
-   PROGRESS + QUESTION CARD (INCREASED HEIGHT)
+   PROGRESS + QUESTION CARD
    ============================================================ */
 .progress-block{background:#e2e8f0;height:5px;border-radius:var(--rf);margin:.25rem 0 .35rem;overflow:hidden}
 .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#0f766e,#0ea5e9);border-radius:var(--rf);transition:width .35s}
 
 .question-card{
   background:var(--sf2);border:1px solid var(--bd);
-  border-radius:20px;padding:1.75rem 1.5rem 1rem;
+  border-radius:20px;padding:1.5rem 1.5rem .85rem;
   margin:.6rem 0 .95rem;position:relative;
 }
 .question-body{
-  max-height:62vh;overflow-y:auto;overflow-x:hidden;
+  max-height:52vh;overflow-y:auto;overflow-x:hidden;
   padding-right:.6rem;padding-bottom:.5rem;
   scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent;
 }
@@ -328,6 +334,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .question-card .q-text:hover{color:var(--pr);text-decoration:underline;text-underline-offset:3px}
 
+/* ----- Options ----- */
 .options-list{display:flex;flex-direction:column;gap:.55rem}
 .options-list .option-btn{
   background:#fff;border:1.5px solid var(--bd);border-radius:var(--rf);
@@ -350,6 +357,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .options-list .option-btn:disabled{cursor:default;opacity:.85}
 .options-list .option-btn .icon-indicator{margin-left:auto;font-size:1.1rem;font-weight:600}
 
+/* ----- Feedback + meta chips ----- */
 .feedback-box{
   margin-top:.95rem;padding:.85rem 1rem;border-radius:14px;
   font-weight:600;font-size:.88rem;line-height:1.45;
@@ -367,7 +375,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .meta-chip.job-chip    {background:#ede9fe;color:#5b21b6;border-color:#ddd6fe}
 
 /* ============================================================
-   ACTION BAR
+   ACTION BAR + BUTTONS
    ============================================================ */
 .action-bar{
   display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
@@ -523,7 +531,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .read-empty{text-align:center;padding:2.5rem 1rem;color:var(--tx3);font-size:.95rem;font-style:italic}
 
 /* ============================================================
-   SEARCH BAR
+   SEARCH BAR (Solved + Facts)
    ============================================================ */
 .mode-search-bar{
   display:flex;align-items:center;gap:.5rem;
@@ -613,6 +621,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .fact-card .fact-meta .fm-chip.topic{background:#fef3c7;color:#92400e;border-color:#fde68a}
 
+/* ----- Tiny corner verification icon (fact cards) ----- */
 .verify-corner{
   position:absolute;
   top:6px;
@@ -655,6 +664,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .facts-mode-active #factsView{display:block!important}
 #factsView{display:none}
 
+/* Hide MCQ pills and timer when in facts mode */
 .facts-mode-active .attempted-pill,
 .facts-mode-active .timer-pill{display:none!important}
 
@@ -662,7 +672,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .timer-pill{display:inline-flex}
 
 /* ============================================================
-   FILTER PANEL
+   FILTER PANEL — shared styles for modal + drawer
    ============================================================ */
 .filter-panel h3{font-size:1.05rem;margin-bottom:.7rem;font-weight:700;text-align:left}
 .filter-panel .panel-user-info{
@@ -701,6 +711,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   font-weight:600;border-radius:var(--rf);cursor:pointer;font-family:inherit;
 }
 
+/* ----- Multi-select (shared) ----- */
 .filter-panel .ms-container{position:relative;width:100%;text-align:left}
 .filter-panel .ms-input-wrapper{
   display:flex;align-items:center;background:#fff;
@@ -760,6 +771,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .filter-panel .ms-select-all-row.selected .ms-check{background:var(--pr);border-color:var(--pr)}
 
+/* ----- Desktop modal ----- */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(15,23,42,.45);
   display:none;align-items:center;justify-content:center;
@@ -773,6 +785,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   max-height:92vh;overflow-y:auto;
 }
 
+/* ----- Mobile right drawer ----- */
 .drawer-overlay{
   position:fixed;inset:0;background:rgba(15,23,42,.45);
   backdrop-filter:blur(4px);z-index:1100;
@@ -857,15 +870,15 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .m-col-badge.empty{background:#f1f5f9}
 
 /* ============================================================
-   JOB SITES BUTTON + MODAL
+   NEW: JOB SITES BUTTON + MODAL (updated)
    ============================================================ */
 .btn-job-sites {
     background: #16a34a;
     border: none;
     color: #fff;
     font-weight: 600;
-    font-size: .8rem;
-    padding: .6rem .9rem;
+    font-size: .78rem;
+    padding: .5rem .8rem;
     border-radius: var(--rf);
     cursor: pointer;
     font-family: inherit;
@@ -873,9 +886,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: .4rem;
+    gap: .35rem;
     transition: background .15s;
-    margin-top: .4rem;
+    margin-bottom: .55rem;
 }
 .btn-job-sites:hover { background: #15803d; }
 .btn-job-sites:active { transform: scale(.98); }
@@ -893,7 +906,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .jobsites-overlay.active { display: flex; }
 .jobsites-modal {
     background: var(--sf);
-    max-width: 700px;
+    max-width: 560px;
     width: 100%;
     max-height: 85vh;
     border-radius: 24px;
@@ -904,7 +917,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
     animation: scaleIn .3s cubic-bezier(.16,1,.3,1);
 }
 .jobsites-header {
-    padding: 1.25rem 1.5rem 0.75rem;
+    padding: 1.1rem 1.3rem .6rem;
     border-bottom: 1px solid var(--bd);
     display: flex;
     justify-content: space-between;
@@ -912,21 +925,21 @@ input,textarea{-webkit-user-select:text;user-select:text}
     flex-shrink: 0;
 }
 .jobsites-header h2 {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 700;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: .5rem;
+    gap: .45rem;
 }
-.jobsites-header h2 span { font-size: 1.3rem; }
+.jobsites-header h2 span { font-size: 1.2rem; }
 .jobsites-close {
     background: var(--sf2);
     border: none;
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
     color: var(--tx2);
     display: flex;
@@ -936,119 +949,114 @@ input,textarea{-webkit-user-select:text;user-select:text}
 }
 .jobsites-close:hover { background: var(--bd); }
 .jobsites-search {
-    padding: .75rem 1.5rem .5rem;
+    padding: .6rem 1.3rem .4rem;
     flex-shrink: 0;
 }
 .jobsites-search input {
     width: 100%;
-    padding: .65rem 1rem;
+    padding: .55rem .9rem;
     border: 1.5px solid var(--bd);
     border-radius: var(--rf);
     font-family: inherit;
-    font-size: .85rem;
+    font-size: .8rem;
     background: var(--sf2);
     outline: none;
     transition: border-color .15s;
 }
 .jobsites-search input:focus { border-color: var(--pr); background: #fff; }
-
-/* Compact job-site cards */
 .jobsites-list {
-    padding: .5rem 1.5rem 1.25rem;
+    padding: .5rem 1.3rem 1.2rem;
     overflow-y: auto;
     flex: 1;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: .5rem;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
 }
+
+/* ===== NEW: compact card layout ===== */
 .jobsites-item {
     background: var(--sf2);
     border: 1px solid var(--bd);
-    border-left: 3px solid #16a34a;
-    border-radius: 10px;
-    padding: .5rem .65rem;
-    display: flex;
-    flex-direction: column;
-    gap: .2rem;
-    transition: background .15s, border-color .15s, transform .15s;
-    cursor: pointer;
-    min-width: 0;
-}
-.jobsites-item:hover {
-    background: #f0fdf4;
-    border-color: #86efac;
-    transform: translateY(-1px);
-}
-.jobsites-item .js-top {
+    border-radius: 12px;
+    padding: .55rem .75rem;
     display: flex;
     align-items: center;
-    gap: .35rem;
+    gap: .55rem;
+    transition: background .15s;
+    font-size: .78rem;
 }
+.jobsites-item:hover { background: #f0fdf4; border-color: #86efac; }
 .jobsites-item .js-srno {
     background: #16a34a;
     color: #fff;
     font-weight: 700;
-    font-size: .58rem;
-    padding: .08rem .35rem;
+    font-size: .62rem;
+    padding: .12rem .42rem;
     border-radius: var(--rf);
     flex-shrink: 0;
-    min-width: 18px;
+    min-width: 20px;
     text-align: center;
 }
 .jobsites-item .js-sector {
     font-weight: 700;
-    font-size: .62rem;
+    font-size: .7rem;
     color: #0f766e;
+    flex-shrink: 0;
     background: #ecfeff;
-    padding: .08rem .4rem;
+    padding: .12rem .5rem;
     border-radius: var(--rf);
     border: 1px solid #a5f3fc;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    max-width: 110px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 100%;
 }
 .jobsites-item .js-name {
     font-weight: 600;
-    font-size: .78rem;
+    font-size: .8rem;
     color: var(--tx);
-    line-height: 1.25;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    word-break: break-word;
-}
-.jobsites-item .js-url {
-    font-size: .65rem;
-    color: #0ea5e9;
-    text-decoration: none;
-    font-weight: 500;
+    flex: 1;
+    min-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: block;
+}
+.jobsites-item .js-url {
+    font-size: .7rem;
+    color: #0ea5e9;
+    text-decoration: none;
+    font-weight: 500;
+    flex-shrink: 0;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .jobsites-item .js-url:hover { text-decoration: underline; color: #0284c7; }
+.jobsites-item .js-date {
+    font-size: .6rem;
+    color: var(--tx3);
+    flex-shrink: 0;
+}
+/* ===== END NEW ===== */
 
 .jobsites-loading, .jobsites-empty {
     text-align: center;
-    padding: 2.5rem 1rem;
+    padding: 2rem 1rem;
     color: var(--tx3);
-    font-size: .9rem;
-    grid-column: 1 / -1;
+    font-size: .85rem;
 }
 .jobsites-loading .spinner {
     display: inline-block;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border: 3px solid var(--bd);
     border-top-color: var(--pr);
     border-radius: 50%;
     animation: spin .8s linear infinite;
-    margin-bottom: .5rem;
+    margin-bottom: .45rem;
 }
 
 /* ============================================================
@@ -1069,7 +1077,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .brand-logo{width:26px;height:26px}
   .brand-title h1{font-size:.8rem;max-width:130px}
   .selected-subjects{max-width:130px;font-size:.58rem}
-  .question-card{padding:1.15rem .9rem .75rem}
+  .question-card{padding:1rem .9rem .65rem}
   .question-card .q-text{font-size:.98rem}
   .options-list .option-btn{padding:.6rem .9rem;font-size:.85rem}
   .grid-dot{width:26px;height:26px;font-size:.6rem}
@@ -1084,7 +1092,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .confirm-box{padding:1.5rem}
   .confirm-box .btn-group{flex-direction:column}
   .confirm-box .btn-group button{width:100%}
-  .question-body{max-height:56vh}
+  .question-body{max-height:46vh}
   body{align-items:flex-start;padding-top:1rem;padding-bottom:1rem}
   .login-wrapper{padding:1.75rem 1.25rem;border-radius:22px}
   .login-wrapper .logo{width:56px;height:56px;margin-bottom:.85rem;padding:8px}
@@ -1100,12 +1108,12 @@ input,textarea{-webkit-user-select:text;user-select:text}
   .mode-search-bar input{font-size:.8rem}
   .filter-panel .ms-dropdown{max-height:220px}
   .jobsites-modal { max-height: 92vh; border-radius: 18px; }
-  .jobsites-header { padding: 1rem 1rem .5rem; }
-  .jobsites-list { padding: .5rem 1rem 1rem; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .4rem; }
-  .jobsites-item { padding: .45rem .55rem; }
-  .jobsites-item .js-name { font-size: .72rem; }
-  .jobsites-item .js-url { font-size: .6rem; }
-  .jobsites-item .js-sector { font-size: .58rem; }
+  .jobsites-header { padding: .9rem 1rem .5rem; }
+  .jobsites-list { padding: .5rem 1rem 1rem; }
+  .jobsites-item { padding: .5rem .65rem; font-size: .72rem; gap: .4rem; }
+  .jobsites-item .js-url { max-width: 100px; font-size: .66rem; }
+  .jobsites-item .js-sector { max-width: 80px; font-size: .64rem; }
+  .jobsites-item .js-name { font-size: .75rem; }
 }
 @media(display-mode:standalone){
   body{
@@ -1194,6 +1202,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
      ============================================================ -->
 <div class="quiz-wrapper" id="quizApp">
 
+  <!-- ----- Top bar (sticky) ----- -->
   <div class="top-bar" id="topBar">
     <div class="brand">
       <img class="brand-logo" id="brandLogo"
@@ -1232,19 +1241,23 @@ input,textarea{-webkit-user-select:text;user-select:text}
         <span>/</span>
         <span id="factsTotalCount">0</span>
       </span>
+      <!-- Desktop: opens modal -->
       <button class="btn-icon" id="refreshBtn" title="Filter &amp; Refresh">
         <span id="refreshIcon">⚙️</span>
       </button>
+      <!-- Mobile: opens drawer -->
       <button class="btn-drawer" id="drawerBtn" title="Filters &amp; options">☰</button>
     </div>
   </div>
 
+  <!-- ----- Quiz content ----- -->
   <div id="quizContent">
 
     <div class="progress-block">
       <div class="progress-fill" id="progressFill"></div>
     </div>
 
+    <!-- MCQ mode view -->
     <div id="singleQuestionView">
       <div id="submittedBanner" style="display:none" class="submitted-header">
         ✅ Submitted — Click "End Quiz" for final score.
@@ -1258,7 +1271,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
 
+    <!-- Solved (read) mode view -->
     <div id="readView">
+      <!-- Search bar for Solved mode -->
       <div class="mode-search-bar" id="readSearchBar">
         <span class="msb-icon">🔍</span>
         <input type="text" id="readSearchInput" placeholder="Search questions, options, topics... (case-insensitive)" autocomplete="off"/>
@@ -1274,7 +1289,9 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
 
+    <!-- Facts mode view -->
     <div id="factsView">
+      <!-- Search bar for Facts mode -->
       <div class="mode-search-bar" id="factsSearchBar">
         <span class="msb-icon">🔍</span>
         <input type="text" id="factsSearchInput" placeholder="Search facts, answers, topics, subjects... (case-insensitive)" autocomplete="off"/>
@@ -1290,6 +1307,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
 
+    <!-- Overview grid -->
     <div class="overview-section">
       <div class="overview-header">
         <span>OVERVIEW</span>
@@ -1306,10 +1324,12 @@ input,textarea{-webkit-user-select:text;user-select:text}
       <div class="grid-dots" id="dotGrid"></div>
     </div>
 
+    <!-- End Quiz (bottom) -->
     <div class="end-quiz-bottom" id="endQuizBottom">
       <button class="btn-success" id="endQuizBtn">🏁 End Quiz</button>
     </div>
 
+    <!-- Result card -->
     <div class="result-card" id="resultArea">
       <h2>🏁 Quiz Complete</h2>
       <div class="result-score" id="finalScore">0 / 0</div>
@@ -1319,10 +1339,13 @@ input,textarea{-webkit-user-select:text;user-select:text}
     </div>
   </div>
 
-  <!-- FILTER MODAL -->
+  <!-- ============================================================
+       FILTER — Desktop modal
+       ============================================================ -->
   <div class="modal-overlay" id="refreshModal">
     <div class="modal-box filter-panel">
       <h3>⚙️ Filter &amp; Refresh</h3>
+
       <div class="panel-user-info">
         <div class="panel-user-left">
           <span class="panel-user-avatar" id="modalUserAvatar">U</span>
@@ -1330,9 +1353,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
         </div>
         <button class="panel-logout-btn" id="modalLogoutBtn">🚪 Logout</button>
       </div>
+
       <div class="panel-reset-row">
         <button class="btn-reset-filters" id="modalResetBtn">⟲ Reset Filters</button>
       </div>
+
       <label class="panel-label">💼 Jobs</label>
       <div class="ms-container" id="modalJobMsContainer">
         <div class="ms-input-wrapper" id="modalJobMsWrapper">
@@ -1342,6 +1367,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
         </div>
         <div class="ms-dropdown" id="modalJobMsDropdown"></div>
       </div>
+
       <label class="panel-label">📚 Subjects</label>
       <div class="ms-container" id="modalSubjMsContainer">
         <div class="ms-input-wrapper" id="modalSubjMsWrapper">
@@ -1351,6 +1377,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
         </div>
         <div class="ms-dropdown" id="modalSubjMsDropdown"></div>
       </div>
+
       <div class="panel-actions">
         <button class="btn-secondary" id="modalCancel">Cancel</button>
         <button class="btn-primary"   id="modalConfirm">Load &amp; Refresh</button>
@@ -1358,10 +1385,14 @@ input,textarea{-webkit-user-select:text;user-select:text}
     </div>
   </div>
 
-  <!-- FILTER DRAWER -->
+  <!-- ============================================================
+       FILTER — Mobile right drawer
+       ============================================================ -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <aside class="drawer" id="drawer" aria-hidden="true">
+
     <div class="drawer-body filter-panel">
+
       <label class="panel-label">💼 Jobs</label>
       <div class="ms-container" id="drawerJobMsContainer">
         <div class="ms-input-wrapper" id="drawerJobMsWrapper">
@@ -1389,6 +1420,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
 
       <div class="drawer-bottom">
+        <!-- ===== NEW: JOB SITES BUTTON (above logout) ===== -->
+        <button class="btn-job-sites" id="jobSitesBtn">🌐 All Jobs Websites</button>
+        <!-- ===== END NEW ===== -->
+
         <div class="panel-user-info" style="margin-bottom:0">
           <div class="panel-user-left">
             <span class="panel-user-avatar" id="drawerUserAvatar">U</span>
@@ -1396,8 +1431,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
           </div>
           <button class="panel-logout-btn" id="drawerLogoutBtn">🚪 Logout</button>
         </div>
-
-        <button class="btn-job-sites" id="jobSitesBtn">🌐 Job Posting Websites &amp; Sectors</button>
 
         <div class="drawer-footer">
           <h3><span>⚙️</span> Filters &amp; Options</h3>
@@ -1407,11 +1440,13 @@ input,textarea{-webkit-user-select:text;user-select:text}
     </div>
   </aside>
 
-  <!-- JOB SITES MODAL -->
+  <!-- ============================================================
+       NEW: JOB SITES MODAL
+       ============================================================ -->
   <div class="jobsites-overlay" id="jobsitesOverlay">
     <div class="jobsites-modal">
       <div class="jobsites-header">
-        <h2><span>🌐</span> Job Posting Websites &amp; Sectors</h2>
+        <h2><span>🌐</span> All Jobs Websites</h2>
         <button class="jobsites-close" id="jobsitesClose">✕</button>
       </div>
       <div class="jobsites-search">
@@ -1422,6 +1457,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
       </div>
     </div>
   </div>
+  <!-- ===== END NEW ===== -->
 
 </div>
 
@@ -1440,7 +1476,7 @@ const LOGIN_GID = '2076597807';
 const LOGIN_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
 const GUEST_LIMIT = 15;
 
-/* Job Sites URL — targets the second sheet tab (gid=614189291) */
+/* ===== Job Sites URL (gviz export for second tab gid=614189291) ===== */
 const JOBSITES_URL =
   'https://docs.google.com/spreadsheets/d/108C9USSy1WysOwKThC1JFsL5OfjSC3HAX5EysDMw4gM/gviz/tq?tqx=out:csv&gid=614189291';
 
@@ -1513,11 +1549,13 @@ const ui = {
   installBtn: $('installBtn'),
   installClose: $('installClose'),
 
+  // ===== NEW =====
   jobSitesBtn: $('jobSitesBtn'),
   jobsitesOverlay: $('jobsitesOverlay'),
   jobsitesClose: $('jobsitesClose'),
   jobsitesSearchInput: $('jobsitesSearchInput'),
   jobsitesList: $('jobsitesList'),
+  // ===== END NEW =====
 };
 
 /* ============================================================
@@ -1562,10 +1600,12 @@ let toastTimer        = null;
 let deferredPrompt    = null;
 let confirmResolve    = null;
 
+// ===== NEW: Job sites state =====
 let jobSites             = [];
 let jobSitesLoaded       = false;
 let jobSitesLoading      = false;
 let jobSitesSearchQuery  = '';
+// ===== END NEW =====
 
 /* ============================================================
    PWA
@@ -1707,6 +1747,12 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+function includesCI(haystack, needle) {
+  if (!needle) return true;
+  if (!haystack) return false;
+  return String(haystack).toLowerCase().includes(String(needle).toLowerCase());
 }
 
 function interpretVerify(raw) {
@@ -2607,7 +2653,7 @@ function restartQuiz() {
 }
 
 /* ============================================================
-   MODE TOGGLE
+   MODE TOGGLE (3 modes)
    ============================================================ */
 function setMode(newMode) {
   mode = (newMode === 'read' || newMode === 'facts') ? newMode : 'mcq';
@@ -2667,7 +2713,7 @@ ui.mReadR.onchange = () => setMode('read');
 ui.mFactsR.onchange = () => setMode('facts');
 
 /* ============================================================
-   READ (SOLVED) MODE
+   READ (SOLVED) MODE — with case-insensitive search
    ============================================================ */
 function readItemMatchesSearch(q, query) {
   if (!query) return true;
@@ -2925,7 +2971,7 @@ function updateSearchBarState(bar, input) {
 }
 
 /* ============================================================
-   FILTER PANEL
+   FILTER PANEL — shared multi-select logic
    ============================================================ */
 const panels = {
   modal: {
@@ -3157,7 +3203,7 @@ document.addEventListener('click', (e) => {
 });
 
 /* ============================================================
-   PANEL OPEN/CLOSE
+   PANEL OPEN/CLOSE — modal (desktop) + drawer (mobile)
    ============================================================ */
 function resetFilters() {
   selJobs = [];
@@ -3343,6 +3389,7 @@ function fetchJobSites(callback) {
       const sectorIdx = findIdx(['sector'], 1);
       const nameIdx = findIdx(['name of job', 'name', 'website'], 2);
       const urlIdx = findIdx(['url', 'link'], 3);
+      const dateIdx = findIdx(['updated', 'date'], 4);
 
       for (let i = 1; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
@@ -3354,6 +3401,7 @@ function fetchJobSites(callback) {
           sector: cols[sectorIdx] ? cols[sectorIdx].trim() : '',
           name: name,
           url: cols[urlIdx] ? cols[urlIdx].trim() : '',
+          date: cols[dateIdx] ? cols[dateIdx].trim() : '',
         });
       }
       jobSitesLoaded = true; jobSitesLoading = false;
@@ -3385,34 +3433,23 @@ function renderJobSites() {
   let html = '';
   filtered.forEach((s) => {
     let urlHtml = '';
-    let urlHref = '';
     if (s.url) {
       let displayUrl = s.url;
-      try { displayUrl = new URL(s.url).hostname.replace(/^www\./, ''); } catch (e) { /* ignore */ }
-      urlHref = s.url;
-      urlHtml = `<a class="js-url" href="${escapeHtml(urlHref)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.url)}">${escapeHtml(displayUrl)}</a>`;
+      try { displayUrl = new URL(s.url).hostname; } catch (e) { /* ignore */ }
+      urlHtml = `<a class="js-url" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.url)}">${escapeHtml(displayUrl)}</a>`;
     }
-    html += `<div class="jobsites-item" data-href="${escapeHtml(urlHref)}">
-        <div class="js-top">
-          <span class="js-srno">#${escapeHtml(s.srno)}</span>
-          ${s.sector ? `<span class="js-sector">${escapeHtml(s.sector)}</span>` : ''}
-        </div>
-        <div class="js-name">${escapeHtml(s.name)}</div>
+    html += `<div class="jobsites-item">
+        <span class="js-srno">${escapeHtml(s.srno)}</span>
+        ${s.sector ? `<span class="js-sector">${escapeHtml(s.sector)}</span>` : ''}
+        <span class="js-name">${escapeHtml(s.name)}</span>
         ${urlHtml}
+        ${s.date ? `<span class="js-date">📅 ${escapeHtml(s.date)}</span>` : ''}
     </div>`;
   });
   ui.jobsitesList.innerHTML = html;
-
-  // Make the whole card clickable (unless clicking the URL itself)
-  ui.jobsitesList.querySelectorAll('.jobsites-item').forEach((card) => {
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.js-url')) return;
-      const href = card.dataset.href;
-      if (href) window.open(href, '_blank', 'noopener,noreferrer');
-    });
-  });
 }
 
+// Event listeners for job sites modal
 ui.jobSitesBtn.addEventListener('click', openJobSitesModal);
 ui.jobsitesClose.addEventListener('click', closeJobSitesModal);
 ui.jobsitesOverlay.addEventListener('click', (e) => {
