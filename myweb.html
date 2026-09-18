@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>CSS 2027 · Schedule & Syllabus</title>
+    <style>
+        /* ---------- GLOBAL ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #eef2f7;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 10px 10px 30px;
+        }
+
+        .app-wrapper {
+            max-width: 680px;
+            width: 100%;
+        }
+
+        /* ---------- TOGGLE BAR (TOP) ---------- */
+        .toggle-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            background: white;
+            padding: 6px;
+            border-radius: 60px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            border: 1px solid #dce5ef;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px 8px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #3b5a7a;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            letter-spacing: 0.2px;
+            user-select: none;
+        }
+
+        .toggle-btn:hover {
+            background: #f0f5fc;
+            color: #0b2b4a;
+        }
+
+        .toggle-btn.active {
+            background: #0b1e33;
+            color: white;
+            box-shadow: 0 4px 10px rgba(11, 30, 51, 0.15);
+        }
+
+        /* ---------- PAGES CONTAINER ---------- */
+        .page-container {
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.6; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================================
+                   PAGE 1 – SCHEDULE (exact original styles)
+                   ============================================================ */
+        .schedule-page .card {
+            max-width: 640px;
+            width: 100%;
+            background: #fff;
+            border-radius: 28px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .04);
+            padding: 16px 14px 18px;
+            border: 1px solid rgba(0, 20, 40, .03);
+        }
+
+        .schedule-page .banner {
+            background: #0b1e33;
+            color: #fff;
+            border-radius: 60px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            min-height: 48px;
+        }
+
+        .schedule-page .banner-activity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .schedule-page .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            flex-shrink: 0;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: .5; transform: scale(.95); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: .5; transform: scale(.95); }
+        }
+
+        .schedule-page .banner-subject {
+            font-weight: 600;
+            font-size: .95rem;
+            line-height: 1.3;
+            letter-spacing: .2px;
+        }
+
+        .schedule-page .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 40px;
+            margin-bottom: 12px;
+            font-size: .8rem;
+            font-weight: 500;
+            color: #1e293b;
+            flex-wrap: wrap;
+        }
+
+        .schedule-page .status-bar span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .schedule-page .status-bar .done-count span,
+        .schedule-page .status-bar .remaining-count span {
+            padding: 0 10px;
+            border-radius: 20px;
+        }
+
+        .schedule-page .done-count span {
+            background: #b3d0ff;
+            color: #0b2b5e;
+            font-weight: 700;
+        }
+
+        .schedule-page .remaining-time {
+            color: #b91c1c;
+            font-weight: 700;
+            background: #fee9e7;
+            padding: 0 14px;
+            border-radius: 20px;
+            font-size: .9rem;
+            white-space: nowrap;
+        }
+
+        .schedule-page .remaining-count span {
+            background: #fee9e7;
+            color: #b91c1c;
+            font-weight: 700;
+        }
+
+        .schedule-page .schedule-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-top: 4px;
+        }
+
+        .schedule-page .row {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 40px;
+            background: #fafcff;
+            border: 1px solid #e9edf3;
+            font-size: .82rem;
+            gap: 4px;
+        }
+
+        .schedule-page .row .srno {
+            font-weight: 600;
+            color: #475569;
+            min-width: 28px;
+            font-size: .7rem;
+            text-align: center;
+        }
+
+        .schedule-page .row .time {
+            font-weight: 600;
+            color: #1e293b;
+            min-width: 62px;
+            font-size: .7rem;
+        }
+
+        .schedule-page .row .subject {
+            flex: 1;
+            font-weight: 500;
+            color: #0b1e33;
+            padding: 0 4px;
+            font-size: .8rem;
+        }
+
+        .schedule-page .row .duration-badge {
+            background: #e9edf3;
+            padding: 1px 12px;
+            border-radius: 40px;
+            font-size: .65rem;
+            font-weight: 600;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .schedule-page .row.done {
+            background: #e6f0ff;
+            border-color: #b3d0ff;
+        }
+
+        .schedule-page .row.done .subject {
+            color: #1a4b8c;
+        }
+
+        .schedule-page .row.done .duration-badge {
+            background: #b3d0ff;
+            color: #0b2b5e;
+        }
+
+        .schedule-page .row.current {
+            background: #fee9e7;
+            border-color: #e53e3e;
+            box-shadow: 0 2px 8px rgba(229, 62, 62, .08);
+        }
+
+        .schedule-page .row.current .subject {
+            color: #b91c1c;
+            font-weight: 600;
+        }
+
+        .schedule-page .row.current .duration-badge {
+            background: #e53e3e;
+            color: #fff;
+        }
+
+        .schedule-page .row.current .srno,
+        .schedule-page .row.current .time {
+            color: #b91c1c;
+        }
+
+        .schedule-page .row.break-row {
+            background: #f1f5f9;
+            border-color: #d9e1ec;
+        }
+
+        .schedule-page .row.break-row .subject {
+            color: #334155;
+        }
+
+        .schedule-page .footer {
+            margin-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: .7rem;
+            color: #5e6f8d;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .schedule-page .footer .pkt-clock {
+            background: #eef2f6;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 500;
+            color: #1e293b;
+            font-size: .75rem;
+        }
+
+        .schedule-page .footer .exam-dates {
+            display: flex;
+            gap: 12px;
+            font-weight: 500;
+            color: #0b1e33;
+            flex-wrap: wrap;
+        }
+
+        .schedule-page .footer .exam-dates span {
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .schedule-page .mpt-date {
+            background: #dbeafe;
+            color: #1a4b8c;
+        }
+
+        .schedule-page .written-date {
+            background: #fee9e7;
+            color: #b91c1c;
+        }
+
+        .schedule-page .footer .exam-dates .count-days {
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .schedule-page .loading-text,
+        .schedule-page .error-text {
+            text-align: center;
+            padding: 20px;
+            font-size: .9rem;
+        }
+
+        .schedule-page .error-text {
+            color: #b91c1c;
+        }
+
+        .schedule-page .loading-text small,
+        .schedule-page .error-text small {
+            color: #94a3b8;
+            font-size: .75rem;
+            display: block;
+            margin-top: 4px;
+        }
+
+        @media(max-width:480px) {
+            .schedule-page .card { padding: 12px 8px; }
+            .schedule-page .banner { padding: 6px 14px; min-height: 40px; }
+            .schedule-page .banner-subject { font-size: .8rem; }
+            .schedule-page .row { padding: 5px 6px; font-size: .72rem; }
+            .schedule-page .row .srno { min-width: 22px; font-size: .65rem; }
+            .schedule-page .row .time { min-width: 52px; font-size: .65rem; }
+            .schedule-page .row .duration-badge { font-size: .6rem; padding: 0 10px; }
+            .schedule-page .row .subject { font-size: .7rem; }
+            .schedule-page .status-bar { font-size: .7rem; padding: 4px 10px; gap: 4px; }
+            .schedule-page .status-bar .remaining-time { font-size: .75rem; padding: 0 10px; }
+            .schedule-page .footer { font-size: .6rem; flex-direction: column; align-items: stretch; gap: 4px; }
+            .schedule-page .footer .exam-dates { justify-content: center; }
+        }
+
+        /* ============================================================
+                   PAGE 2 – SYLLABUS (exact original styles)
+                   ============================================================ */
+        .syllabus-page .app {
+            max-width: 680px;
+            width: 100%;
+        }
+
+        .syllabus-page .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            gap: 6px 4px;
+        }
+
+        .syllabus-page .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #0a2a4a;
+        }
+
+        .syllabus-page .header h1 span {
+            background: #d4e2f5;
+            padding: 0 10px;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #1b3f69;
+            line-height: 1.8;
+        }
+
+        .syllabus-page .count-badge {
+            background: #dce6f0;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #1a3857;
+            white-space: nowrap;
+        }
+
+        .syllabus-page .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .syllabus-page .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .syllabus-page .search-box {
+            flex: 1;
+            position: relative;
+            min-width: 140px;
+        }
+
+        .syllabus-page .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 1px solid #c5d2e0;
+            border-radius: 60px;
+            background: white;
+            font-size: 0.9rem;
+            font-family: inherit;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: 0.15s;
+        }
+
+        .syllabus-page .search-box input:focus {
+            outline: none;
+            border-color: #2a6df4;
+            box-shadow: 0 0 0 3px rgba(42,109,244,0.12);
+        }
+
+        .syllabus-page .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            font-size: 0.95rem;
+        }
+
+        .syllabus-page .subject-select {
+            padding: 10px 36px 10px 16px;
+            border: 1px solid #c5d2e0;
+            border-radius: 60px;
+            background: white;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: #1a2e4a;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233b5a7a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 14px;
+            min-width: 130px;
+            flex: 0 1 auto;
+        }
+
+        .syllabus-page .subject-select:focus {
+            outline: none;
+            border-color: #2a6df4;
+        }
+
+        .syllabus-page .syllabus {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .syllabus-page .paper-block {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 14px 14px;
+            margin-bottom: 14px;
+            border: 1px solid #dce5ef;
+            box-shadow: 0 2px 12px rgba(0,20,40,0.05);
+            transition: 0.15s;
+        }
+
+        .syllabus-page .paper-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .syllabus-page .paper-block:nth-child(odd) {
+            background: #ffffff;
+        }
+
+        .syllabus-page .paper-block:nth-child(even) {
+            background: #f8faff;
+        }
+
+        .syllabus-page .paper-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0b2b4a;
+            letter-spacing: -0.2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px 8px;
+            padding-bottom: 4px;
+        }
+
+        .syllabus-page .paper-title .marks {
+            font-weight: 500;
+            font-size: 0.7rem;
+            color: #3d6185;
+            background: #eef3fa;
+            padding: 0 12px;
+            border-radius: 40px;
+            line-height: 2;
+        }
+
+        .syllabus-page .paper-title .subject-link {
+            color: #0b2b4a;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .syllabus-page .paper-title .subject-link:hover {
+            color: #2a6df4;
+        }
+
+        .syllabus-page .paper-title .subject-link::after {
+            content: "🔗";
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+
+        .syllabus-page .last-studied {
+            font-size: 0.6rem;
+            color: #2a4a6a;
+            background: #e8eff8;
+            padding: 3px 12px;
+            border-radius: 40px;
+            display: inline-block;
+            margin: 4px 0 8px 0;
+            font-weight: 450;
+            border: 1px solid #d5e0ec;
+        }
+
+        .syllabus-page .last-studied span {
+            font-weight: 500;
+            color: #1a4a7a;
+        }
+
+        .syllabus-page .last-studied .pkt-badge {
+            font-weight: 400;
+            color: #5a7a9a;
+            font-size: 0.55rem;
+            margin-left: 4px;
+        }
+
+        .syllabus-page .subject-divider {
+            border: none;
+            border-top: 2px solid #dce5f0;
+            margin: 6px 0 10px 0;
+        }
+
+        .syllabus-page .module-group {
+            margin-bottom: 10px;
+        }
+
+        .syllabus-page .module-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .syllabus-page .module-head {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1f406a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .syllabus-page .module-head .module-marks {
+            font-weight: 400;
+            font-size: 0.65rem;
+            color: #3f6187;
+            background: #f0f5fc;
+            padding: 0 10px;
+            border-radius: 40px;
+            line-height: 1.9;
+        }
+
+        .syllabus-page .topic-item {
+            padding: 6px 0 6px 14px;
+            border-left: 3px solid #b8cce0;
+            margin-left: 4px;
+            margin-bottom: 8px;
+        }
+
+        .syllabus-page .topic-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .syllabus-page .topic-item .topic-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #0b2b4a;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 4px 8px;
+        }
+
+        .syllabus-page .topic-item .topic-label .topic-link {
+            color: #0b2b4a;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .syllabus-page .topic-item .topic-label .topic-link:hover {
+            color: #2a6df4;
+        }
+
+        .syllabus-page .topic-item .topic-label .topic-link::after {
+            content: "🔗";
+            font-size: 0.6rem;
+            opacity: 0.4;
+        }
+
+        .syllabus-page .topic-item .topic-desc {
+            font-size: 0.82rem;
+            color: #1f3d60;
+            line-height: 1.5;
+            margin-top: 2px;
+        }
+
+        .syllabus-page .subtopic-list {
+            margin: 4px 0 2px 6px;
+            padding-left: 4px;
+            list-style: none;
+            counter-reset: sub-counter;
+        }
+
+        .syllabus-page .subtopic-list li {
+            counter-increment: sub-counter;
+            font-size: 0.8rem;
+            color: #1f3d60;
+            line-height: 1.5;
+            padding: 1px 0 1px 24px;
+            position: relative;
+            margin-bottom: 1px;
+        }
+
+        .syllabus-page .subtopic-list li::before {
+            content: counter(sub-counter) ".";
+            position: absolute;
+            left: 2px;
+            font-weight: 500;
+            color: #2a6df4;
+            font-size: 0.75rem;
+        }
+
+        .syllabus-page .subtopic-list li .sub-link {
+            color: #1f3d60;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .syllabus-page .subtopic-list li .sub-link:hover {
+            color: #2a6df4;
+        }
+
+        .syllabus-page .subtopic-list li .sub-link::after {
+            content: "🔗";
+            font-size: 0.5rem;
+            opacity: 0.35;
+        }
+
+        .syllabus-page .sub-subtopic-list {
+            margin: 2px 0 2px 20px;
+            padding-left: 4px;
+            list-style: none;
+        }
+
+        .syllabus-page .sub-subtopic-list li {
+            font-size: 0.78rem;
+            color: #1f3d60;
+            line-height: 1.5;
+            padding: 1px 0 1px 18px;
+            position: relative;
+            margin-bottom: 0px;
+        }
+
+        .syllabus-page .sub-subtopic-list li::before {
+            content: attr(data-letter) ")";
+            position: absolute;
+            left: 0px;
+            font-weight: 450;
+            color: #3a6a9a;
+            font-size: 0.7rem;
+        }
+
+        .syllabus-page .sub-subtopic-list li .sub-link {
+            color: #1f3d60;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .syllabus-page .sub-subtopic-list li .sub-link:hover {
+            color: #2a6df4;
+        }
+
+        .syllabus-page .sub-subtopic-list li .sub-link::after {
+            content: "🔗";
+            font-size: 0.45rem;
+            opacity: 0.3;
+            margin-left: 2px;
+        }
+
+        .syllabus-page .topic-item .book-ref {
+            font-size: 0.75rem;
+            color: #3d6185;
+            margin-top: 3px;
+        }
+
+        .syllabus-page .topic-item .book-ref .book-link {
+            color: #3d6185;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .syllabus-page .topic-item .book-ref .book-link:hover {
+            color: #2a6df4;
+        }
+
+        .syllabus-page .topic-item .book-ref .book-link::after {
+            content: "🔗";
+            font-size: 0.5rem;
+            opacity: 0.35;
+        }
+
+        .syllabus-page .empty-state {
+            padding: 40px 16px;
+            text-align: center;
+            background: white;
+            border-radius: 40px;
+            color: #3b5f82;
+            border: 1px solid #e3eaf3;
+            font-size: 0.9rem;
+        }
+
+        .syllabus-page .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 40px 0;
+            color: #2f557a;
+            font-size: 0.9rem;
+        }
+
+        .syllabus-page .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #d5dfea;
+            border-top: 3px solid #2a6df4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .syllabus-page .footer {
+            margin-top: 16px;
+            font-size: 0.7rem;
+            color: #5f7c99;
+            text-align: right;
+            border-top: 1px solid #dce5ef;
+            padding-top: 12px;
+        }
+
+        @media print {
+            body { background: white !important; padding: 10px !important; font-size: 10px !important; }
+            .app-wrapper { max-width: 100% !important; }
+            .toggle-bar { display: none !important; }
+            .syllabus-page .controls { display: none !important; }
+            .syllabus-page .paper-block { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; padding: 12px !important; margin-bottom: 10px !important; }
+            .syllabus-page .paper-block:nth-child(odd), .syllabus-page .paper-block:nth-child(even) { background: white !important; }
+            .syllabus-page .subject-link::after, .syllabus-page .topic-link::after, .syllabus-page .sub-link::after, .syllabus-page .book-link::after { content: "" !important; display: none !important; }
+            .syllabus-page .last-studied { background: #f0f4f8 !important; border: 1px solid #d0d8e0 !important; }
+            .syllabus-page .module-head { font-size: 0.8rem !important; }
+            .syllabus-page .topic-item .topic-label { font-size: 0.8rem !important; }
+            .syllabus-page .subtopic-list li { font-size: 0.75rem !important; }
+            .syllabus-page .sub-subtopic-list li { font-size: 0.75rem !important; }
+            .syllabus-page .topic-item .book-ref { font-size: 0.7rem !important; }
+            .syllabus-page .footer { font-size: 0.6rem !important; border-top: 1px solid #ccc !important; }
+            .syllabus-page .header h1 { font-size: 1.1rem !important; }
+            .syllabus-page .count-badge { display: none !important; }
+            .syllabus-page .subject-divider { border-top: 1px solid #ccc !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrapper">
+    <!-- ================= TOGGLE BAR ================= -->
+    <div class="toggle-bar">
+        <button class="toggle-btn active" id="btnSchedule" data-page="schedulePage">
+            📅 Schedule
+        </button>
+        <button class="toggle-btn" id="btnSyllabus" data-page="syllabusPage">
+            📘 Syllabus
+        </button>
+    </div>
+
+    <!-- ================= PAGE CONTAINER ================= -->
+    <div class="page-container">
+        <!-- ---------- PAGE 1 : SCHEDULE ---------- -->
+        <div id="schedulePage" class="page active schedule-page">
+            <div class="card">
+                <div class="banner">
+                    <div class="banner-activity">
+                        <span class="status-dot"></span>
+                        <span class="banner-subject" id="currentActivity">Loading schedule…</span>
+                    </div>
+                </div>
+                <div class="status-bar">
+                    <span class="done-count">✅ Done: <span id="doneCount">0</span></span>
+                    <span class="remaining-time">⏳ <span id="remainingTimeMinutes">--</span>:<span id="remainingTimeSeconds">--</span></span>
+                    <span class="remaining-count">⏳ Left: <span id="remainingCount">0</span></span>
+                </div>
+                <div class="schedule-grid" id="scheduleContainer">
+                    <div class="loading-text">⏳ Loading from Google Sheet…<br><small>Please wait</small></div>
+                </div>
+                <div class="footer">
+                    <div class="exam-dates">
+                        <span class="mpt-date">📝 MPT: <span id="mptDateDisplay">--</span> <span class="count-days" id="mptDays">--</span>d</span>
+                        <span class="written-date">✍️ Written: <span id="writtenDateDisplay">--</span> <span class="count-days" id="writtenDays">--</span>d</span>
+                    </div>
+                    <span class="pkt-clock">🇵🇰 <span id="pkTime">--:-- --</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ---------- PAGE 2 : SYLLABUS ---------- -->
+        <div id="syllabusPage" class="page syllabus-page">
+            <div class="app">
+                <div class="header">
+                    <h1>📘 CSS <span>syllabus</span></h1>
+                    <span class="count-badge" id="countDisplay">0</span>
+                </div>
+
+                <div class="controls">
+                    <div class="controls-row">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Search topic, book…" />
+                        </div>
+                        <select id="subjectSelect" class="subject-select">
+                            <option value="">All subjects</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="syllabus" id="syllabusContainer">
+                    <div class="loading"><span class="spinner"></span> loading…</div>
+                </div>
+                <div class="footer">FPSC syllabus · live from Google Sheets</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  TOGGLE LOGIC
+    // ============================================================
+    (function() {
+        const btnSchedule = document.getElementById('btnSchedule');
+        const btnSyllabus = document.getElementById('btnSyllabus');
+        const schedulePage = document.getElementById('schedulePage');
+        const syllabusPage = document.getElementById('syllabusPage');
+
+        function showPage(pageId) {
+            [schedulePage, syllabusPage].forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            [btnSchedule, btnSyllabus].forEach(b => b.classList.remove('active'));
+            if (pageId === 'schedulePage') btnSchedule.classList.add('active');
+            else btnSyllabus.classList.add('active');
+        }
+
+        btnSchedule.addEventListener('click', () => showPage('schedulePage'));
+        btnSyllabus.addEventListener('click', () => showPage('syllabusPage'));
+    })();
+
+    // ============================================================
+    //  PAGE 1 – SCHEDULE SCRIPT (original)
+    // ============================================================
+    (function() {
+        const S = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTX16x-Eeh1mguy6se1B25x0hkRIzIme4pX71KlxpML_vZAD34mtlITIqFs8MCAVycXFFft82j1RZDc/pub?output=csv';
+        let s = [], mpt = null, written = null;
+        const $ = id => document.getElementById(id), c = $('scheduleContainer');
+
+        function getPK() {
+            const n = new Date();
+            return new Date(n.getTime() + n.getTimezoneOffset() * 6e4 + 18e6);
+        }
+
+        function fmt(d) {
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let h = d.getHours() % 12 || 12;
+            return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}, ${d.getFullYear()}, ${h}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')} ${d.getHours()>=12?'PM':'AM'}`;
+        }
+
+        function parseDate(str) {
+            if (!str) return null;
+            const p = str.trim().split(' ');
+            if (p.length !== 3) return null;
+            const m = { jan:0, feb:1, mar:2, apr:3, may:4, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11 },
+                mn = m[p[1].toLowerCase().substring(0, 3)];
+            return mn === undefined ? null : new Date(parseInt(p[2]), mn, parseInt(p[0]));
+        }
+
+        function daysUntil(t, n) {
+            if (!t) return '--';
+            const T = new Date(t); T.setHours(0, 0, 0, 0);
+            const N = new Date(n); N.setHours(0, 0, 0, 0);
+            return Math.max(0, Math.ceil((T - N) / 864e5));
+        }
+
+        function parseCSV(txt) {
+            const lines = txt.split('\n').filter(l => l.trim());
+            if (lines.length < 2) return null;
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const idx = {
+                subject: headers.findIndex(h => h.includes('activity') || h.includes('subject')),
+                from: headers.findIndex(h => h === 'from' || h === 'start'),
+                to: headers.findIndex(h => h === 'to' || h === 'end'),
+                duration: headers.findIndex(h => h === 'duration' || h === 'time'),
+                type: headers.findIndex(h => h === 'type' || h === 'activitytype'),
+                mpt: headers.findIndex(h => h.includes('mpt') || h.includes('test date')),
+                written: headers.findIndex(h => h.includes('written') || h.includes('exam'))
+            };
+            const data = [];
+            let mptStr = null, writtenStr = null;
+
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',').map(c => c.trim());
+                if (cols.length < 4 || cols.every(c => !c)) continue;
+                const subject = idx.subject >= 0 ? cols[idx.subject] : cols[0] || '';
+                let from = (idx.from >= 0 ? cols[idx.from] : cols[1] || '').replace(/\s/g, ''),
+                    to = (idx.to >= 0 ? cols[idx.to] : cols[2] || '').replace(/\s/g, ''),
+                    duration = (idx.duration >= 0 ? cols[idx.duration] : cols[3] || '').replace(/\s/g, '');
+
+                if (idx.mpt >= 0 && cols[idx.mpt]?.match(/\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/)) mptStr = cols[idx.mpt];
+                if (idx.written >= 0 && cols[idx.written]?.match(/\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/)) writtenStr = cols[idx.written];
+                if (!from || !to || !subject) continue;
+                if (from.length === 4) from = '0' + from;
+                if (to.length === 4) to = '0' + to;
+                if (!/^\d{2}:\d{2}$/.test(from) || !/^\d{2}:\d{2}$/.test(to)) continue;
+                if (!duration || !/^\d+[hm]/i.test(duration)) {
+                    const diff = parseInt(to.split(':')[0]) - parseInt(from.split(':')[0]);
+                    duration = (diff > 0 && diff <= 24) ? diff + 'h' : '1h';
+                }
+                let type = 'compulsory';
+                if (idx.type >= 0 && cols[idx.type]) {
+                    const t = cols[idx.type].toLowerCase();
+                    if (['core', 'compulsory', 'optional', 'mpt', 'review', 'break', 'sleep'].includes(t)) type = t;
+                } else {
+                    const subj = subject.toLowerCase();
+                    if (subj.includes('break') || subj.includes('lunch') || subj.includes('dinner')) type = 'break';
+                    else if (subj.includes('sleep') || subj.includes('rest')) type = 'sleep';
+                    else if (subj.includes('mpt') || subj.includes('practice')) type = 'mpt';
+                    else if (subj.includes('review')) type = 'review';
+                    else if (subj.includes('essay') || subj.includes('precis')) type = 'core';
+                    else if (subj.includes('optional')) type = 'optional';
+                }
+                data.push({ from, to, duration, subject, type });
+            }
+            if (mptStr) { const d = parseDate(mptStr); if (d) { mpt = d; $('mptDateDisplay').textContent = mptStr; } }
+            if (writtenStr) { const d = parseDate(writtenStr); if (d) { written = d; $('writtenDateDisplay').textContent = writtenStr; } }
+            return data.length ? data : null;
+        }
+
+        async function load() {
+            try {
+                const r = await fetch(S, { cache: 'no-store' });
+                if (!r.ok) throw new Error();
+                const csv = await r.text();
+                const parsed = parseCSV(csv);
+                if (parsed && parsed.length) { s = parsed; return true; }
+                return false;
+            } catch (e) { return false; }
+        }
+
+        function getCurrent(now) {
+            const secs = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+            let idx = -1, remain = 0;
+            for (let i = 0; i < s.length; i++) {
+                const [fh, fm] = s[i].from.split(':').map(Number),
+                    [th, tm] = s[i].to.split(':').map(Number);
+                const from = fh * 3600 + fm * 60;
+                let to = th * 3600 + tm * 60;
+                if (to < from) {
+                    if (secs >= from || secs < to) {
+                        idx = i;
+                        remain = secs >= from ? (86400 - secs) + to : to - secs;
+                        break;
+                    }
+                } else if (secs >= from && secs < to) {
+                    idx = i;
+                    remain = to - secs;
+                    break;
+                }
+            }
+            if (idx === -1) {
+                let min = Infinity;
+                for (let i = 0; i < s.length; i++) {
+                    const [h, m] = s[i].from.split(':').map(Number);
+                    let diff = h * 3600 + m * 60 - secs;
+                    if (diff < 0) diff += 86400;
+                    if (diff < min) { min = diff; idx = i; }
+                }
+                remain = min;
+            }
+            return { idx: Math.max(0, idx), remain };
+        }
+
+        function render() {
+            const now = getPK();
+            $('pkTime').textContent = fmt(now);
+            if (mpt) $('mptDays').textContent = daysUntil(mpt, now);
+            if (written) $('writtenDays').textContent = daysUntil(written, now);
+            const { idx, remain } = getCurrent(now);
+            const item = s[idx] || { subject: 'No schedule', type: '' };
+            const prefix = { core: '📘 ', compulsory: '📖 ', optional: '📚 ', mpt: '📝 ', review: '📋 ' };
+            let activity = item.subject;
+            if (item.type === 'break') activity = '☕ ' + activity;
+            else if (item.type === 'sleep') activity = '🌙 ' + activity;
+            else if (prefix[item.type]) activity = prefix[item.type] + activity;
+            $('currentActivity').textContent = activity;
+            $('remainingTimeMinutes').textContent = String(Math.floor(remain / 60)).padStart(2, '0');
+            $('remainingTimeSeconds').textContent = String(Math.floor(remain % 60)).padStart(2, '0');
+            let html = '', done = 0, left = 0;
+            for (let i = 0; i < s.length; i++) {
+                const row = s[i], isBreak = row.type === 'break' || row.type === 'sleep';
+                let cls = 'row';
+                if (i < idx) { cls += ' done'; done++; }
+                else if (i === idx) { cls += ' current'; left++; }
+                else { left++; }
+                if (isBreak) cls += ' break-row';
+                const emoji = { core: ' ✏️', compulsory: ' 📖', optional: ' 📚', mpt: ' 📝', review: ' 📘', break: '', sleep: ' 🌙' };
+                html += `<div class="${cls}"><span class="srno">${i+1}</span><span class="time">${row.from} – ${row.to}</span><span class="subject">${row.subject}${emoji[row.type]||''}</span><span class="duration-badge">${row.duration}</span></div>`;
+            }
+            c.innerHTML = html;
+            $('doneCount').textContent = done;
+            $('remainingCount').textContent = left;
+        }
+
+        async function initSchedule() {
+            const loaded = await load();
+            if (!loaded) {
+                c.innerHTML = '<div class="error-text">❌ Failed to load schedule<br><small>Check internet and refresh</small></div>';
+                return;
+            }
+            render();
+            setInterval(render, 1000);
+        }
+        document.addEventListener('DOMContentLoaded', initSchedule);
+    })();
+
+    // ============================================================
+    //  PAGE 2 – SYLLABUS SCRIPT (original)
+    // ============================================================
+    (function() {
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac/pub?output=csv';
+
+        const container = document.getElementById('syllabusContainer');
+        const searchInput = document.getElementById('searchInput');
+        const subjectSelect = document.getElementById('subjectSelect');
+        const countDisplay = document.getElementById('countDisplay');
+
+        let allRecords = [];
+        let filtered = [];
+
+        function parseLine(line) {
+            const res = [];
+            let cur = '', inside = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (inside) {
+                    if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+                    else if (ch === '"') inside = false;
+                    else cur += ch;
+                } else {
+                    if (ch === ',') { res.push(cur.trim()); cur = ''; }
+                    else if (ch === '"') inside = true;
+                    else cur += ch;
+                }
+            }
+            res.push(cur.trim());
+            return res;
+        }
+
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+            if (lines.length < 2) return [];
+            const h = parseLine(lines[0]);
+            const idx = {
+                srno: h.indexOf('srno'),
+                subject: h.indexOf('subjectPaper') !== -1 ? h.indexOf('subjectPaper') : h.indexOf('subject'),
+                Module: h.indexOf('Module'),
+                topicNumber: h.indexOf('Topic Number'),
+                topicName: h.indexOf('Topic Name / Detail'),
+                inFPSC: h.indexOf('Given in FPSC CSS Syllabus?'),
+                book: h.indexOf('Recommended Book / Source to Study'),
+                dateRead: h.indexOf('date_read'),
+                subtopics: h.indexOf('Possible Subtopics (FPSC Syllabus Past Papers & Recent Topics)')
+            };
+            const subtopicsIdx = idx.subtopics !== -1 ? idx.subtopics : idx.topicName;
+
+            const rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                const c = parseLine(lines[i]);
+                if (c.length < 8) continue;
+                const r = {
+                    srno: c[idx.srno] || '',
+                    subject: c[idx.subject] || '',
+                    Module: c[idx.Module] || '',
+                    topicNumber: c[idx.topicNumber] || '',
+                    topicName: c[idx.topicName] || '',
+                    inFPSC: c[idx.inFPSC] || '',
+                    book: c[idx.book] || '',
+                    dateRead: c[idx.dateRead] || '',
+                    subtopics: c[subtopicsIdx] || ''
+                };
+                if (!isNaN(parseFloat(r.srno)) && r.srno.trim() !== '') rows.push(r);
+            }
+            return rows;
+        }
+
+        function googleSearch(query) {
+            const clean = query.trim();
+            if (!clean) return;
+            const url = `https://www.google.com/search?q=css+${encodeURIComponent(clean)}`;
+            window.open(url, '_blank');
+        }
+
+        function smartSplit(text) {
+            if (!text || text.trim() === '') return [];
+            if (text.includes('\n')) {
+                const parts = text.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+                if (parts.length > 1) return parts;
+            }
+            const letterMatch = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
+            if (letterMatch && letterMatch.length > 1) {
+                const afterLetters = text.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
+                if (afterLetters && /\d+\./.test(afterLetters)) {
+                    const result = [...letterMatch];
+                    const numberedMatch = afterLetters.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
+                    if (numberedMatch) {
+                        for (const item of numberedMatch) {
+                            if (item.trim()) result.push(item.trim());
+                        }
+                    }
+                    return result;
+                }
+                return letterMatch.map(s => s.trim());
+            }
+            const numberedMatch = text.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
+            if (numberedMatch && numberedMatch.length > 1) {
+                return numberedMatch.map(s => s.trim());
+            }
+            if (text.includes(';')) {
+                const parts = text.split(';').map(s => s.trim()).filter(s => s.length > 0);
+                if (parts.length > 1) return parts;
+            }
+            if (text.includes(',')) {
+                const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                if (parts.length > 1) return parts;
+            }
+            if (text.includes('. ')) {
+                const parts = text.split('. ').map(s => s.trim()).filter(s => s.length > 0);
+                if (parts.length > 1) return parts;
+            }
+            return [text.trim()];
+        }
+
+        function isNumbered(text) { return /^\d+\./.test(text.trim()); }
+
+        function hasSubLetters(text) {
+            if (!text) return false;
+            return /[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi.test(text) &&
+                (text.match(/[a-z]\)/gi) || []).length > 1;
+        }
+
+        function extractSubLetters(text) {
+            if (!text) return [];
+            const matches = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
+            if (!matches) return [];
+            return matches.map(s => s.trim());
+        }
+
+        function formatDateInPKT(dateStr) {
+            if (!dateStr || dateStr.trim() === '') return '';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                const pktOffset = 5 * 60;
+                const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+                const pktDate = new Date(utc + (pktOffset * 60000));
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const day = days[pktDate.getUTCDay()];
+                const month = months[pktDate.getUTCMonth()];
+                const date = pktDate.getUTCDate();
+                const year = pktDate.getUTCFullYear();
+                let hours = pktDate.getUTCHours();
+                const minutes = String(pktDate.getUTCMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                return `${day}, ${date} ${month}, ${year}, ${hours}:${minutes} ${ampm}`;
+            } catch (e) { return dateStr; }
+        }
+
+        function render(records) {
+            if (!records || records.length === 0) {
+                container.innerHTML = `<div class="empty-state">✨ No topics match</div>`;
+                countDisplay.textContent = '0';
+                return;
+            }
+            const groups = {};
+            for (const r of records) {
+                const key = r.subject || 'Uncategorized';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(r);
+            }
+            let html = '';
+            for (const [subject, items] of Object.entries(groups)) {
+                items.sort((a, b) => parseFloat(a.srno) - parseFloat(b.srno));
+                let latestDate = '';
+                for (const item of items) {
+                    if (item.dateRead && item.dateRead.trim() !== '') {
+                        const d = new Date(item.dateRead);
+                        if (!isNaN(d.getTime())) {
+                            if (!latestDate || d > new Date(latestDate)) latestDate = item.dateRead;
+                        }
+                    }
+                }
+                html += `<div class="paper-block">`;
+                const subjectSearch = subject;
+                html += `<div class="paper-title">
+                            <span class="subject-link" onclick="googleSearch('${subjectSearch.replace(/'/g, "\\'")}')">📄 ${subject}</span>
+                            <span class="marks">${items.length} topics</span>
+                        </div>`;
+                if (latestDate) {
+                    const formatted = formatDateInPKT(latestDate);
+                    html += `<div class="last-studied">📅 Last studied: <span>${formatted}</span> <span class="pkt-badge">(PKT)</span></div>`;
+                } else {
+                    html += `<div class="last-studied" style="opacity:0.6;">📅 Not studied yet</div>`;
+                }
+                html += `<hr class="subject-divider" />`;
+                const moduleMap = {};
+                for (const item of items) {
+                    const mod = item.Module || 'General';
+                    if (!moduleMap[mod]) moduleMap[mod] = [];
+                    moduleMap[mod].push(item);
+                }
+                for (const [mod, topics] of Object.entries(moduleMap)) {
+                    html += `<div class="module-group">`;
+                    html += `<div class="module-head">${mod}</div>`;
+                    for (const t of topics) {
+                        const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
+                        const topicSearch = t.topicName || '';
+                        html += `<div class="topic-item">`;
+                        html += `<div class="topic-label">
+                                    <span class="topic-link" onclick="googleSearch('${topicSearch.replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span>
+                                </div>`;
+                        const subText = t.subtopics || t.topicName || '';
+                        const subItems = smartSplit(subText);
+                        if (subItems.length > 0) {
+                            html += `<ul class="subtopic-list">`;
+                            for (const sub of subItems) {
+                                if (hasSubLetters(sub)) {
+                                    const subLetters = extractSubLetters(sub);
+                                    const mainPart = sub.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
+                                    const cleanMain = mainPart.replace(/[:–-]\s*$/, '').trim();
+                                    if (cleanMain) {
+                                        html += `<li><span class="sub-link" onclick="googleSearch('${cleanMain.replace(/'/g, "\\'")}')">${cleanMain}</span></li>`;
+                                    }
+                                    if (subLetters.length > 0) {
+                                        html += `<ul class="sub-subtopic-list">`;
+                                        const letters = 'abcdefghijklmnopqrstuvwxyz';
+                                        for (let i = 0; i < subLetters.length; i++) {
+                                            const letter = letters[i] || '?';
+                                            const cleanSub = subLetters[i].replace(/^[a-z]\)\s*/, '').trim();
+                                            html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
+                                        }
+                                        html += `</ul>`;
+                                    }
+                                } else if (isNumbered(sub)) {
+                                    const numClean = sub.replace(/^\d+\.\s*/, '').trim();
+                                    html += `<li><span class="sub-link" onclick="googleSearch('${numClean.replace(/'/g, "\\'")}')">${numClean}</span></li>`;
+                                } else {
+                                    let cleanSub = sub.replace(/^\d+\.\s*/, '').trim();
+                                    cleanSub = cleanSub.replace(/[;,:]\s*$/, '').trim();
+                                    if (cleanSub) {
+                                        html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
+                                    }
+                                }
+                            }
+                            html += `</ul>`;
+                        }
+                        if (t.book && t.book !== '—') {
+                            const bookSearch = t.book;
+                            html += `<div class="book-ref">📖 <span class="book-link" onclick="googleSearch('${bookSearch.replace(/'/g, "\\'")}')">${t.book}</span></div>`;
+                        }
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            }
+            container.innerHTML = html;
+            countDisplay.textContent = records.length;
+        }
+
+        function applyFilters() {
+            const search = searchInput.value.trim().toLowerCase();
+            const subject = subjectSelect.value;
+            filtered = allRecords.filter(r => {
+                if (search) {
+                    const all = `${r.srno} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.subtopics}`.toLowerCase();
+                    if (!all.includes(search)) return false;
+                }
+                if (subject && r.subject !== subject) return false;
+                return true;
+            });
+            render(filtered);
+        }
+
+        function updateSubjects(records) {
+            const subs = new Set();
+            records.forEach(r => { if (r.subject) subs.add(r.subject); });
+            const current = subjectSelect.value;
+            subjectSelect.innerHTML = `<option value="">All subjects</option>`;
+            [...subs].sort().forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                subjectSelect.appendChild(opt);
+            });
+            if ([...subs].includes(current)) subjectSelect.value = current;
+            else subjectSelect.value = '';
+        }
+
+        async function loadSyllabus() {
+            try {
+                container.innerHTML = `<div class="loading"><span class="spinner"></span> loading…</div>`;
+                const resp = await fetch(CSV_URL);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const text = await resp.text();
+                const parsed = parseCSV(text);
+                if (parsed.length === 0) {
+                    container.innerHTML = `<div class="empty-state">⚠️ No data found</div>`;
+                    countDisplay.textContent = '0';
+                    return;
+                }
+                allRecords = parsed;
+                updateSubjects(allRecords);
+                applyFilters();
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ ${e.message}</div>`;
+                countDisplay.textContent = 'err';
+            }
+        }
+
+        window.googleSearch = googleSearch;
+        searchInput.addEventListener('input', applyFilters);
+        subjectSelect.addEventListener('change', applyFilters);
+        loadSyllabus();
+    })();
+</script>
+</body>
+</html>
