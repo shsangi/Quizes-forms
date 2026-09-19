@@ -831,6 +831,16 @@
                 padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 14px) !important;
             }
         }
+
+        /* ============================================================
+                   FIX: Page display override for flex pages
+                   (eligibility-page & edu-page set display:flex which
+                    overrides .page { display:none } — this fixes it)
+                   ============================================================ */
+        .page.eligibility-page { display: none; }
+        .page.eligibility-page.active { display: flex; }
+        .page.edu-page { display: none; }
+        .page.edu-page.active { display: flex; }
     </style>
 </head>
 <body>
@@ -856,9 +866,7 @@
 
     <!-- ================= PAGE CONTAINER ================= -->
     <div class="page-container">
-        <!-- ============================================================ -->
-        <!-- 1Paste_toggle_page1 – SCHEDULE                               -->
-        <!-- ============================================================ -->
+        <!-- SCHEDULE -->
         <div id="schedulePage" class="page schedule-page">
             <div class="card">
                 <div class="banner">
@@ -885,9 +893,7 @@
             </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- 2Paste_toggle_page2 – SYLLABUS                               -->
-        <!-- ============================================================ -->
+        <!-- SYLLABUS -->
         <div id="syllabusPage" class="page syllabus-page">
             <div class="app">
                 <div class="header">
@@ -913,9 +919,7 @@
             </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- 3Paste_toggle_page3 – AI SOLVED PAPERS                       -->
-        <!-- ============================================================ -->
+        <!-- AI SOLVED PAPERS -->
         <div id="papersPage" class="page papers-page">
             <div class="container">
                 <div class="page-header">
@@ -969,9 +973,7 @@
             </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- 4Paste_toggle_page4 – ELIGIBILITY                            -->
-        <!-- ============================================================ -->
+        <!-- ELIGIBILITY -->
         <div id="eligibilityPage" class="page eligibility-page">
             <div class="app-container">
                 <div class="top-accent"></div>
@@ -1035,7 +1037,6 @@
                     <div class="results-section" id="resultsSection">
                         <div class="results-title">Year-by-Year Eligibility</div>
                         <div class="year-cards-container" id="yearCardsContainer">
-                            <!-- Dynamic cards -->
                         </div>
                         <p class="results-note">
                             <strong>Note (CSS CE Rules 2019):</strong> Age must be <strong>21–30 years</strong> on the cut-off date (31st Dec of the preceding year). 
@@ -1049,14 +1050,10 @@
             </div>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- 5Paste_toggle_page5 – EDU (Quiz)                             -->
-        <!-- ============================================================ -->
+        <!-- EDU (Quiz) -->
         <div id="eduPage" class="page edu-page active">
-            <!-- Toast container -->
             <div class="toast-container" id="toastContainer"></div>
 
-            <!-- Install banner -->
             <div class="install-banner" id="installBanner">
                 <div class="ib-icon"><img src="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27" alt="SL"></div>
                 <div class="ib-text">
@@ -1067,7 +1064,6 @@
                 <button class="ib-close" id="installClose">✕</button>
             </div>
 
-            <!-- Confirm dialog -->
             <div class="confirm-overlay" id="confirmOverlay">
                 <div class="confirm-box">
                     <div class="icon"><span id="confirmIcon">❓</span></div>
@@ -1080,7 +1076,6 @@
                 </div>
             </div>
 
-            <!-- Login screen -->
             <div class="login-wrapper" id="loginScreen">
                 <img class="logo" id="loginLogo"
                      src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230f766e'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter,sans-serif' font-size='38' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
@@ -1111,9 +1106,7 @@
                 <div class="login-footer"><span id="loginStatus">Loading...</span></div>
             </div>
 
-            <!-- Quiz app -->
             <div class="quiz-wrapper" id="quizApp">
-                <!-- Top bar -->
                 <div class="top-bar" id="topBar">
                     <div class="brand">
                         <img class="brand-logo" id="brandLogo"
@@ -1159,13 +1152,11 @@
                     </div>
                 </div>
 
-                <!-- Quiz content -->
                 <div id="quizContent">
                     <div class="progress-block">
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
 
-                    <!-- MCQ view -->
                     <div id="singleQuestionView">
                         <div id="submittedBanner" style="display:none" class="submitted-header">
                             ✅ Submitted — Click "End Quiz" for final score.
@@ -1179,7 +1170,6 @@
                         </div>
                     </div>
 
-                    <!-- Solved (read) mode view -->
                     <div id="readView">
                         <div class="mode-search-bar" id="readSearchBar">
                             <span class="msb-icon">🔍</span>
@@ -1196,7 +1186,6 @@
                         </div>
                     </div>
 
-                    <!-- Facts mode view -->
                     <div id="factsView">
                         <div class="mode-search-bar" id="factsSearchBar">
                             <span class="msb-icon">🔍</span>
@@ -1213,7 +1202,6 @@
                         </div>
                     </div>
 
-                    <!-- Overview grid -->
                     <div class="overview-section">
                         <div class="overview-header">
                             <span>OVERVIEW</span>
@@ -1230,12 +1218,10 @@
                         <div class="grid-dots" id="dotGrid"></div>
                     </div>
 
-                    <!-- End Quiz -->
                     <div class="end-quiz-bottom" id="endQuizBottom">
                         <button class="btn-success" id="endQuizBtn">🏁 End Quiz</button>
                     </div>
 
-                    <!-- Result card -->
                     <div class="result-card" id="resultArea">
                         <h2>🏁 Quiz Complete</h2>
                         <div class="result-score" id="finalScore">0 / 0</div>
@@ -1245,7 +1231,6 @@
                     </div>
                 </div>
 
-                <!-- Filter modal (desktop) -->
                 <div class="modal-overlay" id="refreshModal">
                     <div class="modal-box filter-panel">
                         <h3>⚙️ Filter &amp; Refresh</h3>
@@ -1289,7 +1274,6 @@
                     </div>
                 </div>
 
-                <!-- Filter drawer (mobile) -->
                 <div class="drawer-overlay" id="drawerOverlay"></div>
                 <aside class="drawer" id="drawer" aria-hidden="true">
                     <div class="drawer-body filter-panel">
@@ -1336,7 +1320,6 @@
                     </div>
                 </aside>
 
-                <!-- Job sites modal -->
                 <div class="jobsites-overlay" id="jobsitesOverlay">
                     <div class="jobsites-modal">
                         <div class="jobsites-header">
@@ -1392,7 +1375,6 @@
         const bottomButtons = document.querySelectorAll('.bottom-nav-btn');
         const pages = PAGE_IDS.map(id => document.getElementById(id));
 
-        // Default active page = Edu
         const DEFAULT_PAGE = 'eduPage';
 
         function showPage(pageId) {
@@ -1405,7 +1387,6 @@
             topButtons.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
             bottomButtons.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
 
-            // Scroll to top when switching pages
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1417,15 +1398,13 @@
             btn.addEventListener('click', () => showPage(btn.dataset.page));
         });
 
-        // Init
         showPage(DEFAULT_PAGE);
 
-        // Expose helper for other scripts (optional)
         window.__showPage = showPage;
     })();
 
     // ============================================================
-    //  1Paste_toggle_page1 – SCHEDULE SCRIPT
+    //  SCHEDULE SCRIPT
     // ============================================================
     (function() {
         const S = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTX16x-Eeh1mguy6se1B25x0hkRIzIme4pX71KlxpML_vZAD34mtlITIqFs8MCAVycXFFft82j1RZDc/pub?output=csv';
@@ -1517,7 +1496,7 @@
     })();
 
     // ============================================================
-    //  2Paste_toggle_page2 – SYLLABUS SCRIPT
+    //  SYLLABUS SCRIPT
     // ============================================================
     (function() {
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac/pub?output=csv';
@@ -1649,7 +1628,7 @@
     })();
 
     // ============================================================
-    //  3Paste_toggle_page3 – AI SOLVED PAPERS SCRIPT
+    //  AI SOLVED PAPERS SCRIPT
     // ============================================================
     (function() {
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv";
@@ -1773,7 +1752,7 @@
     })();
 
     // ============================================================
-    //  4Paste_toggle_page4 – ELIGIBILITY SCRIPT
+    //  ELIGIBILITY SCRIPT
     // ============================================================
     const CURRENT_CYCLE_YEAR = 2027;
 
@@ -1824,7 +1803,7 @@
     }
 
     // ============================================================
-    //  5Paste_toggle_page5 – EDU (QUIZ) SCRIPT
+    //  EDU (QUIZ) SCRIPT
     // ============================================================
     (function () {
         const LOGO = 'https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27';
