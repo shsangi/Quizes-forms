@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#0f766e">
-    <title>CSS 2027 · Schedule · Syllabus · AI Papers · Eligibility · Edu</title>
+    <title>CSS 2027 · Edu · Schedule · Syllabus · Papers · Eligibility</title>
     <style>
         /* ============================================================
                    GLOBAL RESET & VARIABLES
@@ -33,6 +33,7 @@
             --shadow-md: 0 8px 20px -6px rgba(0, 20, 40, 0.1);
             --radius-card: 16px;
             --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            --bottom-nav-h: 64px;
         }
 
         html { -webkit-text-size-adjust: 100%; }
@@ -51,7 +52,7 @@
         .app-wrapper { max-width: 1560px; width: 100%; }
 
         /* ============================================================
-                   COMPACT TOGGLE BAR (5 buttons)
+                   TOP TOGGLE BAR (desktop only)
                    ============================================================ */
         .toggle-bar {
             display: flex;
@@ -88,6 +89,87 @@
         .toggle-btn .emoji { font-size: 0.7rem; line-height: 1; }
         .toggle-btn:hover { background: #f0f5fc; color: #0b2b4a; }
         .toggle-btn.active { background: #0b1e33; color: white; box-shadow: 0 2px 8px rgba(11, 30, 51, 0.12); }
+
+        /* ============================================================
+                   BOTTOM NAVIGATION (mobile only)
+                   ============================================================ */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-h);
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 20px rgba(0, 20, 40, 0.06);
+            z-index: 9000;
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        .bottom-nav-inner {
+            display: flex;
+            height: var(--bottom-nav-h);
+            align-items: stretch;
+            justify-content: space-around;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .bottom-nav-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            color: #64748b;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.6rem;
+            letter-spacing: 0.2px;
+            padding: 6px 2px;
+            position: relative;
+            transition: color 0.15s ease;
+            user-select: none;
+        }
+
+        .bottom-nav-btn .nav-emoji {
+            font-size: 1.15rem;
+            line-height: 1;
+            transition: transform 0.15s ease;
+        }
+
+        .bottom-nav-btn .nav-label {
+            line-height: 1;
+        }
+
+        .bottom-nav-btn:hover { color: #0b1e33; }
+
+        .bottom-nav-btn.active {
+            color: #0f766e;
+        }
+
+        .bottom-nav-btn.active .nav-emoji {
+            transform: translateY(-1px) scale(1.05);
+        }
+
+        .bottom-nav-btn.active::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 26px;
+            height: 3px;
+            border-radius: 4px;
+            background: #0f766e;
+        }
 
         /* ============================================================
                    PAGE CONTAINER
@@ -217,21 +299,12 @@
         @media print {
             body { background: white !important; padding: 10px !important; font-size: 10px !important; }
             .app-wrapper { max-width: 100% !important; }
-            .toggle-bar { display: none !important; }
+            .toggle-bar, .bottom-nav { display: none !important; }
             .syllabus-page .controls { display: none !important; }
             .syllabus-page .paper-block { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; padding: 12px !important; margin-bottom: 10px !important; }
             .syllabus-page .paper-block:nth-child(odd), .syllabus-page .paper-block:nth-child(even) { background: white !important; }
             .syllabus-page .subject-link::after, .syllabus-page .topic-link::after, .syllabus-page .sub-link::after, .syllabus-page .book-link::after { content: "" !important; display: none !important; }
             .syllabus-page .last-studied { background: #f0f4f8 !important; border: 1px solid #d0d8e0 !important; }
-            .syllabus-page .module-head { font-size: 0.8rem !important; }
-            .syllabus-page .topic-item .topic-label { font-size: 0.8rem !important; }
-            .syllabus-page .subtopic-list li { font-size: 0.75rem !important; }
-            .syllabus-page .sub-subtopic-list li { font-size: 0.75rem !important; }
-            .syllabus-page .topic-item .book-ref { font-size: 0.7rem !important; }
-            .syllabus-page .footer { font-size: 0.6rem !important; border-top: 1px solid #ccc !important; }
-            .syllabus-page .header h1 { font-size: 1.1rem !important; }
-            .syllabus-page .count-badge { display: none !important; }
-            .syllabus-page .subject-divider { border-top: 1px solid #ccc !important; }
         }
 
         /* ============================================================
@@ -391,7 +464,7 @@
         }
 
         /* ============================================================
-                   PAGE 5 – EDU (Quiz) – Scoped styles
+                   PAGE 5 – EDU (Quiz)
                    ============================================================ */
         .edu-page { --bg: #f0f4f8; --sf: #fff; --sf2: #f8fafc; --bd: #e2e8f0; --tx: #0f172a; --tx2: #475569; --tx3: #64748b; --pr: #0f766e; --prd: #0d9488; --ac: #0ea5e9; --ok: #10b981; --okb: #d1fae5; --er: #ef4444; --erb: #fee2e2; --wn: #f59e0b; --wnb: #fef3c7; --iv: #ec4899; --ivb: #fce7f3; --r: 20px; --rf: 9999px; --sh: 0 10px 40px -12px rgba(15,23,42,.12); --shl: 0 25px 50px -12px rgba(15,23,42,.18); font-family: Inter, system-ui, sans-serif; background: var(--bg); min-height: 100dvh; display: flex; align-items: flex-start; justify-content: center; padding: 1.25rem; color: var(--tx); -webkit-font-smoothing: antialiased; overscroll-behavior: contain; }
         .edu-page * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
@@ -747,35 +820,46 @@
             .edu-page { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
             .edu-page .drawer { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
         }
+
+        /* ============================================================
+                   RESPONSIVE – Bottom nav visible on mobile only
+                   ============================================================ */
+        @media (max-width: 768px) {
+            .toggle-bar { display: none !important; }
+            .bottom-nav { display: block !important; }
+            body {
+                padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 14px) !important;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="app-wrapper">
-    <!-- ================= COMPACT TOGGLE BAR (5 buttons) ================= -->
-    <div class="toggle-bar">
-        <button class="toggle-btn active" id="btnSchedule" data-page="schedulePage">
-            <span class="emoji">📅</span> Sched
-        </button>
-        <button class="toggle-btn" id="btnSyllabus" data-page="syllabusPage">
-            <span class="emoji">📘</span> Syll
-        </button>
-        <button class="toggle-btn" id="btnPapers" data-page="papersPage">
-            <span class="emoji">📝</span> Papers
-        </button>
-        <button class="toggle-btn" id="btnEligibility" data-page="eligibilityPage">
-            <span class="emoji">✅</span> Elig
-        </button>
-        <button class="toggle-btn" id="btnEdu" data-page="eduPage">
+    <!-- ================= TOP TOGGLE BAR (desktop only) ================= -->
+    <div class="toggle-bar" id="topToggleBar">
+        <button class="toggle-btn active" data-page="eduPage">
             <span class="emoji">🎓</span> Edu
+        </button>
+        <button class="toggle-btn" data-page="schedulePage">
+            <span class="emoji">📅</span> Schedule
+        </button>
+        <button class="toggle-btn" data-page="syllabusPage">
+            <span class="emoji">📋</span> Syll
+        </button>
+        <button class="toggle-btn" data-page="papersPage">
+            <span class="emoji">📄</span> Papers
+        </button>
+        <button class="toggle-btn" data-page="eligibilityPage">
+            <span class="emoji">🛡️</span> Elig
         </button>
     </div>
 
     <!-- ================= PAGE CONTAINER ================= -->
     <div class="page-container">
         <!-- ============================================================ -->
-        <!-- ▼▼▼ 1Paste_toggle_page1 (SCHEDULE) ▼▼▼                        -->
+        <!-- 1Paste_toggle_page1 – SCHEDULE                               -->
         <!-- ============================================================ -->
-        <div id="schedulePage" class="page active schedule-page">
+        <div id="schedulePage" class="page schedule-page">
             <div class="card">
                 <div class="banner">
                     <div class="banner-activity">
@@ -800,15 +884,14 @@
                 </div>
             </div>
         </div>
-        <!-- ▲▲▲ END 1Paste_toggle_page1 ▲▲▲ -->
 
         <!-- ============================================================ -->
-        <!-- ▼▼▼ 2Paste_toggle_page2 (SYLLABUS) ▼▼▼                        -->
+        <!-- 2Paste_toggle_page2 – SYLLABUS                               -->
         <!-- ============================================================ -->
         <div id="syllabusPage" class="page syllabus-page">
             <div class="app">
                 <div class="header">
-                    <h1>📘 CSS <span>syllabus</span></h1>
+                    <h1>📋 CSS <span>syllabus</span></h1>
                     <span class="count-badge" id="countDisplay">0</span>
                 </div>
 
@@ -829,10 +912,9 @@
                 <div class="footer">FPSC syllabus · live from Google Sheets</div>
             </div>
         </div>
-        <!-- ▲▲▲ END 2Paste_toggle_page2 ▲▲▲ -->
 
         <!-- ============================================================ -->
-        <!-- ▼▼▼ 3Paste_toggle_page3 (AI SOLVED PAPERS) ▼▼▼                -->
+        <!-- 3Paste_toggle_page3 – AI SOLVED PAPERS                       -->
         <!-- ============================================================ -->
         <div id="papersPage" class="page papers-page">
             <div class="container">
@@ -886,10 +968,9 @@
                 </div>
             </div>
         </div>
-        <!-- ▲▲▲ END 3Paste_toggle_page3 ▲▲▲ -->
 
         <!-- ============================================================ -->
-        <!-- ▼▼▼ 4Paste_toggle_page4 (ELIGIBILITY) ▼▼▼                     -->
+        <!-- 4Paste_toggle_page4 – ELIGIBILITY                            -->
         <!-- ============================================================ -->
         <div id="eligibilityPage" class="page eligibility-page">
             <div class="app-container">
@@ -967,12 +1048,11 @@
                 </div>
             </div>
         </div>
-        <!-- ▲▲▲ END 4Paste_toggle_page4 ▲▲▲ -->
 
         <!-- ============================================================ -->
-        <!-- ▼▼▼ 5Paste_toggle_page5 (EDU) ▼▼▼                             -->
+        <!-- 5Paste_toggle_page5 – EDU (Quiz)                             -->
         <!-- ============================================================ -->
-        <div id="eduPage" class="page edu-page">
+        <div id="eduPage" class="page edu-page active">
             <!-- Toast container -->
             <div class="toast-container" id="toastContainer"></div>
 
@@ -1273,46 +1353,75 @@
                 </div>
             </div>
         </div>
-        <!-- ▲▲▲ END 5Paste_toggle_page5 ▲▲▲ -->
     </div>
 </div>
 
+<!-- ================= BOTTOM NAVIGATION (mobile only) ================= -->
+<nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="Main navigation">
+    <div class="bottom-nav-inner">
+        <button class="bottom-nav-btn active" data-page="eduPage" aria-label="Edu">
+            <span class="nav-emoji">🎓</span>
+            <span class="nav-label">Edu</span>
+        </button>
+        <button class="bottom-nav-btn" data-page="schedulePage" aria-label="Schedule">
+            <span class="nav-emoji">📅</span>
+            <span class="nav-label">Schedule</span>
+        </button>
+        <button class="bottom-nav-btn" data-page="syllabusPage" aria-label="Syllabus">
+            <span class="nav-emoji">📋</span>
+            <span class="nav-label">Syll</span>
+        </button>
+        <button class="bottom-nav-btn" data-page="papersPage" aria-label="Papers">
+            <span class="nav-emoji">📄</span>
+            <span class="nav-label">Papers</span>
+        </button>
+        <button class="bottom-nav-btn" data-page="eligibilityPage" aria-label="Eligibility">
+            <span class="nav-emoji">🛡️</span>
+            <span class="nav-label">Eligi</span>
+        </button>
+    </div>
+</nav>
+
 <script>
     // ============================================================
-    //  TOGGLE LOGIC (5 pages)
+    //  UNIFIED TOGGLE LOGIC (5 pages) – top bar + bottom nav sync
     // ============================================================
     (function() {
-        const btnSchedule = document.getElementById('btnSchedule');
-        const btnSyllabus = document.getElementById('btnSyllabus');
-        const btnPapers = document.getElementById('btnPapers');
-        const btnEligibility = document.getElementById('btnEligibility');
-        const btnEdu = document.getElementById('btnEdu');
-        const schedulePage = document.getElementById('schedulePage');
-        const syllabusPage = document.getElementById('syllabusPage');
-        const papersPage = document.getElementById('papersPage');
-        const eligibilityPage = document.getElementById('eligibilityPage');
-        const eduPage = document.getElementById('eduPage');
+        const PAGE_IDS = ['eduPage', 'schedulePage', 'syllabusPage', 'papersPage', 'eligibilityPage'];
+        const topButtons = document.querySelectorAll('.toggle-btn');
+        const bottomButtons = document.querySelectorAll('.bottom-nav-btn');
+        const pages = PAGE_IDS.map(id => document.getElementById(id));
 
-        const buttons = [btnSchedule, btnSyllabus, btnPapers, btnEligibility, btnEdu];
-        const pages = [schedulePage, syllabusPage, papersPage, eligibilityPage, eduPage];
+        // Default active page = Edu
+        const DEFAULT_PAGE = 'eduPage';
 
         function showPage(pageId) {
-            pages.forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
+            if (!PAGE_IDS.includes(pageId)) pageId = DEFAULT_PAGE;
 
-            buttons.forEach(b => b.classList.remove('active'));
-            if (pageId === 'schedulePage') btnSchedule.classList.add('active');
-            else if (pageId === 'syllabusPage') btnSyllabus.classList.add('active');
-            else if (pageId === 'papersPage') btnPapers.classList.add('active');
-            else if (pageId === 'eligibilityPage') btnEligibility.classList.add('active');
-            else btnEdu.classList.add('active');
+            pages.forEach(p => { if (p) p.classList.remove('active'); });
+            const target = document.getElementById(pageId);
+            if (target) target.classList.add('active');
+
+            topButtons.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+            bottomButtons.forEach(b => b.classList.toggle('active', b.dataset.page === pageId));
+
+            // Scroll to top when switching pages
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        btnSchedule.addEventListener('click', () => showPage('schedulePage'));
-        btnSyllabus.addEventListener('click', () => showPage('syllabusPage'));
-        btnPapers.addEventListener('click', () => showPage('papersPage'));
-        btnEligibility.addEventListener('click', () => showPage('eligibilityPage'));
-        btnEdu.addEventListener('click', () => showPage('eduPage'));
+        topButtons.forEach(btn => {
+            btn.addEventListener('click', () => showPage(btn.dataset.page));
+        });
+
+        bottomButtons.forEach(btn => {
+            btn.addEventListener('click', () => showPage(btn.dataset.page));
+        });
+
+        // Init
+        showPage(DEFAULT_PAGE);
+
+        // Expose helper for other scripts (optional)
+        window.__showPage = showPage;
     })();
 
     // ============================================================
