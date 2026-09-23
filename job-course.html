@@ -358,22 +358,42 @@
             font-size: 0.45rem; margin-left: 0.1rem; opacity: 0.75;
         }
 
-        /* TOAST */
+        /* TOAST — hidden by default with visibility + opacity to prevent flash */
         .toast {
             position: fixed;
             bottom: 1.5rem;
             left: 50%;
-            transform: translateX(-50%) translateY(150%);
-            background: #0f2b3d; color: white;
-            padding: 0.6rem 1rem; border-radius: 30px;
-            font-size: 0.75rem; font-weight: 500;
+            background: #0f2b3d;
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
             box-shadow: 0 8px 24px -6px rgba(0, 20, 40, 0.4);
-            z-index: 1000; display: flex; align-items: center; gap: 0.5rem;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 90vw; word-break: break-word;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            max-width: 90vw;
+            word-break: break-word;
             pointer-events: none;
+
+            /* Prevent flash on load: hide fully until .show is added */
+            visibility: hidden;
+            opacity: 0;
+            transform: translateX(-50%) translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        visibility 0s linear 0.3s;
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        visibility 0s linear 0s;
+        }
         .toast i { color: #4ade80; font-size: 0.85rem; }
 
         /* STATE MESSAGES */
@@ -537,10 +557,9 @@
             let subjectCounts = {};
             let mainTopicCounts = {};
 
-            // Toast debounce state
             let toastTimer = null;
             let lastToastTime = 0;
-            const TOAST_DEBOUNCE_MS = 800; // ignore repeat toasts within this window
+            const TOAST_DEBOUNCE_MS = 800;
 
             function parseCSV(csvText) {
                 const rows = [];
@@ -858,9 +877,20 @@
                 renderCards(filteredData);
             }
 
-            // ============ COPY PROMPT ============
+            // ============ PROMPT TITLE LOGIC ============
+            /**
+             * Build a prompt for the given item.
+             * Title logic:
+             *  - If item.job is valid (not '—'), use it as the title.
+             *  - Otherwise, use the main topic as a fallback title.
+             *  - If neither exists, fall back to "this topic".
+             */
             function buildPrompt(item) {
-                return `Prepare me on ${item.subTopic} 20 mcqs with detail solution for CSS MPT exam.
+                const jobTitle = (item.job && item.job !== '—') ? item.job : null;
+                const fallbackTitle = (item.mainTopic && item.mainTopic !== '—') ? item.mainTopic : 'this topic';
+                const title = jobTitle || fallbackTitle;
+
+                return `Prepare me on ${item.subTopic} 20 mcqs with detail solution for ${title} exam.
 
 It should be:
 Srno
@@ -897,10 +927,8 @@ Correct answer as per choices`;
                 document.body.removeChild(textarea);
             }
 
-            // Debounced toast — prevents rapid re-showing
             function showToast(msg) {
                 const now = Date.now();
-                // If a toast was just shown <800ms ago, reset its timer instead of re-triggering
                 if (now - lastToastTime < TOAST_DEBOUNCE_MS && toast.classList.contains('show')) {
                     toastMessage.textContent = msg;
                     if (toastTimer) clearTimeout(toastTimer);
@@ -937,11 +965,9 @@ Correct answer as per choices`;
                     const card = document.createElement('div');
                     card.className = `topic-card ${item.status === 'covered' ? 'covered' : 'pending'}`;
 
-                    // Pending → clicking card copies prompt
                     if (item.status === 'pending') {
                         card.title = 'Click to copy DeepSeek prompt';
                         card.addEventListener('click', (e) => {
-                            // Don't copy when clicking the badge (badge handles its own click)
                             if (e.target.closest('.status-badge-inline')) return;
                             copyPrompt(item);
                         });
@@ -1011,7 +1037,6 @@ Correct answer as per choices`;
                             <span>Pending</span>
                             <i class="fas fa-copy copy-icon"></i>
                         `;
-                        // Clicking the badge copies — but stopPropagation so card handler doesn't also fire
                         pendingBadge.addEventListener('click', (e) => {
                             e.stopPropagation();
                             copyPrompt(item);
