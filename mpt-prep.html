@@ -511,7 +511,7 @@
             border-left: 4px solid #e6a017;
         }
 
-        /* Top row: Srno + Subtopic + URL button */
+        /* Top row: Srno + Subtopic + Status badge (right) */
         .card-top-row {
             display: flex;
             align-items: center;
@@ -548,32 +548,64 @@
             text-overflow: ellipsis;
         }
 
-        /* URL nav button top right */
-        .card-nav {
+        /* Status badge in top right (replaces Open) */
+        .status-badge-top {
             display: inline-flex;
             align-items: center;
-            gap: 0.2rem;
-            background: #eef6fe;
-            color: #18668a;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.6rem;
-            padding: 0.15rem 0.55rem;
+            gap: 0.25rem;
+            padding: 0.15rem 0.6rem 0.15rem 0.3rem;
             border-radius: 30px;
-            transition: 0.2s;
-            border: 1px solid #d3e6f2;
+            font-size: 0.65rem;
+            font-weight: 700;
             white-space: nowrap;
             flex-shrink: 0;
+            text-decoration: none;
+            transition: 0.2s;
+            border: 1px solid transparent;
         }
 
-        .card-nav i {
-            font-size: 0.55rem;
+        .status-badge-top.covered {
+            background: #e2f5ec;
+            color: #147a4a;
+            border-color: #b8e0cd;
         }
 
-        .card-nav:hover {
-            background: #d8e9f8;
-            border-color: #97c0db;
-            color: #0a3e58;
+        .status-badge-top.covered:hover {
+            background: #d0ede0;
+            border-color: #9fd4b9;
+        }
+
+        .status-badge-top.pending {
+            background: #fef3e0;
+            color: #a8690e;
+            border-color: #f2d9a8;
+        }
+
+        .status-badge-top .status-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            font-size: 0.5rem;
+        }
+
+        .status-badge-top.covered .status-check {
+            background: #2e9b6e;
+            color: white;
+        }
+
+        .status-badge-top.pending .status-check {
+            background: #e6a017;
+            color: white;
+        }
+
+        .status-badge-top .external-icon {
+            font-size: 0.5rem;
+            margin-left: 0.1rem;
+            opacity: 0.7;
         }
 
         /* Main topic row */
@@ -645,82 +677,6 @@
             display: flex;
             align-items: center;
             gap: 0.25rem;
-        }
-
-        /* Status row with clickable Covered link */
-        .card-status-row {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            margin-top: 0.1rem;
-        }
-
-        .status-check {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            font-size: 0.55rem;
-        }
-
-        .status-check.covered {
-            background: #2e9b6e;
-            color: white;
-        }
-
-        .status-check.pending {
-            background: #e6a017;
-            color: white;
-        }
-
-        .status-text {
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: #2c5777;
-        }
-
-        .status-text.covered {
-            color: #147a4a;
-        }
-
-        .status-text.pending {
-            color: #a8690e;
-        }
-
-        /* Clickable covered link - opens the chat URL */
-        .covered-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            text-decoration: none;
-            cursor: pointer;
-            padding: 0.15rem 0.5rem 0.15rem 0.15rem;
-            border-radius: 30px;
-            transition: 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .covered-link:hover {
-            background: #e2f5ec;
-            border-color: #b8e0cd;
-        }
-
-        .covered-link .status-check.covered {
-            background: #2e9b6e;
-            color: white;
-        }
-
-        .covered-link .status-text.covered {
-            color: #147a4a;
-        }
-
-        .covered-link .external-icon {
-            font-size: 0.55rem;
-            color: #2e9b6e;
-            margin-left: 0.1rem;
         }
 
         /* ---------- STATE MESSAGES ---------- */
@@ -1268,7 +1224,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- CARD RENDERING (with clickable Covered link) ----------
+            // ---------- CARD RENDERING (Status badge replaces Open button) ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1286,7 +1242,7 @@
                     const card = document.createElement('div');
                     card.className = `topic-card ${item.status === 'covered' ? 'covered' : 'pending'}`;
 
-                    // ===== TOP ROW: Srno + Subtopic + URL button =====
+                    // ===== TOP ROW: Srno + Subtopic + Status badge (right) =====
                     const topRow = document.createElement('div');
                     topRow.className = 'card-top-row';
 
@@ -1298,14 +1254,28 @@
                     `;
                     topRow.appendChild(subtopicDiv);
 
+                    // Status badge in top right (replaces Open button)
                     if (item.hasUrl) {
-                        const navLink = document.createElement('a');
-                        navLink.href = item.url;
-                        navLink.target = '_blank';
-                        navLink.rel = 'noopener noreferrer';
-                        navLink.className = 'card-nav';
-                        navLink.innerHTML = `<i class="fas fa-external-link-alt"></i> Open`;
-                        topRow.appendChild(navLink);
+                        const coveredBadge = document.createElement('a');
+                        coveredBadge.href = item.url;
+                        coveredBadge.target = '_blank';
+                        coveredBadge.rel = 'noopener noreferrer';
+                        coveredBadge.className = 'status-badge-top covered';
+                        coveredBadge.title = 'Click to open the complete chat';
+                        coveredBadge.innerHTML = `
+                            <span class="status-check"><i class="fas fa-check"></i></span>
+                            <span>Covered</span>
+                            <i class="fas fa-external-link-alt external-icon"></i>
+                        `;
+                        topRow.appendChild(coveredBadge);
+                    } else {
+                        const pendingBadge = document.createElement('span');
+                        pendingBadge.className = 'status-badge-top pending';
+                        pendingBadge.innerHTML = `
+                            <span class="status-check"><i class="fas fa-clock"></i></span>
+                            <span>Pending</span>
+                        `;
+                        topRow.appendChild(pendingBadge);
                     }
 
                     card.appendChild(topRow);
@@ -1333,34 +1303,6 @@
                         </span>
                     `;
                     card.appendChild(detailRow);
-
-                    // ===== STATUS ROW: Clickable Covered link OR Pending badge =====
-                    const statusRow = document.createElement('div');
-                    statusRow.className = 'card-status-row';
-
-                    if (item.hasUrl) {
-                        // Covered: clickable link to open the chat URL
-                        const coveredLink = document.createElement('a');
-                        coveredLink.href = item.url;
-                        coveredLink.target = '_blank';
-                        coveredLink.rel = 'noopener noreferrer';
-                        coveredLink.className = 'covered-link';
-                        coveredLink.title = 'Click to open the complete chat';
-                        coveredLink.innerHTML = `
-                            <span class="status-check covered"><i class="fas fa-check"></i></span>
-                            <span class="status-text covered">Covered</span>
-                            <i class="fas fa-external-link-alt external-icon"></i>
-                        `;
-                        statusRow.appendChild(coveredLink);
-                    } else {
-                        // Pending: non-clickable badge
-                        statusRow.innerHTML = `
-                            <span class="status-check pending"><i class="fas fa-clock"></i></span>
-                            <span class="status-text pending">Pending</span>
-                        `;
-                    }
-
-                    card.appendChild(statusRow);
 
                     fragment.appendChild(card);
                 });
