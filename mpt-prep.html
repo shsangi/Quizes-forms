@@ -502,7 +502,8 @@
             text-overflow: ellipsis;
         }
 
-        .main-topic-count {
+        /* Consistent count badge style for both main topic and subject */
+        .count-badge-style {
             background: #e0f0fa;
             color: #146a8a;
             font-size: 0.6rem;
@@ -513,7 +514,7 @@
             flex-shrink: 0;
         }
 
-        /* Detail row: Percentage + Subject */
+        /* Detail row: Percentage + Subject (with count) */
         .card-detail-row {
             display: flex;
             align-items: center;
@@ -539,12 +540,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
-        }
-
-        .card-subject .count-badge {
-            color: #6a8ba5;
-            font-weight: 500;
-            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
 
         /* Status row with checkmark */
@@ -872,17 +870,14 @@
                     }
 
                     // Parse topic: extract numbering (e.g., "1.1") and subtopic (e.g., "Percentages")
-                    // Format: "1.1 Basic Arithmetic: Percentages" or "1.1 - Percentages"
                     let topicCode = '';
                     let subTopic = '';
                     let mainTopic = '';
 
-                    // Try to match "1.1 Basic Arithmetic: Percentages" or "1.1 Basic Arithmetic - Percentages"
                     const codeMatch = topicWithSrno.match(/^(\d+\.\d+)\s*(.+)/);
                     if (codeMatch) {
                         topicCode = codeMatch[1];
                         let rest = codeMatch[2].trim();
-                        // Split by ":" or " - " to separate main topic from subtopic
                         const splitMatch = rest.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
                         if (splitMatch) {
                             mainTopic = splitMatch[1].trim();
@@ -892,7 +887,6 @@
                             subTopic = rest;
                         }
                     } else {
-                        // fallback: try to split by ":" or "-"
                         const splitMatch = topicWithSrno.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
                         if (splitMatch) {
                             mainTopic = splitMatch[1].trim();
@@ -901,7 +895,6 @@
                             mainTopic = topicWithSrno;
                             subTopic = topicWithSrno;
                         }
-                        // try to extract code from mainTopic
                         const codeOnly = mainTopic.match(/^(\d+\.\d+)\s*(.*)/);
                         if (codeOnly) {
                             topicCode = codeOnly[1];
@@ -932,16 +925,19 @@
                 return result;
             }
 
+            // ---------- COUNTING (corrected) ----------
             function computeCounts(data) {
                 subjectCounts = {};
                 mainTopicCounts = {};
 
                 data.forEach(item => {
+                    // Subject count
                     if (item.subject && item.subject !== '—') {
                         subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
                     }
-                    // Count by main topic + code (e.g., "1.1 Basic Arithmetic")
-                    const key = item.topicCode !== '—' ? `${item.topicCode} ${item.mainTopic}` : item.mainTopic;
+                    // Main topic count: use only the main topic name (without code) as key
+                    // This groups all subtopics under the same main topic name together
+                    const key = item.mainTopic;
                     if (key && key !== '—') {
                         mainTopicCounts[key] = (mainTopicCounts[key] || 0) + 1;
                     }
@@ -1106,7 +1102,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- CARD RENDERING (Srno + Subtopic top, Main Topic with numbering below) ----------
+            // ---------- CARD RENDERING (Corrected counts + consistent badge style) ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1148,26 +1144,26 @@
 
                     card.appendChild(topRow);
 
-                    // ===== MAIN TOPIC ROW with numbering (e.g., "1.1 Basic Arithmetic") =====
+                    // ===== MAIN TOPIC ROW with numbering + corrected count =====
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
-                    const mainKey = item.topicCode !== '—' ? `${item.topicCode} ${item.mainTopic}` : item.mainTopic;
-                    const mainCount = mainTopicCounts[mainKey] || 1;
+                    const mainCount = mainTopicCounts[item.mainTopic] || 1;
                     mainTopicRow.innerHTML = `
                         ${item.topicCode && item.topicCode !== '—' ? `<span class="main-topic-code">${escapeHtml(item.topicCode)}</span>` : ''}
                         <span class="main-topic-name">${escapeHtml(item.mainTopic)}</span>
-                        <span class="main-topic-count">${mainCount}</span>
+                        <span class="count-badge-style">${mainCount}</span>
                     `;
                     card.appendChild(mainTopicRow);
 
-                    // ===== DETAIL ROW: Percentage + Subject (with count) =====
+                    // ===== DETAIL ROW: Percentage + Subject (with count badge same style) =====
                     const detailRow = document.createElement('div');
                     detailRow.className = 'card-detail-row';
+                    const subjCount = subjectCounts[item.subject] || 1;
                     detailRow.innerHTML = `
                         ${item.marks !== '—' ? `<span class="card-percentage">${escapeHtml(item.marks)}%</span>` : ''}
                         <span class="card-subject">
-                            ${escapeHtml(item.subject)} 
-                            <span class="count-badge">(${subjectCounts[item.subject] || 1})</span>
+                            ${escapeHtml(item.subject)}
+                            <span class="count-badge-style">${subjCount}</span>
                         </span>
                     `;
                     card.appendChild(detailRow);
