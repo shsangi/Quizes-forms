@@ -36,13 +36,8 @@
         }
         .top-bar h1 i { color: #2a6b8f; font-size: 0.9rem; }
 
-        /* Job mode active — highlight title */
-        .top-bar h1.job-active {
-            color: #0c4b6b;
-        }
-        .top-bar h1.job-active i {
-            color: #146a8a;
-        }
+        .top-bar h1.job-active { color: #0c4b6b; }
+        .top-bar h1.job-active i { color: #146a8a; }
         .top-bar h1 .job-title {
             background: linear-gradient(135deg, #d9eaf5, #e0f0fa);
             padding: 0.15rem 0.6rem;
@@ -114,8 +109,18 @@
             font-size: 0.5rem; font-weight: 600;
             text-transform: uppercase; letter-spacing: 0.2px;
             color: #4a6a80; margin-left: 0.15rem;
+            display: flex; align-items: center; justify-content: space-between;
         }
         .filter-group label i { margin-right: 2px; font-size: 0.5rem; }
+        .filter-group label .count-hint {
+            font-size: 0.5rem;
+            font-weight: 700;
+            color: #8aa4b8;
+            background: #f0f5fa;
+            padding: 0.05rem 0.35rem;
+            border-radius: 30px;
+            margin-left: auto;
+        }
 
         /* MULTI-SELECT */
         .multi-select-wrap { position: relative; width: 100%; }
@@ -270,7 +275,6 @@
         .topic-card.pending { border-left: 3px solid #e6a017; cursor: pointer; }
         .topic-card.pending:hover { background: #fffdf7; }
 
-        /* JOB BADGE — top right corner of card */
         .card-job-badge {
             position: absolute;
             top: 0.4rem;
@@ -327,9 +331,7 @@
             opacity: 0.5;
             transition: 0.15s;
         }
-        .subtopic-name:hover .search-icon {
-            opacity: 1;
-        }
+        .subtopic-name:hover .search-icon { opacity: 1; }
 
         /* Row 2 */
         .card-main-topic-row {
@@ -526,7 +528,7 @@
         <div class="filter-bar">
             <div class="filter-row-top">
                 <div class="filter-group">
-                    <label><i class="fas fa-book"></i> Subject</label>
+                    <label><i class="fas fa-book"></i> Subject <span class="count-hint" id="subjectCountHint">0</span></label>
                     <div class="multi-select-wrap" id="subjectMultiWrap">
                         <div class="multi-select-trigger" id="subjectTrigger">
                             <span class="placeholder" id="subjectPlaceholder">All subjects</span>
@@ -537,7 +539,7 @@
                 </div>
 
                 <div class="filter-group">
-                    <label><i class="fas fa-tag"></i> Topic</label>
+                    <label><i class="fas fa-tag"></i> Topic <span class="count-hint" id="topicCountHint">0</span></label>
                     <div class="multi-select-wrap" id="topicMultiWrap">
                         <div class="multi-select-trigger" id="topicTrigger">
                             <span class="placeholder" id="topicPlaceholder">All topics</span>
@@ -548,7 +550,7 @@
                 </div>
 
                 <div class="filter-group">
-                    <label><i class="fas fa-briefcase"></i> Job</label>
+                    <label><i class="fas fa-briefcase"></i> Job <span class="count-hint" id="jobCountHint">0</span></label>
                     <div class="multi-select-wrap" id="jobMultiWrap">
                         <div class="multi-select-trigger" id="jobTrigger">
                             <span class="placeholder" id="jobPlaceholder">All jobs</span>
@@ -598,6 +600,10 @@
             const pageTitle = document.getElementById('pageTitle');
             const titleText = document.getElementById('titleText');
 
+            const subjectCountHint = document.getElementById('subjectCountHint');
+            const topicCountHint = document.getElementById('topicCountHint');
+            const jobCountHint = document.getElementById('jobCountHint');
+
             let rawData = [];
             let filteredData = [];
             let selectedSubjects = new Set();
@@ -611,6 +617,11 @@
             let toastTimer = null;
             let lastToastTime = 0;
             const TOAST_DEBOUNCE_MS = 800;
+
+            // Store rebuild functions for each multi-select so we can refresh them dynamically
+            let rebuildSubjectSelect = null;
+            let rebuildTopicSelect = null;
+            let rebuildJobSelect = null;
 
             function parseCSV(csvText) {
                 const rows = [];
@@ -654,7 +665,6 @@
                 return rows;
             }
 
-            // A: Srno | B: Subject with Marks (e.g. "English; 20") | C: Topic | D: Subtopic | E: URL | F: job
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
                 const dataRows = rows.slice(1);
@@ -724,9 +734,6 @@
                 statSubjects.textContent = subjects;
             }
 
-            // ============ PAGE TITLE UPDATE ============
-            // When a single job is selected, replace the page title with that job name.
-            // Otherwise show the default title.
             function updatePageTitle() {
                 if (selectedJobs.size === 1) {
                     const jobName = Array.from(selectedJobs)[0];
@@ -738,133 +745,209 @@
                 }
             }
 
+            // ============ DYNAMIC FILTER OPTIONS ============
+            // Given a set of "exclude" filters, return what options are actually available.
+            // E.g. to compute Subject options: consider all data matching Topic, Job, Status filters
+            // (but NOT the Subject filter itself, so users can still unselect within it).
+            function getAvailableOptions(excludeFilter) {
+                const activeSubjects = excludeFilter === 'subject' ? new Set() : selectedSubjects;
+                const activeTopics = excludeFilter === 'topic' ? new Set() : selectedTopics;
+                const activeJobs = excludeFilter === 'job' ? new Set() : selectedJobs;
+
+                const subjects = new Set();
+                const topics = new Set();
+                const jobs = new Set();
+
+                rawData.forEach(item => {
+                    // Filter by all *other* active filters
+                    if (activeSubjects.size > 0 && !activeSubjects.has(item.subject)) return;
+                    if (activeTopics.size > 0 && !activeTopics.has(item.displayTopic)) return;
+                    if (activeJobs.size > 0 && !activeJobs.has(item.job)) return;
+                    if (selectedStatuses.size > 0 && !selectedStatuses.has(item.status)) return;
+
+                    if (item.subject && item.subject !== '—') subjects.add(item.subject);
+                    if (item.displayTopic && item.displayTopic !== '—') topics.add(item.displayTopic);
+                    if (item.job && item.job !== '—') jobs.add(item.job);
+                });
+
+                return {
+                    subjects: Array.from(subjects).sort(),
+                    topics: Array.from(topics).sort(),
+                    jobs: Array.from(jobs).sort()
+                };
+            }
+
+            // Auto-remove selected values that are no longer available
+            function pruneSelections() {
+                const available = getAvailableOptions('none');
+
+                let changed = false;
+
+                Array.from(selectedSubjects).forEach(s => {
+                    if (!available.subjects.includes(s)) {
+                        selectedSubjects.delete(s);
+                        changed = true;
+                    }
+                });
+                Array.from(selectedTopics).forEach(t => {
+                    if (!available.topics.includes(t)) {
+                        selectedTopics.delete(t);
+                        changed = true;
+                    }
+                });
+                Array.from(selectedJobs).forEach(j => {
+                    if (!available.jobs.includes(j)) {
+                        selectedJobs.delete(j);
+                        changed = true;
+                    }
+                });
+
+                return changed;
+            }
+
+            // ============ MULTI-SELECT BUILDER (returns a rebuild function) ============
             function buildMultiSelect(container, options, selectedSet, onUpdate, enableSearch) {
                 const dropdown = container.querySelector('.multi-select-dropdown');
                 const trigger = container.querySelector('.multi-select-trigger');
                 const placeholder = container.querySelector('.placeholder');
 
-                dropdown.innerHTML = '';
+                function rebuild(newOptions) {
+                    dropdown.innerHTML = '';
 
-                let searchInput = null;
-                if (enableSearch) {
-                    searchInput = document.createElement('input');
-                    searchInput.type = 'text';
-                    searchInput.className = 'multi-select-search';
-                    searchInput.placeholder = 'Search...';
-                    searchInput.addEventListener('input', () => renderDropdown(searchInput.value));
-                    searchInput.addEventListener('click', (e) => e.stopPropagation());
-                    dropdown.appendChild(searchInput);
-                }
-
-                const actionsDiv = document.createElement('div');
-                actionsDiv.className = 'multi-select-actions';
-                const selectAllBtn = document.createElement('button');
-                selectAllBtn.textContent = 'All';
-                selectAllBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const visibleOpts = options.filter(opt => {
-                        if (!searchInput || !searchInput.value) return true;
-                        return opt.label.toLowerCase().includes(searchInput.value.toLowerCase());
-                    });
-                    visibleOpts.forEach(opt => selectedSet.add(opt.value));
-                    onUpdate(); updateTriggerText();
-                    renderDropdown(searchInput ? searchInput.value : '');
-                });
-                const clearAllBtn = document.createElement('button');
-                clearAllBtn.textContent = 'Clear';
-                clearAllBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    selectedSet.clear();
-                    onUpdate(); updateTriggerText();
-                    renderDropdown(searchInput ? searchInput.value : '');
-                });
-                actionsDiv.appendChild(selectAllBtn);
-                actionsDiv.appendChild(clearAllBtn);
-                dropdown.appendChild(actionsDiv);
-
-                function renderDropdown(filterText) {
-                    const existingOptions = dropdown.querySelectorAll('.multi-select-option');
-                    existingOptions.forEach(el => el.remove());
-
-                    let filteredOptions = options;
-                    if (filterText && filterText.trim() !== '') {
-                        const q = filterText.toLowerCase().trim();
-                        filteredOptions = options.filter(opt => opt.label.toLowerCase().includes(q));
+                    let searchInput = null;
+                    if (enableSearch) {
+                        searchInput = document.createElement('input');
+                        searchInput.type = 'text';
+                        searchInput.className = 'multi-select-search';
+                        searchInput.placeholder = 'Search...';
+                        searchInput.addEventListener('input', () => renderDropdown(searchInput.value));
+                        searchInput.addEventListener('click', (e) => e.stopPropagation());
+                        dropdown.appendChild(searchInput);
                     }
 
-                    if (filteredOptions.length === 0) {
-                        const emptyDiv = document.createElement('div');
-                        emptyDiv.className = 'multi-select-option';
-                        emptyDiv.style.opacity = '0.5';
-                        emptyDiv.style.cursor = 'default';
-                        emptyDiv.innerHTML = `<span style="padding: 0.2rem 0;">No matches</span>`;
-                        dropdown.appendChild(emptyDiv);
-                        return;
-                    }
-
-                    filteredOptions.forEach(opt => {
-                        const div = document.createElement('div');
-                        div.className = 'multi-select-option' + (selectedSet.has(opt.value) ? ' selected' : '');
-                        div.innerHTML = `
-                            <span class="check"><i class="fas fa-check"></i></span>
-                            <span>${escapeHtml(opt.label)}</span>
-                        `;
-                        div.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            if (selectedSet.has(opt.value)) {
-                                selectedSet.delete(opt.value);
-                            } else {
-                                selectedSet.add(opt.value);
-                            }
-                            onUpdate(); updateTriggerText();
-                            renderDropdown(searchInput ? searchInput.value : '');
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'multi-select-actions';
+                    const selectAllBtn = document.createElement('button');
+                    selectAllBtn.textContent = 'All';
+                    selectAllBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const visibleOpts = newOptions.filter(opt => {
+                            if (!searchInput || !searchInput.value) return true;
+                            return opt.label.toLowerCase().includes(searchInput.value.toLowerCase());
                         });
-                        dropdown.appendChild(div);
+                        visibleOpts.forEach(opt => selectedSet.add(opt.value));
+                        onUpdate(); updateTriggerText();
+                        renderDropdown(searchInput ? searchInput.value : '');
                     });
+                    const clearAllBtn = document.createElement('button');
+                    clearAllBtn.textContent = 'Clear';
+                    clearAllBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectedSet.clear();
+                        onUpdate(); updateTriggerText();
+                        renderDropdown(searchInput ? searchInput.value : '');
+                    });
+                    actionsDiv.appendChild(selectAllBtn);
+                    actionsDiv.appendChild(clearAllBtn);
+                    dropdown.appendChild(actionsDiv);
+
+                    function renderDropdown(filterText) {
+                        const existingOptions = dropdown.querySelectorAll('.multi-select-option');
+                        existingOptions.forEach(el => el.remove());
+
+                        let filteredOptions = newOptions;
+                        if (filterText && filterText.trim() !== '') {
+                            const q = filterText.toLowerCase().trim();
+                            filteredOptions = newOptions.filter(opt => opt.label.toLowerCase().includes(q));
+                        }
+
+                        if (filteredOptions.length === 0) {
+                            const emptyDiv = document.createElement('div');
+                            emptyDiv.className = 'multi-select-option';
+                            emptyDiv.style.opacity = '0.5';
+                            emptyDiv.style.cursor = 'default';
+                            emptyDiv.innerHTML = `<span style="padding: 0.2rem 0;">No matches</span>`;
+                            dropdown.appendChild(emptyDiv);
+                            return;
+                        }
+
+                        filteredOptions.forEach(opt => {
+                            const div = document.createElement('div');
+                            div.className = 'multi-select-option' + (selectedSet.has(opt.value) ? ' selected' : '');
+                            div.innerHTML = `
+                                <span class="check"><i class="fas fa-check"></i></span>
+                                <span>${escapeHtml(opt.label)}</span>
+                            `;
+                            div.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                if (selectedSet.has(opt.value)) {
+                                    selectedSet.delete(opt.value);
+                                } else {
+                                    selectedSet.add(opt.value);
+                                }
+                                onUpdate(); updateTriggerText();
+                                renderDropdown(searchInput ? searchInput.value : '');
+                            });
+                            dropdown.appendChild(div);
+                        });
+                    }
+
+                    function updateTriggerText() {
+                        if (selectedSet.size === 0) {
+                            placeholder.textContent = 'All ' + (container.dataset.type || 'items');
+                            placeholder.style.display = 'inline';
+                            let existing = trigger.querySelector('.selected-text');
+                            if (existing) existing.remove();
+                        } else {
+                            placeholder.style.display = 'none';
+                            let selectedText = trigger.querySelector('.selected-text');
+                            if (!selectedText) {
+                                selectedText = document.createElement('span');
+                                selectedText.className = 'selected-text';
+                                trigger.insertBefore(selectedText, trigger.querySelector('.chevron'));
+                            }
+                            selectedText.textContent = `${selectedSet.size} sel`;
+                            selectedText.style.display = 'inline';
+                        }
+                    }
+
+                    // Only attach listeners once
+                    if (!trigger.dataset.listenerAttached) {
+                        trigger.dataset.listenerAttached = '1';
+                        trigger.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const isOpen = dropdown.classList.contains('open');
+                            document.querySelectorAll('.multi-select-dropdown.open').forEach(d => d.classList.remove('open'));
+                            document.querySelectorAll('.multi-select-trigger.open').forEach(t => t.classList.remove('open'));
+                            if (!isOpen) {
+                                dropdown.classList.add('open');
+                                trigger.classList.add('open');
+                                if (searchInput) {
+                                    searchInput.value = '';
+                                    setTimeout(() => searchInput.focus(), 50);
+                                }
+                                renderDropdown('');
+                            }
+                        });
+
+                        document.addEventListener('click', (e) => {
+                            if (!container.contains(e.target)) {
+                                dropdown.classList.remove('open');
+                                trigger.classList.remove('open');
+                            }
+                        });
+                    }
+
+                    // Expose renderDropdown and updateTriggerText so callers can refresh
+                    rebuild._render = renderDropdown;
+                    rebuild._updateText = updateTriggerText;
+
+                    renderDropdown('');
+                    updateTriggerText();
                 }
 
-                function updateTriggerText() {
-                    if (selectedSet.size === 0) {
-                        placeholder.textContent = 'All ' + (container.dataset.type || 'items');
-                        placeholder.style.display = 'inline';
-                    } else {
-                        placeholder.style.display = 'none';
-                        let selectedText = trigger.querySelector('.selected-text');
-                        if (!selectedText) {
-                            selectedText = document.createElement('span');
-                            selectedText.className = 'selected-text';
-                            trigger.insertBefore(selectedText, trigger.querySelector('.chevron'));
-                        }
-                        selectedText.textContent = `${selectedSet.size} sel`;
-                        selectedText.style.display = 'inline';
-                    }
-                }
-
-                trigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isOpen = dropdown.classList.contains('open');
-                    document.querySelectorAll('.multi-select-dropdown.open').forEach(d => d.classList.remove('open'));
-                    document.querySelectorAll('.multi-select-trigger.open').forEach(t => t.classList.remove('open'));
-                    if (!isOpen) {
-                        dropdown.classList.add('open');
-                        trigger.classList.add('open');
-                        if (searchInput) {
-                            searchInput.value = '';
-                            setTimeout(() => searchInput.focus(), 50);
-                        }
-                        renderDropdown('');
-                    }
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!container.contains(e.target)) {
-                        dropdown.classList.remove('open');
-                        trigger.classList.remove('open');
-                    }
-                });
-
-                renderDropdown('');
-                updateTriggerText();
+                rebuild(options);
+                return rebuild;
             }
 
             function setupStatusCheckboxes() {
@@ -886,7 +969,30 @@
                     selectedStatuses.add(status);
                     el.classList.add('checked');
                 }
+                refreshAllFilters();
                 applyFiltersAndRender();
+            }
+
+            // ============ REFRESH FILTER OPTIONS ============
+            function refreshAllFilters() {
+                // Prune any selections that are no longer available
+                pruneSelections();
+
+                const availForSubject = getAvailableOptions('subject');
+                const availForTopic = getAvailableOptions('topic');
+                const availForJob = getAvailableOptions('job');
+
+                const subjectOpts = availForSubject.subjects.map(s => ({ value: s, label: s }));
+                const topicOpts = availForTopic.topics.map(t => ({ value: t, label: t }));
+                const jobOpts = availForJob.jobs.map(j => ({ value: j, label: j }));
+
+                subjectCountHint.textContent = subjectOpts.length;
+                topicCountHint.textContent = topicOpts.length;
+                jobCountHint.textContent = jobOpts.length;
+
+                if (rebuildSubjectSelect) rebuildSubjectSelect(subjectOpts);
+                if (rebuildTopicSelect) rebuildTopicSelect(topicOpts);
+                if (rebuildJobSelect) rebuildJobSelect(jobOpts);
             }
 
             function applyFiltersAndRender() {
@@ -902,6 +1008,11 @@
                 renderCards(filteredData);
             }
 
+            function onFilterChange() {
+                refreshAllFilters();
+                applyFiltersAndRender();
+            }
+
             // ============ GOOGLE SEARCH BUILDER ============
             function buildGoogleSearchQuery(item) {
                 const parts = [];
@@ -912,7 +1023,6 @@
                 return parts.join(' ');
             }
 
-            // ============ PROMPT TITLE LOGIC ============
             function buildPrompt(item) {
                 const jobTitle = (item.job && item.job !== '—') ? item.job : null;
                 const fallbackTitle = (item.mainTopic && item.mainTopic !== '—') ? item.mainTopic : 'this topic';
@@ -928,7 +1038,6 @@ Detail solution
 Correct answer as per choices`;
             }
 
-            // ============ ROBUST COPY FUNCTION ============
             function copyPrompt(item) {
                 const text = buildPrompt(item);
                 const success = fallbackCopy(text);
@@ -999,7 +1108,6 @@ Correct answer as per choices`;
                 }, 1800);
             }
 
-            // ============ CARD RENDERING ============
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1011,9 +1119,7 @@ Correct answer as per choices`;
                     return;
                 }
 
-                // Show the job badge on the card ONLY when no job filter is active
                 const showJobBadge = selectedJobs.size === 0;
-
                 const fragment = document.createDocumentFragment();
 
                 data.forEach(item => {
@@ -1029,7 +1135,6 @@ Correct answer as per choices`;
                         });
                     }
 
-                    // JOB BADGE (top-right) — only shown when no job is filtered
                     if (showJobBadge && item.job && item.job !== '—') {
                         const jobBadge = document.createElement('span');
                         jobBadge.className = 'card-job-badge';
@@ -1038,7 +1143,6 @@ Correct answer as per choices`;
                         card.appendChild(jobBadge);
                     }
 
-                    // ROW 1: Srno + Subtopic
                     const topRow = document.createElement('div');
                     topRow.className = 'card-top-row';
                     const subtopicDiv = document.createElement('div');
@@ -1065,7 +1169,6 @@ Correct answer as per choices`;
                     topRow.appendChild(subtopicDiv);
                     card.appendChild(topRow);
 
-                    // ROW 2: Main topic + count
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
@@ -1078,7 +1181,6 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
-                    // ROW 3: Subject + status badge
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
                     const leftSide = document.createElement('div');
@@ -1141,6 +1243,7 @@ Correct answer as per choices`;
             }
 
             function populateFilters(data) {
+                // Build initial options from full dataset, then hook up rebuild functions
                 const subjects = new Set();
                 const topics = new Set();
                 const jobs = new Set();
@@ -1157,15 +1260,20 @@ Correct answer as per choices`;
 
                 const subjectWrap = document.getElementById('subjectMultiWrap');
                 subjectWrap.dataset.type = 'subjects';
-                buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, applyFiltersAndRender, false);
+                rebuildSubjectSelect = buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, onFilterChange, false);
 
                 const topicWrap = document.getElementById('topicMultiWrap');
                 topicWrap.dataset.type = 'topics';
-                buildMultiSelect(topicWrap, topicOptions, selectedTopics, applyFiltersAndRender, true);
+                rebuildTopicSelect = buildMultiSelect(topicWrap, topicOptions, selectedTopics, onFilterChange, true);
 
                 const jobWrap = document.getElementById('jobMultiWrap');
                 jobWrap.dataset.type = 'jobs';
-                buildMultiSelect(jobWrap, jobOptions, selectedJobs, applyFiltersAndRender, true);
+                rebuildJobSelect = buildMultiSelect(jobWrap, jobOptions, selectedJobs, onFilterChange, true);
+
+                // Set initial count hints
+                subjectCountHint.textContent = subjectOptions.length;
+                topicCountHint.textContent = topicOptions.length;
+                jobCountHint.textContent = jobOptions.length;
             }
 
             async function loadData() {
@@ -1204,6 +1312,7 @@ Correct answer as per choices`;
                     cbCovered.classList.add('checked');
                     cbPending.classList.add('checked');
 
+                    refreshAllFilters();
                     applyFiltersAndRender();
 
                 } catch (error) {
@@ -1239,6 +1348,7 @@ Correct answer as per choices`;
                         selectedJobs.clear();
                         cbCovered.classList.add('checked');
                         cbPending.classList.add('checked');
+                        refreshAllFilters();
                         applyFiltersAndRender();
                     }, 200);
                 }
