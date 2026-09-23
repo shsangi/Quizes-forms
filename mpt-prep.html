@@ -54,7 +54,7 @@
             font-size: 1rem;
         }
 
-        .excel-link {
+        .sheet-link {
             background: #ffffff;
             border-radius: 30px;
             padding: 0.3rem 0.9rem;
@@ -71,12 +71,12 @@
             white-space: nowrap;
         }
 
-        .excel-link i {
-            color: #1e7a5e;
+        .sheet-link i {
+            color: #1a7a5e;
             font-size: 0.7rem;
         }
 
-        .excel-link:hover {
+        .sheet-link:hover {
             background: #f0f7ff;
             border-color: #b8d4e8;
         }
@@ -255,7 +255,7 @@
             border-radius: 12px;
             box-shadow: 0 10px 30px -8px rgba(0, 30, 50, 0.2);
             border: 1px solid #e2edf5;
-            max-height: 200px;
+            max-height: 240px;
             overflow-y: auto;
             z-index: 100;
             display: none;
@@ -264,6 +264,33 @@
 
         .multi-select-dropdown.open {
             display: block;
+        }
+
+        /* search box inside dropdown */
+        .multi-select-search {
+            width: 100%;
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+            border: 1.5px solid #d9e6f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #1a2b3c;
+            outline: none;
+            transition: 0.2s;
+            margin-bottom: 0.25rem;
+            background: #fafdff;
+        }
+
+        .multi-select-search:focus {
+            border-color: #2a6b8f;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(42, 107, 143, 0.1);
+        }
+
+        .multi-select-search::placeholder {
+            color: #8aa4b8;
+            font-weight: 400;
         }
 
         .multi-select-option {
@@ -352,7 +379,7 @@
             gap: 0.8rem;
         }
 
-        /* ---------- NEW CARD LAYOUT ---------- */
+        /* ---------- CARD ---------- */
         .topic-card {
             background: white;
             border-radius: 14px;
@@ -446,7 +473,7 @@
             color: #0a3e58;
         }
 
-        /* ROW 2: Srno + Percentage + Subject (count) */
+        /* MID ROW: Srno + Percentage + Subject (with count) */
         .card-mid-row {
             display: flex;
             align-items: center;
@@ -490,31 +517,74 @@
             font-size: 0.7rem;
         }
 
-        /* ROW 3: status badge */
+        /* Category count row */
+        .card-category-count {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.65rem;
+            color: #4a6a80;
+            font-weight: 500;
+            background: #f5f9fd;
+            border-radius: 8px;
+            padding: 0.2rem 0.5rem;
+            border: 1px solid #e6eef6;
+        }
+
+        .card-category-count i {
+            font-size: 0.55rem;
+            color: #6a8ba5;
+        }
+
+        .card-category-count .cat-count {
+            font-weight: 700;
+            color: #146a8a;
+            margin-left: auto;
+            background: #e0f0fa;
+            padding: 0.05rem 0.4rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+        }
+
+        /* STATUS ROW with checkmark */
         .card-status-row {
             display: flex;
             align-items: center;
             gap: 0.4rem;
         }
 
-        .status-badge {
+        .status-check {
             display: inline-flex;
             align-items: center;
-            gap: 0.2rem;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
             font-size: 0.55rem;
-            font-weight: 700;
-            padding: 0.1rem 0.5rem;
-            border-radius: 30px;
-            white-space: nowrap;
         }
 
-        .status-covered {
-            background: #e2f5ec;
+        .status-check.covered {
+            background: #2e9b6e;
+            color: white;
+        }
+
+        .status-check.pending {
+            background: #e6a017;
+            color: white;
+        }
+
+        .status-text {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #2c5777;
+        }
+
+        .status-text.covered {
             color: #147a4a;
         }
 
-        .status-pending {
-            background: #fef3e0;
+        .status-text.pending {
             color: #a8690e;
         }
 
@@ -614,16 +684,16 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- top bar -->
+        <!-- top bar with Google Sheet link -->
         <div class="top-bar">
             <h1>
                 <i class="fas fa-graduation-cap"></i> Subject & Topic Tracker
             </h1>
-            <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRILNNrW889d6XpNKRQeUFbYC2mRcwk3SXxRBuMLM3QrygW7nuOsLjID4zJjN2CkhHJtosjYpDmkTmK/pub?output=xlsx" 
-               class="excel-link" 
+            <a href="https://docs.google.com/spreadsheets/d/1D_wCGy3Rks9MXt84qpC4Ea2Qjo3uSgm0b-JBIh2_mmc/edit?gid=0#gid=0" 
+               class="sheet-link" 
                target="_blank" 
                rel="noopener noreferrer">
-                <i class="fas fa-file-excel"></i> Excel
+                <i class="fas fa-table"></i> Google Sheet
             </a>
         </div>
 
@@ -705,7 +775,7 @@
             let selectedTopics = new Set();
             let selectedStatuses = new Set(['covered', 'pending']);
 
-            // Counts per subject and per topic (subtopic)
+            // Counts per subject and per subtopic category
             let subjectCounts = {};
             let subtopicCounts = {};
 
@@ -779,7 +849,6 @@
                     const topicWithSrno = (topicSrnoIdx !== -1 ? row[topicSrnoIdx] : row[2] || '').trim();
                     const url = (urlIdx !== -1 ? row[urlIdx] : row[3] || '').trim();
 
-                    // Parse subject and marks
                     let subject = subjectWithMarks;
                     let marks = '';
                     const marksMatch = subjectWithMarks.match(/\((\d+)\)|\[(\d+)\]|(\d+)\s*$/);
@@ -797,32 +866,39 @@
                         }
                     }
 
-                    // Parse topic (subtopic) and its code
+                    // Parse topic: split into category code (like 1.1) and topic name
                     let topic = topicWithSrno;
                     let topicSrno = '';
-                    const topicSrnoMatch = topicWithSrno.match(/\(([^)]+)\)|\[([^\]]+)\]/);
-                    if (topicSrnoMatch) {
-                        topicSrno = topicSrnoMatch[1] || topicSrnoMatch[2] || '';
-                        topic = topicWithSrno.replace(/\(([^)]+)\)|\[([^\]]+)\]/, '').trim();
-                        if (!topic) topic = topicWithSrno;
+                    // Try to match patterns like "1.1 Basic Arithmetic" or "1.1 - Basic Arithmetic" or "Basic Arithmetic (1.1)"
+                    const codeMatch = topicWithSrno.match(/^(\d+\.\d+)\s*[-–]?\s*(.+)/);
+                    if (codeMatch) {
+                        topicSrno = codeMatch[1];
+                        topic = codeMatch[2].trim();
                     } else {
-                        const parts = topicWithSrno.split(/[-:]/);
-                        if (parts.length >= 2) {
-                            topicSrno = parts[0].trim();
-                            topic = parts.slice(1).join(' ').trim();
+                        const topicSrnoMatch = topicWithSrno.match(/\(([^)]+)\)|\[([^\]]+)\]/);
+                        if (topicSrnoMatch) {
+                            topicSrno = topicSrnoMatch[1] || topicSrnoMatch[2] || '';
+                            topic = topicWithSrno.replace(/\(([^)]+)\)|\[([^\]]+)\]/, '').trim();
                         } else {
-                            topic = topicWithSrno;
+                            const parts = topicWithSrno.split(/[-:]/);
+                            if (parts.length >= 2) {
+                                topicSrno = parts[0].trim();
+                                topic = parts.slice(1).join(' ').trim();
+                            } else {
+                                topic = topicWithSrno;
+                            }
                         }
                     }
 
-                    if (!topicSrno && /^[A-Za-z0-9]+$/.test(topicWithSrno.trim()) && topicWithSrno.trim().length < 6) {
+                    if (!topicSrno && /^[A-Za-z0-9.]+$/.test(topicWithSrno.trim()) && topicWithSrno.trim().length < 8) {
                         topicSrno = topicWithSrno.trim();
                         topic = '';
                     }
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
                     const status = hasUrl ? 'covered' : 'pending';
-                    const topicDisplay = topicSrno !== '—' ? `${topicSrno} – ${topic}` : topic;
+                    // category key: e.g. "1.1 Basic Arithmetic" — group by code + topic name
+                    const categoryKey = topicSrno !== '—' ? `${topicSrno} ${topic}` : topic;
 
                     result.push({
                         srno: srno || '—',
@@ -830,7 +906,8 @@
                         marks: marks || '—',
                         topicSrno: topicSrno || '—',
                         topic: topic || '—',
-                        topicDisplay: topicDisplay || '—',
+                        topicDisplay: topicSrno !== '—' ? `${topicSrno} – ${topic}` : topic,
+                        categoryKey: categoryKey || '—',
                         url: hasUrl ? url : '#',
                         hasUrl: hasUrl,
                         status: status
@@ -844,12 +921,10 @@
                 subtopicCounts = {};
 
                 data.forEach(item => {
-                    // Subject count
                     if (item.subject && item.subject !== '—') {
                         subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
                     }
-                    // Subtopic (topic) count
-                    const key = item.topicSrno !== '—' ? `${item.topicSrno} ${item.topic}` : item.topic;
+                    const key = item.categoryKey;
                     if (key && key !== '—') {
                         subtopicCounts[key] = (subtopicCounts[key] || 0) + 1;
                     }
@@ -868,12 +943,27 @@
                 statSubjects.textContent = subjects;
             }
 
-            function buildMultiSelect(container, options, selectedSet, onUpdate) {
+            // Build multi-select with optional search
+            function buildMultiSelect(container, options, selectedSet, onUpdate, enableSearch) {
                 const dropdown = container.querySelector('.multi-select-dropdown');
                 const trigger = container.querySelector('.multi-select-trigger');
                 const placeholder = container.querySelector('.placeholder');
 
                 dropdown.innerHTML = '';
+
+                // search box (only if enabled)
+                let searchInput = null;
+                if (enableSearch) {
+                    searchInput = document.createElement('input');
+                    searchInput.type = 'text';
+                    searchInput.className = 'multi-select-search';
+                    searchInput.placeholder = 'Search...';
+                    searchInput.addEventListener('input', () => {
+                        renderDropdown(searchInput.value);
+                    });
+                    searchInput.addEventListener('click', (e) => e.stopPropagation());
+                    dropdown.appendChild(searchInput);
+                }
 
                 const actionsDiv = document.createElement('div');
                 actionsDiv.className = 'multi-select-actions';
@@ -881,10 +971,15 @@
                 selectAllBtn.textContent = 'All';
                 selectAllBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    options.forEach(opt => selectedSet.add(opt.value));
+                    // select all visible (filtered) options
+                    const visibleOpts = options.filter(opt => {
+                        if (!searchInput || !searchInput.value) return true;
+                        return opt.label.toLowerCase().includes(searchInput.value.toLowerCase());
+                    });
+                    visibleOpts.forEach(opt => selectedSet.add(opt.value));
                     onUpdate();
                     updateTriggerText();
-                    renderDropdown();
+                    renderDropdown(searchInput ? searchInput.value : '');
                 });
                 const clearAllBtn = document.createElement('button');
                 clearAllBtn.textContent = 'Clear';
@@ -893,17 +988,34 @@
                     selectedSet.clear();
                     onUpdate();
                     updateTriggerText();
-                    renderDropdown();
+                    renderDropdown(searchInput ? searchInput.value : '');
                 });
                 actionsDiv.appendChild(selectAllBtn);
                 actionsDiv.appendChild(clearAllBtn);
                 dropdown.appendChild(actionsDiv);
 
-                function renderDropdown() {
+                function renderDropdown(filterText) {
+                    // remove existing options (but keep search and actions)
                     const existingOptions = dropdown.querySelectorAll('.multi-select-option');
                     existingOptions.forEach(el => el.remove());
 
-                    options.forEach(opt => {
+                    let filteredOptions = options;
+                    if (filterText && filterText.trim() !== '') {
+                        const q = filterText.toLowerCase().trim();
+                        filteredOptions = options.filter(opt => opt.label.toLowerCase().includes(q));
+                    }
+
+                    if (filteredOptions.length === 0) {
+                        const emptyDiv = document.createElement('div');
+                        emptyDiv.className = 'multi-select-option';
+                        emptyDiv.style.opacity = '0.5';
+                        emptyDiv.style.cursor = 'default';
+                        emptyDiv.innerHTML = `<span style="padding: 0.3rem 0;">No matches found</span>`;
+                        dropdown.appendChild(emptyDiv);
+                        return;
+                    }
+
+                    filteredOptions.forEach(opt => {
                         const div = document.createElement('div');
                         div.className = 'multi-select-option' + (selectedSet.has(opt.value) ? ' selected' : '');
                         div.innerHTML = `
@@ -919,7 +1031,7 @@
                             }
                             onUpdate();
                             updateTriggerText();
-                            renderDropdown();
+                            renderDropdown(searchInput ? searchInput.value : '');
                         });
                         dropdown.appendChild(div);
                     });
@@ -950,6 +1062,11 @@
                     if (!isOpen) {
                         dropdown.classList.add('open');
                         trigger.classList.add('open');
+                        if (searchInput) {
+                            searchInput.value = '';
+                            setTimeout(() => searchInput.focus(), 50);
+                        }
+                        renderDropdown('');
                     }
                 });
 
@@ -960,7 +1077,7 @@
                     }
                 });
 
-                renderDropdown();
+                renderDropdown('');
                 updateTriggerText();
             }
 
@@ -976,7 +1093,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- NEW CARD RENDERING ----------
+            // ---------- CARD RENDERING with category count ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1006,7 +1123,6 @@
                     `;
                     topRow.appendChild(subtopicDiv);
 
-                    // URL nav on top right
                     if (item.hasUrl) {
                         const navLink = document.createElement('a');
                         navLink.href = item.url;
@@ -1023,13 +1139,11 @@
                     const midRow = document.createElement('div');
                     midRow.className = 'card-mid-row';
 
-                    // Srno
                     const srnoSpan = document.createElement('span');
                     srnoSpan.className = 'card-srno';
                     srnoSpan.textContent = `#${item.srno}`;
                     midRow.appendChild(srnoSpan);
 
-                    // Percentage (marks)
                     if (item.marks && item.marks !== '—') {
                         const pctSpan = document.createElement('span');
                         pctSpan.className = 'card-percentage';
@@ -1037,7 +1151,6 @@
                         midRow.appendChild(pctSpan);
                     }
 
-                    // Subject with count
                     const subjectSpan = document.createElement('span');
                     subjectSpan.className = 'card-subject-with-count';
                     const subjCount = subjectCounts[item.subject] || 1;
@@ -1046,13 +1159,33 @@
 
                     card.appendChild(midRow);
 
-                    // ===== STATUS ROW =====
+                    // ===== CATEGORY COUNT ROW =====
+                    const catKey = item.categoryKey;
+                    const catCount = subtopicCounts[catKey] || 1;
+                    if (catKey && catKey !== '—') {
+                        const catRow = document.createElement('div');
+                        catRow.className = 'card-category-count';
+                        catRow.innerHTML = `
+                            <i class="fas fa-tags"></i>
+                            <span>${escapeHtml(catKey)}</span>
+                            <span class="cat-count">${catCount} topic${catCount > 1 ? 's' : ''}</span>
+                        `;
+                        card.appendChild(catRow);
+                    }
+
+                    // ===== STATUS ROW with checkmark =====
                     const statusRow = document.createElement('div');
                     statusRow.className = 'card-status-row';
                     if (item.hasUrl) {
-                        statusRow.innerHTML = `<span class="status-badge status-covered"><i class="fas fa-check-circle"></i> Covered</span>`;
+                        statusRow.innerHTML = `
+                            <span class="status-check covered"><i class="fas fa-check"></i></span>
+                            <span class="status-text covered">Covered</span>
+                        `;
                     } else {
-                        statusRow.innerHTML = `<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>`;
+                        statusRow.innerHTML = `
+                            <span class="status-check pending"><i class="fas fa-clock"></i></span>
+                            <span class="status-text pending">Pending</span>
+                        `;
                     }
                     card.appendChild(statusRow);
 
@@ -1087,11 +1220,12 @@
 
                 const subjectWrap = document.getElementById('subjectMultiWrap');
                 subjectWrap.dataset.type = 'subjects';
-                buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, applyFiltersAndRender);
+                buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, applyFiltersAndRender, false);
 
+                // Topic multi-select WITH search
                 const topicWrap = document.getElementById('topicMultiWrap');
                 topicWrap.dataset.type = 'topics';
-                buildMultiSelect(topicWrap, topicOptions, selectedTopics, applyFiltersAndRender);
+                buildMultiSelect(topicWrap, topicOptions, selectedTopics, applyFiltersAndRender, true);
 
                 const statusOptions = [
                     { value: 'covered', label: '✅ Covered' },
@@ -1099,7 +1233,7 @@
                 ];
                 const statusWrap = document.getElementById('statusMultiWrap');
                 statusWrap.dataset.type = 'statuses';
-                buildMultiSelect(statusWrap, statusOptions, selectedStatuses, applyFiltersAndRender);
+                buildMultiSelect(statusWrap, statusOptions, selectedStatuses, applyFiltersAndRender, false);
             }
 
             async function loadData() {
@@ -1124,7 +1258,6 @@
                     rawData = mapRowsToObjects(rows);
                     if (rawData.length === 0) throw new Error('No parsed data');
 
-                    // Compute counts for subject and subtopic
                     computeCounts(rawData);
 
                     populateFilters(rawData);
@@ -1149,14 +1282,14 @@
 
                     setTimeout(() => {
                         const sample = [
-                            { srno: '1', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.1', topic: 'Basic Arithmetic', topicDisplay: '1.1 – Basic Arithmetic', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
-                            { srno: '2', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.2', topic: 'Basic Arithmetic', topicDisplay: '1.2 – Basic Arithmetic', url: 'https://example.com/ratios', hasUrl: true, status: 'covered' },
-                            { srno: '3', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.3', topic: 'Basic Arithmetic', topicDisplay: '1.3 – Basic Arithmetic', url: 'https://example.com/averages', hasUrl: true, status: 'covered' },
-                            { srno: '4', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.4', topic: 'Basic Arithmetic', topicDisplay: '1.4 – Basic Arithmetic', url: '#', hasUrl: false, status: 'pending' },
-                            { srno: '5', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '2.1', topic: 'Algebra', topicDisplay: '2.1 – Algebra', url: 'https://example.com/algebra', hasUrl: true, status: 'covered' },
-                            { srno: '6', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '2.2', topic: 'Algebra', topicDisplay: '2.2 – Algebra', url: '#', hasUrl: false, status: 'pending' },
-                            { srno: '7', subject: 'English (40 MCQs)', marks: '40', topicSrno: '3.1', topic: 'Grammar', topicDisplay: '3.1 – Grammar', url: 'https://example.com/grammar', hasUrl: true, status: 'covered' },
-                            { srno: '8', subject: 'English (40 MCQs)', marks: '40', topicSrno: '3.2', topic: 'Vocabulary', topicDisplay: '3.2 – Vocabulary', url: '#', hasUrl: false, status: 'pending' }
+                            { srno: '1', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.1', topic: 'Basic Arithmetic', topicDisplay: '1.1 – Basic Arithmetic', categoryKey: '1.1 Basic Arithmetic', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
+                            { srno: '2', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.2', topic: 'Basic Arithmetic', topicDisplay: '1.2 – Basic Arithmetic', categoryKey: '1.2 Basic Arithmetic', url: 'https://example.com/ratios', hasUrl: true, status: 'covered' },
+                            { srno: '3', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.3', topic: 'Basic Arithmetic', topicDisplay: '1.3 – Basic Arithmetic', categoryKey: '1.3 Basic Arithmetic', url: 'https://example.com/averages', hasUrl: true, status: 'covered' },
+                            { srno: '4', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.4', topic: 'Basic Arithmetic', topicDisplay: '1.4 – Basic Arithmetic', categoryKey: '1.4 Basic Arithmetic', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '5', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '2.1', topic: 'Algebra', topicDisplay: '2.1 – Algebra', categoryKey: '2.1 Algebra', url: 'https://example.com/algebra', hasUrl: true, status: 'covered' },
+                            { srno: '6', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '2.2', topic: 'Algebra', topicDisplay: '2.2 – Algebra', categoryKey: '2.2 Algebra', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '7', subject: 'English (40 MCQs)', marks: '40', topicSrno: '3.1', topic: 'Grammar', topicDisplay: '3.1 – Grammar', categoryKey: '3.1 Grammar', url: 'https://example.com/grammar', hasUrl: true, status: 'covered' },
+                            { srno: '8', subject: 'English (40 MCQs)', marks: '40', topicSrno: '3.2', topic: 'Vocabulary', topicDisplay: '3.2 – Vocabulary', categoryKey: '3.2 Vocabulary', url: '#', hasUrl: false, status: 'pending' }
                         ];
                         rawData = sample;
                         computeCounts(rawData);
