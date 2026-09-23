@@ -270,6 +270,24 @@
         .subtopic-name {
             font-weight: 700; color: #0c334a; font-size: 0.85rem;
             word-break: break-word; overflow-wrap: break-word; line-height: 1.25;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .subtopic-name:hover {
+            color: #18668a;
+            text-decoration: underline;
+        }
+        .subtopic-name .search-icon {
+            font-size: 0.6rem;
+            opacity: 0.5;
+            transition: 0.15s;
+        }
+        .subtopic-name:hover .search-icon {
+            opacity: 1;
         }
 
         /* Row 2 */
@@ -358,7 +376,7 @@
             font-size: 0.45rem; margin-left: 0.1rem; opacity: 0.75;
         }
 
-        /* TOAST — display:none by default to prevent flash on load */
+        /* TOAST */
         .toast {
             position: fixed;
             bottom: 1.5rem;
@@ -372,7 +390,7 @@
             font-weight: 500;
             box-shadow: 0 8px 24px -6px rgba(0, 20, 40, 0.4);
             z-index: 1000;
-            display: none;               /* fully removed from layout */
+            display: none;
             align-items: center;
             gap: 0.5rem;
             max-width: 90vw;
@@ -383,7 +401,7 @@
                         opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .toast.show {
-            display: flex;                /* shown only when active */
+            display: flex;
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
@@ -870,6 +888,27 @@
                 renderCards(filteredData);
             }
 
+            // ============ GOOGLE SEARCH BUILDER ============
+            /**
+             * Build the Google search query from subtopic + mainTopic + subject + job.
+             * Example: "Percentages Basic Arithmetic General Abilities CSS MPT"
+             */
+            function buildGoogleSearchQuery(item) {
+                const parts = [];
+                if (item.subTopic && item.subTopic !== '—') parts.push(item.subTopic);
+                if (item.mainTopic && item.mainTopic !== '—') parts.push(item.mainTopic);
+                if (item.subject && item.subject !== '—') parts.push(item.subject);
+                if (item.job && item.job !== '—') parts.push(item.job);
+                return parts.join(' ');
+            }
+
+            function openGoogleSearch(item) {
+                const query = buildGoogleSearchQuery(item);
+                if (!query) return;
+                const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+
             // ============ PROMPT TITLE LOGIC ============
             function buildPrompt(item) {
                 const jobTitle = (item.job && item.job !== '—') ? item.job : null;
@@ -955,19 +994,38 @@ Correct answer as per choices`;
                         card.title = 'Click to copy DeepSeek prompt';
                         card.addEventListener('click', (e) => {
                             if (e.target.closest('.status-badge-inline')) return;
+                            if (e.target.closest('.subtopic-name')) return;
                             copyPrompt(item);
                         });
                     }
 
-                    // ROW 1: Srno + Subtopic
+                    // ROW 1: Srno + Subtopic (clickable → Google search)
                     const topRow = document.createElement('div');
                     topRow.className = 'card-top-row';
                     const subtopicDiv = document.createElement('div');
                     subtopicDiv.className = 'card-subtopic';
-                    subtopicDiv.innerHTML = `
-                        <span class="card-srno">#${escapeHtml(item.srno)}</span>
-                        <span class="subtopic-name">${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}</span>
+
+                    const srnoSpan = document.createElement('span');
+                    srnoSpan.className = 'card-srno';
+                    srnoSpan.textContent = `#${item.srno}`;
+                    subtopicDiv.appendChild(srnoSpan);
+
+                    const subtopicLink = document.createElement('a');
+                    subtopicLink.className = 'subtopic-name';
+                    subtopicLink.href = `https://www.google.com/search?q=${encodeURIComponent(buildGoogleSearchQuery(item))}`;
+                    subtopicLink.target = '_blank';
+                    subtopicLink.rel = 'noopener noreferrer';
+                    subtopicLink.title = 'Search on Google: ' + buildGoogleSearchQuery(item);
+                    subtopicLink.innerHTML = `
+                        ${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}
+                        <i class="fas fa-search search-icon"></i>
                     `;
+                    // Prevent card click (copy prompt) from also triggering when clicking this link
+                    subtopicLink.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
+                    subtopicDiv.appendChild(subtopicLink);
+
                     topRow.appendChild(subtopicDiv);
                     card.appendChild(topRow);
 
