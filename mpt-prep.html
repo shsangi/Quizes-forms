@@ -378,7 +378,7 @@
             gap: 0.8rem;
         }
 
-        /* ---------- NEW CARD LAYOUT (Subtopic Top, Main Topic Below) ---------- */
+        /* ---------- CARD LAYOUT ---------- */
         .topic-card {
             background: white;
             border-radius: 14px;
@@ -408,8 +408,8 @@
             border-left: 4px solid #e6a017;
         }
 
-        /* Top row: Subtopic (large) + URL button (right) */
-        .card-subtopic-row {
+        /* Top row: Srno + Subtopic + URL button */
+        .card-top-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -425,18 +425,18 @@
             flex: 1;
         }
 
-        .card-subtopic .subtopic-code-badge {
-            background: #d9eaf5;
+        .card-srno {
+            background: #e9f0f7;
             border-radius: 30px;
-            font-size: 0.55rem;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.6rem;
             font-weight: 700;
-            color: #0c4b6b;
-            padding: 0.1rem 0.45rem;
+            color: #1a4a66;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
-        .card-subtopic .subtopic-name {
+        .subtopic-name {
             font-weight: 700;
             color: #0c334a;
             font-size: 0.95rem;
@@ -473,13 +473,24 @@
             color: #0a3e58;
         }
 
-        /* Main topic row (below subtopic) */
+        /* Main topic row (below subtopic) - keeps numbering like "1.1" */
         .card-main-topic-row {
             display: flex;
             align-items: center;
             gap: 0.35rem;
             flex-wrap: wrap;
             margin-bottom: 0.05rem;
+        }
+
+        .main-topic-code {
+            background: #d9eaf5;
+            border-radius: 30px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #0c4b6b;
+            padding: 0.1rem 0.45rem;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .main-topic-name {
@@ -502,22 +513,12 @@
             flex-shrink: 0;
         }
 
-        /* Srno + Subject + Percentage row */
+        /* Detail row: Percentage + Subject */
         .card-detail-row {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 0.3rem 0.5rem;
-        }
-
-        .card-srno {
-            background: #e9f0f7;
-            border-radius: 30px;
-            padding: 0.1rem 0.5rem;
-            font-size: 0.6rem;
-            font-weight: 700;
-            color: #1a4a66;
-            white-space: nowrap;
         }
 
         .card-percentage {
@@ -671,7 +672,7 @@
                 padding: 0.65rem 0.75rem;
             }
 
-            .card-subtopic .subtopic-name {
+            .subtopic-name {
                 font-size: 0.9rem;
             }
         }
@@ -870,17 +871,18 @@
                         }
                     }
 
-                    // Parse topic: extract subtopic (e.g., "Percentages") and main topic (e.g., "Basic Arithmetic")
-                    let fullTopic = topicWithSrno;
+                    // Parse topic: extract numbering (e.g., "1.1") and subtopic (e.g., "Percentages")
+                    // Format: "1.1 Basic Arithmetic: Percentages" or "1.1 - Percentages"
                     let topicCode = '';
-                    let mainTopic = '';
                     let subTopic = '';
+                    let mainTopic = '';
 
                     // Try to match "1.1 Basic Arithmetic: Percentages" or "1.1 Basic Arithmetic - Percentages"
                     const codeMatch = topicWithSrno.match(/^(\d+\.\d+)\s*(.+)/);
                     if (codeMatch) {
                         topicCode = codeMatch[1];
                         let rest = codeMatch[2].trim();
+                        // Split by ":" or " - " to separate main topic from subtopic
                         const splitMatch = rest.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
                         if (splitMatch) {
                             mainTopic = splitMatch[1].trim();
@@ -890,6 +892,7 @@
                             subTopic = rest;
                         }
                     } else {
+                        // fallback: try to split by ":" or "-"
                         const splitMatch = topicWithSrno.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
                         if (splitMatch) {
                             mainTopic = splitMatch[1].trim();
@@ -898,10 +901,7 @@
                             mainTopic = topicWithSrno;
                             subTopic = topicWithSrno;
                         }
-                        topicCode = '';
-                    }
-
-                    if (!topicCode) {
+                        // try to extract code from mainTopic
                         const codeOnly = mainTopic.match(/^(\d+\.\d+)\s*(.*)/);
                         if (codeOnly) {
                             topicCode = codeOnly[1];
@@ -909,6 +909,7 @@
                         }
                     }
 
+                    if (!subTopic) subTopic = mainTopic;
                     if (!mainTopic) mainTopic = subTopic;
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
@@ -939,7 +940,8 @@
                     if (item.subject && item.subject !== '—') {
                         subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
                     }
-                    const key = item.mainTopic;
+                    // Count by main topic + code (e.g., "1.1 Basic Arithmetic")
+                    const key = item.topicCode !== '—' ? `${item.topicCode} ${item.mainTopic}` : item.mainTopic;
                     if (key && key !== '—') {
                         mainTopicCounts[key] = (mainTopicCounts[key] || 0) + 1;
                     }
@@ -1104,7 +1106,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- CARD RENDERING (Subtopic Top, Main Topic Below) ----------
+            // ---------- CARD RENDERING (Srno + Subtopic top, Main Topic with numbering below) ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1122,17 +1124,17 @@
                     const card = document.createElement('div');
                     card.className = `topic-card ${item.status === 'covered' ? 'covered' : 'pending'}`;
 
-                    // ===== TOP ROW: Subtopic (large) + URL button (right) =====
-                    const subtopicRow = document.createElement('div');
-                    subtopicRow.className = 'card-subtopic-row';
+                    // ===== TOP ROW: Srno + Subtopic + URL button =====
+                    const topRow = document.createElement('div');
+                    topRow.className = 'card-top-row';
 
                     const subtopicDiv = document.createElement('div');
                     subtopicDiv.className = 'card-subtopic';
                     subtopicDiv.innerHTML = `
-                        ${item.topicCode && item.topicCode !== '—' ? `<span class="subtopic-code-badge">${escapeHtml(item.topicCode)}</span>` : ''}
+                        <span class="card-srno">#${escapeHtml(item.srno)}</span>
                         <span class="subtopic-name">${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}</span>
                     `;
-                    subtopicRow.appendChild(subtopicDiv);
+                    topRow.appendChild(subtopicDiv);
 
                     if (item.hasUrl) {
                         const navLink = document.createElement('a');
@@ -1141,26 +1143,27 @@
                         navLink.rel = 'noopener noreferrer';
                         navLink.className = 'card-nav';
                         navLink.innerHTML = `<i class="fas fa-external-link-alt"></i> Open`;
-                        subtopicRow.appendChild(navLink);
+                        topRow.appendChild(navLink);
                     }
 
-                    card.appendChild(subtopicRow);
+                    card.appendChild(topRow);
 
-                    // ===== MAIN TOPIC ROW (below subtopic) =====
+                    // ===== MAIN TOPIC ROW with numbering (e.g., "1.1 Basic Arithmetic") =====
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
-                    const mainCount = mainTopicCounts[item.mainTopic] || 1;
+                    const mainKey = item.topicCode !== '—' ? `${item.topicCode} ${item.mainTopic}` : item.mainTopic;
+                    const mainCount = mainTopicCounts[mainKey] || 1;
                     mainTopicRow.innerHTML = `
+                        ${item.topicCode && item.topicCode !== '—' ? `<span class="main-topic-code">${escapeHtml(item.topicCode)}</span>` : ''}
                         <span class="main-topic-name">${escapeHtml(item.mainTopic)}</span>
                         <span class="main-topic-count">${mainCount}</span>
                     `;
                     card.appendChild(mainTopicRow);
 
-                    // ===== DETAIL ROW: Srno + Percentage + Subject (with count) =====
+                    // ===== DETAIL ROW: Percentage + Subject (with count) =====
                     const detailRow = document.createElement('div');
                     detailRow.className = 'card-detail-row';
                     detailRow.innerHTML = `
-                        <span class="card-srno">#${escapeHtml(item.srno)}</span>
                         ${item.marks !== '—' ? `<span class="card-percentage">${escapeHtml(item.marks)}%</span>` : ''}
                         <span class="card-subject">
                             ${escapeHtml(item.subject)} 
