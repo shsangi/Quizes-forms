@@ -358,11 +358,12 @@
             font-size: 0.45rem; margin-left: 0.1rem; opacity: 0.75;
         }
 
-        /* TOAST — hidden by default with visibility + opacity to prevent flash */
+        /* TOAST — display:none by default to prevent flash on load */
         .toast {
             position: fixed;
             bottom: 1.5rem;
             left: 50%;
+            transform: translateX(-50%) translateY(150%);
             background: #0f2b3d;
             color: white;
             padding: 0.6rem 1rem;
@@ -371,28 +372,20 @@
             font-weight: 500;
             box-shadow: 0 8px 24px -6px rgba(0, 20, 40, 0.4);
             z-index: 1000;
-            display: flex;
+            display: none;               /* fully removed from layout */
             align-items: center;
             gap: 0.5rem;
             max-width: 90vw;
             word-break: break-word;
             pointer-events: none;
-
-            /* Prevent flash on load: hide fully until .show is added */
-            visibility: hidden;
             opacity: 0;
-            transform: translateX(-50%) translateY(150%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        visibility 0s linear 0.3s;
+                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .toast.show {
-            visibility: visible;
+            display: flex;                /* shown only when active */
             opacity: 1;
             transform: translateX(-50%) translateY(0);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                        visibility 0s linear 0s;
         }
         .toast i { color: #4ade80; font-size: 0.85rem; }
 
@@ -878,13 +871,6 @@
             }
 
             // ============ PROMPT TITLE LOGIC ============
-            /**
-             * Build a prompt for the given item.
-             * Title logic:
-             *  - If item.job is valid (not '—'), use it as the title.
-             *  - Otherwise, use the main topic as a fallback title.
-             *  - If neither exists, fall back to "this topic".
-             */
             function buildPrompt(item) {
                 const jobTitle = (item.job && item.job !== '—') ? item.job : null;
                 const fallbackTitle = (item.mainTopic && item.mainTopic !== '—') ? item.mainTopic : 'this topic';
