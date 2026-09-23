@@ -609,8 +609,8 @@
                 return rows;
             }
 
-            // ---------- SIMPLIFIED 6-COLUMN PARSER ----------
-            // A: Srno | B: Subject with Marks | C: Topic | D: Subtopic | E: URL | F: job
+            // ---------- 6-COLUMN PARSER ----------
+            // A: Srno | B: Subject with Marks (e.g. "English; 20") | C: Topic | D: Subtopic | E: URL | F: job
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
                 const dataRows = rows.slice(1);
@@ -626,13 +626,13 @@
                     const url = (row[4] || '').trim();
                     const job = (row[5] || '').trim();
 
-                    // Extract marks from "English (50 MCQs)" or "English (20 Marks)"
+                    // Extract marks from "English; 20" (semicolon format)
                     let subject = subjectWithMarks;
                     let marks = '';
-                    const marksMatch = subjectWithMarks.match(/\((\d+)(?:\s*MCQs?|\s*Marks?)?\)/i);
+                    const marksMatch = subjectWithMarks.match(/;\s*(\d+)\s*$/);
                     if (marksMatch) {
                         marks = marksMatch[1];
-                        subject = subjectWithMarks.replace(marksMatch[0], '').trim();
+                        subject = subjectWithMarks.replace(/;\s*\d+\s*$/, '').trim();
                     }
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
@@ -871,19 +871,15 @@ Correct answer as per choices`;
             }
 
             // ============ ROBUST COPY FUNCTION ============
-            // Primary: use execCommand fallback FIRST (works everywhere, no permission prompts)
-            // Secondary: try navigator.clipboard as an enhancement
             function copyPrompt(item) {
                 const text = buildPrompt(item);
 
-                // Try the synchronous fallback first — most reliable across all browsers
                 const success = fallbackCopy(text);
                 if (success) {
                     showToast(`Copied "${item.subTopic}" prompt`);
                     return;
                 }
 
-                // If fallback fails, try the modern async clipboard API
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(text).then(() => {
                         showToast(`Copied "${item.subTopic}" prompt`);
@@ -896,11 +892,9 @@ Correct answer as per choices`;
                 }
             }
 
-            // Synchronous copy using a hidden textarea — works in all browsers
             function fallbackCopy(text) {
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
-                // Keep it rendered but invisible — display:none breaks copy in some browsers
                 textarea.style.position = 'fixed';
                 textarea.style.top = '0';
                 textarea.style.left = '0';
@@ -919,10 +913,8 @@ Correct answer as per choices`;
 
                 let success = false;
                 try {
-                    // Focus and select — required for execCommand to work
                     textarea.focus();
                     textarea.select();
-                    // iOS requires setSelectionRange
                     textarea.setSelectionRange(0, text.length);
                     success = document.execCommand('copy');
                 } catch (err) {
