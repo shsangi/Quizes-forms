@@ -516,11 +516,10 @@
             border-left: 3px solid #e6a017;
         }
 
-        /* Top row: Srno + Subtopic */
+        /* Row 1: Srno + Subtopic */
         .card-top-row {
             display: flex;
             align-items: flex-start;
-            justify-content: space-between;
             gap: 0.4rem;
             margin-bottom: 0.05rem;
             flex-wrap: wrap;
@@ -557,7 +556,7 @@
             line-height: 1.25;
         }
 
-        /* Main topic row */
+        /* Row 2: Main topic with code + count grouped together */
         .card-main-topic-row {
             display: flex;
             align-items: center;
@@ -566,6 +565,15 @@
             margin-bottom: 0.02rem;
             word-break: break-word;
             overflow-wrap: break-word;
+        }
+
+        /* Group code + name + count into a single inline group */
+        .main-topic-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            max-width: 100%;
         }
 
         .main-topic-code {
@@ -585,7 +593,6 @@
             font-size: 0.78rem;
             word-break: break-word;
             overflow-wrap: break-word;
-            flex: 1 1 auto;
         }
 
         .count-badge-style {
@@ -599,7 +606,7 @@
             flex-shrink: 0;
         }
 
-        /* ===== SUBJECT ROW (with status badge on the right) ===== */
+        /* Row 3: Subject row with status badge on the right */
         .card-subject-row {
             display: flex;
             align-items: center;
@@ -644,7 +651,7 @@
             overflow-wrap: break-word;
         }
 
-        /* Status badges (Covered / Pending) — now on subject row */
+        /* Status badges (Covered / Pending) on subject row */
         .status-badge-inline {
             display: inline-flex;
             align-items: center;
@@ -1263,7 +1270,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- CARD RENDERING (Status badges on subject row) ----------
+            // ---------- CARD RENDERING ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1292,21 +1299,24 @@
                         <span class="subtopic-name">${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}</span>
                     `;
                     topRow.appendChild(subtopicDiv);
-
                     card.appendChild(topRow);
 
-                    // ===== ROW 2: Main topic with code + count =====
+                    // ===== ROW 2: Main topic (code + name + count grouped) =====
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
-                    mainTopicRow.innerHTML = `
+                    // Group code + name + count together so count stays with the topic
+                    const mainGroup = document.createElement('span');
+                    mainGroup.className = 'main-topic-group';
+                    mainGroup.innerHTML = `
                         ${item.topicCode && item.topicCode !== '—' ? `<span class="main-topic-code">${escapeHtml(item.topicCode)}</span>` : ''}
                         <span class="main-topic-name">${escapeHtml(item.mainTopic)}</span>
                         <span class="count-badge-style">${mainCount}</span>
                     `;
+                    mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
-                    // ===== ROW 3: Subject row with status badge on the right =====
+                    // ===== ROW 3: Subject row with status badge on right =====
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
 
