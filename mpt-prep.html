@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>📊 Subject & Topic Tracker</title>
-    <!-- Google Font & Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -18,7 +17,7 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f4f7fb;
             color: #1a2b3c;
-            padding: 1rem;
+            padding: 0.8rem;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -35,31 +34,31 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1rem;
+            margin-bottom: 0.7rem;
             flex-wrap: wrap;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
 
         .top-bar h1 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #0f2b3d;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.35rem;
             letter-spacing: -0.01em;
         }
 
         .top-bar h1 i {
             color: #2a6b8f;
-            font-size: 1.15rem;
+            font-size: 1rem;
         }
 
         .excel-link {
             background: #ffffff;
             border-radius: 30px;
-            padding: 0.4rem 1rem;
-            font-size: 0.75rem;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: #0f2b3d;
             text-decoration: none;
@@ -68,13 +67,13 @@
             transition: 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.35rem;
             white-space: nowrap;
         }
 
         .excel-link i {
             color: #1e7a5e;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .excel-link:hover {
@@ -82,81 +81,102 @@
             border-color: #b8d4e8;
         }
 
-        /* ---------- STATS BAR ---------- */
-        .stats-bar {
+        /* ---------- ULTRA COMPACT STATS ROW ---------- */
+        .stats-row {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 1rem;
+            flex-direction: row;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 2px;
         }
 
-        .stat-card {
+        .stats-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stat-chip {
             flex: 1 1 0;
-            min-width: 120px;
+            min-width: 0;
             background: white;
-            border-radius: 16px;
-            padding: 0.8rem 1rem;
-            box-shadow: 0 4px 14px -6px rgba(0, 30, 50, 0.08);
+            border-radius: 12px;
+            padding: 0.45rem 0.5rem;
+            box-shadow: 0 3px 10px -5px rgba(0, 30, 50, 0.1);
             border: 1px solid #eef4fa;
             display: flex;
             flex-direction: column;
-            gap: 0.15rem;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 0.05rem;
+            transition: 0.2s;
+            cursor: default;
         }
 
-        .stat-label {
-            font-size: 0.65rem;
-            font-weight: 600;
+        .stat-chip:hover {
+            box-shadow: 0 5px 14px -5px rgba(0, 50, 80, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .stat-chip .chip-label {
+            font-size: 0.5rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
-            color: #4a6a80;
+            letter-spacing: 0.3px;
+            color: #6a8ba5;
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.2rem;
+            white-space: nowrap;
+            line-height: 1;
         }
 
-        .stat-label i {
-            font-size: 0.65rem;
+        .stat-chip .chip-label i {
+            font-size: 0.5rem;
         }
 
-        .stat-value {
-            font-size: 1.5rem;
+        .stat-chip .chip-value {
+            font-size: 1.1rem;
             font-weight: 700;
             color: #0c334a;
             line-height: 1.1;
         }
 
-        .stat-value.covered {
+        .stat-chip .chip-value.covered {
             color: #147a4a;
         }
 
-        .stat-value.pending {
+        .stat-chip .chip-value.pending {
             color: #a8690e;
         }
 
         /* ---------- FILTER BAR ---------- */
         .filter-bar {
             background: white;
-            border-radius: 18px;
-            padding: 0.7rem 1rem;
+            border-radius: 16px;
+            padding: 0.6rem 0.9rem;
             box-shadow: 0 4px 14px -6px rgba(0, 30, 50, 0.08);
             border: 1px solid #eef4fa;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
 
         .filter-group {
             flex: 1 1 0;
-            min-width: 140px;
+            min-width: 130px;
             display: flex;
             flex-direction: column;
-            gap: 0.15rem;
+            gap: 0.1rem;
         }
 
         .filter-group label {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.3px;
@@ -165,8 +185,8 @@
         }
 
         .filter-group label i {
-            margin-right: 4px;
-            font-size: 0.6rem;
+            margin-right: 3px;
+            font-size: 0.55rem;
         }
 
         /* ---------- MULTI-SELECT ---------- */
@@ -177,12 +197,12 @@
 
         .multi-select-trigger {
             width: 100%;
-            padding: 0.5rem 0.7rem;
-            border-radius: 14px;
+            padding: 0.4rem 0.6rem;
+            border-radius: 12px;
             border: 1.5px solid #d9e6f0;
             background: #ffffff;
             font-family: 'Inter', sans-serif;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: #1a2b3c;
             cursor: pointer;
@@ -192,7 +212,7 @@
             gap: 0.4rem;
             transition: 0.2s;
             user-select: none;
-            min-height: 36px;
+            min-height: 32px;
         }
 
         .multi-select-trigger:hover {
@@ -218,7 +238,7 @@
         }
 
         .multi-select-trigger i.chevron {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #4a6a80;
             transition: 0.2s;
         }
@@ -233,14 +253,14 @@
             left: 0;
             right: 0;
             background: white;
-            border-radius: 14px;
+            border-radius: 12px;
             box-shadow: 0 10px 30px -8px rgba(0, 30, 50, 0.2);
             border: 1px solid #e2edf5;
-            max-height: 220px;
+            max-height: 200px;
             overflow-y: auto;
             z-index: 100;
             display: none;
-            padding: 0.4rem;
+            padding: 0.35rem;
         }
 
         .multi-select-dropdown.open {
@@ -250,11 +270,11 @@
         .multi-select-option {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.45rem 0.6rem;
-            border-radius: 10px;
+            gap: 0.45rem;
+            padding: 0.4rem 0.5rem;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: #1a2b3c;
             transition: 0.15s;
@@ -271,8 +291,8 @@
         }
 
         .multi-select-option .check {
-            width: 16px;
-            height: 16px;
+            width: 15px;
+            height: 15px;
             border-radius: 4px;
             border: 1.5px solid #c0d4e4;
             display: flex;
@@ -289,7 +309,7 @@
         }
 
         .multi-select-option .check i {
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             color: white;
             opacity: 0;
             transition: 0.15s;
@@ -301,20 +321,20 @@
 
         .multi-select-actions {
             display: flex;
-            gap: 0.4rem;
-            padding: 0.3rem 0.4rem 0.1rem;
+            gap: 0.35rem;
+            padding: 0.25rem 0.35rem 0.1rem;
             border-top: 1px solid #eef4fa;
-            margin-top: 0.2rem;
+            margin-top: 0.15rem;
         }
 
         .multi-select-actions button {
             flex: 1;
-            padding: 0.35rem;
-            border-radius: 8px;
+            padding: 0.3rem;
+            border-radius: 7px;
             border: 1px solid #d9e6f0;
             background: white;
             font-family: 'Inter', sans-serif;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             color: #2c5777;
             cursor: pointer;
@@ -329,28 +349,27 @@
         /* ---------- CARD GRID ---------- */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 0.9rem;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 0.8rem;
         }
 
         /* ---------- CARD ---------- */
         .topic-card {
             background: white;
-            border-radius: 16px;
-            padding: 0.85rem 1rem;
-            box-shadow: 0 5px 16px -8px rgba(0, 30, 50, 0.1);
+            border-radius: 14px;
+            padding: 0.75rem 0.9rem;
+            box-shadow: 0 4px 14px -7px rgba(0, 30, 50, 0.1);
             border: 1px solid #eef4fa;
             transition: 0.2s;
             display: flex;
             flex-direction: column;
-            gap: 0.3rem;
-            font-size: 0.8rem;
-            line-height: 1.35;
-            position: relative;
+            gap: 0.25rem;
+            font-size: 0.78rem;
+            line-height: 1.3;
         }
 
         .topic-card:hover {
-            box-shadow: 0 10px 24px -8px rgba(0, 50, 80, 0.15);
+            box-shadow: 0 8px 22px -8px rgba(0, 50, 80, 0.15);
             transform: translateY(-2px);
             border-color: #d9e6f2;
         }
@@ -363,19 +382,18 @@
             border-left: 4px solid #e6a017;
         }
 
-        /* row 1: srno + subject + marks */
         .card-row-1 {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.3rem 0.6rem;
+            gap: 0.25rem 0.5rem;
         }
 
         .card-srno {
             background: #e9f0f7;
             border-radius: 30px;
-            padding: 0.1rem 0.6rem;
-            font-size: 0.65rem;
+            padding: 0.1rem 0.55rem;
+            font-size: 0.6rem;
             font-weight: 700;
             color: #1a4a66;
             white-space: nowrap;
@@ -384,35 +402,34 @@
         .card-subject {
             font-weight: 600;
             color: #0c334a;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
         }
 
         .card-marks {
             background: #e0f0fa;
-            padding: 0.1rem 0.5rem;
+            padding: 0.1rem 0.45rem;
             border-radius: 30px;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             font-weight: 700;
             color: #146a8a;
             white-space: nowrap;
             margin-left: auto;
         }
 
-        /* row 2: topic with srno */
         .card-row-2 {
             display: flex;
             align-items: flex-start;
-            gap: 0.4rem;
+            gap: 0.35rem;
             flex-wrap: wrap;
         }
 
         .topic-srno-badge {
             background: #d9eaf5;
             border-radius: 30px;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             font-weight: 700;
             color: #0c4b6b;
-            padding: 0.1rem 0.5rem;
+            padding: 0.1rem 0.45rem;
             white-space: nowrap;
             flex-shrink: 0;
         }
@@ -421,28 +438,27 @@
             font-weight: 500;
             color: #1f3d51;
             word-break: break-word;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
 
-        /* row 3: url + status */
         .card-row-3 {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
-            margin-top: 0.1rem;
+            gap: 0.35rem;
+            margin-top: 0.05rem;
             flex-wrap: wrap;
         }
 
         .url-link {
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.2rem;
             background: #eef6fe;
             color: #18668a;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.7rem;
-            padding: 0.15rem 0.6rem;
+            font-size: 0.65rem;
+            padding: 0.12rem 0.55rem;
             border-radius: 30px;
             transition: 0.2s;
             border: 1px solid #d3e6f2;
@@ -450,7 +466,7 @@
         }
 
         .url-link i {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
         }
 
         .url-link:hover {
@@ -462,10 +478,10 @@
         .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
-            font-size: 0.6rem;
+            gap: 0.2rem;
+            font-size: 0.55rem;
             font-weight: 700;
-            padding: 0.1rem 0.5rem;
+            padding: 0.1rem 0.45rem;
             border-radius: 30px;
             white-space: nowrap;
         }
@@ -518,30 +534,34 @@
         /* ---------- MOBILE ---------- */
         @media (max-width: 640px) {
             body {
-                padding: 0.7rem;
+                padding: 0.6rem;
             }
 
             .top-bar h1 {
-                font-size: 1.05rem;
+                font-size: 1rem;
             }
 
-            .stats-bar {
-                gap: 0.5rem;
+            .stat-chip {
+                padding: 0.4rem 0.35rem;
+                border-radius: 10px;
             }
 
-            .stat-card {
-                padding: 0.6rem 0.8rem;
-                min-width: 90px;
+            .stat-chip .chip-value {
+                font-size: 0.95rem;
             }
 
-            .stat-value {
-                font-size: 1.2rem;
+            .stat-chip .chip-label {
+                font-size: 0.45rem;
+            }
+
+            .stat-chip .chip-label i {
+                font-size: 0.45rem;
             }
 
             .filter-bar {
                 flex-direction: column;
-                gap: 0.5rem;
-                padding: 0.7rem;
+                gap: 0.4rem;
+                padding: 0.6rem;
             }
 
             .filter-group {
@@ -551,11 +571,21 @@
 
             .cards-grid {
                 grid-template-columns: 1fr;
-                gap: 0.7rem;
+                gap: 0.6rem;
             }
 
             .topic-card {
-                padding: 0.75rem 0.85rem;
+                padding: 0.65rem 0.75rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .stat-chip .chip-label {
+                font-size: 0.4rem;
+            }
+
+            .stat-chip .chip-value {
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -575,29 +605,28 @@
             </a>
         </div>
 
-        <!-- stats bar -->
-        <div class="stats-bar">
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-layer-group"></i> Total Topics</div>
-                <div class="stat-value" id="statTotal">0</div>
+        <!-- ULTRA COMPACT STATS ROW (4 in one row) -->
+        <div class="stats-row">
+            <div class="stat-chip">
+                <div class="chip-label"><i class="fas fa-layer-group"></i> Total</div>
+                <div class="chip-value" id="statTotal">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-check-circle"></i> Covered</div>
-                <div class="stat-value covered" id="statCovered">0</div>
+            <div class="stat-chip">
+                <div class="chip-label"><i class="fas fa-check-circle"></i> Covered</div>
+                <div class="chip-value covered" id="statCovered">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-clock"></i> Pending</div>
-                <div class="stat-value pending" id="statPending">0</div>
+            <div class="stat-chip">
+                <div class="chip-label"><i class="fas fa-clock"></i> Pending</div>
+                <div class="chip-value pending" id="statPending">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-book"></i> Subjects</div>
-                <div class="stat-value" id="statSubjects">0</div>
+            <div class="stat-chip">
+                <div class="chip-label"><i class="fas fa-book"></i> Subjects</div>
+                <div class="chip-value" id="statSubjects">0</div>
             </div>
         </div>
 
-        <!-- filter bar with 3 multi-selects -->
+        <!-- filter bar -->
         <div class="filter-bar">
-            <!-- Subject multi-select -->
             <div class="filter-group">
                 <label><i class="fas fa-book"></i> Subject</label>
                 <div class="multi-select-wrap" id="subjectMultiWrap">
@@ -609,7 +638,6 @@
                 </div>
             </div>
 
-            <!-- Topic multi-select -->
             <div class="filter-group">
                 <label><i class="fas fa-tag"></i> Topic</label>
                 <div class="multi-select-wrap" id="topicMultiWrap">
@@ -621,7 +649,6 @@
                 </div>
             </div>
 
-            <!-- Status multi-select -->
             <div class="filter-group">
                 <label><i class="fas fa-check-circle"></i> Status</label>
                 <div class="multi-select-wrap" id="statusMultiWrap">
@@ -635,34 +662,26 @@
         </div>
 
         <!-- cards grid -->
-        <div id="cardsContainer" class="cards-grid">
-            <!-- filled by JS -->
-        </div>
+        <div id="cardsContainer" class="cards-grid"></div>
     </div>
 
     <script>
         (function() {
-            // --- config ---
             const SHEET_ID = '1D_wCGy3Rks9MXt84qpC4Ea2Qjo3uSgm0b-JBIh2_mmc';
             const GID = '0';
             const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
 
-            // --- dom ---
             const cardsContainer = document.getElementById('cardsContainer');
             const statTotal = document.getElementById('statTotal');
             const statCovered = document.getElementById('statCovered');
             const statPending = document.getElementById('statPending');
             const statSubjects = document.getElementById('statSubjects');
 
-            // --- state ---
             let rawData = [];
             let filteredData = [];
-            // multi-select state
             let selectedSubjects = new Set();
             let selectedTopics = new Set();
-            let selectedStatuses = new Set(['covered', 'pending']); // default: both
-
-            // --- helpers ---
+            let selectedStatuses = new Set(['covered', 'pending']);
 
             function parseCSV(csvText) {
                 const rows = [];
@@ -792,7 +811,6 @@
                 return result;
             }
 
-            // --- stats ---
             function updateStats(data) {
                 const total = data.length;
                 const covered = data.filter(d => d.status === 'covered').length;
@@ -805,21 +823,17 @@
                 statSubjects.textContent = subjects;
             }
 
-            // --- multi-select builder ---
             function buildMultiSelect(container, options, selectedSet, onUpdate) {
                 const dropdown = container.querySelector('.multi-select-dropdown');
                 const trigger = container.querySelector('.multi-select-trigger');
                 const placeholder = container.querySelector('.placeholder');
-                const selectedText = container.querySelector('.selected-text') || null;
 
-                // clear dropdown
                 dropdown.innerHTML = '';
 
-                // "Select All" / "Clear All" actions
                 const actionsDiv = document.createElement('div');
                 actionsDiv.className = 'multi-select-actions';
                 const selectAllBtn = document.createElement('button');
-                selectAllBtn.textContent = 'Select All';
+                selectAllBtn.textContent = 'All';
                 selectAllBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     options.forEach(opt => selectedSet.add(opt.value));
@@ -828,7 +842,7 @@
                     renderDropdown();
                 });
                 const clearAllBtn = document.createElement('button');
-                clearAllBtn.textContent = 'Clear All';
+                clearAllBtn.textContent = 'Clear';
                 clearAllBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     selectedSet.clear();
@@ -841,7 +855,6 @@
                 dropdown.appendChild(actionsDiv);
 
                 function renderDropdown() {
-                    // remove existing options (but keep actions)
                     const existingOptions = dropdown.querySelectorAll('.multi-select-option');
                     existingOptions.forEach(el => el.remove());
 
@@ -871,39 +884,30 @@
                     if (selectedSet.size === 0) {
                         placeholder.textContent = 'All ' + (container.dataset.type || 'items');
                         placeholder.style.display = 'inline';
-                        if (selectedText) selectedText.style.display = 'none';
                     } else {
                         placeholder.style.display = 'none';
-                        if (selectedText) {
-                            selectedText.style.display = 'inline';
-                            selectedText.textContent = `${selectedSet.size} selected`;
-                        } else {
-                            // create selected text element if not exists
-                            const span = document.createElement('span');
-                            span.className = 'selected-text';
-                            span.textContent = `${selectedSet.size} selected`;
-                            trigger.insertBefore(span, trigger.querySelector('.chevron'));
+                        let selectedText = trigger.querySelector('.selected-text');
+                        if (!selectedText) {
+                            selectedText = document.createElement('span');
+                            selectedText.className = 'selected-text';
+                            trigger.insertBefore(selectedText, trigger.querySelector('.chevron'));
                         }
+                        selectedText.textContent = `${selectedSet.size} selected`;
+                        selectedText.style.display = 'inline';
                     }
                 }
 
-                // toggle dropdown
                 trigger.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const isOpen = dropdown.classList.contains('open');
-                    // close all other dropdowns
                     document.querySelectorAll('.multi-select-dropdown.open').forEach(d => d.classList.remove('open'));
                     document.querySelectorAll('.multi-select-trigger.open').forEach(t => t.classList.remove('open'));
                     if (!isOpen) {
                         dropdown.classList.add('open');
                         trigger.classList.add('open');
-                    } else {
-                        dropdown.classList.remove('open');
-                        trigger.classList.remove('open');
                     }
                 });
 
-                // close on outside click
                 document.addEventListener('click', (e) => {
                     if (!container.contains(e.target)) {
                         dropdown.classList.remove('open');
@@ -911,19 +915,14 @@
                     }
                 });
 
-                // initial render
                 renderDropdown();
                 updateTriggerText();
             }
 
-            // --- filter logic ---
             function applyFiltersAndRender() {
                 filteredData = rawData.filter(item => {
-                    // Subject filter
                     if (selectedSubjects.size > 0 && !selectedSubjects.has(item.subject)) return false;
-                    // Topic filter
                     if (selectedTopics.size > 0 && !selectedTopics.has(item.topicDisplay)) return false;
-                    // Status filter
                     if (selectedStatuses.size > 0 && !selectedStatuses.has(item.status)) return false;
                     return true;
                 });
@@ -932,7 +931,6 @@
                 renderCards(filteredData);
             }
 
-            // --- render cards ---
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1004,7 +1002,6 @@
                     .replace(/'/g, "&#039;");
             }
 
-            // --- populate filters ---
             function populateFilters(data) {
                 const subjects = new Set();
                 const topics = new Set();
@@ -1014,21 +1011,17 @@
                     if (item.topicDisplay && item.topicDisplay !== '—') topics.add(item.topicDisplay);
                 });
 
-                // build multi-select options
                 const subjectOptions = Array.from(subjects).sort().map(s => ({ value: s, label: s }));
                 const topicOptions = Array.from(topics).sort().map(t => ({ value: t, label: t }));
 
-                // build subject multi-select
                 const subjectWrap = document.getElementById('subjectMultiWrap');
                 subjectWrap.dataset.type = 'subjects';
                 buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, applyFiltersAndRender);
 
-                // build topic multi-select
                 const topicWrap = document.getElementById('topicMultiWrap');
                 topicWrap.dataset.type = 'topics';
                 buildMultiSelect(topicWrap, topicOptions, selectedTopics, applyFiltersAndRender);
 
-                // build status multi-select (static options)
                 const statusOptions = [
                     { value: 'covered', label: '✅ Covered' },
                     { value: 'pending', label: '⏳ Pending' }
@@ -1036,20 +1029,8 @@
                 const statusWrap = document.getElementById('statusMultiWrap');
                 statusWrap.dataset.type = 'statuses';
                 buildMultiSelect(statusWrap, statusOptions, selectedStatuses, applyFiltersAndRender);
-
-                // rebuild status trigger text
-                const statusTrigger = document.getElementById('statusTrigger');
-                const statusPlaceholder = document.getElementById('statusPlaceholder');
-                if (selectedStatuses.size === 0) {
-                    statusPlaceholder.textContent = 'All statuses';
-                } else if (selectedStatuses.size === 2) {
-                    statusPlaceholder.textContent = 'All statuses';
-                } else {
-                    statusPlaceholder.textContent = selectedStatuses.has('covered') ? 'Covered only' : 'Pending only';
-                }
             }
 
-            // --- load data ---
             async function loadData() {
                 cardsContainer.innerHTML = `
                     <div class="state-message">
@@ -1074,12 +1055,9 @@
 
                     populateFilters(rawData);
 
-                    // set default selected statuses to both
                     selectedStatuses.clear();
                     selectedStatuses.add('covered');
                     selectedStatuses.add('pending');
-
-                    // reset filters
                     selectedSubjects.clear();
                     selectedTopics.clear();
 
@@ -1116,7 +1094,6 @@
                 }
             }
 
-            // init
             loadData();
         })();
     </script>
