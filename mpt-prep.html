@@ -152,23 +152,30 @@
             color: #a8690e;
         }
 
-        /* ---------- FILTER BAR ---------- */
+        /* ---------- FILTER BAR (Subject & Topic on one line, Status as checkboxes) ---------- */
         .filter-bar {
             background: white;
             border-radius: 16px;
-            padding: 0.6rem 0.9rem;
+            padding: 0.7rem 0.9rem;
             box-shadow: 0 4px 14px -6px rgba(0, 30, 50, 0.08);
             border: 1px solid #eef4fa;
             margin-bottom: 1rem;
             display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .filter-row-top {
+            display: flex;
+            flex-direction: row;
+            gap: 0.7rem;
+            align-items: flex-end;
             flex-wrap: wrap;
-            align-items: center;
-            gap: 0.5rem;
         }
 
         .filter-group {
             flex: 1 1 0;
-            min-width: 130px;
+            min-width: 140px;
             display: flex;
             flex-direction: column;
             gap: 0.1rem;
@@ -188,7 +195,7 @@
             font-size: 0.55rem;
         }
 
-        /* ---------- MULTI-SELECT ---------- */
+        /* ---------- MULTI-SELECT (for Subject & Topic) ---------- */
         .multi-select-wrap {
             position: relative;
             width: 100%;
@@ -196,12 +203,12 @@
 
         .multi-select-trigger {
             width: 100%;
-            padding: 0.4rem 0.6rem;
+            padding: 0.45rem 0.7rem;
             border-radius: 12px;
             border: 1.5px solid #d9e6f0;
             background: #ffffff;
             font-family: 'Inter', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             font-weight: 500;
             color: #1a2b3c;
             cursor: pointer;
@@ -211,7 +218,7 @@
             gap: 0.4rem;
             transition: 0.2s;
             user-select: none;
-            min-height: 32px;
+            min-height: 36px;
         }
 
         .multi-select-trigger:hover {
@@ -371,6 +378,102 @@
             border-color: #b0cde0;
         }
 
+        /* ---------- STATUS CHECKBOXES ---------- */
+        .status-checkboxes {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            padding: 0.2rem 0;
+        }
+
+        .status-checkboxes .cb-label {
+            font-size: 0.55rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #4a6a80;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-right: 0.2rem;
+        }
+
+        .status-checkboxes .cb-label i {
+            font-size: 0.55rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #1a2b3c;
+            user-select: none;
+            padding: 0.25rem 0.6rem 0.25rem 0.3rem;
+            border-radius: 20px;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+
+        .checkbox-item:hover {
+            background: #f0f7ff;
+        }
+
+        .checkbox-item .cb-box {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 2px solid #c0d4e4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.15s;
+            background: white;
+        }
+
+        .checkbox-item.checked .cb-box {
+            background: #2a6b8f;
+            border-color: #2a6b8f;
+        }
+
+        .checkbox-item .cb-box i {
+            font-size: 0.6rem;
+            color: white;
+            opacity: 0;
+            transition: 0.15s;
+        }
+
+        .checkbox-item.checked .cb-box i {
+            opacity: 1;
+        }
+
+        .checkbox-item.covered .cb-box {
+            border-color: #2e9b6e;
+        }
+
+        .checkbox-item.covered.checked .cb-box {
+            background: #2e9b6e;
+            border-color: #2e9b6e;
+        }
+
+        .checkbox-item.pending .cb-box {
+            border-color: #e6a017;
+        }
+
+        .checkbox-item.pending.checked .cb-box {
+            background: #e6a017;
+            border-color: #e6a017;
+        }
+
+        .checkbox-item .cb-text {
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+
         /* ---------- CARD GRID ---------- */
         .cards-grid {
             display: grid;
@@ -502,7 +605,7 @@
             text-overflow: ellipsis;
         }
 
-        /* Consistent count badge style for both main topic and subject */
+        /* Consistent count badge style */
         .count-badge-style {
             background: #e0f0fa;
             color: #146a8a;
@@ -650,10 +753,10 @@
                 font-size: 0.45rem;
             }
 
-            .filter-bar {
+            .filter-row-top {
                 flex-direction: column;
-                gap: 0.4rem;
-                padding: 0.6rem;
+                gap: 0.5rem;
+                align-items: stretch;
             }
 
             .filter-group {
@@ -673,6 +776,10 @@
             .subtopic-name {
                 font-size: 0.9rem;
             }
+
+            .status-checkboxes {
+                gap: 0.5rem;
+            }
         }
 
         @media (max-width: 380px) {
@@ -682,6 +789,10 @@
 
             .stat-chip .chip-value {
                 font-size: 0.85rem;
+            }
+
+            .checkbox-item .cb-text {
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -723,36 +834,41 @@
 
         <!-- filter bar -->
         <div class="filter-bar">
-            <div class="filter-group">
-                <label><i class="fas fa-book"></i> Subject</label>
-                <div class="multi-select-wrap" id="subjectMultiWrap">
-                    <div class="multi-select-trigger" id="subjectTrigger">
-                        <span class="placeholder" id="subjectPlaceholder">All subjects</span>
-                        <i class="fas fa-chevron-down chevron"></i>
+            <!-- Subject & Topic on one line -->
+            <div class="filter-row-top">
+                <div class="filter-group">
+                    <label><i class="fas fa-book"></i> Subject</label>
+                    <div class="multi-select-wrap" id="subjectMultiWrap">
+                        <div class="multi-select-trigger" id="subjectTrigger">
+                            <span class="placeholder" id="subjectPlaceholder">All subjects</span>
+                            <i class="fas fa-chevron-down chevron"></i>
+                        </div>
+                        <div class="multi-select-dropdown" id="subjectDropdown"></div>
                     </div>
-                    <div class="multi-select-dropdown" id="subjectDropdown"></div>
+                </div>
+
+                <div class="filter-group">
+                    <label><i class="fas fa-tag"></i> Topic</label>
+                    <div class="multi-select-wrap" id="topicMultiWrap">
+                        <div class="multi-select-trigger" id="topicTrigger">
+                            <span class="placeholder" id="topicPlaceholder">All topics</span>
+                            <i class="fas fa-chevron-down chevron"></i>
+                        </div>
+                        <div class="multi-select-dropdown" id="topicDropdown"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="filter-group">
-                <label><i class="fas fa-tag"></i> Topic</label>
-                <div class="multi-select-wrap" id="topicMultiWrap">
-                    <div class="multi-select-trigger" id="topicTrigger">
-                        <span class="placeholder" id="topicPlaceholder">All topics</span>
-                        <i class="fas fa-chevron-down chevron"></i>
-                    </div>
-                    <div class="multi-select-dropdown" id="topicDropdown"></div>
+            <!-- Status as checkboxes -->
+            <div class="status-checkboxes">
+                <span class="cb-label"><i class="fas fa-check-circle"></i> Status</span>
+                <div class="checkbox-item covered checked" id="cbCovered" data-status="covered">
+                    <span class="cb-box"><i class="fas fa-check"></i></span>
+                    <span class="cb-text">Covered</span>
                 </div>
-            </div>
-
-            <div class="filter-group">
-                <label><i class="fas fa-check-circle"></i> Status</label>
-                <div class="multi-select-wrap" id="statusMultiWrap">
-                    <div class="multi-select-trigger" id="statusTrigger">
-                        <span class="placeholder" id="statusPlaceholder">All statuses</span>
-                        <i class="fas fa-chevron-down chevron"></i>
-                    </div>
-                    <div class="multi-select-dropdown" id="statusDropdown"></div>
+                <div class="checkbox-item pending checked" id="cbPending" data-status="pending">
+                    <span class="cb-box"><i class="fas fa-check"></i></span>
+                    <span class="cb-text">Pending</span>
                 </div>
             </div>
         </div>
@@ -772,6 +888,10 @@
             const statCovered = document.getElementById('statCovered');
             const statPending = document.getElementById('statPending');
             const statSubjects = document.getElementById('statSubjects');
+
+            // Checkbox elements
+            const cbCovered = document.getElementById('cbCovered');
+            const cbPending = document.getElementById('cbPending');
 
             let rawData = [];
             let filteredData = [];
@@ -925,18 +1045,14 @@
                 return result;
             }
 
-            // ---------- COUNTING (corrected) ----------
             function computeCounts(data) {
                 subjectCounts = {};
                 mainTopicCounts = {};
 
                 data.forEach(item => {
-                    // Subject count
                     if (item.subject && item.subject !== '—') {
                         subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
                     }
-                    // Main topic count: use only the main topic name (without code) as key
-                    // This groups all subtopics under the same main topic name together
                     const key = item.mainTopic;
                     if (key && key !== '—') {
                         mainTopicCounts[key] = (mainTopicCounts[key] || 0) + 1;
@@ -1090,6 +1206,29 @@
                 updateTriggerText();
             }
 
+            // Status checkbox logic
+            function setupStatusCheckboxes() {
+                cbCovered.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleStatus('covered', cbCovered);
+                });
+                cbPending.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleStatus('pending', cbPending);
+                });
+            }
+
+            function toggleStatus(status, el) {
+                if (selectedStatuses.has(status)) {
+                    selectedStatuses.delete(status);
+                    el.classList.remove('checked');
+                } else {
+                    selectedStatuses.add(status);
+                    el.classList.add('checked');
+                }
+                applyFiltersAndRender();
+            }
+
             function applyFiltersAndRender() {
                 filteredData = rawData.filter(item => {
                     if (selectedSubjects.size > 0 && !selectedSubjects.has(item.subject)) return false;
@@ -1102,7 +1241,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- CARD RENDERING (Corrected counts + consistent badge style) ----------
+            // ---------- CARD RENDERING ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1144,7 +1283,7 @@
 
                     card.appendChild(topRow);
 
-                    // ===== MAIN TOPIC ROW with numbering + corrected count =====
+                    // ===== MAIN TOPIC ROW with numbering + count =====
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
@@ -1155,7 +1294,7 @@
                     `;
                     card.appendChild(mainTopicRow);
 
-                    // ===== DETAIL ROW: Percentage + Subject (with count badge same style) =====
+                    // ===== DETAIL ROW: Percentage + Subject (with count) =====
                     const detailRow = document.createElement('div');
                     detailRow.className = 'card-detail-row';
                     const subjCount = subjectCounts[item.subject] || 1;
@@ -1220,14 +1359,6 @@
                 const topicWrap = document.getElementById('topicMultiWrap');
                 topicWrap.dataset.type = 'topics';
                 buildMultiSelect(topicWrap, topicOptions, selectedTopics, applyFiltersAndRender, true);
-
-                const statusOptions = [
-                    { value: 'covered', label: '✅ Covered' },
-                    { value: 'pending', label: '⏳ Pending' }
-                ];
-                const statusWrap = document.getElementById('statusMultiWrap');
-                statusWrap.dataset.type = 'statuses';
-                buildMultiSelect(statusWrap, statusOptions, selectedStatuses, applyFiltersAndRender, false);
             }
 
             async function loadData() {
@@ -1253,14 +1384,18 @@
                     if (rawData.length === 0) throw new Error('No parsed data');
 
                     computeCounts(rawData);
-
                     populateFilters(rawData);
+                    setupStatusCheckboxes();
 
                     selectedStatuses.clear();
                     selectedStatuses.add('covered');
                     selectedStatuses.add('pending');
                     selectedSubjects.clear();
                     selectedTopics.clear();
+
+                    // Reset checkboxes to checked
+                    cbCovered.classList.add('checked');
+                    cbPending.classList.add('checked');
 
                     applyFiltersAndRender();
 
@@ -1288,11 +1423,14 @@
                         rawData = sample;
                         computeCounts(rawData);
                         populateFilters(rawData);
+                        setupStatusCheckboxes();
                         selectedStatuses.clear();
                         selectedStatuses.add('covered');
                         selectedStatuses.add('pending');
                         selectedSubjects.clear();
                         selectedTopics.clear();
+                        cbCovered.classList.add('checked');
+                        cbPending.classList.add('checked');
                         applyFiltersAndRender();
                     }, 200);
                 }
