@@ -32,8 +32,27 @@
             font-size: 1rem; font-weight: 700; color: #0f2b3d;
             display: flex; align-items: center; gap: 0.3rem;
             letter-spacing: -0.01em;
+            transition: 0.2s;
         }
         .top-bar h1 i { color: #2a6b8f; font-size: 0.9rem; }
+
+        /* Job mode active — highlight title */
+        .top-bar h1.job-active {
+            color: #0c4b6b;
+        }
+        .top-bar h1.job-active i {
+            color: #146a8a;
+        }
+        .top-bar h1 .job-title {
+            background: linear-gradient(135deg, #d9eaf5, #e0f0fa);
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            color: #0c4b6b;
+            font-weight: 700;
+            margin-left: 0.2rem;
+            border: 1px solid #b8d4e8;
+        }
+
         .sheet-link {
             background: #ffffff; border-radius: 30px; padding: 0.25rem 0.75rem;
             font-size: 0.65rem; font-weight: 600; color: #0f2b3d;
@@ -251,10 +270,32 @@
         .topic-card.pending { border-left: 3px solid #e6a017; cursor: pointer; }
         .topic-card.pending:hover { background: #fffdf7; }
 
+        /* JOB BADGE — top right corner of card */
+        .card-job-badge {
+            position: absolute;
+            top: 0.4rem;
+            right: 0.5rem;
+            background: #f0f7ff;
+            color: #18668a;
+            font-size: 0.5rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 30px;
+            border: 1px solid #cfe2f0;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            max-width: 45%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 1;
+        }
+
         /* Row 1 */
         .card-top-row {
             display: flex; align-items: flex-start; gap: 0.4rem;
             margin-bottom: 0.05rem; flex-wrap: wrap;
+            padding-right: 0.2rem;
         }
         .card-subtopic {
             display: flex; align-items: flex-start; gap: 0.3rem;
@@ -425,7 +466,8 @@
         /* MOBILE */
         @media (max-width: 640px) {
             body { padding: 0.4rem; }
-            .top-bar h1 { font-size: 0.9rem; }
+            .top-bar h1 { font-size: 0.85rem; }
+            .top-bar h1 .job-title { font-size: 0.8rem; }
             .stat-chip { padding: 0.3rem 0.25rem; border-radius: 8px; }
             .stat-chip .chip-value { font-size: 0.85rem; }
             .stat-chip .chip-label { font-size: 0.4rem; }
@@ -440,6 +482,7 @@
             .subtopic-name { font-size: 0.8rem; }
             .status-checkboxes { gap: 0.4rem; }
             .filter-bar { padding: 0.5rem 0.6rem; }
+            .card-job-badge { font-size: 0.45rem; }
         }
 
         @media (max-width: 380px) {
@@ -454,7 +497,7 @@
 <body>
     <div class="app-container">
         <div class="top-bar">
-            <h1><i class="fas fa-graduation-cap"></i> Subject & Topic Tracker</h1>
+            <h1 id="pageTitle"><i class="fas fa-graduation-cap"></i> <span id="titleText">Subject & Topic Tracker</span></h1>
             <a href="https://docs.google.com/spreadsheets/d/1D_wCGy3Rks9MXt84qpC4Ea2Qjo3uSgm0b-JBIh2_mmc/edit?gid=0#gid=0"
                class="sheet-link" target="_blank" rel="noopener noreferrer">
                 <i class="fas fa-table"></i> Sheet
@@ -552,6 +595,8 @@
             const cbPending = document.getElementById('cbPending');
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
+            const pageTitle = document.getElementById('pageTitle');
+            const titleText = document.getElementById('titleText');
 
             let rawData = [];
             let filteredData = [];
@@ -609,7 +654,6 @@
                 return rows;
             }
 
-            // ---------- 6-COLUMN PARSER ----------
             // A: Srno | B: Subject with Marks (e.g. "English; 20") | C: Topic | D: Subtopic | E: URL | F: job
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
@@ -626,7 +670,6 @@
                     const url = (row[4] || '').trim();
                     const job = (row[5] || '').trim();
 
-                    // Extract marks from "English; 20" (semicolon format)
                     let subject = subjectWithMarks;
                     let marks = '';
                     const marksMatch = subjectWithMarks.match(/;\s*(\d+)\s*$/);
@@ -679,6 +722,20 @@
                 statCovered.textContent = covered;
                 statPending.textContent = pending;
                 statSubjects.textContent = subjects;
+            }
+
+            // ============ PAGE TITLE UPDATE ============
+            // When a single job is selected, replace the page title with that job name.
+            // Otherwise show the default title.
+            function updatePageTitle() {
+                if (selectedJobs.size === 1) {
+                    const jobName = Array.from(selectedJobs)[0];
+                    pageTitle.classList.add('job-active');
+                    titleText.innerHTML = `Topic Tracker: <span class="job-title">${escapeHtml(jobName)}</span>`;
+                } else {
+                    pageTitle.classList.remove('job-active');
+                    titleText.textContent = 'Subject & Topic Tracker';
+                }
             }
 
             function buildMultiSelect(container, options, selectedSet, onUpdate, enableSearch) {
@@ -841,6 +898,7 @@
                     return true;
                 });
                 updateStats(filteredData);
+                updatePageTitle();
                 renderCards(filteredData);
             }
 
@@ -873,13 +931,11 @@ Correct answer as per choices`;
             // ============ ROBUST COPY FUNCTION ============
             function copyPrompt(item) {
                 const text = buildPrompt(item);
-
                 const success = fallbackCopy(text);
                 if (success) {
                     showToast(`Copied "${item.subTopic}" prompt`);
                     return;
                 }
-
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(text).then(() => {
                         showToast(`Copied "${item.subTopic}" prompt`);
@@ -908,9 +964,7 @@ Correct answer as per choices`;
                 textarea.style.opacity = '0';
                 textarea.setAttribute('readonly', '');
                 textarea.setAttribute('aria-hidden', 'true');
-
                 document.body.appendChild(textarea);
-
                 let success = false;
                 try {
                     textarea.focus();
@@ -921,7 +975,6 @@ Correct answer as per choices`;
                     console.warn('execCommand copy failed:', err);
                     success = false;
                 }
-
                 document.body.removeChild(textarea);
                 return success;
             }
@@ -958,6 +1011,9 @@ Correct answer as per choices`;
                     return;
                 }
 
+                // Show the job badge on the card ONLY when no job filter is active
+                const showJobBadge = selectedJobs.size === 0;
+
                 const fragment = document.createDocumentFragment();
 
                 data.forEach(item => {
@@ -973,7 +1029,16 @@ Correct answer as per choices`;
                         });
                     }
 
-                    // ROW 1: Srno + Subtopic (clickable → Google search)
+                    // JOB BADGE (top-right) — only shown when no job is filtered
+                    if (showJobBadge && item.job && item.job !== '—') {
+                        const jobBadge = document.createElement('span');
+                        jobBadge.className = 'card-job-badge';
+                        jobBadge.textContent = item.job;
+                        jobBadge.title = `Job: ${item.job}`;
+                        card.appendChild(jobBadge);
+                    }
+
+                    // ROW 1: Srno + Subtopic
                     const topRow = document.createElement('div');
                     topRow.className = 'card-top-row';
                     const subtopicDiv = document.createElement('div');
@@ -994,9 +1059,7 @@ Correct answer as per choices`;
                         ${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}
                         <i class="fas fa-search search-icon"></i>
                     `;
-                    subtopicLink.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                    });
+                    subtopicLink.addEventListener('click', (e) => e.stopPropagation());
                     subtopicDiv.appendChild(subtopicLink);
 
                     topRow.appendChild(subtopicDiv);
@@ -1018,7 +1081,6 @@ Correct answer as per choices`;
                     // ROW 3: Subject + status badge
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
-
                     const leftSide = document.createElement('div');
                     leftSide.className = 'card-subject-left';
                     const subjCount = subjectCounts[item.subject] || 1;
@@ -1161,9 +1223,9 @@ Correct answer as per choices`;
                             { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
                             { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' },
                             { srno: '5', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Work Rate', displayTopic: 'Work Rate', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' },
-                            { srno: '6', subject: 'General Abilities', marks: '60', mainTopic: 'Algebra & Geometry', subTopic: 'Linear Equations', displayTopic: 'Linear Equations', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' },
-                            { srno: '17', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: 'https://chat.deepseek.com/share/ml1faf956wlc844b3c', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
-                            { srno: '18', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Antonyms', displayTopic: 'Antonyms', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' }
+                            { srno: '6', subject: 'General Abilities', marks: '60', mainTopic: 'Algebra & Geometry', subTopic: 'Linear Equations', displayTopic: 'Linear Equations', url: '#', hasUrl: false, status: 'pending', job: 'fia-superintendent' },
+                            { srno: '17', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: 'https://chat.deepseek.com/share/ml1faf956wlc844b3c', hasUrl: true, status: 'covered', job: 'fia-superintendent' },
+                            { srno: '18', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Antonyms', displayTopic: 'Antonyms', url: '#', hasUrl: false, status: 'pending', job: 'fia-superintendent' }
                         ];
                         rawData = sample;
                         computeCounts(rawData);
