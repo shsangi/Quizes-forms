@@ -266,7 +266,6 @@
             display: block;
         }
 
-        /* search box inside dropdown */
         .multi-select-search {
             width: 100%;
             padding: 0.4rem 0.6rem;
@@ -379,7 +378,7 @@
             gap: 0.8rem;
         }
 
-        /* ---------- CARD ---------- */
+        /* ---------- NEW CARD LAYOUT (Main Topic at Top) ---------- */
         .topic-card {
             background: white;
             border-radius: 14px;
@@ -389,7 +388,7 @@
             transition: 0.2s;
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            gap: 0.3rem;
             font-size: 0.78rem;
             line-height: 1.3;
             position: relative;
@@ -409,15 +408,16 @@
             border-left: 4px solid #e6a017;
         }
 
-        /* TOP ROW: subtopic (left) + URL nav (right) */
-        .card-top-row {
+        /* Top row: Main Topic (large) + URL button (right) */
+        .card-main-topic-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 0.5rem;
+            margin-bottom: 0.1rem;
         }
 
-        .card-subtopic {
+        .card-main-topic {
             display: flex;
             align-items: center;
             gap: 0.35rem;
@@ -425,24 +425,24 @@
             flex: 1;
         }
 
-        .card-subtopic .subtopic-code {
-            background: #d9eaf5;
-            border-radius: 30px;
-            font-size: 0.55rem;
+        .card-main-topic .main-topic-name {
             font-weight: 700;
-            color: #0c4b6b;
-            padding: 0.1rem 0.45rem;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .card-subtopic .subtopic-name {
-            font-weight: 600;
             color: #0c334a;
-            font-size: 0.8rem;
+            font-size: 0.95rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .card-main-topic .main-topic-count {
+            background: #e0f0fa;
+            color: #146a8a;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.1rem 0.5rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         /* URL nav button top right */
@@ -473,8 +473,37 @@
             color: #0a3e58;
         }
 
-        /* MID ROW: Srno + Percentage + Subject (with count) */
-        .card-mid-row {
+        /* Subtopic row (smaller) */
+        .card-subtopic-row {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.05rem;
+        }
+
+        .subtopic-code-badge {
+            background: #d9eaf5;
+            border-radius: 30px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #0c4b6b;
+            padding: 0.1rem 0.45rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .subtopic-name {
+            font-weight: 500;
+            color: #1f3d51;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Srno + Subject + Percentage row */
+        .card-detail-row {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
@@ -501,7 +530,7 @@
             white-space: nowrap;
         }
 
-        .card-subject-with-count {
+        .card-subject {
             font-weight: 500;
             color: #1f3d51;
             font-size: 0.75rem;
@@ -511,46 +540,18 @@
             max-width: 100%;
         }
 
-        .card-subject-with-count .count-badge {
+        .card-subject .count-badge {
             color: #6a8ba5;
             font-weight: 500;
             font-size: 0.7rem;
         }
 
-        /* Category count row */
-        .card-category-count {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-size: 0.65rem;
-            color: #4a6a80;
-            font-weight: 500;
-            background: #f5f9fd;
-            border-radius: 8px;
-            padding: 0.2rem 0.5rem;
-            border: 1px solid #e6eef6;
-        }
-
-        .card-category-count i {
-            font-size: 0.55rem;
-            color: #6a8ba5;
-        }
-
-        .card-category-count .cat-count {
-            font-weight: 700;
-            color: #146a8a;
-            margin-left: auto;
-            background: #e0f0fa;
-            padding: 0.05rem 0.4rem;
-            border-radius: 20px;
-            font-size: 0.6rem;
-        }
-
-        /* STATUS ROW with checkmark */
+        /* Status row with checkmark */
         .card-status-row {
             display: flex;
             align-items: center;
             gap: 0.4rem;
+            margin-top: 0.1rem;
         }
 
         .status-check {
@@ -669,6 +670,10 @@
             .topic-card {
                 padding: 0.65rem 0.75rem;
             }
+
+            .card-main-topic .main-topic-name {
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 380px) {
@@ -775,9 +780,8 @@
             let selectedTopics = new Set();
             let selectedStatuses = new Set(['covered', 'pending']);
 
-            // Counts per subject and per subtopic category
             let subjectCounts = {};
-            let subtopicCounts = {};
+            let mainTopicCounts = {};
 
             function parseCSV(csvText) {
                 const rows = [];
@@ -866,48 +870,63 @@
                         }
                     }
 
-                    // Parse topic: split into category code (like 1.1) and topic name
-                    let topic = topicWithSrno;
-                    let topicSrno = '';
-                    // Try to match patterns like "1.1 Basic Arithmetic" or "1.1 - Basic Arithmetic" or "Basic Arithmetic (1.1)"
-                    const codeMatch = topicWithSrno.match(/^(\d+\.\d+)\s*[-–]?\s*(.+)/);
+                    // Parse topic: extract main topic (e.g., "Basic Arithmetic") and subtopic (e.g., "Percentages")
+                    let fullTopic = topicWithSrno;
+                    let topicCode = '';
+                    let mainTopic = '';
+                    let subTopic = '';
+
+                    // Try to match "1.1 Basic Arithmetic: Percentages" or "1.1 Basic Arithmetic - Percentages"
+                    const codeMatch = topicWithSrno.match(/^(\d+\.\d+)\s*(.+)/);
                     if (codeMatch) {
-                        topicSrno = codeMatch[1];
-                        topic = codeMatch[2].trim();
-                    } else {
-                        const topicSrnoMatch = topicWithSrno.match(/\(([^)]+)\)|\[([^\]]+)\]/);
-                        if (topicSrnoMatch) {
-                            topicSrno = topicSrnoMatch[1] || topicSrnoMatch[2] || '';
-                            topic = topicWithSrno.replace(/\(([^)]+)\)|\[([^\]]+)\]/, '').trim();
+                        topicCode = codeMatch[1];
+                        let rest = codeMatch[2].trim();
+                        // Split by ":" or " - " to separate main topic from subtopic
+                        const splitMatch = rest.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
+                        if (splitMatch) {
+                            mainTopic = splitMatch[1].trim();
+                            subTopic = splitMatch[2].trim();
                         } else {
-                            const parts = topicWithSrno.split(/[-:]/);
-                            if (parts.length >= 2) {
-                                topicSrno = parts[0].trim();
-                                topic = parts.slice(1).join(' ').trim();
-                            } else {
-                                topic = topicWithSrno;
-                            }
+                            mainTopic = rest;
+                            subTopic = rest;
+                        }
+                    } else {
+                        // fallback: try to split by ":" or "-"
+                        const splitMatch = topicWithSrno.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
+                        if (splitMatch) {
+                            mainTopic = splitMatch[1].trim();
+                            subTopic = splitMatch[2].trim();
+                        } else {
+                            mainTopic = topicWithSrno;
+                            subTopic = topicWithSrno;
+                        }
+                        topicCode = '';
+                    }
+
+                    // If mainTopic still contains a code, clean it
+                    if (!topicCode) {
+                        const codeOnly = mainTopic.match(/^(\d+\.\d+)\s*(.*)/);
+                        if (codeOnly) {
+                            topicCode = codeOnly[1];
+                            mainTopic = codeOnly[2].trim() || mainTopic;
                         }
                     }
 
-                    if (!topicSrno && /^[A-Za-z0-9.]+$/.test(topicWithSrno.trim()) && topicWithSrno.trim().length < 8) {
-                        topicSrno = topicWithSrno.trim();
-                        topic = '';
-                    }
+                    // If main topic is empty, use subTopic
+                    if (!mainTopic) mainTopic = subTopic;
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
                     const status = hasUrl ? 'covered' : 'pending';
-                    // category key: e.g. "1.1 Basic Arithmetic" — group by code + topic name
-                    const categoryKey = topicSrno !== '—' ? `${topicSrno} ${topic}` : topic;
+                    const displayTopic = topicCode ? `${topicCode} ${subTopic}` : subTopic;
 
                     result.push({
                         srno: srno || '—',
                         subject: subject || '—',
                         marks: marks || '—',
-                        topicSrno: topicSrno || '—',
-                        topic: topic || '—',
-                        topicDisplay: topicSrno !== '—' ? `${topicSrno} – ${topic}` : topic,
-                        categoryKey: categoryKey || '—',
+                        topicCode: topicCode || '—',
+                        mainTopic: mainTopic || '—',
+                        subTopic: subTopic || '—',
+                        displayTopic: displayTopic || '—',
                         url: hasUrl ? url : '#',
                         hasUrl: hasUrl,
                         status: status
@@ -918,15 +937,15 @@
 
             function computeCounts(data) {
                 subjectCounts = {};
-                subtopicCounts = {};
+                mainTopicCounts = {};
 
                 data.forEach(item => {
                     if (item.subject && item.subject !== '—') {
                         subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
                     }
-                    const key = item.categoryKey;
+                    const key = item.mainTopic;
                     if (key && key !== '—') {
-                        subtopicCounts[key] = (subtopicCounts[key] || 0) + 1;
+                        mainTopicCounts[key] = (mainTopicCounts[key] || 0) + 1;
                     }
                 });
             }
@@ -943,7 +962,6 @@
                 statSubjects.textContent = subjects;
             }
 
-            // Build multi-select with optional search
             function buildMultiSelect(container, options, selectedSet, onUpdate, enableSearch) {
                 const dropdown = container.querySelector('.multi-select-dropdown');
                 const trigger = container.querySelector('.multi-select-trigger');
@@ -951,7 +969,6 @@
 
                 dropdown.innerHTML = '';
 
-                // search box (only if enabled)
                 let searchInput = null;
                 if (enableSearch) {
                     searchInput = document.createElement('input');
@@ -971,7 +988,6 @@
                 selectAllBtn.textContent = 'All';
                 selectAllBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // select all visible (filtered) options
                     const visibleOpts = options.filter(opt => {
                         if (!searchInput || !searchInput.value) return true;
                         return opt.label.toLowerCase().includes(searchInput.value.toLowerCase());
@@ -995,7 +1011,6 @@
                 dropdown.appendChild(actionsDiv);
 
                 function renderDropdown(filterText) {
-                    // remove existing options (but keep search and actions)
                     const existingOptions = dropdown.querySelectorAll('.multi-select-option');
                     existingOptions.forEach(el => el.remove());
 
@@ -1084,7 +1099,7 @@
             function applyFiltersAndRender() {
                 filteredData = rawData.filter(item => {
                     if (selectedSubjects.size > 0 && !selectedSubjects.has(item.subject)) return false;
-                    if (selectedTopics.size > 0 && !selectedTopics.has(item.topicDisplay)) return false;
+                    if (selectedTopics.size > 0 && !selectedTopics.has(item.displayTopic)) return false;
                     if (selectedStatuses.size > 0 && !selectedStatuses.has(item.status)) return false;
                     return true;
                 });
@@ -1093,7 +1108,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- CARD RENDERING with category count ----------
+            // ---------- NEW CARD RENDERING (Main Topic at Top) ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1111,17 +1126,18 @@
                     const card = document.createElement('div');
                     card.className = `topic-card ${item.status === 'covered' ? 'covered' : 'pending'}`;
 
-                    // ===== TOP ROW: Subtopic (left) + URL nav (right) =====
-                    const topRow = document.createElement('div');
-                    topRow.className = 'card-top-row';
+                    // ===== TOP ROW: Main Topic (large) + URL nav (right) =====
+                    const mainTopicRow = document.createElement('div');
+                    mainTopicRow.className = 'card-main-topic-row';
 
-                    const subtopicDiv = document.createElement('div');
-                    subtopicDiv.className = 'card-subtopic';
-                    subtopicDiv.innerHTML = `
-                        ${item.topicSrno && item.topicSrno !== '—' ? `<span class="subtopic-code">${escapeHtml(item.topicSrno)}</span>` : ''}
-                        <span class="subtopic-name">${escapeHtml(item.topic !== '—' ? item.topic : '—')}</span>
+                    const mainTopicDiv = document.createElement('div');
+                    mainTopicDiv.className = 'card-main-topic';
+                    const mainCount = mainTopicCounts[item.mainTopic] || 1;
+                    mainTopicDiv.innerHTML = `
+                        <span class="main-topic-name">${escapeHtml(item.mainTopic)}</span>
+                        <span class="main-topic-count">${mainCount}</span>
                     `;
-                    topRow.appendChild(subtopicDiv);
+                    mainTopicRow.appendChild(mainTopicDiv);
 
                     if (item.hasUrl) {
                         const navLink = document.createElement('a');
@@ -1130,48 +1146,33 @@
                         navLink.rel = 'noopener noreferrer';
                         navLink.className = 'card-nav';
                         navLink.innerHTML = `<i class="fas fa-external-link-alt"></i> Open`;
-                        topRow.appendChild(navLink);
+                        mainTopicRow.appendChild(navLink);
                     }
 
-                    card.appendChild(topRow);
+                    card.appendChild(mainTopicRow);
 
-                    // ===== MID ROW: Srno + Percentage + Subject (with count) =====
-                    const midRow = document.createElement('div');
-                    midRow.className = 'card-mid-row';
+                    // ===== SUBTOPIC ROW (code + name) =====
+                    const subtopicRow = document.createElement('div');
+                    subtopicRow.className = 'card-subtopic-row';
+                    subtopicRow.innerHTML = `
+                        ${item.topicCode && item.topicCode !== '—' ? `<span class="subtopic-code-badge">${escapeHtml(item.topicCode)}</span>` : ''}
+                        <span class="subtopic-name">${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}</span>
+                    `;
+                    card.appendChild(subtopicRow);
 
-                    const srnoSpan = document.createElement('span');
-                    srnoSpan.className = 'card-srno';
-                    srnoSpan.textContent = `#${item.srno}`;
-                    midRow.appendChild(srnoSpan);
+                    // ===== DETAIL ROW: Srno + Percentage + Subject (with count) =====
+                    const detailRow = document.createElement('div');
+                    detailRow.className = 'card-detail-row';
 
-                    if (item.marks && item.marks !== '—') {
-                        const pctSpan = document.createElement('span');
-                        pctSpan.className = 'card-percentage';
-                        pctSpan.textContent = `${item.marks}%`;
-                        midRow.appendChild(pctSpan);
-                    }
-
-                    const subjectSpan = document.createElement('span');
-                    subjectSpan.className = 'card-subject-with-count';
-                    const subjCount = subjectCounts[item.subject] || 1;
-                    subjectSpan.innerHTML = `${escapeHtml(item.subject)} <span class="count-badge">(${subjCount})</span>`;
-                    midRow.appendChild(subjectSpan);
-
-                    card.appendChild(midRow);
-
-                    // ===== CATEGORY COUNT ROW =====
-                    const catKey = item.categoryKey;
-                    const catCount = subtopicCounts[catKey] || 1;
-                    if (catKey && catKey !== '—') {
-                        const catRow = document.createElement('div');
-                        catRow.className = 'card-category-count';
-                        catRow.innerHTML = `
-                            <i class="fas fa-tags"></i>
-                            <span>${escapeHtml(catKey)}</span>
-                            <span class="cat-count">${catCount} topic${catCount > 1 ? 's' : ''}</span>
-                        `;
-                        card.appendChild(catRow);
-                    }
+                    detailRow.innerHTML = `
+                        <span class="card-srno">#${escapeHtml(item.srno)}</span>
+                        ${item.marks !== '—' ? `<span class="card-percentage">${escapeHtml(item.marks)}%</span>` : ''}
+                        <span class="card-subject">
+                            ${escapeHtml(item.subject)} 
+                            <span class="count-badge">(${subjectCounts[item.subject] || 1})</span>
+                        </span>
+                    `;
+                    card.appendChild(detailRow);
 
                     // ===== STATUS ROW with checkmark =====
                     const statusRow = document.createElement('div');
@@ -1212,7 +1213,7 @@
 
                 data.forEach(item => {
                     if (item.subject && item.subject !== '—') subjects.add(item.subject);
-                    if (item.topicDisplay && item.topicDisplay !== '—') topics.add(item.topicDisplay);
+                    if (item.displayTopic && item.displayTopic !== '—') topics.add(item.displayTopic);
                 });
 
                 const subjectOptions = Array.from(subjects).sort().map(s => ({ value: s, label: s }));
@@ -1222,7 +1223,6 @@
                 subjectWrap.dataset.type = 'subjects';
                 buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, applyFiltersAndRender, false);
 
-                // Topic multi-select WITH search
                 const topicWrap = document.getElementById('topicMultiWrap');
                 topicWrap.dataset.type = 'topics';
                 buildMultiSelect(topicWrap, topicOptions, selectedTopics, applyFiltersAndRender, true);
@@ -1282,14 +1282,14 @@
 
                     setTimeout(() => {
                         const sample = [
-                            { srno: '1', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.1', topic: 'Basic Arithmetic', topicDisplay: '1.1 – Basic Arithmetic', categoryKey: '1.1 Basic Arithmetic', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
-                            { srno: '2', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.2', topic: 'Basic Arithmetic', topicDisplay: '1.2 – Basic Arithmetic', categoryKey: '1.2 Basic Arithmetic', url: 'https://example.com/ratios', hasUrl: true, status: 'covered' },
-                            { srno: '3', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.3', topic: 'Basic Arithmetic', topicDisplay: '1.3 – Basic Arithmetic', categoryKey: '1.3 Basic Arithmetic', url: 'https://example.com/averages', hasUrl: true, status: 'covered' },
-                            { srno: '4', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.4', topic: 'Basic Arithmetic', topicDisplay: '1.4 – Basic Arithmetic', categoryKey: '1.4 Basic Arithmetic', url: '#', hasUrl: false, status: 'pending' },
-                            { srno: '5', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '2.1', topic: 'Algebra', topicDisplay: '2.1 – Algebra', categoryKey: '2.1 Algebra', url: 'https://example.com/algebra', hasUrl: true, status: 'covered' },
-                            { srno: '6', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '2.2', topic: 'Algebra', topicDisplay: '2.2 – Algebra', categoryKey: '2.2 Algebra', url: '#', hasUrl: false, status: 'pending' },
-                            { srno: '7', subject: 'English (40 MCQs)', marks: '40', topicSrno: '3.1', topic: 'Grammar', topicDisplay: '3.1 – Grammar', categoryKey: '3.1 Grammar', url: 'https://example.com/grammar', hasUrl: true, status: 'covered' },
-                            { srno: '8', subject: 'English (40 MCQs)', marks: '40', topicSrno: '3.2', topic: 'Vocabulary', topicDisplay: '3.2 – Vocabulary', categoryKey: '3.2 Vocabulary', url: '#', hasUrl: false, status: 'pending' }
+                            { srno: '1', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.1', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: '1.1 Percentages', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
+                            { srno: '2', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.2', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: '1.2 Ratios', url: 'https://example.com/ratios', hasUrl: true, status: 'covered' },
+                            { srno: '3', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.3', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: '1.3 Averages', url: 'https://example.com/averages', hasUrl: true, status: 'covered' },
+                            { srno: '4', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.4', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: '1.4 Profit/Loss', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '5', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '2.1', mainTopic: 'Algebra', subTopic: 'Linear Equations', displayTopic: '2.1 Linear Equations', url: 'https://example.com/algebra', hasUrl: true, status: 'covered' },
+                            { srno: '6', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '2.2', mainTopic: 'Algebra', subTopic: 'Quadratic Equations', displayTopic: '2.2 Quadratic Equations', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '7', subject: 'English (40 MCQs)', marks: '40', topicCode: '3.1', mainTopic: 'Grammar', subTopic: 'Tenses', displayTopic: '3.1 Tenses', url: 'https://example.com/grammar', hasUrl: true, status: 'covered' },
+                            { srno: '8', subject: 'English (40 MCQs)', marks: '40', topicCode: '3.2', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: '3.2 Synonyms', url: '#', hasUrl: false, status: 'pending' }
                         ];
                         rawData = sample;
                         computeCounts(rawData);
