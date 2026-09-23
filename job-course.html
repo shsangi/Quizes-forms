@@ -354,40 +354,7 @@
             white-space: nowrap; flex-shrink: 0;
         }
 
-        /* PDF ROW — shown above the subject/status row */
-        .card-pdf-row {
-            display: flex; align-items: center;
-            gap: 0.3rem; flex-wrap: wrap;
-        }
-        .pdf-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            background: #fff0f0;
-            color: #b91c1c;
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 0.15rem 0.55rem;
-            border-radius: 30px;
-            text-decoration: none;
-            border: 1px solid #f3c0c0;
-            transition: 0.15s;
-            white-space: nowrap;
-        }
-        .pdf-link:hover {
-            background: #ffe0e0;
-            border-color: #e89a9a;
-            color: #991b1b;
-        }
-        .pdf-link i {
-            font-size: 0.6rem;
-        }
-        .pdf-link .pdf-label {
-            font-weight: 700;
-            letter-spacing: 0.2px;
-        }
-
-        /* Row 3 */
+        /* Row 3: Subject + status + PDF (right-aligned) */
         .card-subject-row {
             display: flex; align-items: center; justify-content: space-between;
             gap: 0.4rem; flex-wrap: wrap;
@@ -397,16 +364,41 @@
             display: flex; align-items: center; flex-wrap: wrap;
             gap: 0.25rem 0.4rem; flex: 1 1 auto; min-width: 0;
         }
-        .card-percentage {
-            background: #e0f0fa; padding: 0.05rem 0.4rem;
-            border-radius: 30px; font-size: 0.55rem;
-            font-weight: 700; color: #146a8a;
-            white-space: nowrap; flex-shrink: 0;
-        }
         .card-subject {
             font-weight: 500; color: #1f3d51; font-size: 0.7rem;
             display: flex; align-items: center; gap: 0.2rem;
             flex: 1 1 auto; word-break: break-word; overflow-wrap: break-word;
+        }
+
+        /* Subject coverage percentage pill (replaces marks %) */
+        .card-coverage {
+            background: #e2f5ec;
+            color: #147a4a;
+            padding: 0.05rem 0.4rem;
+            border-radius: 30px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+            border: 1px solid #b8e0cd;
+        }
+        .card-coverage.full {
+            background: #d0ede0;
+            border-color: #9fd4b9;
+        }
+        .card-coverage.low {
+            background: #fef3e0;
+            color: #a8690e;
+            border-color: #f2d9a8;
+        }
+
+        /* Right-side cluster: status badge + PDF link */
+        .card-right-cluster {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-shrink: 0;
+            margin-left: auto;
         }
 
         /* Status badges */
@@ -445,6 +437,36 @@
         }
         .status-badge-inline.pending .copy-icon {
             font-size: 0.45rem; margin-left: 0.1rem; opacity: 0.75;
+        }
+
+        /* PDF link (right-most) */
+        .pdf-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #fff0f0;
+            color: #b91c1c;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.1rem 0.5rem 0.1rem 0.3rem;
+            border-radius: 30px;
+            text-decoration: none;
+            border: 1px solid #f3c0c0;
+            transition: 0.15s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .pdf-link:hover {
+            background: #ffe0e0;
+            border-color: #e89a9a;
+            color: #991b1b;
+        }
+        .pdf-link i {
+            font-size: 0.55rem;
+        }
+        .pdf-link .pdf-label {
+            font-weight: 700;
+            letter-spacing: 0.2px;
         }
 
         /* TOAST */
@@ -545,7 +567,7 @@
                 <div class="chip-value" id="statTotal">0</div>
             </div>
             <div class="stat-chip">
-                <div class="chip-label"><i class="fas fa-check-circle"></i> Covered</div>
+                <div class="chip-label"><i class="fas fa-check-circle"></i> Done</div>
                 <div class="chip-value covered" id="statCovered">0</div>
             </div>
             <div class="stat-chip">
@@ -598,7 +620,7 @@
                 <span class="cb-label"><i class="fas fa-check-circle"></i> Status</span>
                 <div class="checkbox-item covered checked" id="cbCovered" data-status="covered">
                     <span class="cb-box"><i class="fas fa-check"></i></span>
-                    <span class="cb-text">Covered</span>
+                    <span class="cb-text">Done</span>
                 </div>
                 <div class="checkbox-item pending checked" id="cbPending" data-status="pending">
                     <span class="cb-box"><i class="fas fa-check"></i></span>
@@ -646,6 +668,8 @@
 
             let subjectCounts = {};
             let mainTopicCounts = {};
+            // Coverage map: per subject → { total, done }
+            let subjectCoverage = {};
 
             let toastTimer = null;
             let lastToastTime = 0;
@@ -716,6 +740,7 @@
                     const url = (row[5] || '').trim();
                     const pdfUrl = (row[6] || '').trim();
 
+                    // Marks parsing kept internally for legacy, but not displayed
                     let subject = subjectWithMarks;
                     let marks = '';
                     const marksMatch = subjectWithMarks.match(/;\s*(\d+)\s*$/);
@@ -750,15 +775,30 @@
             function computeCounts(data) {
                 subjectCounts = {};
                 mainTopicCounts = {};
+                subjectCoverage = {};
+
                 data.forEach(item => {
                     if (item.subject && item.subject !== '—') {
                         subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
+                        if (!subjectCoverage[item.subject]) {
+                            subjectCoverage[item.subject] = { total: 0, done: 0 };
+                        }
+                        subjectCoverage[item.subject].total += 1;
+                        if (item.status === 'covered') {
+                            subjectCoverage[item.subject].done += 1;
+                        }
                     }
                     const key = item.mainTopic;
                     if (key && key !== '—') {
                         mainTopicCounts[key] = (mainTopicCounts[key] || 0) + 1;
                     }
                 });
+            }
+
+            function getSubjectCoveragePct(subject) {
+                const c = subjectCoverage[subject];
+                if (!c || c.total === 0) return 0;
+                return Math.round((c.done / c.total) * 100);
             }
 
             function updateStats(data) {
@@ -1210,40 +1250,31 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
-                    // ===== PDF ROW (above status) =====
-                    if (item.hasPdf) {
-                        const pdfRow = document.createElement('div');
-                        pdfRow.className = 'card-pdf-row';
-                        const pdfLink = document.createElement('a');
-                        pdfLink.href = item.pdfUrl;
-                        pdfLink.target = '_blank';
-                        pdfLink.rel = 'noopener noreferrer';
-                        pdfLink.className = 'pdf-link';
-                        pdfLink.title = 'Open PDF: sol.pdf';
-                        pdfLink.innerHTML = `
-                            <i class="fas fa-file-pdf"></i>
-                            <span class="pdf-label">sol.pdf</span>
-                            <i class="fas fa-external-link-alt" style="font-size:0.5rem;opacity:0.7;"></i>
-                        `;
-                        pdfLink.addEventListener('click', (e) => e.stopPropagation());
-                        pdfRow.appendChild(pdfLink);
-                        card.appendChild(pdfRow);
-                    }
-
-                    // ROW 3: Subject + status badge
+                    // ===== ROW 3: Subject + coverage% + status + PDF (right-most) =====
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
+
                     const leftSide = document.createElement('div');
                     leftSide.className = 'card-subject-left';
+
+                    // Subject coverage percentage pill (replaces marks)
+                    const covPct = getSubjectCoveragePct(item.subject);
+                    const covClass = covPct === 100 ? 'full' : (covPct < 50 ? 'low' : '');
+                    const covPill = `<span class="card-coverage ${covClass}" title="Subject coverage: ${covPct}%">${covPct}%</span>`;
+
                     const subjCount = subjectCounts[item.subject] || 1;
                     leftSide.innerHTML = `
-                        ${item.marks !== '—' ? `<span class="card-percentage">${escapeHtml(item.marks)}%</span>` : ''}
+                        ${covPill}
                         <span class="card-subject">
                             ${escapeHtml(item.subject)}
                             <span class="count-badge-style">${subjCount}</span>
                         </span>
                     `;
                     subjectRow.appendChild(leftSide);
+
+                    // Right cluster: status badge + PDF (PDF last → right-most)
+                    const rightCluster = document.createElement('div');
+                    rightCluster.className = 'card-right-cluster';
 
                     if (item.hasUrl) {
                         const coveredBadge = document.createElement('a');
@@ -1254,10 +1285,10 @@ Correct answer as per choices`;
                         coveredBadge.title = 'Click to open the complete chat';
                         coveredBadge.innerHTML = `
                             <span class="status-check"><i class="fas fa-check"></i></span>
-                            <span>Covered</span>
+                            <span>Done</span>
                             <i class="fas fa-external-link-alt external-icon"></i>
                         `;
-                        subjectRow.appendChild(coveredBadge);
+                        rightCluster.appendChild(coveredBadge);
                     } else {
                         const pendingBadge = document.createElement('span');
                         pendingBadge.className = 'status-badge-inline pending';
@@ -1271,10 +1302,28 @@ Correct answer as per choices`;
                             e.stopPropagation();
                             copyPrompt(item);
                         });
-                        subjectRow.appendChild(pendingBadge);
+                        rightCluster.appendChild(pendingBadge);
                     }
 
+                    // PDF link at the very right
+                    if (item.hasPdf) {
+                        const pdfLink = document.createElement('a');
+                        pdfLink.href = item.pdfUrl;
+                        pdfLink.target = '_blank';
+                        pdfLink.rel = 'noopener noreferrer';
+                        pdfLink.className = 'pdf-link';
+                        pdfLink.title = 'Open PDF: sol.pdf';
+                        pdfLink.innerHTML = `
+                            <i class="fas fa-file-pdf"></i>
+                            <span class="pdf-label">sol.pdf</span>
+                        `;
+                        pdfLink.addEventListener('click', (e) => e.stopPropagation());
+                        rightCluster.appendChild(pdfLink);
+                    }
+
+                    subjectRow.appendChild(rightCluster);
                     card.appendChild(subjectRow);
+
                     fragment.appendChild(card);
                 });
 
@@ -1379,7 +1428,7 @@ Correct answer as per choices`;
                             { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, pdfUrl: 'https://example.com/sol2.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt' },
                             { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, pdfUrl: '', hasPdf: false, status: 'covered', job: 'css-2027-mpt' },
                             { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, pdfUrl: '', hasPdf: false, status: 'pending', job: 'css-2027-mpt' },
-                            { srno: '5', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Work Rate', displayTopic: 'Work Rate', url: '#', hasUrl: false, pdfUrl: 'https://example.com/sol5.pdf', hasPdf: true, status: 'pending', job: 'css-2027-mpt' }
+                            { srno: '5', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: '#', hasUrl: false, pdfUrl: 'https://example.com/sol5.pdf', hasPdf: true, status: 'pending', job: 'css-2027-mpt' }
                         ];
                         rawData = sample;
                         computeCounts(rawData);
