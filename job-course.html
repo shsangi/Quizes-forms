@@ -354,6 +354,39 @@
             white-space: nowrap; flex-shrink: 0;
         }
 
+        /* PDF ROW — shown above the subject/status row */
+        .card-pdf-row {
+            display: flex; align-items: center;
+            gap: 0.3rem; flex-wrap: wrap;
+        }
+        .pdf-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #fff0f0;
+            color: #b91c1c;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.55rem;
+            border-radius: 30px;
+            text-decoration: none;
+            border: 1px solid #f3c0c0;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+        .pdf-link:hover {
+            background: #ffe0e0;
+            border-color: #e89a9a;
+            color: #991b1b;
+        }
+        .pdf-link i {
+            font-size: 0.6rem;
+        }
+        .pdf-link .pdf-label {
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
         /* Row 3 */
         .card-subject-row {
             display: flex; align-items: center; justify-content: space-between;
@@ -618,7 +651,6 @@
             let lastToastTime = 0;
             const TOAST_DEBOUNCE_MS = 800;
 
-            // Store rebuild functions for each multi-select so we can refresh them dynamically
             let rebuildSubjectSelect = null;
             let rebuildTopicSelect = null;
             let rebuildJobSelect = null;
@@ -665,6 +697,9 @@
                 return rows;
             }
 
+            // ============ 7-COLUMN PARSER ============
+            // A: Srno | B: Subject with Marks | C: Topic | D: Subtopic
+            // E: job | F: URL | G: pdf files url
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
                 const dataRows = rows.slice(1);
@@ -677,8 +712,9 @@
                     const subjectWithMarks = (row[1] || '').trim();
                     const mainTopic = (row[2] || '').trim();
                     const subTopic = (row[3] || '').trim();
-                    const url = (row[4] || '').trim();
-                    const job = (row[5] || '').trim();
+                    const job = (row[4] || '').trim();
+                    const url = (row[5] || '').trim();
+                    const pdfUrl = (row[6] || '').trim();
 
                     let subject = subjectWithMarks;
                     let marks = '';
@@ -689,6 +725,7 @@
                     }
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
+                    const hasPdf = pdfUrl && pdfUrl !== '#' && pdfUrl !== '—' && pdfUrl.trim() !== '';
                     const status = hasUrl ? 'covered' : 'pending';
                     const displayTopic = subTopic || mainTopic;
 
@@ -701,6 +738,8 @@
                         displayTopic: displayTopic || '—',
                         url: hasUrl ? url : '#',
                         hasUrl: hasUrl,
+                        pdfUrl: hasPdf ? pdfUrl : '',
+                        hasPdf: hasPdf,
                         status: status,
                         job: job || '—'
                     });
@@ -745,10 +784,6 @@
                 }
             }
 
-            // ============ DYNAMIC FILTER OPTIONS ============
-            // Given a set of "exclude" filters, return what options are actually available.
-            // E.g. to compute Subject options: consider all data matching Topic, Job, Status filters
-            // (but NOT the Subject filter itself, so users can still unselect within it).
             function getAvailableOptions(excludeFilter) {
                 const activeSubjects = excludeFilter === 'subject' ? new Set() : selectedSubjects;
                 const activeTopics = excludeFilter === 'topic' ? new Set() : selectedTopics;
@@ -759,7 +794,6 @@
                 const jobs = new Set();
 
                 rawData.forEach(item => {
-                    // Filter by all *other* active filters
                     if (activeSubjects.size > 0 && !activeSubjects.has(item.subject)) return;
                     if (activeTopics.size > 0 && !activeTopics.has(item.displayTopic)) return;
                     if (activeJobs.size > 0 && !activeJobs.has(item.job)) return;
@@ -777,10 +811,8 @@
                 };
             }
 
-            // Auto-remove selected values that are no longer available
             function pruneSelections() {
                 const available = getAvailableOptions('none');
-
                 let changed = false;
 
                 Array.from(selectedSubjects).forEach(s => {
@@ -805,7 +837,6 @@
                 return changed;
             }
 
-            // ============ MULTI-SELECT BUILDER (returns a rebuild function) ============
             function buildMultiSelect(container, options, selectedSet, onUpdate, enableSearch) {
                 const dropdown = container.querySelector('.multi-select-dropdown');
                 const trigger = container.querySelector('.multi-select-trigger');
@@ -911,7 +942,6 @@
                         }
                     }
 
-                    // Only attach listeners once
                     if (!trigger.dataset.listenerAttached) {
                         trigger.dataset.listenerAttached = '1';
                         trigger.addEventListener('click', (e) => {
@@ -938,7 +968,6 @@
                         });
                     }
 
-                    // Expose renderDropdown and updateTriggerText so callers can refresh
                     rebuild._render = renderDropdown;
                     rebuild._updateText = updateTriggerText;
 
@@ -973,9 +1002,7 @@
                 applyFiltersAndRender();
             }
 
-            // ============ REFRESH FILTER OPTIONS ============
             function refreshAllFilters() {
-                // Prune any selections that are no longer available
                 pruneSelections();
 
                 const availForSubject = getAvailableOptions('subject');
@@ -1013,7 +1040,6 @@
                 applyFiltersAndRender();
             }
 
-            // ============ GOOGLE SEARCH BUILDER ============
             function buildGoogleSearchQuery(item) {
                 const parts = [];
                 if (item.subTopic && item.subTopic !== '—') parts.push(item.subTopic);
@@ -1131,6 +1157,7 @@ Correct answer as per choices`;
                         card.addEventListener('click', (e) => {
                             if (e.target.closest('.status-badge-inline')) return;
                             if (e.target.closest('.subtopic-name')) return;
+                            if (e.target.closest('.pdf-link')) return;
                             copyPrompt(item);
                         });
                     }
@@ -1143,6 +1170,7 @@ Correct answer as per choices`;
                         card.appendChild(jobBadge);
                     }
 
+                    // ROW 1: Srno + Subtopic
                     const topRow = document.createElement('div');
                     topRow.className = 'card-top-row';
                     const subtopicDiv = document.createElement('div');
@@ -1169,6 +1197,7 @@ Correct answer as per choices`;
                     topRow.appendChild(subtopicDiv);
                     card.appendChild(topRow);
 
+                    // ROW 2: Main topic + count
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
@@ -1181,6 +1210,27 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
+                    // ===== PDF ROW (above status) =====
+                    if (item.hasPdf) {
+                        const pdfRow = document.createElement('div');
+                        pdfRow.className = 'card-pdf-row';
+                        const pdfLink = document.createElement('a');
+                        pdfLink.href = item.pdfUrl;
+                        pdfLink.target = '_blank';
+                        pdfLink.rel = 'noopener noreferrer';
+                        pdfLink.className = 'pdf-link';
+                        pdfLink.title = 'Open PDF: sol.pdf';
+                        pdfLink.innerHTML = `
+                            <i class="fas fa-file-pdf"></i>
+                            <span class="pdf-label">sol.pdf</span>
+                            <i class="fas fa-external-link-alt" style="font-size:0.5rem;opacity:0.7;"></i>
+                        `;
+                        pdfLink.addEventListener('click', (e) => e.stopPropagation());
+                        pdfRow.appendChild(pdfLink);
+                        card.appendChild(pdfRow);
+                    }
+
+                    // ROW 3: Subject + status badge
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
                     const leftSide = document.createElement('div');
@@ -1243,7 +1293,6 @@ Correct answer as per choices`;
             }
 
             function populateFilters(data) {
-                // Build initial options from full dataset, then hook up rebuild functions
                 const subjects = new Set();
                 const topics = new Set();
                 const jobs = new Set();
@@ -1270,7 +1319,6 @@ Correct answer as per choices`;
                 jobWrap.dataset.type = 'jobs';
                 rebuildJobSelect = buildMultiSelect(jobWrap, jobOptions, selectedJobs, onFilterChange, true);
 
-                // Set initial count hints
                 subjectCountHint.textContent = subjectOptions.length;
                 topicCountHint.textContent = topicOptions.length;
                 jobCountHint.textContent = jobOptions.length;
@@ -1327,14 +1375,11 @@ Correct answer as per choices`;
 
                     setTimeout(() => {
                         const sample = [
-                            { srno: '1', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: 'Percentages', url: 'https://chat.deepseek.com/share/x2gdwyy9txdzvcadm', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
-                            { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
-                            { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
-                            { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' },
-                            { srno: '5', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Work Rate', displayTopic: 'Work Rate', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' },
-                            { srno: '6', subject: 'General Abilities', marks: '60', mainTopic: 'Algebra & Geometry', subTopic: 'Linear Equations', displayTopic: 'Linear Equations', url: '#', hasUrl: false, status: 'pending', job: 'fia-superintendent' },
-                            { srno: '17', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: 'https://chat.deepseek.com/share/ml1faf956wlc844b3c', hasUrl: true, status: 'covered', job: 'fia-superintendent' },
-                            { srno: '18', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Antonyms', displayTopic: 'Antonyms', url: '#', hasUrl: false, status: 'pending', job: 'fia-superintendent' }
+                            { srno: '1', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: 'Percentages', url: 'https://chat.deepseek.com/share/x2gdwyy9txdzvcadm', hasUrl: true, pdfUrl: 'https://example.com/sol1.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt' },
+                            { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, pdfUrl: 'https://example.com/sol2.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt' },
+                            { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, pdfUrl: '', hasPdf: false, status: 'covered', job: 'css-2027-mpt' },
+                            { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, pdfUrl: '', hasPdf: false, status: 'pending', job: 'css-2027-mpt' },
+                            { srno: '5', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Work Rate', displayTopic: 'Work Rate', url: '#', hasUrl: false, pdfUrl: 'https://example.com/sol5.pdf', hasPdf: true, status: 'pending', job: 'css-2027-mpt' }
                         ];
                         rawData = sample;
                         computeCounts(rawData);
