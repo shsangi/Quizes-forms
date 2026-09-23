@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>📚 Subject & Topic Explorer</title>
+    <title>📚 Subject & Topic Cards</title>
     <!-- Google Font & Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -26,125 +26,115 @@
         }
 
         .app-container {
-            max-width: 1300px;
+            max-width: 1200px;
             width: 100%;
         }
 
-        /* header */
-        .app-header {
+        /* ---------- SMALL HEADER ---------- */
+        .top-bar {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2rem;
-            gap: 1rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.6rem;
         }
 
-        .app-header h1 {
-            font-size: 1.8rem;
+        .top-bar h1 {
+            font-size: 1.3rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #0f2b3d, #1e4c6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.02em;
+            color: #0f2b3d;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            letter-spacing: -0.01em;
         }
 
-        .app-header h1 i {
-            background: linear-gradient(145deg, #1e4c6b, #2a6b8f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.9rem;
+        .top-bar h1 i {
+            color: #2a6b8f;
+            font-size: 1.2rem;
         }
 
         .excel-link {
             background: #ffffff;
-            border-radius: 40px;
-            padding: 0.6rem 1.3rem;
-            font-size: 0.9rem;
+            border-radius: 30px;
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #0f2b3d;
             text-decoration: none;
-            box-shadow: 0 4px 12px rgba(0, 20, 30, 0.06);
+            box-shadow: 0 2px 8px rgba(0, 20, 30, 0.06);
             border: 1px solid #e2edf5;
             transition: 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             white-space: nowrap;
         }
 
         .excel-link i {
             color: #1e7a5e;
+            font-size: 0.75rem;
         }
 
         .excel-link:hover {
             background: #f0f7ff;
             border-color: #b8d4e8;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 18px rgba(0, 40, 60, 0.1);
         }
 
-        /* dropdown filters */
-        .filters-card {
-            background: white;
-            border-radius: 28px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 30px -8px rgba(0, 30, 50, 0.12);
-            border: 1px solid #eef4fa;
-            margin-bottom: 2rem;
-            transition: 0.2s;
-        }
-
+        /* ---------- 3 SMALL DROPDOWNS ---------- */
         .filter-row {
             display: flex;
-            flex-direction: row;
             flex-wrap: wrap;
             align-items: center;
-            gap: 1.2rem;
+            gap: 0.6rem;
+            margin-bottom: 1.4rem;
+            background: white;
+            padding: 0.8rem 1rem;
+            border-radius: 18px;
+            box-shadow: 0 4px 14px -6px rgba(0, 30, 50, 0.08);
+            border: 1px solid #eef4fa;
         }
 
         .filter-group {
-            flex: 1 1 200px;
+            flex: 1 1 0;
+            min-width: 130px;
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.15rem;
         }
 
         .filter-group label {
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             color: #4a6a80;
-            margin-left: 0.3rem;
+            margin-left: 0.2rem;
         }
 
         .filter-group label i {
-            margin-right: 6px;
-            font-size: 0.8rem;
+            margin-right: 4px;
+            font-size: 0.65rem;
         }
 
         select {
             width: 100%;
-            padding: 0.85rem 1rem;
-            border-radius: 18px;
+            padding: 0.5rem 0.7rem;
+            border-radius: 14px;
             border: 1.5px solid #d9e6f0;
             background: #ffffff;
             font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             font-weight: 500;
             color: #1a2b3c;
             outline: none;
             transition: 0.2s;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%234a6a80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%234a6a80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 18px;
+            background-position: right 0.7rem center;
+            background-size: 14px;
             cursor: pointer;
         }
 
@@ -155,132 +145,134 @@
 
         select:focus {
             border-color: #2a6b8f;
-            box-shadow: 0 0 0 3px rgba(42, 107, 143, 0.1);
+            box-shadow: 0 0 0 2px rgba(42, 107, 143, 0.1);
         }
 
-        /* table wrapper */
-        .table-wrapper {
+        /* ---------- CARD GRID ---------- */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        /* ---------- CARD ---------- */
+        .topic-card {
             background: white;
-            border-radius: 28px;
-            padding: 0.1rem;
-            box-shadow: 0 15px 35px -12px rgba(0, 30, 50, 0.12);
+            border-radius: 18px;
+            padding: 0.9rem 1rem;
+            box-shadow: 0 6px 18px -8px rgba(0, 30, 50, 0.1);
             border: 1px solid #eef4fa;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-            font-size: 0.9rem;
-        }
-
-        .data-table thead th {
-            text-align: left;
-            padding: 1.1rem 1rem;
-            background: #f8fcff;
-            font-weight: 600;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
             font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            color: #2b5775;
-            border-bottom: 1px solid #dae9f2;
-            white-space: nowrap;
+            line-height: 1.35;
         }
 
-        .data-table thead th i {
-            margin-right: 6px;
-            font-size: 0.8rem;
-            color: #4782a7;
+        .topic-card:hover {
+            box-shadow: 0 10px 24px -8px rgba(0, 50, 80, 0.15);
+            transform: translateY(-2px);
+            border-color: #d9e6f2;
         }
 
-        .data-table tbody td {
-            padding: 1rem 1rem;
-            border-bottom: 1px solid #eaf1f8;
-            color: #1f3d51;
-            vertical-align: middle;
+        /* status stripe */
+        .topic-card.covered {
+            border-left: 4px solid #2e9b6e;
         }
 
-        .data-table tbody tr:last-child td {
-            border-bottom: none;
+        .topic-card.pending {
+            border-left: 4px solid #e6a017;
         }
 
-        .data-table tbody tr:hover {
-            background: #f5faff;
-            transition: 0.1s;
-        }
-
-        .data-table tbody tr {
-            transition: 0.1s;
-        }
-
-        /* badge for subject / marks */
-        .subject-badge {
-            display: inline-flex;
+        /* row 1: srno + subject + marks */
+        .card-row-1 {
+            display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 0.3rem 0.6rem;
         }
 
-        .subject-name {
+        .card-srno {
+            background: #e9f0f7;
+            border-radius: 30px;
+            padding: 0.1rem 0.6rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #1a4a66;
+            white-space: nowrap;
+        }
+
+        .card-subject {
             font-weight: 600;
             color: #0c334a;
+            font-size: 0.85rem;
         }
 
-        .marks-pill {
+        .card-marks {
             background: #e0f0fa;
-            padding: 0.2rem 0.7rem;
+            padding: 0.1rem 0.5rem;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-weight: 700;
             color: #146a8a;
-            letter-spacing: 0.2px;
             white-space: nowrap;
+            margin-left: auto;
         }
 
-        /* topic with srno */
-        .topic-cell {
+        /* row 2: topic with srno */
+        .card-row-2 {
             display: flex;
             align-items: flex-start;
-            gap: 0.6rem;
+            gap: 0.4rem;
+            flex-wrap: wrap;
         }
 
-        .topic-srno {
+        .topic-srno-badge {
             background: #d9eaf5;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-weight: 700;
             color: #0c4b6b;
-            padding: 0.2rem 0.6rem;
+            padding: 0.1rem 0.5rem;
             white-space: nowrap;
-            line-height: 1.4;
+            flex-shrink: 0;
         }
 
-        .topic-text {
+        .topic-name {
             font-weight: 500;
+            color: #1f3d51;
             word-break: break-word;
+            font-size: 0.8rem;
         }
 
-        /* URL link */
+        /* row 3: URL */
+        .card-row-3 {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.1rem;
+            flex-wrap: wrap;
+        }
+
         .url-link {
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.25rem;
             background: #eef6fe;
             color: #18668a;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.8rem;
-            padding: 0.25rem 0.8rem;
-            border-radius: 40px;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
             transition: 0.2s;
             border: 1px solid #d3e6f2;
             white-space: nowrap;
         }
 
         .url-link i {
-            font-size: 0.7rem;
+            font-size: 0.6rem;
         }
 
         .url-link:hover {
@@ -289,23 +281,29 @@
             color: #0a3e58;
         }
 
-        /* command column */
-        .command-badge {
-            background: #eef2f6;
-            color: #2c5777;
-            font-weight: 500;
-            font-size: 0.75rem;
-            padding: 0.3rem 0.8rem;
+        /* status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.1rem 0.5rem;
             border-radius: 30px;
-            display: inline-block;
-            border: 1px solid #d3e1ec;
-            max-width: 140px;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        /* loading / error */
+        .status-covered {
+            background: #e2f5ec;
+            color: #147a4a;
+        }
+
+        .status-pending {
+            background: #fef3e0;
+            color: #a8690e;
+        }
+
+        /* ---------- STATE MESSAGES ---------- */
         .state-message {
             padding: 3rem 2rem;
             text-align: center;
@@ -315,6 +313,7 @@
             color: #2c5777;
             box-shadow: 0 8px 24px -8px rgba(0, 30, 50, 0.1);
             border: 1px solid #eef4fa;
+            grid-column: 1 / -1;
         }
 
         .state-message i {
@@ -339,134 +338,104 @@
             to { transform: rotate(360deg); }
         }
 
-        /* mobile adjustments */
+        /* ---------- MOBILE ---------- */
         @media (max-width: 640px) {
             body {
-                padding: 0.8rem;
+                padding: 0.7rem;
             }
 
-            .app-header {
-                flex-direction: column;
-                align-items: flex-start;
-                margin-bottom: 1.5rem;
-            }
-
-            .app-header h1 {
-                font-size: 1.6rem;
-            }
-
-            .excel-link {
-                align-self: flex-start;
-            }
-
-            .filters-card {
-                padding: 1.2rem;
-                border-radius: 24px;
+            .top-bar h1 {
+                font-size: 1.1rem;
             }
 
             .filter-row {
                 flex-direction: column;
-                gap: 1rem;
+                gap: 0.5rem;
+                padding: 0.7rem;
             }
 
             .filter-group {
                 width: 100%;
+                min-width: unset;
             }
 
-            .data-table thead th,
-            .data-table tbody td {
-                padding: 0.85rem 0.8rem;
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
             }
 
-            .data-table {
-                font-size: 0.82rem;
-            }
-
-            .subject-badge {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.2rem;
-            }
-
-            .marks-pill {
-                font-size: 0.65rem;
-            }
-
-            .topic-cell {
-                flex-direction: column;
-                gap: 0.3rem;
+            .topic-card {
+                padding: 0.8rem 0.9rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <div class="app-header">
+        <!-- small header -->
+        <div class="top-bar">
             <h1>
-                <i class="fas fa-graduation-cap"></i> Subject & Topic Explorer
+                <i class="fas fa-graduation-cap"></i> Subject & Topic Cards
             </h1>
             <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRILNNrW889d6XpNKRQeUFbYC2mRcwk3SXxRBuMLM3QrygW7nuOsLjID4zJjN2CkhHJtosjYpDmkTmK/pub?output=xlsx" 
                class="excel-link" 
                target="_blank" 
                rel="noopener noreferrer">
-                <i class="fas fa-file-excel"></i> Download Excel
+                <i class="fas fa-file-excel"></i> Excel
             </a>
         </div>
 
-        <!-- Filters card -->
-        <div class="filters-card">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label for="subjectFilter"><i class="fas fa-book"></i> Subject</label>
-                    <select id="subjectFilter">
-                        <option value="all">All subjects</option>
-                        <!-- dynamically filled -->
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="topicFilter"><i class="fas fa-tag"></i> Topic (with Srno)</label>
-                    <select id="topicFilter">
-                        <option value="all">All topics</option>
-                        <!-- dynamically filled -->
-                    </select>
-                </div>
+        <!-- 3 small dropdowns -->
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="subjectFilter"><i class="fas fa-book"></i> Subject</label>
+                <select id="subjectFilter">
+                    <option value="all">All subjects</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="topicFilter"><i class="fas fa-tag"></i> Topic</label>
+                <select id="topicFilter">
+                    <option value="all">All topics</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="statusFilter"><i class="fas fa-check-circle"></i> Status</label>
+                <select id="statusFilter">
+                    <option value="all">All</option>
+                    <option value="covered">✅ Covered (has URL)</option>
+                    <option value="pending">⏳ Pending (no URL)</option>
+                </select>
             </div>
         </div>
 
-        <!-- Table container (dynamic) -->
-        <div id="tableContainer" class="table-wrapper">
+        <!-- cards grid -->
+        <div id="cardsContainer" class="cards-grid">
             <!-- filled by JS -->
         </div>
     </div>
 
     <script>
         (function() {
-            // --- Configuration ---
-            // Use the published XLSX URL (same as provided, but we parse CSV via proxy approach)
-            // Google Sheets published XLSX → we need CSV. We'll use a public CSV endpoint with gviz.
-            // But we have the XLSX link; however, easier: extract sheet ID and use gviz with CSV.
-            // From the sheet URL: https://docs.google.com/spreadsheets/d/1D_wCGy3Rks9MXt84qpC4Ea2Qjo3uSgm0b-JBIh2_mmc/edit#gid=0
-            // We'll build gviz csv url:
-            // https://docs.google.com/spreadsheets/d/1D_wCGy3Rks9MXt84qpC4Ea2Qjo3uSgm0b-JBIh2_mmc/gviz/tq?tqx=out:csv&gid=0
-            // That returns CSV.
-            // Fallback: If that fails, we create sample data (to keep UI functional)
+            // --- config ---
             const SHEET_ID = '1D_wCGy3Rks9MXt84qpC4Ea2Qjo3uSgm0b-JBIh2_mmc';
-            const GID = '0'; // from url fragment
+            const GID = '0';
             const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
 
-            // --- DOM elements ---
-            const tableContainer = document.getElementById('tableContainer');
+            // --- dom ---
+            const cardsContainer = document.getElementById('cardsContainer');
             const subjectFilter = document.getElementById('subjectFilter');
             const topicFilter = document.getElementById('topicFilter');
+            const statusFilter = document.getElementById('statusFilter');
 
-            // --- Global state ---
-            let rawData = [];          // array of objects { srno, subject, marks, topicSrno, topic, url, command }
+            // --- state ---
+            let rawData = [];        // parsed objects
             let filteredData = [];
 
-            // --- Helper: parse CSV ---
+            // --- helpers ---
+
+            // simple csv parser
             function parseCSV(csvText) {
-                // simple CSV parser that handles quoted fields
                 const rows = [];
                 let currentRow = [];
                 let currentField = '';
@@ -478,7 +447,6 @@
 
                     if (char === '"') {
                         if (insideQuotes && nextChar === '"') {
-                            // escaped quote
                             currentField += '"';
                             i++;
                         } else {
@@ -488,7 +456,6 @@
                         currentRow.push(currentField);
                         currentField = '';
                     } else if (char === '\n' && !insideQuotes) {
-                        // end of row
                         currentRow.push(currentField);
                         if (currentRow.length > 1 || (currentRow.length === 1 && currentRow[0].trim() !== '')) {
                             rows.push(currentRow);
@@ -496,13 +463,11 @@
                         currentRow = [];
                         currentField = '';
                     } else if (char === '\r') {
-                        // ignore carriage return
                         continue;
                     } else {
                         currentField += char;
                     }
                 }
-                // last field/row
                 if (currentField !== '' || currentRow.length > 0) {
                     currentRow.push(currentField);
                     if (currentRow.length > 1 || (currentRow.length === 1 && currentRow[0].trim() !== '')) {
@@ -512,13 +477,11 @@
                 return rows;
             }
 
-            // --- Map headers to keys ---
+            // map csv rows to objects
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
-                // first row should be headers
                 const headers = rows[0].map(h => h.trim().toLowerCase());
-                // Expected: Srno, Subject with Marks, Topic with Srno, URL, command
-                // We need to handle flexible naming: find indices
+
                 const findIndex = (keywords) => {
                     for (let i = 0; i < headers.length; i++) {
                         const h = headers[i];
@@ -531,33 +494,27 @@
                 const subjectMarksIdx = findIndex(['subject with marks', 'subject', 'marks']);
                 const topicSrnoIdx = findIndex(['topic with srno', 'topic with sr no', 'topic']);
                 const urlIdx = findIndex(['url', 'link']);
-                const commandIdx = findIndex(['command', 'cmd']);
 
-                // If some columns missing, we fallback to positional assumption (0,1,2,3,4) 
                 const dataRows = rows.slice(1);
                 const result = [];
 
                 for (const row of dataRows) {
-                    if (row.length < 3) continue; // skip incomplete
+                    if (row.length < 3) continue;
 
-                    // Use found indices or fallback to position
                     const srno = (srnoIdx !== -1 ? row[srnoIdx] : row[0] || '').trim();
                     const subjectWithMarks = (subjectMarksIdx !== -1 ? row[subjectMarksIdx] : row[1] || '').trim();
                     const topicWithSrno = (topicSrnoIdx !== -1 ? row[topicSrnoIdx] : row[2] || '').trim();
                     const url = (urlIdx !== -1 ? row[urlIdx] : row[3] || '').trim();
-                    const command = (commandIdx !== -1 ? row[commandIdx] : row[4] || '').trim();
 
-                    // Parse subject and marks (assuming format like "Mathematics (85)" or "Math - 85")
+                    // parse subject + marks
                     let subject = subjectWithMarks;
                     let marks = '';
-                    // try to separate marks: look for pattern like (85) or [85] or - 85
                     const marksMatch = subjectWithMarks.match(/\((\d+)\)|\[(\d+)\]|(\d+)\s*$/);
                     if (marksMatch) {
                         marks = marksMatch[1] || marksMatch[2] || marksMatch[3] || '';
                         subject = subjectWithMarks.replace(/\((\d+)\)|\[(\d+)\]|\s*\d+\s*$/, '').trim();
-                        if (!subject) subject = subjectWithMarks; // fallback
+                        if (!subject) subject = subjectWithMarks;
                     } else {
-                        // try splitting by dash or other
                         const parts = subjectWithMarks.split(' - ');
                         if (parts.length === 2) {
                             subject = parts[0].trim();
@@ -567,7 +524,7 @@
                         }
                     }
 
-                    // Parse topic and topicSrno: format like "Algebra (T1)" or "T1 - Algebra"
+                    // parse topic + topicSrno
                     let topic = topicWithSrno;
                     let topicSrno = '';
                     const topicSrnoMatch = topicWithSrno.match(/\(([^)]+)\)|\[([^\]]+)\]/);
@@ -576,7 +533,6 @@
                         topic = topicWithSrno.replace(/\(([^)]+)\)|\[([^\]]+)\]/, '').trim();
                         if (!topic) topic = topicWithSrno;
                     } else {
-                        // try split by "-" or ":"
                         const parts = topicWithSrno.split(/[-:]/);
                         if (parts.length >= 2) {
                             topicSrno = parts[0].trim();
@@ -586,12 +542,14 @@
                         }
                     }
 
-                    // Clean topicSrno if it's just a number / letters
                     if (!topicSrno && /^[A-Za-z0-9]+$/.test(topicWithSrno.trim()) && topicWithSrno.trim().length < 6) {
-                        // if entire string is short like "T1", treat as srno and topic empty?
                         topicSrno = topicWithSrno.trim();
                         topic = '';
                     }
+
+                    // determine status
+                    const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
+                    const status = hasUrl ? 'covered' : 'pending';
 
                     result.push({
                         srno: srno || '—',
@@ -599,35 +557,25 @@
                         marks: marks || '—',
                         topicSrno: topicSrno || '—',
                         topic: topic || '—',
-                        url: url || '#',
-                        command: command || '—',
-                        // also keep original for filter
-                        originalSubject: subjectWithMarks,
-                        originalTopic: topicWithSrno
+                        url: hasUrl ? url : '#',
+                        hasUrl: hasUrl,
+                        status: status
                     });
                 }
                 return result;
             }
 
-            // --- Populate filters from data ---
+            // populate filter dropdowns
             function populateFilters(data) {
-                // Unique subjects (full "Subject with Marks" string is not needed, we use subject name)
                 const subjects = new Set();
                 const topics = new Set();
 
                 data.forEach(item => {
                     if (item.subject && item.subject !== '—') subjects.add(item.subject);
-                    // For topics, we use topicSrno + topic combined string for filter? Or just topic? 
-                    // The filter says "Topic with Srno", so we display "topicSrno – topic" if both exist.
-                    if (item.topic && item.topic !== '—') {
-                        const display = item.topicSrno !== '—' ? `${item.topicSrno} – ${item.topic}` : item.topic;
-                        topics.add(display);
-                    } else if (item.topicSrno && item.topicSrno !== '—') {
-                        topics.add(item.topicSrno);
-                    }
+                    const topicDisplay = item.topicSrno !== '—' ? `${item.topicSrno} – ${item.topic}` : item.topic;
+                    if (topicDisplay && topicDisplay !== '—') topics.add(topicDisplay);
                 });
 
-                // reset select options but keep "All"
                 subjectFilter.innerHTML = '<option value="all">All subjects</option>';
                 topicFilter.innerHTML = '<option value="all">All topics</option>';
 
@@ -646,10 +594,11 @@
                 });
             }
 
-            // --- Apply filters and render table ---
+            // apply filters and render
             function applyFiltersAndRender() {
                 const selectedSubject = subjectFilter.value;
                 const selectedTopic = topicFilter.value;
+                const selectedStatus = statusFilter.value;
 
                 filteredData = rawData.filter(item => {
                     // subject filter
@@ -657,108 +606,85 @@
 
                     // topic filter
                     if (selectedTopic !== 'all') {
-                        const topicDisplay = item.topicSrno !== '—' ? `${item.topicSrno} – ${item.topic}` : (item.topic !== '—' ? item.topic : '');
-                        const topicDisplayAlt = item.topicSrno !== '—' ? item.topicSrno : '';
-                        // match either the combined or just topicSrno if topic missing
-                        if (topicDisplay !== selectedTopic && topicDisplayAlt !== selectedTopic && item.topic !== selectedTopic) {
-                            return false;
-                        }
+                        const topicDisplay = item.topicSrno !== '—' ? `${item.topicSrno} – ${item.topic}` : item.topic;
+                        if (topicDisplay !== selectedTopic) return false;
                     }
+
+                    // status filter
+                    if (selectedStatus !== 'all' && item.status !== selectedStatus) return false;
+
                     return true;
                 });
 
-                renderTable(filteredData);
+                renderCards(filteredData);
             }
 
-            // --- Render table from data array ---
-            function renderTable(data) {
+            // render card grid
+            function renderCards(data) {
                 if (!data.length) {
-                    tableContainer.innerHTML = `
+                    cardsContainer.innerHTML = `
                         <div class="state-message">
                             <i class="fas fa-search"></i>
-                            No matching records found.<br>
-                            <span style="font-size:0.85rem; opacity:0.7;">Try adjusting filters</span>
+                            No matching topics found.<br>
+                            <span style="font-size:0.8rem; opacity:0.7;">Try adjusting filters</span>
                         </div>`;
                     return;
                 }
 
-                const table = document.createElement('table');
-                table.className = 'data-table';
+                const fragment = document.createDocumentFragment();
 
-                // thead
-                const thead = document.createElement('thead');
-                thead.innerHTML = `
-                    <tr>
-                        <th><i class="fas fa-hashtag"></i> Srno</th>
-                        <th><i class="fas fa-book-open"></i> Subject with Marks</th>
-                        <th><i class="fas fa-tasks"></i> Topic with Srno</th>
-                        <th><i class="fas fa-link"></i> URL</th>
-                        <th><i class="fas fa-terminal"></i> Command</th>
-                    </tr>
-                `;
-                table.appendChild(thead);
-
-                // tbody
-                const tbody = document.createElement('tbody');
                 data.forEach(item => {
-                    const tr = document.createElement('tr');
+                    const card = document.createElement('div');
+                    card.className = `topic-card ${item.status === 'covered' ? 'covered' : 'pending'}`;
 
-                    // Srno
-                    const tdSrno = document.createElement('td');
-                    tdSrno.textContent = item.srno;
-                    tr.appendChild(tdSrno);
-
-                    // Subject with Marks
-                    const tdSubject = document.createElement('td');
-                    tdSubject.innerHTML = `
-                        <div class="subject-badge">
-                            <span class="subject-name">${escapeHtml(item.subject)}</span>
-                            ${item.marks && item.marks !== '—' ? `<span class="marks-pill">${escapeHtml(item.marks)}</span>` : ''}
-                        </div>
+                    // row 1: srno + subject + marks
+                    const row1 = document.createElement('div');
+                    row1.className = 'card-row-1';
+                    row1.innerHTML = `
+                        <span class="card-srno">#${escapeHtml(item.srno)}</span>
+                        <span class="card-subject">${escapeHtml(item.subject)}</span>
+                        ${item.marks !== '—' ? `<span class="card-marks">${escapeHtml(item.marks)}</span>` : ''}
                     `;
-                    tr.appendChild(tdSubject);
+                    card.appendChild(row1);
 
-                    // Topic with Srno
-                    const tdTopic = document.createElement('td');
+                    // row 2: topic with srno
+                    const row2 = document.createElement('div');
+                    row2.className = 'card-row-2';
                     if (item.topicSrno !== '—' || item.topic !== '—') {
-                        tdTopic.innerHTML = `
-                            <div class="topic-cell">
-                                ${item.topicSrno !== '—' ? `<span class="topic-srno">${escapeHtml(item.topicSrno)}</span>` : ''}
-                                <span class="topic-text">${escapeHtml(item.topic !== '—' ? item.topic : '')}</span>
-                            </div>
+                        row2.innerHTML = `
+                            ${item.topicSrno !== '—' ? `<span class="topic-srno-badge">${escapeHtml(item.topicSrno)}</span>` : ''}
+                            <span class="topic-name">${escapeHtml(item.topic !== '—' ? item.topic : '')}</span>
                         `;
                     } else {
-                        tdTopic.textContent = '—';
+                        row2.innerHTML = `<span class="topic-name" style="opacity:0.6;">—</span>`;
                     }
-                    tr.appendChild(tdTopic);
+                    card.appendChild(row2);
 
-                    // URL
-                    const tdUrl = document.createElement('td');
-                    if (item.url && item.url !== '#' && item.url !== '—') {
-                        tdUrl.innerHTML = `
+                    // row 3: url + status badge
+                    const row3 = document.createElement('div');
+                    row3.className = 'card-row-3';
+                    if (item.hasUrl) {
+                        row3.innerHTML = `
                             <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="url-link">
                                 <i class="fas fa-external-link-alt"></i> Open
                             </a>
+                            <span class="status-badge status-covered"><i class="fas fa-check-circle"></i> Covered</span>
                         `;
                     } else {
-                        tdUrl.textContent = '—';
+                        row3.innerHTML = `
+                            <span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>
+                        `;
                     }
-                    tr.appendChild(tdUrl);
+                    card.appendChild(row3);
 
-                    // Command
-                    const tdCommand = document.createElement('td');
-                    tdCommand.innerHTML = `<span class="command-badge" title="${escapeHtml(item.command)}">${escapeHtml(item.command)}</span>`;
-                    tr.appendChild(tdCommand);
-
-                    tbody.appendChild(tr);
+                    fragment.appendChild(card);
                 });
-                table.appendChild(tbody);
 
-                tableContainer.innerHTML = '';
-                tableContainer.appendChild(table);
+                cardsContainer.innerHTML = '';
+                cardsContainer.appendChild(fragment);
             }
 
-            // --- Simple escape for HTML ---
+            // escape html
             function escapeHtml(unsafe) {
                 if (unsafe === null || unsafe === undefined) return '';
                 return String(unsafe)
@@ -769,77 +695,73 @@
                     .replace(/'/g, "&#039;");
             }
 
-            // --- Load Data ---
+            // load data
             async function loadData() {
-                tableContainer.innerHTML = `
+                cardsContainer.innerHTML = `
                     <div class="state-message">
                         <div class="spinner"></div>
-                        <div>Loading sheet data…</div>
+                        <div>Loading topics…</div>
                     </div>`;
 
                 try {
                     const response = await fetch(CSV_URL);
-                    if (!response.ok) throw new Error(`HTTP ${response.status} – ${response.statusText}`);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const csvText = await response.text();
 
-                    // check if we got HTML (error page) instead of CSV
                     if (csvText.trim().startsWith('<!DOCTYPE') || csvText.trim().startsWith('<html')) {
-                        throw new Error('Received HTML instead of CSV. Sheet may not be published or accessible.');
+                        throw new Error('Received HTML instead of CSV');
                     }
 
                     const rows = parseCSV(csvText);
-                    if (rows.length < 2) throw new Error('No data rows found in sheet.');
+                    if (rows.length < 2) throw new Error('No data rows');
 
                     rawData = mapRowsToObjects(rows);
-                    if (rawData.length === 0) throw new Error('Could not parse any data rows.');
+                    if (rawData.length === 0) throw new Error('No parsed data');
 
-                    // Populate filters and set initial render
                     populateFilters(rawData);
-
-                    // reset filter selects to 'all'
                     subjectFilter.value = 'all';
                     topicFilter.value = 'all';
+                    statusFilter.value = 'all';
 
-                    // initial filtered data = all
                     filteredData = [...rawData];
-                    renderTable(filteredData);
+                    renderCards(filteredData);
 
                 } catch (error) {
-                    console.error('Data loading error:', error);
-                    // Show error message + fallback demo data? 
-                    // For better UX, we show a message and then load demo data so UI is not broken.
-                    tableContainer.innerHTML = `
+                    console.error('Load error:', error);
+                    cardsContainer.innerHTML = `
                         <div class="state-message">
                             <i class="fas fa-exclamation-triangle" style="color:#c06b4a;"></i>
-                            <div style="margin-bottom:0.6rem;"><strong>Couldn't load sheet</strong></div>
-                            <div style="font-size:0.85rem; opacity:0.8;">${escapeHtml(error.message)}</div>
-                            <div style="margin-top:1.2rem; font-size:0.85rem;">Showing sample data for preview.</div>
+                            <div style="margin-bottom:0.4rem;"><strong>Couldn't load sheet</strong></div>
+                            <div style="font-size:0.8rem; opacity:0.8;">${escapeHtml(error.message)}</div>
+                            <div style="margin-top:1rem; font-size:0.8rem;">Showing sample cards.</div>
                         </div>`;
 
-                    // Fallback sample data (so the UI shows something meaningful)
+                    // fallback sample
                     setTimeout(() => {
                         const sample = [
-                            { srno: '1', subject: 'Mathematics', marks: '92', topicSrno: 'T1', topic: 'Algebra', url: 'https://example.com/math', command: 'open_math' },
-                            { srno: '2', subject: 'Physics', marks: '88', topicSrno: 'P2', topic: 'Mechanics', url: 'https://example.com/physics', command: 'view_mech' },
-                            { srno: '3', subject: 'Chemistry', marks: '79', topicSrno: 'C3', topic: 'Organic', url: 'https://example.com/chem', command: 'start_organic' },
-                            { srno: '4', subject: 'Biology', marks: '85', topicSrno: 'B4', topic: 'Genetics', url: 'https://example.com/bio', command: 'explore_gen' },
-                            { srno: '5', subject: 'Computer Science', marks: '95', topicSrno: 'CS1', topic: 'Algorithms', url: 'https://example.com/cs', command: 'run_algo' }
+                            { srno: '1', subject: 'Mathematics', marks: '92', topicSrno: 'T1', topic: 'Algebra', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
+                            { srno: '2', subject: 'Physics', marks: '88', topicSrno: 'P2', topic: 'Mechanics', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '3', subject: 'Chemistry', marks: '79', topicSrno: 'C3', topic: 'Organic', url: 'https://example.com/chem', hasUrl: true, status: 'covered' },
+                            { srno: '4', subject: 'Biology', marks: '85', topicSrno: 'B4', topic: 'Genetics', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '5', subject: 'Computer Science', marks: '95', topicSrno: 'CS1', topic: 'Algorithms', url: 'https://example.com/cs', hasUrl: true, status: 'covered' }
                         ];
                         rawData = sample;
                         populateFilters(rawData);
                         subjectFilter.value = 'all';
                         topicFilter.value = 'all';
+                        statusFilter.value = 'all';
                         filteredData = [...rawData];
-                        renderTable(filteredData);
+                        renderCards(filteredData);
                     }, 200);
                 }
             }
 
-            // --- Event listeners for filters ---
+            // events
             subjectFilter.addEventListener('change', applyFiltersAndRender);
             topicFilter.addEventListener('change', applyFiltersAndRender);
+            statusFilter.addEventListener('change', applyFiltersAndRender);
 
-            // --- Initial load ---
+            // init
             loadData();
         })();
     </script>
