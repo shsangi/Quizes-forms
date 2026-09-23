@@ -483,7 +483,7 @@
             width: 100%;
         }
 
-        /* ---------- CARD LAYOUT (wrap text enabled) ---------- */
+        /* ---------- CARD LAYOUT ---------- */
         .topic-card {
             background: white;
             border-radius: 12px;
@@ -516,7 +516,7 @@
             border-left: 3px solid #e6a017;
         }
 
-        /* Top row: Srno + Subtopic + Status badge (right) */
+        /* Top row: Srno + Subtopic */
         .card-top-row {
             display: flex;
             align-items: flex-start;
@@ -557,67 +557,7 @@
             line-height: 1.25;
         }
 
-        /* Status badge in top right */
-        .status-badge-top {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-            padding: 0.1rem 0.5rem 0.1rem 0.25rem;
-            border-radius: 30px;
-            font-size: 0.6rem;
-            font-weight: 700;
-            white-space: nowrap;
-            flex-shrink: 0;
-            text-decoration: none;
-            transition: 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .status-badge-top.covered {
-            background: #e2f5ec;
-            color: #147a4a;
-            border-color: #b8e0cd;
-        }
-
-        .status-badge-top.covered:hover {
-            background: #d0ede0;
-            border-color: #9fd4b9;
-        }
-
-        .status-badge-top.pending {
-            background: #fef3e0;
-            color: #a8690e;
-            border-color: #f2d9a8;
-        }
-
-        .status-badge-top .status-check {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 13px;
-            height: 13px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            font-size: 0.45rem;
-        }
-
-        .status-badge-top.covered .status-check {
-            background: #2e9b6e;
-            color: white;
-        }
-
-        .status-badge-top.pending .status-check {
-            background: #e6a017;
-            color: white;
-        }
-
-        .status-badge-top .external-icon {
-            font-size: 0.45rem;
-            margin-left: 0.05rem;
-            opacity: 0.7;
-        }
-
-        /* Main topic row (wrap) */
+        /* Main topic row */
         .card-main-topic-row {
             display: flex;
             align-items: center;
@@ -659,12 +599,24 @@
             flex-shrink: 0;
         }
 
-        /* Detail row (wrap) */
-        .card-detail-row {
+        /* ===== SUBJECT ROW (with status badge on the right) ===== */
+        .card-subject-row {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
             flex-wrap: wrap;
-            gap: 0.2rem 0.4rem;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .card-subject-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.25rem 0.4rem;
+            flex: 1 1 auto;
+            min-width: 0;
             word-break: break-word;
             overflow-wrap: break-word;
         }
@@ -690,6 +642,66 @@
             flex: 1 1 auto;
             word-break: break-word;
             overflow-wrap: break-word;
+        }
+
+        /* Status badges (Covered / Pending) — now on subject row */
+        .status-badge-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.1rem 0.5rem 0.1rem 0.25rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .status-badge-inline.covered {
+            background: #e2f5ec;
+            color: #147a4a;
+            border-color: #b8e0cd;
+        }
+
+        .status-badge-inline.covered:hover {
+            background: #d0ede0;
+            border-color: #9fd4b9;
+        }
+
+        .status-badge-inline.pending {
+            background: #fef3e0;
+            color: #a8690e;
+            border-color: #f2d9a8;
+        }
+
+        .status-badge-inline .status-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            font-size: 0.45rem;
+        }
+
+        .status-badge-inline.covered .status-check {
+            background: #2e9b6e;
+            color: white;
+        }
+
+        .status-badge-inline.pending .status-check {
+            background: #e6a017;
+            color: white;
+        }
+
+        .status-badge-inline .external-icon {
+            font-size: 0.45rem;
+            margin-left: 0.05rem;
+            opacity: 0.7;
         }
 
         /* ---------- STATE MESSAGES ---------- */
@@ -1251,7 +1263,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- CARD RENDERING ----------
+            // ---------- CARD RENDERING (Status badges on subject row) ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1269,7 +1281,7 @@
                     const card = document.createElement('div');
                     card.className = `topic-card ${item.status === 'covered' ? 'covered' : 'pending'}`;
 
-                    // ===== TOP ROW: Srno + Subtopic + Status badge =====
+                    // ===== ROW 1: Srno + Subtopic =====
                     const topRow = document.createElement('div');
                     topRow.className = 'card-top-row';
 
@@ -1281,32 +1293,9 @@
                     `;
                     topRow.appendChild(subtopicDiv);
 
-                    if (item.hasUrl) {
-                        const coveredBadge = document.createElement('a');
-                        coveredBadge.href = item.url;
-                        coveredBadge.target = '_blank';
-                        coveredBadge.rel = 'noopener noreferrer';
-                        coveredBadge.className = 'status-badge-top covered';
-                        coveredBadge.title = 'Click to open the complete chat';
-                        coveredBadge.innerHTML = `
-                            <span class="status-check"><i class="fas fa-check"></i></span>
-                            <span>Covered</span>
-                            <i class="fas fa-external-link-alt external-icon"></i>
-                        `;
-                        topRow.appendChild(coveredBadge);
-                    } else {
-                        const pendingBadge = document.createElement('span');
-                        pendingBadge.className = 'status-badge-top pending';
-                        pendingBadge.innerHTML = `
-                            <span class="status-check"><i class="fas fa-clock"></i></span>
-                            <span>Pending</span>
-                        `;
-                        topRow.appendChild(pendingBadge);
-                    }
-
                     card.appendChild(topRow);
 
-                    // ===== MAIN TOPIC ROW =====
+                    // ===== ROW 2: Main topic with code + count =====
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
@@ -1317,18 +1306,47 @@
                     `;
                     card.appendChild(mainTopicRow);
 
-                    // ===== DETAIL ROW =====
-                    const detailRow = document.createElement('div');
-                    detailRow.className = 'card-detail-row';
+                    // ===== ROW 3: Subject row with status badge on the right =====
+                    const subjectRow = document.createElement('div');
+                    subjectRow.className = 'card-subject-row';
+
+                    const leftSide = document.createElement('div');
+                    leftSide.className = 'card-subject-left';
                     const subjCount = subjectCounts[item.subject] || 1;
-                    detailRow.innerHTML = `
+                    leftSide.innerHTML = `
                         ${item.marks !== '—' ? `<span class="card-percentage">${escapeHtml(item.marks)}%</span>` : ''}
                         <span class="card-subject">
                             ${escapeHtml(item.subject)}
                             <span class="count-badge-style">${subjCount}</span>
                         </span>
                     `;
-                    card.appendChild(detailRow);
+                    subjectRow.appendChild(leftSide);
+
+                    // Status badge on the right side of subject row
+                    if (item.hasUrl) {
+                        const coveredBadge = document.createElement('a');
+                        coveredBadge.href = item.url;
+                        coveredBadge.target = '_blank';
+                        coveredBadge.rel = 'noopener noreferrer';
+                        coveredBadge.className = 'status-badge-inline covered';
+                        coveredBadge.title = 'Click to open the complete chat';
+                        coveredBadge.innerHTML = `
+                            <span class="status-check"><i class="fas fa-check"></i></span>
+                            <span>Covered</span>
+                            <i class="fas fa-external-link-alt external-icon"></i>
+                        `;
+                        subjectRow.appendChild(coveredBadge);
+                    } else {
+                        const pendingBadge = document.createElement('span');
+                        pendingBadge.className = 'status-badge-inline pending';
+                        pendingBadge.innerHTML = `
+                            <span class="status-check"><i class="fas fa-clock"></i></span>
+                            <span>Pending</span>
+                        `;
+                        subjectRow.appendChild(pendingBadge);
+                    }
+
+                    card.appendChild(subjectRow);
 
                     fragment.appendChild(card);
                 });
