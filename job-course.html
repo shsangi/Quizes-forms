@@ -275,10 +275,20 @@
         .topic-card.pending { border-left: 3px solid #e6a017; cursor: pointer; }
         .topic-card.pending:hover { background: #fffdf7; }
 
-        .card-job-badge {
+        /* Top-right corner stack: job badge + date */
+        .card-corner {
             position: absolute;
             top: 0.4rem;
             right: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.15rem;
+            max-width: 45%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .card-job-badge {
             background: #f0f7ff;
             color: #18668a;
             font-size: 0.5rem;
@@ -288,11 +298,18 @@
             border: 1px solid #cfe2f0;
             text-transform: uppercase;
             letter-spacing: 0.2px;
-            max-width: 45%;
+            max-width: 100%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            z-index: 1;
+        }
+        .card-last-update {
+            font-size: 0.5rem;
+            font-weight: 500;
+            color: #8aa4b8;
+            letter-spacing: 0.1px;
+            white-space: nowrap;
+            text-align: right;
         }
 
         /* Row 1 */
@@ -354,7 +371,7 @@
             white-space: nowrap; flex-shrink: 0;
         }
 
-        /* Row 3: Subject + status + PDF (right-aligned) */
+        /* Row 3 */
         .card-subject-row {
             display: flex; align-items: center; justify-content: space-between;
             gap: 0.4rem; flex-wrap: wrap;
@@ -370,7 +387,6 @@
             flex: 1 1 auto; word-break: break-word; overflow-wrap: break-word;
         }
 
-        /* Subject coverage percentage pill (replaces marks %) */
         .card-coverage {
             background: #e2f5ec;
             color: #147a4a;
@@ -392,7 +408,6 @@
             border-color: #f2d9a8;
         }
 
-        /* Right-side cluster: status badge + PDF link */
         .card-right-cluster {
             display: flex;
             align-items: center;
@@ -401,7 +416,6 @@
             margin-left: auto;
         }
 
-        /* Status badges */
         .status-badge-inline {
             display: inline-flex; align-items: center; gap: 0.2rem;
             padding: 0.1rem 0.5rem 0.1rem 0.25rem;
@@ -439,7 +453,7 @@
             font-size: 0.45rem; margin-left: 0.1rem; opacity: 0.75;
         }
 
-        /* PDF link (right-most) */
+        /* PDF link */
         .pdf-link {
             display: inline-flex;
             align-items: center;
@@ -461,13 +475,8 @@
             border-color: #e89a9a;
             color: #991b1b;
         }
-        .pdf-link i {
-            font-size: 0.55rem;
-        }
-        .pdf-link .pdf-label {
-            font-weight: 700;
-            letter-spacing: 0.2px;
-        }
+        .pdf-link i { font-size: 0.55rem; }
+        .pdf-link .pdf-label { font-weight: 700; letter-spacing: 0.2px; }
 
         /* TOAST */
         .toast {
@@ -540,6 +549,7 @@
             .status-checkboxes { gap: 0.4rem; }
             .filter-bar { padding: 0.5rem 0.6rem; }
             .card-job-badge { font-size: 0.45rem; }
+            .card-last-update { font-size: 0.45rem; }
         }
 
         @media (max-width: 380px) {
@@ -668,7 +678,6 @@
 
             let subjectCounts = {};
             let mainTopicCounts = {};
-            // Coverage map: per subject → { total, done }
             let subjectCoverage = {};
 
             let toastTimer = null;
@@ -721,9 +730,9 @@
                 return rows;
             }
 
-            // ============ 7-COLUMN PARSER ============
+            // ============ 8-COLUMN PARSER ============
             // A: Srno | B: Subject with Marks | C: Topic | D: Subtopic
-            // E: job | F: URL | G: pdf files url
+            // E: job | F: URL | G: pdf files url | H: last update date
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
                 const dataRows = rows.slice(1);
@@ -739,8 +748,8 @@
                     const job = (row[4] || '').trim();
                     const url = (row[5] || '').trim();
                     const pdfUrl = (row[6] || '').trim();
+                    const lastUpdate = (row[7] || '').trim();
 
-                    // Marks parsing kept internally for legacy, but not displayed
                     let subject = subjectWithMarks;
                     let marks = '';
                     const marksMatch = subjectWithMarks.match(/;\s*(\d+)\s*$/);
@@ -766,7 +775,8 @@
                         pdfUrl: hasPdf ? pdfUrl : '',
                         hasPdf: hasPdf,
                         status: status,
-                        job: job || '—'
+                        job: job || '—',
+                        lastUpdate: lastUpdate || ''
                     });
                 }
                 return result;
@@ -853,28 +863,15 @@
 
             function pruneSelections() {
                 const available = getAvailableOptions('none');
-                let changed = false;
-
                 Array.from(selectedSubjects).forEach(s => {
-                    if (!available.subjects.includes(s)) {
-                        selectedSubjects.delete(s);
-                        changed = true;
-                    }
+                    if (!available.subjects.includes(s)) selectedSubjects.delete(s);
                 });
                 Array.from(selectedTopics).forEach(t => {
-                    if (!available.topics.includes(t)) {
-                        selectedTopics.delete(t);
-                        changed = true;
-                    }
+                    if (!available.topics.includes(t)) selectedTopics.delete(t);
                 });
                 Array.from(selectedJobs).forEach(j => {
-                    if (!available.jobs.includes(j)) {
-                        selectedJobs.delete(j);
-                        changed = true;
-                    }
+                    if (!available.jobs.includes(j)) selectedJobs.delete(j);
                 });
-
-                return changed;
             }
 
             function buildMultiSelect(container, options, selectedSet, onUpdate, enableSearch) {
@@ -1202,12 +1199,28 @@ Correct answer as per choices`;
                         });
                     }
 
-                    if (showJobBadge && item.job && item.job !== '—') {
-                        const jobBadge = document.createElement('span');
-                        jobBadge.className = 'card-job-badge';
-                        jobBadge.textContent = item.job;
-                        jobBadge.title = `Job: ${item.job}`;
-                        card.appendChild(jobBadge);
+                    // Top-right corner: job badge + last update date (stacked)
+                    if ((showJobBadge && item.job && item.job !== '—') || item.lastUpdate) {
+                        const corner = document.createElement('div');
+                        corner.className = 'card-corner';
+
+                        if (showJobBadge && item.job && item.job !== '—') {
+                            const jobBadge = document.createElement('span');
+                            jobBadge.className = 'card-job-badge';
+                            jobBadge.textContent = item.job;
+                            jobBadge.title = `Job: ${item.job}`;
+                            corner.appendChild(jobBadge);
+                        }
+
+                        if (item.lastUpdate) {
+                            const dateEl = document.createElement('span');
+                            dateEl.className = 'card-last-update';
+                            dateEl.textContent = item.lastUpdate;
+                            dateEl.title = `Last update: ${item.lastUpdate}`;
+                            corner.appendChild(dateEl);
+                        }
+
+                        card.appendChild(corner);
                     }
 
                     // ROW 1: Srno + Subtopic
@@ -1250,14 +1263,13 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
-                    // ===== ROW 3: Subject + coverage% + status + PDF (right-most) =====
+                    // ROW 3: Subject + coverage% + status + PDF
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
 
                     const leftSide = document.createElement('div');
                     leftSide.className = 'card-subject-left';
 
-                    // Subject coverage percentage pill (replaces marks)
                     const covPct = getSubjectCoveragePct(item.subject);
                     const covClass = covPct === 100 ? 'full' : (covPct < 50 ? 'low' : '');
                     const covPill = `<span class="card-coverage ${covClass}" title="Subject coverage: ${covPct}%">${covPct}%</span>`;
@@ -1272,7 +1284,6 @@ Correct answer as per choices`;
                     `;
                     subjectRow.appendChild(leftSide);
 
-                    // Right cluster: status badge + PDF (PDF last → right-most)
                     const rightCluster = document.createElement('div');
                     rightCluster.className = 'card-right-cluster';
 
@@ -1305,7 +1316,6 @@ Correct answer as per choices`;
                         rightCluster.appendChild(pendingBadge);
                     }
 
-                    // PDF link at the very right
                     if (item.hasPdf) {
                         const pdfLink = document.createElement('a');
                         pdfLink.href = item.pdfUrl;
@@ -1424,11 +1434,11 @@ Correct answer as per choices`;
 
                     setTimeout(() => {
                         const sample = [
-                            { srno: '1', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: 'Percentages', url: 'https://chat.deepseek.com/share/x2gdwyy9txdzvcadm', hasUrl: true, pdfUrl: 'https://example.com/sol1.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt' },
-                            { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, pdfUrl: 'https://example.com/sol2.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt' },
-                            { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, pdfUrl: '', hasPdf: false, status: 'covered', job: 'css-2027-mpt' },
-                            { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, pdfUrl: '', hasPdf: false, status: 'pending', job: 'css-2027-mpt' },
-                            { srno: '5', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: '#', hasUrl: false, pdfUrl: 'https://example.com/sol5.pdf', hasPdf: true, status: 'pending', job: 'css-2027-mpt' }
+                            { srno: '1', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: 'Percentages', url: 'https://chat.deepseek.com/share/x2gdwyy9txdzvcadm', hasUrl: true, pdfUrl: 'https://example.com/sol1.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-20' },
+                            { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, pdfUrl: 'https://example.com/sol2.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-21' },
+                            { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, pdfUrl: '', hasPdf: false, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-22' },
+                            { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, pdfUrl: '', hasPdf: false, status: 'pending', job: 'css-2027-mpt', lastUpdate: '' },
+                            { srno: '5', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: '#', hasUrl: false, pdfUrl: 'https://example.com/sol5.pdf', hasPdf: true, status: 'pending', job: 'css-2027-mpt', lastUpdate: '2026-09-23' }
                         ];
                         rawData = sample;
                         computeCounts(rawData);
