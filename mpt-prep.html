@@ -81,7 +81,7 @@
             border-color: #b8d4e8;
         }
 
-        /* ---------- ULTRA COMPACT STATS ROW ---------- */
+        /* ---------- COMPACT STATS ROW ---------- */
         .stats-row {
             display: flex;
             flex-direction: row;
@@ -113,7 +113,6 @@
             text-align: center;
             gap: 0.05rem;
             transition: 0.2s;
-            cursor: default;
         }
 
         .stat-chip:hover {
@@ -353,7 +352,7 @@
             gap: 0.8rem;
         }
 
-        /* ---------- CARD ---------- */
+        /* ---------- NEW CARD LAYOUT ---------- */
         .topic-card {
             background: white;
             border-radius: 14px;
@@ -363,9 +362,10 @@
             transition: 0.2s;
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.35rem;
             font-size: 0.78rem;
             line-height: 1.3;
+            position: relative;
         }
 
         .topic-card:hover {
@@ -382,48 +382,23 @@
             border-left: 4px solid #e6a017;
         }
 
-        .card-row-1 {
+        /* TOP ROW: subtopic (left) + URL nav (right) */
+        .card-top-row {
             display: flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 0.25rem 0.5rem;
+            justify-content: space-between;
+            gap: 0.5rem;
         }
 
-        .card-srno {
-            background: #e9f0f7;
-            border-radius: 30px;
-            padding: 0.1rem 0.55rem;
-            font-size: 0.6rem;
-            font-weight: 700;
-            color: #1a4a66;
-            white-space: nowrap;
-        }
-
-        .card-subject {
-            font-weight: 600;
-            color: #0c334a;
-            font-size: 0.82rem;
-        }
-
-        .card-marks {
-            background: #e0f0fa;
-            padding: 0.1rem 0.45rem;
-            border-radius: 30px;
-            font-size: 0.55rem;
-            font-weight: 700;
-            color: #146a8a;
-            white-space: nowrap;
-            margin-left: auto;
-        }
-
-        .card-row-2 {
+        .card-subtopic {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 0.35rem;
-            flex-wrap: wrap;
+            min-width: 0;
+            flex: 1;
         }
 
-        .topic-srno-badge {
+        .card-subtopic .subtopic-code {
             background: #d9eaf5;
             border-radius: 30px;
             font-size: 0.55rem;
@@ -434,22 +409,17 @@
             flex-shrink: 0;
         }
 
-        .topic-name {
-            font-weight: 500;
-            color: #1f3d51;
-            word-break: break-word;
-            font-size: 0.78rem;
+        .card-subtopic .subtopic-name {
+            font-weight: 600;
+            color: #0c334a;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .card-row-3 {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            margin-top: 0.05rem;
-            flex-wrap: wrap;
-        }
-
-        .url-link {
+        /* URL nav button top right */
+        .card-nav {
             display: inline-flex;
             align-items: center;
             gap: 0.2rem;
@@ -457,22 +427,74 @@
             color: #18668a;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.65rem;
-            padding: 0.12rem 0.55rem;
+            font-size: 0.6rem;
+            padding: 0.15rem 0.55rem;
             border-radius: 30px;
             transition: 0.2s;
             border: 1px solid #d3e6f2;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .url-link i {
+        .card-nav i {
             font-size: 0.55rem;
         }
 
-        .url-link:hover {
+        .card-nav:hover {
             background: #d8e9f8;
             border-color: #97c0db;
             color: #0a3e58;
+        }
+
+        /* ROW 2: Srno + Percentage + Subject (count) */
+        .card-mid-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.3rem 0.5rem;
+        }
+
+        .card-srno {
+            background: #e9f0f7;
+            border-radius: 30px;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #1a4a66;
+            white-space: nowrap;
+        }
+
+        .card-percentage {
+            background: #e0f0fa;
+            padding: 0.1rem 0.45rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #146a8a;
+            white-space: nowrap;
+        }
+
+        .card-subject-with-count {
+            font-weight: 500;
+            color: #1f3d51;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .card-subject-with-count .count-badge {
+            color: #6a8ba5;
+            font-weight: 500;
+            font-size: 0.7rem;
+        }
+
+        /* ROW 3: status badge */
+        .card-status-row {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .status-badge {
@@ -481,7 +503,7 @@
             gap: 0.2rem;
             font-size: 0.55rem;
             font-weight: 700;
-            padding: 0.1rem 0.45rem;
+            padding: 0.1rem 0.5rem;
             border-radius: 30px;
             white-space: nowrap;
         }
@@ -605,7 +627,7 @@
             </a>
         </div>
 
-        <!-- ULTRA COMPACT STATS ROW (4 in one row) -->
+        <!-- compact stats row -->
         <div class="stats-row">
             <div class="stat-chip">
                 <div class="chip-label"><i class="fas fa-layer-group"></i> Total</div>
@@ -683,6 +705,10 @@
             let selectedTopics = new Set();
             let selectedStatuses = new Set(['covered', 'pending']);
 
+            // Counts per subject and per topic (subtopic)
+            let subjectCounts = {};
+            let subtopicCounts = {};
+
             function parseCSV(csvText) {
                 const rows = [];
                 let currentRow = [];
@@ -753,6 +779,7 @@
                     const topicWithSrno = (topicSrnoIdx !== -1 ? row[topicSrnoIdx] : row[2] || '').trim();
                     const url = (urlIdx !== -1 ? row[urlIdx] : row[3] || '').trim();
 
+                    // Parse subject and marks
                     let subject = subjectWithMarks;
                     let marks = '';
                     const marksMatch = subjectWithMarks.match(/\((\d+)\)|\[(\d+)\]|(\d+)\s*$/);
@@ -770,6 +797,7 @@
                         }
                     }
 
+                    // Parse topic (subtopic) and its code
                     let topic = topicWithSrno;
                     let topicSrno = '';
                     const topicSrnoMatch = topicWithSrno.match(/\(([^)]+)\)|\[([^\]]+)\]/);
@@ -809,6 +837,23 @@
                     });
                 }
                 return result;
+            }
+
+            function computeCounts(data) {
+                subjectCounts = {};
+                subtopicCounts = {};
+
+                data.forEach(item => {
+                    // Subject count
+                    if (item.subject && item.subject !== '—') {
+                        subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
+                    }
+                    // Subtopic (topic) count
+                    const key = item.topicSrno !== '—' ? `${item.topicSrno} ${item.topic}` : item.topic;
+                    if (key && key !== '—') {
+                        subtopicCounts[key] = (subtopicCounts[key] || 0) + 1;
+                    }
+                });
             }
 
             function updateStats(data) {
@@ -931,6 +976,7 @@
                 renderCards(filteredData);
             }
 
+            // ---------- NEW CARD RENDERING ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -948,42 +994,67 @@
                     const card = document.createElement('div');
                     card.className = `topic-card ${item.status === 'covered' ? 'covered' : 'pending'}`;
 
-                    const row1 = document.createElement('div');
-                    row1.className = 'card-row-1';
-                    row1.innerHTML = `
-                        <span class="card-srno">#${escapeHtml(item.srno)}</span>
-                        <span class="card-subject">${escapeHtml(item.subject)}</span>
-                        ${item.marks !== '—' ? `<span class="card-marks">${escapeHtml(item.marks)}</span>` : ''}
+                    // ===== TOP ROW: Subtopic (left) + URL nav (right) =====
+                    const topRow = document.createElement('div');
+                    topRow.className = 'card-top-row';
+
+                    const subtopicDiv = document.createElement('div');
+                    subtopicDiv.className = 'card-subtopic';
+                    subtopicDiv.innerHTML = `
+                        ${item.topicSrno && item.topicSrno !== '—' ? `<span class="subtopic-code">${escapeHtml(item.topicSrno)}</span>` : ''}
+                        <span class="subtopic-name">${escapeHtml(item.topic !== '—' ? item.topic : '—')}</span>
                     `;
-                    card.appendChild(row1);
+                    topRow.appendChild(subtopicDiv);
 
-                    const row2 = document.createElement('div');
-                    row2.className = 'card-row-2';
-                    if (item.topicSrno !== '—' || item.topic !== '—') {
-                        row2.innerHTML = `
-                            ${item.topicSrno !== '—' ? `<span class="topic-srno-badge">${escapeHtml(item.topicSrno)}</span>` : ''}
-                            <span class="topic-name">${escapeHtml(item.topic !== '—' ? item.topic : '')}</span>
-                        `;
-                    } else {
-                        row2.innerHTML = `<span class="topic-name" style="opacity:0.6;">—</span>`;
-                    }
-                    card.appendChild(row2);
-
-                    const row3 = document.createElement('div');
-                    row3.className = 'card-row-3';
+                    // URL nav on top right
                     if (item.hasUrl) {
-                        row3.innerHTML = `
-                            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="url-link">
-                                <i class="fas fa-external-link-alt"></i> Open
-                            </a>
-                            <span class="status-badge status-covered"><i class="fas fa-check-circle"></i> Covered</span>
-                        `;
-                    } else {
-                        row3.innerHTML = `
-                            <span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>
-                        `;
+                        const navLink = document.createElement('a');
+                        navLink.href = item.url;
+                        navLink.target = '_blank';
+                        navLink.rel = 'noopener noreferrer';
+                        navLink.className = 'card-nav';
+                        navLink.innerHTML = `<i class="fas fa-external-link-alt"></i> Open`;
+                        topRow.appendChild(navLink);
                     }
-                    card.appendChild(row3);
+
+                    card.appendChild(topRow);
+
+                    // ===== MID ROW: Srno + Percentage + Subject (with count) =====
+                    const midRow = document.createElement('div');
+                    midRow.className = 'card-mid-row';
+
+                    // Srno
+                    const srnoSpan = document.createElement('span');
+                    srnoSpan.className = 'card-srno';
+                    srnoSpan.textContent = `#${item.srno}`;
+                    midRow.appendChild(srnoSpan);
+
+                    // Percentage (marks)
+                    if (item.marks && item.marks !== '—') {
+                        const pctSpan = document.createElement('span');
+                        pctSpan.className = 'card-percentage';
+                        pctSpan.textContent = `${item.marks}%`;
+                        midRow.appendChild(pctSpan);
+                    }
+
+                    // Subject with count
+                    const subjectSpan = document.createElement('span');
+                    subjectSpan.className = 'card-subject-with-count';
+                    const subjCount = subjectCounts[item.subject] || 1;
+                    subjectSpan.innerHTML = `${escapeHtml(item.subject)} <span class="count-badge">(${subjCount})</span>`;
+                    midRow.appendChild(subjectSpan);
+
+                    card.appendChild(midRow);
+
+                    // ===== STATUS ROW =====
+                    const statusRow = document.createElement('div');
+                    statusRow.className = 'card-status-row';
+                    if (item.hasUrl) {
+                        statusRow.innerHTML = `<span class="status-badge status-covered"><i class="fas fa-check-circle"></i> Covered</span>`;
+                    } else {
+                        statusRow.innerHTML = `<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>`;
+                    }
+                    card.appendChild(statusRow);
 
                     fragment.appendChild(card);
                 });
@@ -1053,6 +1124,9 @@
                     rawData = mapRowsToObjects(rows);
                     if (rawData.length === 0) throw new Error('No parsed data');
 
+                    // Compute counts for subject and subtopic
+                    computeCounts(rawData);
+
                     populateFilters(rawData);
 
                     selectedStatuses.clear();
@@ -1075,14 +1149,17 @@
 
                     setTimeout(() => {
                         const sample = [
-                            { srno: '1', subject: 'Mathematics', marks: '92', topicSrno: 'T1', topic: 'Algebra', topicDisplay: 'T1 – Algebra', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
-                            { srno: '2', subject: 'Physics', marks: '88', topicSrno: 'P2', topic: 'Mechanics', topicDisplay: 'P2 – Mechanics', url: '#', hasUrl: false, status: 'pending' },
-                            { srno: '3', subject: 'Chemistry', marks: '79', topicSrno: 'C3', topic: 'Organic', topicDisplay: 'C3 – Organic', url: 'https://example.com/chem', hasUrl: true, status: 'covered' },
-                            { srno: '4', subject: 'Biology', marks: '85', topicSrno: 'B4', topic: 'Genetics', topicDisplay: 'B4 – Genetics', url: '#', hasUrl: false, status: 'pending' },
-                            { srno: '5', subject: 'Computer Science', marks: '95', topicSrno: 'CS1', topic: 'Algorithms', topicDisplay: 'CS1 – Algorithms', url: 'https://example.com/cs', hasUrl: true, status: 'covered' },
-                            { srno: '6', subject: 'Mathematics', marks: '92', topicSrno: 'T2', topic: 'Calculus', topicDisplay: 'T2 – Calculus', url: '#', hasUrl: false, status: 'pending' }
+                            { srno: '1', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.1', topic: 'Basic Arithmetic', topicDisplay: '1.1 – Basic Arithmetic', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
+                            { srno: '2', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.2', topic: 'Basic Arithmetic', topicDisplay: '1.2 – Basic Arithmetic', url: 'https://example.com/ratios', hasUrl: true, status: 'covered' },
+                            { srno: '3', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.3', topic: 'Basic Arithmetic', topicDisplay: '1.3 – Basic Arithmetic', url: 'https://example.com/averages', hasUrl: true, status: 'covered' },
+                            { srno: '4', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '1.4', topic: 'Basic Arithmetic', topicDisplay: '1.4 – Basic Arithmetic', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '5', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '2.1', topic: 'Algebra', topicDisplay: '2.1 – Algebra', url: 'https://example.com/algebra', hasUrl: true, status: 'covered' },
+                            { srno: '6', subject: 'General Abilities (60 MCQs)', marks: '60', topicSrno: '2.2', topic: 'Algebra', topicDisplay: '2.2 – Algebra', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '7', subject: 'English (40 MCQs)', marks: '40', topicSrno: '3.1', topic: 'Grammar', topicDisplay: '3.1 – Grammar', url: 'https://example.com/grammar', hasUrl: true, status: 'covered' },
+                            { srno: '8', subject: 'English (40 MCQs)', marks: '40', topicSrno: '3.2', topic: 'Vocabulary', topicDisplay: '3.2 – Vocabulary', url: '#', hasUrl: false, status: 'pending' }
                         ];
                         rawData = sample;
+                        computeCounts(rawData);
                         populateFilters(rawData);
                         selectedStatuses.clear();
                         selectedStatuses.add('covered');
