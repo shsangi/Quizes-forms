@@ -1030,4 +1030,95 @@
 
                 // build status multi-select (static options)
                 const statusOptions = [
-                    { value
+                    { value: 'covered', label: '✅ Covered' },
+                    { value: 'pending', label: '⏳ Pending' }
+                ];
+                const statusWrap = document.getElementById('statusMultiWrap');
+                statusWrap.dataset.type = 'statuses';
+                buildMultiSelect(statusWrap, statusOptions, selectedStatuses, applyFiltersAndRender);
+
+                // rebuild status trigger text
+                const statusTrigger = document.getElementById('statusTrigger');
+                const statusPlaceholder = document.getElementById('statusPlaceholder');
+                if (selectedStatuses.size === 0) {
+                    statusPlaceholder.textContent = 'All statuses';
+                } else if (selectedStatuses.size === 2) {
+                    statusPlaceholder.textContent = 'All statuses';
+                } else {
+                    statusPlaceholder.textContent = selectedStatuses.has('covered') ? 'Covered only' : 'Pending only';
+                }
+            }
+
+            // --- load data ---
+            async function loadData() {
+                cardsContainer.innerHTML = `
+                    <div class="state-message">
+                        <div class="spinner"></div>
+                        <div>Loading topics…</div>
+                    </div>`;
+
+                try {
+                    const response = await fetch(CSV_URL);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const csvText = await response.text();
+
+                    if (csvText.trim().startsWith('<!DOCTYPE') || csvText.trim().startsWith('<html')) {
+                        throw new Error('Received HTML instead of CSV');
+                    }
+
+                    const rows = parseCSV(csvText);
+                    if (rows.length < 2) throw new Error('No data rows');
+
+                    rawData = mapRowsToObjects(rows);
+                    if (rawData.length === 0) throw new Error('No parsed data');
+
+                    populateFilters(rawData);
+
+                    // set default selected statuses to both
+                    selectedStatuses.clear();
+                    selectedStatuses.add('covered');
+                    selectedStatuses.add('pending');
+
+                    // reset filters
+                    selectedSubjects.clear();
+                    selectedTopics.clear();
+
+                    applyFiltersAndRender();
+
+                } catch (error) {
+                    console.error('Load error:', error);
+                    cardsContainer.innerHTML = `
+                        <div class="state-message">
+                            <i class="fas fa-exclamation-triangle" style="color:#c06b4a;"></i>
+                            <div style="margin-bottom:0.4rem;"><strong>Couldn't load sheet</strong></div>
+                            <div style="font-size:0.8rem; opacity:0.8;">${escapeHtml(error.message)}</div>
+                            <div style="margin-top:1rem; font-size:0.8rem;">Showing sample cards.</div>
+                        </div>`;
+
+                    setTimeout(() => {
+                        const sample = [
+                            { srno: '1', subject: 'Mathematics', marks: '92', topicSrno: 'T1', topic: 'Algebra', topicDisplay: 'T1 – Algebra', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
+                            { srno: '2', subject: 'Physics', marks: '88', topicSrno: 'P2', topic: 'Mechanics', topicDisplay: 'P2 – Mechanics', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '3', subject: 'Chemistry', marks: '79', topicSrno: 'C3', topic: 'Organic', topicDisplay: 'C3 – Organic', url: 'https://example.com/chem', hasUrl: true, status: 'covered' },
+                            { srno: '4', subject: 'Biology', marks: '85', topicSrno: 'B4', topic: 'Genetics', topicDisplay: 'B4 – Genetics', url: '#', hasUrl: false, status: 'pending' },
+                            { srno: '5', subject: 'Computer Science', marks: '95', topicSrno: 'CS1', topic: 'Algorithms', topicDisplay: 'CS1 – Algorithms', url: 'https://example.com/cs', hasUrl: true, status: 'covered' },
+                            { srno: '6', subject: 'Mathematics', marks: '92', topicSrno: 'T2', topic: 'Calculus', topicDisplay: 'T2 – Calculus', url: '#', hasUrl: false, status: 'pending' }
+                        ];
+                        rawData = sample;
+                        populateFilters(rawData);
+                        selectedStatuses.clear();
+                        selectedStatuses.add('covered');
+                        selectedStatuses.add('pending');
+                        selectedSubjects.clear();
+                        selectedTopics.clear();
+                        applyFiltersAndRender();
+                    }, 200);
+                }
+            }
+
+            // init
+            loadData();
+        })();
+    </script>
+</body>
+</html>
