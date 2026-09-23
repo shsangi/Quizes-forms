@@ -870,31 +870,68 @@ Detail solution
 Correct answer as per choices`;
             }
 
+            // ============ ROBUST COPY FUNCTION ============
+            // Primary: use execCommand fallback FIRST (works everywhere, no permission prompts)
+            // Secondary: try navigator.clipboard as an enhancement
             function copyPrompt(item) {
                 const text = buildPrompt(item);
+
+                // Try the synchronous fallback first — most reliable across all browsers
+                const success = fallbackCopy(text);
+                if (success) {
+                    showToast(`Copied "${item.subTopic}" prompt`);
+                    return;
+                }
+
+                // If fallback fails, try the modern async clipboard API
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(text).then(() => {
                         showToast(`Copied "${item.subTopic}" prompt`);
-                    }).catch(() => fallbackCopy(text, item.subTopic));
+                    }).catch((err) => {
+                        console.error('Clipboard write failed:', err);
+                        showToast('Copy failed — please copy manually');
+                    });
                 } else {
-                    fallbackCopy(text, item.subTopic);
+                    showToast('Copy failed — please copy manually');
                 }
             }
 
-            function fallbackCopy(text, label) {
+            // Synchronous copy using a hidden textarea — works in all browsers
+            function fallbackCopy(text) {
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
+                // Keep it rendered but invisible — display:none breaks copy in some browsers
                 textarea.style.position = 'fixed';
+                textarea.style.top = '0';
+                textarea.style.left = '0';
+                textarea.style.width = '2em';
+                textarea.style.height = '2em';
+                textarea.style.padding = '0';
+                textarea.style.border = 'none';
+                textarea.style.outline = 'none';
+                textarea.style.boxShadow = 'none';
+                textarea.style.background = 'transparent';
                 textarea.style.opacity = '0';
+                textarea.setAttribute('readonly', '');
+                textarea.setAttribute('aria-hidden', 'true');
+
                 document.body.appendChild(textarea);
-                textarea.select();
+
+                let success = false;
                 try {
-                    document.execCommand('copy');
-                    showToast(`Copied "${label}" prompt`);
+                    // Focus and select — required for execCommand to work
+                    textarea.focus();
+                    textarea.select();
+                    // iOS requires setSelectionRange
+                    textarea.setSelectionRange(0, text.length);
+                    success = document.execCommand('copy');
                 } catch (err) {
-                    showToast('Copy failed — please copy manually');
+                    console.warn('execCommand copy failed:', err);
+                    success = false;
                 }
+
                 document.body.removeChild(textarea);
+                return success;
             }
 
             function showToast(msg) {
