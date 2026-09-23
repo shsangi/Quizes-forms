@@ -378,7 +378,7 @@
             gap: 0.8rem;
         }
 
-        /* ---------- NEW CARD LAYOUT (Main Topic at Top) ---------- */
+        /* ---------- NEW CARD LAYOUT (Subtopic Top, Main Topic Below) ---------- */
         .topic-card {
             background: white;
             border-radius: 14px;
@@ -408,8 +408,8 @@
             border-left: 4px solid #e6a017;
         }
 
-        /* Top row: Main Topic (large) + URL button (right) */
-        .card-main-topic-row {
+        /* Top row: Subtopic (large) + URL button (right) */
+        .card-subtopic-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -417,7 +417,7 @@
             margin-bottom: 0.1rem;
         }
 
-        .card-main-topic {
+        .card-subtopic {
             display: flex;
             align-items: center;
             gap: 0.35rem;
@@ -425,24 +425,24 @@
             flex: 1;
         }
 
-        .card-main-topic .main-topic-name {
+        .card-subtopic .subtopic-code-badge {
+            background: #d9eaf5;
+            border-radius: 30px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #0c4b6b;
+            padding: 0.1rem 0.45rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .card-subtopic .subtopic-name {
             font-weight: 700;
             color: #0c334a;
             font-size: 0.95rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .card-main-topic .main-topic-count {
-            background: #e0f0fa;
-            color: #146a8a;
-            font-size: 0.6rem;
-            font-weight: 700;
-            padding: 0.1rem 0.5rem;
-            border-radius: 30px;
-            white-space: nowrap;
-            flex-shrink: 0;
         }
 
         /* URL nav button top right */
@@ -473,8 +473,8 @@
             color: #0a3e58;
         }
 
-        /* Subtopic row (smaller) */
-        .card-subtopic-row {
+        /* Main topic row (below subtopic) */
+        .card-main-topic-row {
             display: flex;
             align-items: center;
             gap: 0.35rem;
@@ -482,24 +482,24 @@
             margin-bottom: 0.05rem;
         }
 
-        .subtopic-code-badge {
-            background: #d9eaf5;
-            border-radius: 30px;
-            font-size: 0.55rem;
-            font-weight: 700;
-            color: #0c4b6b;
-            padding: 0.1rem 0.45rem;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .subtopic-name {
-            font-weight: 500;
+        .main-topic-name {
+            font-weight: 600;
             color: #1f3d51;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .main-topic-count {
+            background: #e0f0fa;
+            color: #146a8a;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.1rem 0.5rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         /* Srno + Subject + Percentage row */
@@ -671,7 +671,7 @@
                 padding: 0.65rem 0.75rem;
             }
 
-            .card-main-topic .main-topic-name {
+            .card-subtopic .subtopic-name {
                 font-size: 0.9rem;
             }
         }
@@ -870,7 +870,7 @@
                         }
                     }
 
-                    // Parse topic: extract main topic (e.g., "Basic Arithmetic") and subtopic (e.g., "Percentages")
+                    // Parse topic: extract subtopic (e.g., "Percentages") and main topic (e.g., "Basic Arithmetic")
                     let fullTopic = topicWithSrno;
                     let topicCode = '';
                     let mainTopic = '';
@@ -881,7 +881,6 @@
                     if (codeMatch) {
                         topicCode = codeMatch[1];
                         let rest = codeMatch[2].trim();
-                        // Split by ":" or " - " to separate main topic from subtopic
                         const splitMatch = rest.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
                         if (splitMatch) {
                             mainTopic = splitMatch[1].trim();
@@ -891,7 +890,6 @@
                             subTopic = rest;
                         }
                     } else {
-                        // fallback: try to split by ":" or "-"
                         const splitMatch = topicWithSrno.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
                         if (splitMatch) {
                             mainTopic = splitMatch[1].trim();
@@ -903,7 +901,6 @@
                         topicCode = '';
                     }
 
-                    // If mainTopic still contains a code, clean it
                     if (!topicCode) {
                         const codeOnly = mainTopic.match(/^(\d+\.\d+)\s*(.*)/);
                         if (codeOnly) {
@@ -912,7 +909,6 @@
                         }
                     }
 
-                    // If main topic is empty, use subTopic
                     if (!mainTopic) mainTopic = subTopic;
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
@@ -1108,7 +1104,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- NEW CARD RENDERING (Main Topic at Top) ----------
+            // ---------- CARD RENDERING (Subtopic Top, Main Topic Below) ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1126,18 +1122,17 @@
                     const card = document.createElement('div');
                     card.className = `topic-card ${item.status === 'covered' ? 'covered' : 'pending'}`;
 
-                    // ===== TOP ROW: Main Topic (large) + URL nav (right) =====
-                    const mainTopicRow = document.createElement('div');
-                    mainTopicRow.className = 'card-main-topic-row';
+                    // ===== TOP ROW: Subtopic (large) + URL button (right) =====
+                    const subtopicRow = document.createElement('div');
+                    subtopicRow.className = 'card-subtopic-row';
 
-                    const mainTopicDiv = document.createElement('div');
-                    mainTopicDiv.className = 'card-main-topic';
-                    const mainCount = mainTopicCounts[item.mainTopic] || 1;
-                    mainTopicDiv.innerHTML = `
-                        <span class="main-topic-name">${escapeHtml(item.mainTopic)}</span>
-                        <span class="main-topic-count">${mainCount}</span>
+                    const subtopicDiv = document.createElement('div');
+                    subtopicDiv.className = 'card-subtopic';
+                    subtopicDiv.innerHTML = `
+                        ${item.topicCode && item.topicCode !== '—' ? `<span class="subtopic-code-badge">${escapeHtml(item.topicCode)}</span>` : ''}
+                        <span class="subtopic-name">${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}</span>
                     `;
-                    mainTopicRow.appendChild(mainTopicDiv);
+                    subtopicRow.appendChild(subtopicDiv);
 
                     if (item.hasUrl) {
                         const navLink = document.createElement('a');
@@ -1146,24 +1141,24 @@
                         navLink.rel = 'noopener noreferrer';
                         navLink.className = 'card-nav';
                         navLink.innerHTML = `<i class="fas fa-external-link-alt"></i> Open`;
-                        mainTopicRow.appendChild(navLink);
+                        subtopicRow.appendChild(navLink);
                     }
 
-                    card.appendChild(mainTopicRow);
-
-                    // ===== SUBTOPIC ROW (code + name) =====
-                    const subtopicRow = document.createElement('div');
-                    subtopicRow.className = 'card-subtopic-row';
-                    subtopicRow.innerHTML = `
-                        ${item.topicCode && item.topicCode !== '—' ? `<span class="subtopic-code-badge">${escapeHtml(item.topicCode)}</span>` : ''}
-                        <span class="subtopic-name">${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}</span>
-                    `;
                     card.appendChild(subtopicRow);
+
+                    // ===== MAIN TOPIC ROW (below subtopic) =====
+                    const mainTopicRow = document.createElement('div');
+                    mainTopicRow.className = 'card-main-topic-row';
+                    const mainCount = mainTopicCounts[item.mainTopic] || 1;
+                    mainTopicRow.innerHTML = `
+                        <span class="main-topic-name">${escapeHtml(item.mainTopic)}</span>
+                        <span class="main-topic-count">${mainCount}</span>
+                    `;
+                    card.appendChild(mainTopicRow);
 
                     // ===== DETAIL ROW: Srno + Percentage + Subject (with count) =====
                     const detailRow = document.createElement('div');
                     detailRow.className = 'card-detail-row';
-
                     detailRow.innerHTML = `
                         <span class="card-srno">#${escapeHtml(item.srno)}</span>
                         ${item.marks !== '—' ? `<span class="card-percentage">${escapeHtml(item.marks)}%</span>` : ''}
