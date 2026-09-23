@@ -152,7 +152,7 @@
             color: #a8690e;
         }
 
-        /* ---------- FILTER BAR (Subject & Topic on one line, Status as checkboxes) ---------- */
+        /* ---------- FILTER BAR ---------- */
         .filter-bar {
             background: white;
             border-radius: 16px;
@@ -195,7 +195,7 @@
             font-size: 0.55rem;
         }
 
-        /* ---------- MULTI-SELECT (for Subject & Topic) ---------- */
+        /* ---------- MULTI-SELECT ---------- */
         .multi-select-wrap {
             position: relative;
             width: 100%;
@@ -576,7 +576,7 @@
             color: #0a3e58;
         }
 
-        /* Main topic row (below subtopic) - keeps numbering like "1.1" */
+        /* Main topic row */
         .card-main-topic-row {
             display: flex;
             align-items: center;
@@ -605,7 +605,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Consistent count badge style */
         .count-badge-style {
             background: #e0f0fa;
             color: #146a8a;
@@ -617,7 +616,7 @@
             flex-shrink: 0;
         }
 
-        /* Detail row: Percentage + Subject (with count) */
+        /* Detail row */
         .card-detail-row {
             display: flex;
             align-items: center;
@@ -648,7 +647,7 @@
             gap: 0.25rem;
         }
 
-        /* Status row with checkmark */
+        /* Status row with clickable Covered link */
         .card-status-row {
             display: flex;
             align-items: center;
@@ -689,6 +688,39 @@
 
         .status-text.pending {
             color: #a8690e;
+        }
+
+        /* Clickable covered link - opens the chat URL */
+        .covered-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0.15rem 0.5rem 0.15rem 0.15rem;
+            border-radius: 30px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .covered-link:hover {
+            background: #e2f5ec;
+            border-color: #b8e0cd;
+        }
+
+        .covered-link .status-check.covered {
+            background: #2e9b6e;
+            color: white;
+        }
+
+        .covered-link .status-text.covered {
+            color: #147a4a;
+        }
+
+        .covered-link .external-icon {
+            font-size: 0.55rem;
+            color: #2e9b6e;
+            margin-left: 0.1rem;
         }
 
         /* ---------- STATE MESSAGES ---------- */
@@ -834,7 +866,6 @@
 
         <!-- filter bar -->
         <div class="filter-bar">
-            <!-- Subject & Topic on one line -->
             <div class="filter-row-top">
                 <div class="filter-group">
                     <label><i class="fas fa-book"></i> Subject</label>
@@ -859,7 +890,6 @@
                 </div>
             </div>
 
-            <!-- Status as checkboxes -->
             <div class="status-checkboxes">
                 <span class="cb-label"><i class="fas fa-check-circle"></i> Status</span>
                 <div class="checkbox-item covered checked" id="cbCovered" data-status="covered">
@@ -889,7 +919,6 @@
             const statPending = document.getElementById('statPending');
             const statSubjects = document.getElementById('statSubjects');
 
-            // Checkbox elements
             const cbCovered = document.getElementById('cbCovered');
             const cbPending = document.getElementById('cbPending');
 
@@ -989,7 +1018,6 @@
                         }
                     }
 
-                    // Parse topic: extract numbering (e.g., "1.1") and subtopic (e.g., "Percentages")
                     let topicCode = '';
                     let subTopic = '';
                     let mainTopic = '';
@@ -1206,7 +1234,6 @@
                 updateTriggerText();
             }
 
-            // Status checkbox logic
             function setupStatusCheckboxes() {
                 cbCovered.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1241,7 +1268,7 @@
                 renderCards(filteredData);
             }
 
-            // ---------- CARD RENDERING ----------
+            // ---------- CARD RENDERING (with clickable Covered link) ----------
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1307,20 +1334,32 @@
                     `;
                     card.appendChild(detailRow);
 
-                    // ===== STATUS ROW with checkmark =====
+                    // ===== STATUS ROW: Clickable Covered link OR Pending badge =====
                     const statusRow = document.createElement('div');
                     statusRow.className = 'card-status-row';
+
                     if (item.hasUrl) {
-                        statusRow.innerHTML = `
+                        // Covered: clickable link to open the chat URL
+                        const coveredLink = document.createElement('a');
+                        coveredLink.href = item.url;
+                        coveredLink.target = '_blank';
+                        coveredLink.rel = 'noopener noreferrer';
+                        coveredLink.className = 'covered-link';
+                        coveredLink.title = 'Click to open the complete chat';
+                        coveredLink.innerHTML = `
                             <span class="status-check covered"><i class="fas fa-check"></i></span>
                             <span class="status-text covered">Covered</span>
+                            <i class="fas fa-external-link-alt external-icon"></i>
                         `;
+                        statusRow.appendChild(coveredLink);
                     } else {
+                        // Pending: non-clickable badge
                         statusRow.innerHTML = `
                             <span class="status-check pending"><i class="fas fa-clock"></i></span>
                             <span class="status-text pending">Pending</span>
                         `;
                     }
+
                     card.appendChild(statusRow);
 
                     fragment.appendChild(card);
@@ -1393,7 +1432,6 @@
                     selectedSubjects.clear();
                     selectedTopics.clear();
 
-                    // Reset checkboxes to checked
                     cbCovered.classList.add('checked');
                     cbPending.classList.add('checked');
 
@@ -1411,13 +1449,13 @@
 
                     setTimeout(() => {
                         const sample = [
-                            { srno: '1', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.1', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: '1.1 Percentages', url: 'https://example.com/math', hasUrl: true, status: 'covered' },
-                            { srno: '2', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.2', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: '1.2 Ratios', url: 'https://example.com/ratios', hasUrl: true, status: 'covered' },
-                            { srno: '3', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.3', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: '1.3 Averages', url: 'https://example.com/averages', hasUrl: true, status: 'covered' },
+                            { srno: '1', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.1', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: '1.1 Percentages', url: 'https://chat.deepseek.com/a/chat/s/abc123', hasUrl: true, status: 'covered' },
+                            { srno: '2', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.2', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: '1.2 Ratios', url: 'https://chatgpt.com/c/def456', hasUrl: true, status: 'covered' },
+                            { srno: '3', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.3', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: '1.3 Averages', url: 'https://gemini.google.com/app/ghi789', hasUrl: true, status: 'covered' },
                             { srno: '4', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.4', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: '1.4 Profit/Loss', url: '#', hasUrl: false, status: 'pending' },
-                            { srno: '5', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '2.1', mainTopic: 'Algebra', subTopic: 'Linear Equations', displayTopic: '2.1 Linear Equations', url: 'https://example.com/algebra', hasUrl: true, status: 'covered' },
+                            { srno: '5', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '2.1', mainTopic: 'Algebra', subTopic: 'Linear Equations', displayTopic: '2.1 Linear Equations', url: 'https://grok.com/chat/xyz101', hasUrl: true, status: 'covered' },
                             { srno: '6', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '2.2', mainTopic: 'Algebra', subTopic: 'Quadratic Equations', displayTopic: '2.2 Quadratic Equations', url: '#', hasUrl: false, status: 'pending' },
-                            { srno: '7', subject: 'English (40 MCQs)', marks: '40', topicCode: '3.1', mainTopic: 'Grammar', subTopic: 'Tenses', displayTopic: '3.1 Tenses', url: 'https://example.com/grammar', hasUrl: true, status: 'covered' },
+                            { srno: '7', subject: 'English (40 MCQs)', marks: '40', topicCode: '3.1', mainTopic: 'Grammar', subTopic: 'Tenses', displayTopic: '3.1 Tenses', url: 'https://claude.ai/chat/abc202', hasUrl: true, status: 'covered' },
                             { srno: '8', subject: 'English (40 MCQs)', marks: '40', topicCode: '3.2', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: '3.2 Synonyms', url: '#', hasUrl: false, status: 'pending' }
                         ];
                         rawData = sample;
