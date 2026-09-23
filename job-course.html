@@ -300,11 +300,6 @@
             display: inline-flex; align-items: center; gap: 0.3rem;
             flex-wrap: wrap; max-width: 100%;
         }
-        .main-topic-code {
-            background: #d9eaf5; border-radius: 30px;
-            font-size: 0.5rem; font-weight: 700; color: #0c4b6b;
-            padding: 0.05rem 0.4rem; white-space: nowrap; flex-shrink: 0;
-        }
         .main-topic-name {
             font-weight: 600; color: #1f3d51; font-size: 0.78rem;
             word-break: break-word; overflow-wrap: break-word;
@@ -614,6 +609,8 @@
                 return rows;
             }
 
+            // ---------- SIMPLIFIED 6-COLUMN PARSER ----------
+            // A: Srno | B: Subject with Marks | C: Topic | D: Subtopic | E: URL | F: job
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
                 const dataRows = rows.slice(1);
@@ -624,69 +621,28 @@
 
                     const srno = (row[0] || '').trim();
                     const subjectWithMarks = (row[1] || '').trim();
-                    const topicWithSrno = (row[2] || '').trim();
-                    const url = (row[3] || '').trim();
-                    const job = (row[4] || '').trim();
+                    const mainTopic = (row[2] || '').trim();
+                    const subTopic = (row[3] || '').trim();
+                    const url = (row[4] || '').trim();
+                    const job = (row[5] || '').trim();
 
+                    // Extract marks from "English (50 MCQs)" or "English (20 Marks)"
                     let subject = subjectWithMarks;
                     let marks = '';
-                    const marksMatch = subjectWithMarks.match(/\((\d+)\)|\[(\d+)\]|(\d+)\s*$/);
+                    const marksMatch = subjectWithMarks.match(/\((\d+)(?:\s*MCQs?|\s*Marks?)?\)/i);
                     if (marksMatch) {
-                        marks = marksMatch[1] || marksMatch[2] || marksMatch[3] || '';
-                        subject = subjectWithMarks.replace(/\((\d+)\)|\[(\d+)\]|\s*\d+\s*$/, '').trim();
-                        if (!subject) subject = subjectWithMarks;
-                    } else {
-                        const parts = subjectWithMarks.split(' - ');
-                        if (parts.length === 2) {
-                            subject = parts[0].trim();
-                            marks = parts[1].trim();
-                        }
+                        marks = marksMatch[1];
+                        subject = subjectWithMarks.replace(marksMatch[0], '').trim();
                     }
-
-                    let topicCode = '';
-                    let subTopic = '';
-                    let mainTopic = '';
-
-                    const codeMatch = topicWithSrno.match(/^(\d+\.\d+)\s*(.+)/);
-                    if (codeMatch) {
-                        topicCode = codeMatch[1];
-                        let rest = codeMatch[2].trim();
-                        const splitMatch = rest.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
-                        if (splitMatch) {
-                            mainTopic = splitMatch[1].trim();
-                            subTopic = splitMatch[2].trim();
-                        } else {
-                            mainTopic = rest;
-                            subTopic = rest;
-                        }
-                    } else {
-                        const splitMatch = topicWithSrno.match(/^(.+?)[\s]*[:\-–]\s*(.+)$/);
-                        if (splitMatch) {
-                            mainTopic = splitMatch[1].trim();
-                            subTopic = splitMatch[2].trim();
-                        } else {
-                            mainTopic = topicWithSrno;
-                            subTopic = topicWithSrno;
-                        }
-                        const codeOnly = mainTopic.match(/^(\d+\.\d+)\s*(.*)/);
-                        if (codeOnly) {
-                            topicCode = codeOnly[1];
-                            mainTopic = codeOnly[2].trim() || mainTopic;
-                        }
-                    }
-
-                    if (!subTopic) subTopic = mainTopic;
-                    if (!mainTopic) mainTopic = subTopic;
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
                     const status = hasUrl ? 'covered' : 'pending';
-                    const displayTopic = topicCode ? `${topicCode} ${subTopic}` : subTopic;
+                    const displayTopic = subTopic || mainTopic;
 
                     result.push({
                         srno: srno || '—',
                         subject: subject || '—',
                         marks: marks || '—',
-                        topicCode: topicCode || '—',
                         mainTopic: mainTopic || '—',
                         subTopic: subTopic || '—',
                         displayTopic: displayTopic || '—',
@@ -889,10 +845,6 @@
             }
 
             // ============ GOOGLE SEARCH BUILDER ============
-            /**
-             * Build the Google search query from subtopic + mainTopic + subject + job.
-             * Example: "Percentages Basic Arithmetic General Abilities CSS MPT"
-             */
             function buildGoogleSearchQuery(item) {
                 const parts = [];
                 if (item.subTopic && item.subTopic !== '—') parts.push(item.subTopic);
@@ -900,13 +852,6 @@
                 if (item.subject && item.subject !== '—') parts.push(item.subject);
                 if (item.job && item.job !== '—') parts.push(item.job);
                 return parts.join(' ');
-            }
-
-            function openGoogleSearch(item) {
-                const query = buildGoogleSearchQuery(item);
-                if (!query) return;
-                const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-                window.open(url, '_blank', 'noopener,noreferrer');
             }
 
             // ============ PROMPT TITLE LOGIC ============
@@ -1020,7 +965,6 @@ Correct answer as per choices`;
                         ${escapeHtml(item.subTopic !== '—' ? item.subTopic : '—')}
                         <i class="fas fa-search search-icon"></i>
                     `;
-                    // Prevent card click (copy prompt) from also triggering when clicking this link
                     subtopicLink.addEventListener('click', (e) => {
                         e.stopPropagation();
                     });
@@ -1036,7 +980,6 @@ Correct answer as per choices`;
                     const mainGroup = document.createElement('span');
                     mainGroup.className = 'main-topic-group';
                     mainGroup.innerHTML = `
-                        ${item.topicCode && item.topicCode !== '—' ? `<span class="main-topic-code">${escapeHtml(item.topicCode)}</span>` : ''}
                         <span class="main-topic-name">${escapeHtml(item.mainTopic)}</span>
                         <span class="count-badge-style">${mainCount}</span>
                     `;
@@ -1184,14 +1127,14 @@ Correct answer as per choices`;
 
                     setTimeout(() => {
                         const sample = [
-                            { srno: '1', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.1', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: '1.1 Percentages', url: 'https://chat.deepseek.com/a/chat/s/abc123', hasUrl: true, status: 'covered', job: 'CSS MPT' },
-                            { srno: '2', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.2', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: '1.2 Ratios', url: 'https://chatgpt.com/c/def456', hasUrl: true, status: 'covered', job: 'CSS MPT' },
-                            { srno: '3', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.3', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: '1.3 Averages', url: 'https://gemini.google.com/app/ghi789', hasUrl: true, status: 'covered', job: 'PMS' },
-                            { srno: '4', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '1.4', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: '1.4 Profit/Loss', url: '#', hasUrl: false, status: 'pending', job: 'CSS MPT' },
-                            { srno: '5', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '2.1', mainTopic: 'Algebra', subTopic: 'Linear Equations', displayTopic: '2.1 Linear Equations', url: 'https://grok.com/chat/xyz101', hasUrl: true, status: 'covered', job: 'PMS' },
-                            { srno: '6', subject: 'General Abilities (60 MCQs)', marks: '60', topicCode: '2.2', mainTopic: 'Algebra', subTopic: 'Quadratic Equations', displayTopic: '2.2 Quadratic Equations', url: '#', hasUrl: false, status: 'pending', job: 'CSS MPT' },
-                            { srno: '7', subject: 'English (40 MCQs)', marks: '40', topicCode: '3.1', mainTopic: 'Grammar', subTopic: 'Tenses', displayTopic: '3.1 Tenses', url: 'https://claude.ai/chat/abc202', hasUrl: true, status: 'covered', job: 'PPSC' },
-                            { srno: '8', subject: 'English (40 MCQs)', marks: '40', topicCode: '3.2', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: '3.2 Synonyms', url: '#', hasUrl: false, status: 'pending', job: 'PPSC' }
+                            { srno: '1', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: 'Percentages', url: 'https://chat.deepseek.com/share/x2gdwyy9txdzvcadm', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
+                            { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
+                            { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
+                            { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' },
+                            { srno: '5', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Work Rate', displayTopic: 'Work Rate', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' },
+                            { srno: '6', subject: 'General Abilities', marks: '60', mainTopic: 'Algebra & Geometry', subTopic: 'Linear Equations', displayTopic: 'Linear Equations', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' },
+                            { srno: '17', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: 'https://chat.deepseek.com/share/ml1faf956wlc844b3c', hasUrl: true, status: 'covered', job: 'css-2027-mpt' },
+                            { srno: '18', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Antonyms', displayTopic: 'Antonyms', url: '#', hasUrl: false, status: 'pending', job: 'css-2027-mpt' }
                         ];
                         rawData = sample;
                         computeCounts(rawData);
