@@ -971,8 +971,6 @@
             /* ============================================ */
             /* ========== FAST FILTER REFRESH ============= */
             /* ============================================ */
-            // Coalesce multiple rapid calls into a single rAF-driven update.
-            // This makes dropdown choice refresh feel instant even with many rows.
             function scheduleFastFilterRefresh() {
                 if (filterRefreshScheduled) return;
                 filterRefreshScheduled = true;
@@ -1165,24 +1163,61 @@
                 }
             }
 
+            /* ============================================ */
+            /* ========== FIXED getAvailableOptions ======= */
+            /* ============================================ */
+            /* The bug: when building the option list for a filter,
+               the OLD version excluded the filter's own selections, so it
+               always showed ALL options matching the other filters, even
+               after you picked something. This made it look like your
+               selection had no effect until you cleared it.
+
+               The FIX: when building options for filter X, if filter X
+               already has selections, only include rows whose value for X
+               matches one of those selections. That way the list collapses
+               to reflect what you've chosen (still respecting other filters).
+
+               For 'none' (used by pruneSelections), we include everything
+               matching all filters so selections can be validated. */
             function getAvailableOptions(excludeFilter) {
-                const activeSubjects = excludeFilter === 'subject' ? new Set() : selectedSubjects;
-                const activeTopics = excludeFilter === 'topic' ? new Set() : selectedTopics;
-                const activeJobs = excludeFilter === 'job' ? new Set() : selectedJobs;
+                // The "other" filters — everything except the one we're building options for
+                const applySubjects = excludeFilter === 'subject' ? new Set() : selectedSubjects;
+                const applyTopics   = excludeFilter === 'topic'   ? new Set() : selectedTopics;
+                const applyJobs     = excludeFilter === 'job'     ? new Set() : selectedJobs;
 
                 const subjects = new Set();
                 const topics = new Set();
                 const jobs = new Set();
 
                 rawData.forEach(item => {
-                    if (activeSubjects.size > 0 && !activeSubjects.has(item.subject)) return;
-                    if (activeTopics.size > 0 && !activeTopics.has(item.displayTopic)) return;
-                    if (activeJobs.size > 0 && !activeJobs.has(item.job)) return;
+                    // Status always applies
                     if (selectedStatuses.size > 0 && !selectedStatuses.has(item.status)) return;
 
-                    if (item.subject && item.subject !== '—') subjects.add(item.subject);
-                    if (item.displayTopic && item.displayTopic !== '—') topics.add(item.displayTopic);
-                    if (item.job && item.job !== '—') jobs.add(item.job);
+                    // Apply the "other" filters
+                    if (applySubjects.size > 0 && !applySubjects.has(item.subject)) return;
+                    if (applyTopics.size > 0 && !applyTopics.has(item.displayTopic)) return;
+                    if (applyJobs.size > 0 && !applyJobs.has(item.job)) return;
+
+                    // Now decide what to add, based on which filter we're building for
+                    if (excludeFilter === 'subject') {
+                        // Only include subjects matching the user's current subject selections (if any)
+                        if (selectedSubjects.size > 0 && !selectedSubjects.has(item.subject)) return;
+                        if (item.subject && item.subject !== '—') subjects.add(item.subject);
+                    }
+                    else if (excludeFilter === 'topic') {
+                        if (selectedTopics.size > 0 && !selectedTopics.has(item.displayTopic)) return;
+                        if (item.displayTopic && item.displayTopic !== '—') topics.add(item.displayTopic);
+                    }
+                    else if (excludeFilter === 'job') {
+                        if (selectedJobs.size > 0 && !selectedJobs.has(item.job)) return;
+                        if (item.job && item.job !== '—') jobs.add(item.job);
+                    }
+                    else {
+                        // excludeFilter === 'none' → add all values (for pruning validation)
+                        if (item.subject && item.subject !== '—') subjects.add(item.subject);
+                        if (item.displayTopic && item.displayTopic !== '—') topics.add(item.displayTopic);
+                        if (item.job && item.job !== '—') jobs.add(item.job);
+                    }
                 });
 
                 return {
@@ -1402,7 +1437,6 @@
                 renderCards(filteredData);
             }
 
-            // onUpdate callback passed into multi-select → uses fast scheduler
             function onFilterChange() {
                 scheduleFastFilterRefresh();
             }
@@ -1986,7 +2020,7 @@ Correct answer as per choices`;
             }
 
             async function loadData(isManualRefresh) {
-                if (isLoading && isManualRefresh) return; // prevent double-click spam
+                if (isLoading && isManualRefresh) return;
 
                 if (isManualRefresh) {
                     setRefreshLoading(true);
@@ -1999,7 +2033,6 @@ Correct answer as per choices`;
                 }
 
                 try {
-                    // Cache-bust so Google Sheets always returns fresh CSV
                     const bust = `&_=${Date.now()}`;
                     const response = await fetch(CSV_URL + bust, { cache: 'no-store' });
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -2020,8 +2053,6 @@ Correct answer as per choices`;
                     populateFilters(rawData);
 
                     if (isManualRefresh) {
-                        // Keep existing selections but re-validate them against fresh data.
-                        // If a selection no longer exists, pruneSelections() inside refreshAllFilters handles it.
                         refreshAllFilters();
                         applyFiltersAndRender();
                         showToast('Data refreshed');
@@ -2050,12 +2081,10 @@ Correct answer as per choices`;
                 }
             }
 
-            // Wire up floating refresh button
             fabRefresh.addEventListener('click', () => {
                 loadData(true);
             });
 
-            // Initial load
             loadData(false);
         })();
     </script>
