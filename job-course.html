@@ -196,10 +196,15 @@
             background: #f0f7ff; border-color: #b0cde0;
         }
 
-        /* STATUS CHECKBOXES */
+        /* STATUS ROW (checkboxes + reset button) */
+        .status-row {
+            display: flex; align-items: center; gap: 0.4rem;
+            flex-wrap: wrap; padding: 0.1rem 0;
+            width: 100%;
+        }
         .status-checkboxes {
             display: flex; align-items: center; gap: 0.6rem;
-            flex-wrap: wrap; padding: 0.1rem 0;
+            flex-wrap: wrap; flex: 1 1 auto; min-width: 0;
         }
         .status-checkboxes .cb-label {
             font-size: 0.5rem; font-weight: 600;
@@ -239,6 +244,35 @@
             background: #e6a017; border-color: #e6a017;
         }
         .checkbox-item .cb-text { font-size: 0.7rem; font-weight: 500; }
+
+        /* RESET BUTTON (rightmost of status row) */
+        .reset-btn {
+            margin-left: auto;
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            background: #ffffff; color: #b91c1c;
+            border: 1.5px solid #f3c0c0;
+            border-radius: 30px;
+            padding: 0.28rem 0.7rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem; font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            letter-spacing: 0.1px;
+        }
+        .reset-btn i { font-size: 0.6rem; transition: transform 0.4s ease; }
+        .reset-btn:hover {
+            background: #fff5f5; border-color: #e89a9a; color: #991b1b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px -4px rgba(185, 28, 28, 0.25);
+        }
+        .reset-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+        .reset-btn:hover i {
+            transform: rotate(-180deg);
+        }
 
         /* CARDS GRID */
         .cards-grid {
@@ -285,7 +319,7 @@
             white-space: nowrap; text-align: right;
         }
 
-        /* ===== SUBTOPIC HEADER (TOP, BLUE, PROMINENT) ===== */
+        /* SUBTOPIC HEADER (TOP, BLUE, PROMINENT) */
         .card-subtopic-header {
             display: flex; align-items: flex-start; gap: 0.35rem;
             margin-bottom: 0.15rem;
@@ -438,7 +472,7 @@
         .pdf-link i { font-size: 0.55rem; }
         .pdf-link .pdf-label { font-weight: 700; letter-spacing: 0.2px; }
 
-        /* ===== FLOATING REFRESH BUTTON (BOTTOM-LEFT) ===== */
+        /* FLOATING REFRESH BUTTON (BOTTOM-LEFT) */
         .fab-refresh {
             position: fixed;
             bottom: 1.2rem;
@@ -495,7 +529,7 @@
         }
         .fab-refresh:hover::after { opacity: 1; }
 
-        /* ===== MODAL ===== */
+        /* MODAL */
         .modal-overlay {
             position: fixed; inset: 0;
             background: rgba(8, 28, 42, 0.55);
@@ -757,6 +791,12 @@
             .card-job-badge { font-size: 0.45rem; }
             .card-last-update { font-size: 0.45rem; }
 
+            .reset-btn {
+                padding: 0.25rem 0.55rem;
+                font-size: 0.6rem;
+            }
+            .reset-btn i { font-size: 0.55rem; }
+
             .fab-refresh {
                 width: 48px;
                 height: 48px;
@@ -788,6 +828,7 @@
             .read-btn { font-size: 0.55rem; padding: 0.12rem 0.45rem; }
             .fab-refresh { width: 44px; height: 44px; bottom: 0.8rem; left: 0.8rem; }
             .fab-refresh i { font-size: 1rem; }
+            .reset-btn { font-size: 0.55rem; padding: 0.22rem 0.5rem; }
         }
     </style>
 </head>
@@ -856,16 +897,22 @@
                 </div>
             </div>
 
-            <div class="status-checkboxes">
-                <span class="cb-label"><i class="fas fa-check-circle"></i> Status</span>
-                <div class="checkbox-item covered checked" id="cbCovered" data-status="covered">
-                    <span class="cb-box"><i class="fas fa-check"></i></span>
-                    <span class="cb-text">Done</span>
+            <div class="status-row">
+                <div class="status-checkboxes">
+                    <span class="cb-label"><i class="fas fa-check-circle"></i> Status</span>
+                    <div class="checkbox-item covered checked" id="cbCovered" data-status="covered">
+                        <span class="cb-box"><i class="fas fa-check"></i></span>
+                        <span class="cb-text">Done</span>
+                    </div>
+                    <div class="checkbox-item pending checked" id="cbPending" data-status="pending">
+                        <span class="cb-box"><i class="fas fa-check"></i></span>
+                        <span class="cb-text">Pending</span>
+                    </div>
                 </div>
-                <div class="checkbox-item pending checked" id="cbPending" data-status="pending">
-                    <span class="cb-box"><i class="fas fa-check"></i></span>
-                    <span class="cb-text">Pending</span>
-                </div>
+
+                <button class="reset-btn" id="resetFiltersBtn" title="Reset all filters to default">
+                    <i class="fas fa-undo-alt"></i> Reset
+                </button>
             </div>
         </div>
 
@@ -929,6 +976,7 @@
             const pageTitle = document.getElementById('pageTitle');
             const titleText = document.getElementById('titleText');
             const fabRefresh = document.getElementById('fabRefresh');
+            const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
             const subjectCountHint = document.getElementById('subjectCountHint');
             const topicCountHint = document.getElementById('topicCountHint');
@@ -964,7 +1012,6 @@
             let rebuildTopicSelect = null;
             let rebuildJobSelect = null;
 
-            // Fast-refresh scheduling for filter updates
             let filterRefreshScheduled = false;
             let isLoading = false;
 
@@ -1164,23 +1211,15 @@
             }
 
             /* ============================================ */
-            /* ========== FIXED getAvailableOptions ======= */
+            /* ========== AVAILABLE OPTIONS =============== */
             /* ============================================ */
-            /* The bug: when building the option list for a filter,
-               the OLD version excluded the filter's own selections, so it
-               always showed ALL options matching the other filters, even
-               after you picked something. This made it look like your
-               selection had no effect until you cleared it.
-
-               The FIX: when building options for filter X, if filter X
-               already has selections, only include rows whose value for X
-               matches one of those selections. That way the list collapses
-               to reflect what you've chosen (still respecting other filters).
-
-               For 'none' (used by pruneSelections), we include everything
-               matching all filters so selections can be validated. */
+            /* For the filter we're building options for:
+               - If it has NO selections → show all values matching the OTHER filters.
+               - If it HAS selections    → narrow to only those selections
+                 (still respecting the OTHER filters).
+               This gives instant visual feedback when you pick something.
+               'none' is used by pruneSelections to validate against everything. */
             function getAvailableOptions(excludeFilter) {
-                // The "other" filters — everything except the one we're building options for
                 const applySubjects = excludeFilter === 'subject' ? new Set() : selectedSubjects;
                 const applyTopics   = excludeFilter === 'topic'   ? new Set() : selectedTopics;
                 const applyJobs     = excludeFilter === 'job'     ? new Set() : selectedJobs;
@@ -1193,14 +1232,12 @@
                     // Status always applies
                     if (selectedStatuses.size > 0 && !selectedStatuses.has(item.status)) return;
 
-                    // Apply the "other" filters
+                    // Other filters
                     if (applySubjects.size > 0 && !applySubjects.has(item.subject)) return;
                     if (applyTopics.size > 0 && !applyTopics.has(item.displayTopic)) return;
                     if (applyJobs.size > 0 && !applyJobs.has(item.job)) return;
 
-                    // Now decide what to add, based on which filter we're building for
                     if (excludeFilter === 'subject') {
-                        // Only include subjects matching the user's current subject selections (if any)
                         if (selectedSubjects.size > 0 && !selectedSubjects.has(item.subject)) return;
                         if (item.subject && item.subject !== '—') subjects.add(item.subject);
                     }
@@ -1213,7 +1250,6 @@
                         if (item.job && item.job !== '—') jobs.add(item.job);
                     }
                     else {
-                        // excludeFilter === 'none' → add all values (for pruning validation)
                         if (item.subject && item.subject !== '—') subjects.add(item.subject);
                         if (item.displayTopic && item.displayTopic !== '—') topics.add(item.displayTopic);
                         if (item.job && item.job !== '—') jobs.add(item.job);
@@ -1240,10 +1276,53 @@
                 });
             }
 
+            /* ============================================ */
+            /* ========== MULTI-SELECT BUILD (FIXED) ====== */
+            /* ============================================ */
+            /* The bug that was fixed: the trigger click listener was attached
+               once and captured the FIRST rebuild's renderDropdown closure.
+               After rebuild() was called with new options, the trigger still
+               referenced the old closure — so it rendered STALE options.
+               Fix: store the latest rebuild on the container and have the
+               trigger always call container._latestRebuild._render(). */
             function buildMultiSelect(container, options, selectedSet, onUpdate, enableSearch) {
                 const dropdown = container.querySelector('.multi-select-dropdown');
                 const trigger = container.querySelector('.multi-select-trigger');
                 const placeholder = container.querySelector('.placeholder');
+
+                // Attach trigger + outside-click listeners ONCE
+                if (!trigger.dataset.listenerAttached) {
+                    trigger.dataset.listenerAttached = '1';
+
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isOpen = dropdown.classList.contains('open');
+                        document.querySelectorAll('.multi-select-dropdown.open').forEach(d => d.classList.remove('open'));
+                        document.querySelectorAll('.multi-select-trigger.open').forEach(t => t.classList.remove('open'));
+
+                        if (!isOpen) {
+                            dropdown.classList.add('open');
+                            trigger.classList.add('open');
+
+                            const latest = container._latestRebuild;
+                            if (latest && latest._render) {
+                                const searchInput = dropdown.querySelector('.multi-select-search');
+                                if (searchInput) {
+                                    searchInput.value = '';
+                                    setTimeout(() => searchInput.focus(), 50);
+                                }
+                                latest._render('');
+                            }
+                        }
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (!container.contains(e.target)) {
+                            dropdown.classList.remove('open');
+                            trigger.classList.remove('open');
+                        }
+                    });
+                }
 
                 function rebuild(newOptions) {
                     dropdown.innerHTML = '';
@@ -1286,8 +1365,7 @@
                     dropdown.appendChild(actionsDiv);
 
                     function renderDropdown(filterText) {
-                        const existingOptions = dropdown.querySelectorAll('.multi-select-option');
-                        existingOptions.forEach(el => el.remove());
+                        dropdown.querySelectorAll('.multi-select-option').forEach(el => el.remove());
 
                         let filteredOptions = newOptions;
                         if (filterText && filterText.trim() !== '') {
@@ -1345,34 +1423,9 @@
                         }
                     }
 
-                    if (!trigger.dataset.listenerAttached) {
-                        trigger.dataset.listenerAttached = '1';
-                        trigger.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const isOpen = dropdown.classList.contains('open');
-                            document.querySelectorAll('.multi-select-dropdown.open').forEach(d => d.classList.remove('open'));
-                            document.querySelectorAll('.multi-select-trigger.open').forEach(t => t.classList.remove('open'));
-                            if (!isOpen) {
-                                dropdown.classList.add('open');
-                                trigger.classList.add('open');
-                                if (searchInput) {
-                                    searchInput.value = '';
-                                    setTimeout(() => searchInput.focus(), 50);
-                                }
-                                renderDropdown('');
-                            }
-                        });
-
-                        document.addEventListener('click', (e) => {
-                            if (!container.contains(e.target)) {
-                                dropdown.classList.remove('open');
-                                trigger.classList.remove('open');
-                            }
-                        });
-                    }
-
                     rebuild._render = renderDropdown;
                     rebuild._updateText = updateTriggerText;
+                    container._latestRebuild = rebuild;
 
                     renderDropdown('');
                     updateTriggerText();
@@ -1383,6 +1436,10 @@
             }
 
             function setupStatusCheckboxes() {
+                if (cbCovered.dataset.listenerAttached) return;
+                cbCovered.dataset.listenerAttached = '1';
+                cbPending.dataset.listenerAttached = '1';
+
                 cbCovered.addEventListener('click', (e) => {
                     e.stopPropagation();
                     toggleStatus('covered', cbCovered);
@@ -1440,6 +1497,31 @@
             function onFilterChange() {
                 scheduleFastFilterRefresh();
             }
+
+            /* ============================================ */
+            /* ========== RESET FILTERS =================== */
+            /* ============================================ */
+            function resetAllFilters(silent) {
+                selectedSubjects.clear();
+                selectedTopics.clear();
+                selectedJobs.clear();
+                selectedStatuses.clear();
+                selectedStatuses.add('covered');
+                selectedStatuses.add('pending');
+
+                cbCovered.classList.add('checked');
+                cbPending.classList.add('checked');
+
+                // Rebuild filter options from full dataset
+                refreshAllFilters();
+                applyFiltersAndRender();
+
+                if (!silent) showToast('Filters reset to default');
+            }
+
+            resetFiltersBtn.addEventListener('click', () => {
+                resetAllFilters(false);
+            });
 
             function buildGoogleSearchQuery(item) {
                 const parts = [];
@@ -1979,15 +2061,27 @@ Correct answer as per choices`;
 
                 const subjectWrap = document.getElementById('subjectMultiWrap');
                 subjectWrap.dataset.type = 'subjects';
-                rebuildSubjectSelect = buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, onFilterChange, false);
+                if (!rebuildSubjectSelect) {
+                    rebuildSubjectSelect = buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, onFilterChange, false);
+                } else {
+                    rebuildSubjectSelect(subjectOptions);
+                }
 
                 const topicWrap = document.getElementById('topicMultiWrap');
                 topicWrap.dataset.type = 'topics';
-                rebuildTopicSelect = buildMultiSelect(topicWrap, topicOptions, selectedTopics, onFilterChange, true);
+                if (!rebuildTopicSelect) {
+                    rebuildTopicSelect = buildMultiSelect(topicWrap, topicOptions, selectedTopics, onFilterChange, true);
+                } else {
+                    rebuildTopicSelect(topicOptions);
+                }
 
                 const jobWrap = document.getElementById('jobMultiWrap');
                 jobWrap.dataset.type = 'jobs';
-                rebuildJobSelect = buildMultiSelect(jobWrap, jobOptions, selectedJobs, onFilterChange, true);
+                if (!rebuildJobSelect) {
+                    rebuildJobSelect = buildMultiSelect(jobWrap, jobOptions, selectedJobs, onFilterChange, true);
+                } else {
+                    rebuildJobSelect(jobOptions);
+                }
 
                 subjectCountHint.textContent = subjectOptions.length;
                 topicCountHint.textContent = topicOptions.length;
@@ -2006,17 +2100,6 @@ Correct answer as per choices`;
                     fabRefresh.classList.remove('loading');
                     fabRefresh.title = 'Refresh data from sheet';
                 }
-            }
-
-            function resetFiltersToDefault() {
-                selectedSubjects.clear();
-                selectedTopics.clear();
-                selectedJobs.clear();
-                selectedStatuses.clear();
-                selectedStatuses.add('covered');
-                selectedStatuses.add('pending');
-                cbCovered.classList.add('checked');
-                cbPending.classList.add('checked');
             }
 
             async function loadData(isManualRefresh) {
@@ -2058,7 +2141,12 @@ Correct answer as per choices`;
                         showToast('Data refreshed');
                     } else {
                         setupStatusCheckboxes();
-                        resetFiltersToDefault();
+                        // Ensure defaults on first load
+                        selectedStatuses.clear();
+                        selectedStatuses.add('covered');
+                        selectedStatuses.add('pending');
+                        cbCovered.classList.add('checked');
+                        cbPending.classList.add('checked');
                         refreshAllFilters();
                         applyFiltersAndRender();
                     }
