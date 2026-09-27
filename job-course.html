@@ -438,6 +438,63 @@
         .pdf-link i { font-size: 0.55rem; }
         .pdf-link .pdf-label { font-weight: 700; letter-spacing: 0.2px; }
 
+        /* ===== FLOATING REFRESH BUTTON (BOTTOM-LEFT) ===== */
+        .fab-refresh {
+            position: fixed;
+            bottom: 1.2rem;
+            left: 1.2rem;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #146a8a, #1a86a8);
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 18px -4px rgba(20, 106, 138, 0.55),
+                        0 2px 6px -1px rgba(0, 30, 50, 0.25);
+            z-index: 1500;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', sans-serif;
+        }
+        .fab-refresh i {
+            font-size: 1.15rem;
+            transition: transform 0.6s ease;
+        }
+        .fab-refresh:hover {
+            background: linear-gradient(135deg, #0c4b6b, #146a8a);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px -6px rgba(20, 106, 138, 0.65),
+                        0 3px 8px -1px rgba(0, 30, 50, 0.3);
+        }
+        .fab-refresh:active {
+            transform: translateY(0) scale(0.96);
+        }
+        .fab-refresh.loading {
+            pointer-events: none;
+            background: linear-gradient(135deg, #4a8aa8, #6aa8c0);
+        }
+        .fab-refresh.loading i {
+            animation: fab-spin 0.9s linear infinite;
+        }
+        @keyframes fab-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .fab-refresh::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(20, 106, 138, 0.25);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .fab-refresh:hover::after { opacity: 1; }
+
         /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed; inset: 0;
@@ -700,6 +757,14 @@
             .card-job-badge { font-size: 0.45rem; }
             .card-last-update { font-size: 0.45rem; }
 
+            .fab-refresh {
+                width: 48px;
+                height: 48px;
+                bottom: 1rem;
+                left: 1rem;
+            }
+            .fab-refresh i { font-size: 1.05rem; }
+
             .modal-overlay { padding: 0.4rem; }
             .modal-box { max-height: 94vh; border-radius: 14px; }
             .modal-header { padding: 0.6rem 0.75rem; }
@@ -721,6 +786,8 @@
             .subtopic-name { font-size: 0.88rem; }
             .card-srno { font-size: 0.5rem; padding: 0.05rem 0.3rem; }
             .read-btn { font-size: 0.55rem; padding: 0.12rem 0.45rem; }
+            .fab-refresh { width: 44px; height: 44px; bottom: 0.8rem; left: 0.8rem; }
+            .fab-refresh i { font-size: 1rem; }
         }
     </style>
 </head>
@@ -805,6 +872,11 @@
         <div id="cardsContainer" class="cards-grid"></div>
     </div>
 
+    <!-- FLOATING REFRESH BUTTON (BOTTOM-LEFT) -->
+    <button class="fab-refresh" id="fabRefresh" title="Refresh data from sheet" aria-label="Refresh data">
+        <i class="fas fa-sync-alt"></i>
+    </button>
+
     <!-- MODAL -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -856,6 +928,7 @@
             const toastMessage = document.getElementById('toastMessage');
             const pageTitle = document.getElementById('pageTitle');
             const titleText = document.getElementById('titleText');
+            const fabRefresh = document.getElementById('fabRefresh');
 
             const subjectCountHint = document.getElementById('subjectCountHint');
             const topicCountHint = document.getElementById('topicCountHint');
@@ -890,6 +963,25 @@
             let rebuildSubjectSelect = null;
             let rebuildTopicSelect = null;
             let rebuildJobSelect = null;
+
+            // Fast-refresh scheduling for filter updates
+            let filterRefreshScheduled = false;
+            let isLoading = false;
+
+            /* ============================================ */
+            /* ========== FAST FILTER REFRESH ============= */
+            /* ============================================ */
+            // Coalesce multiple rapid calls into a single rAF-driven update.
+            // This makes dropdown choice refresh feel instant even with many rows.
+            function scheduleFastFilterRefresh() {
+                if (filterRefreshScheduled) return;
+                filterRefreshScheduled = true;
+                requestAnimationFrame(() => {
+                    filterRefreshScheduled = false;
+                    refreshAllFilters();
+                    applyFiltersAndRender();
+                });
+            }
 
             /* ============================================ */
             /* ========== CSV PARSER (ROBUST) ============= */
@@ -1274,8 +1366,7 @@
                     selectedStatuses.add(status);
                     el.classList.add('checked');
                 }
-                refreshAllFilters();
-                applyFiltersAndRender();
+                scheduleFastFilterRefresh();
             }
 
             function refreshAllFilters() {
@@ -1311,9 +1402,9 @@
                 renderCards(filteredData);
             }
 
+            // onUpdate callback passed into multi-select → uses fast scheduler
             function onFilterChange() {
-                refreshAllFilters();
-                applyFiltersAndRender();
+                scheduleFastFilterRefresh();
             }
 
             function buildGoogleSearchQuery(item) {
@@ -1676,7 +1767,6 @@ Correct answer as per choices`;
                         });
                     }
 
-                    /* ----- CORNER BADGES (job + last update) ----- */
                     if ((showJobBadge && item.job && item.job !== '—') || item.lastUpdate) {
                         const corner = document.createElement('div');
                         corner.className = 'card-corner';
@@ -1700,7 +1790,7 @@ Correct answer as per choices`;
                         card.appendChild(corner);
                     }
 
-                    /* ----- 1) SUBTOPIC HEADER (TOP, BLUE, PROMINENT) ----- */
+                    /* ----- SUBTOPIC HEADER ----- */
                     const subtopicHeader = document.createElement('div');
                     subtopicHeader.className = 'card-subtopic-header';
 
@@ -1724,7 +1814,7 @@ Correct answer as per choices`;
 
                     card.appendChild(subtopicHeader);
 
-                    /* ----- 2) MAIN TOPIC ROW ----- */
+                    /* ----- MAIN TOPIC ----- */
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
@@ -1737,7 +1827,7 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
-                    /* ----- 3) SUBJECT ROW + ACTIONS ----- */
+                    /* ----- SUBJECT + ACTIONS ----- */
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
 
@@ -1870,15 +1960,48 @@ Correct answer as per choices`;
                 jobCountHint.textContent = jobOptions.length;
             }
 
-            async function loadData() {
-                cardsContainer.innerHTML = `
-                    <div class="state-message">
-                        <div class="spinner"></div>
-                        <div style="font-size:0.85rem;">Loading topics…</div>
-                    </div>`;
+            /* ============================================ */
+            /* ========== FLOATING REFRESH BUTTON ========= */
+            /* ============================================ */
+            function setRefreshLoading(loading) {
+                isLoading = loading;
+                if (loading) {
+                    fabRefresh.classList.add('loading');
+                    fabRefresh.title = 'Refreshing…';
+                } else {
+                    fabRefresh.classList.remove('loading');
+                    fabRefresh.title = 'Refresh data from sheet';
+                }
+            }
+
+            function resetFiltersToDefault() {
+                selectedSubjects.clear();
+                selectedTopics.clear();
+                selectedJobs.clear();
+                selectedStatuses.clear();
+                selectedStatuses.add('covered');
+                selectedStatuses.add('pending');
+                cbCovered.classList.add('checked');
+                cbPending.classList.add('checked');
+            }
+
+            async function loadData(isManualRefresh) {
+                if (isLoading && isManualRefresh) return; // prevent double-click spam
+
+                if (isManualRefresh) {
+                    setRefreshLoading(true);
+                } else {
+                    cardsContainer.innerHTML = `
+                        <div class="state-message">
+                            <div class="spinner"></div>
+                            <div style="font-size:0.85rem;">Loading topics…</div>
+                        </div>`;
+                }
 
                 try {
-                    const response = await fetch(CSV_URL);
+                    // Cache-bust so Google Sheets always returns fresh CSV
+                    const bust = `&_=${Date.now()}`;
+                    const response = await fetch(CSV_URL + bust, { cache: 'no-store' });
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const csvText = await response.text();
 
@@ -1889,39 +2012,51 @@ Correct answer as per choices`;
                     const rows = parseCSV(csvText);
                     if (rows.length < 2) throw new Error('No data rows');
 
-                    rawData = mapRowsToObjects(rows);
-                    if (rawData.length === 0) throw new Error('No parsed data');
+                    const newData = mapRowsToObjects(rows);
+                    if (newData.length === 0) throw new Error('No parsed data');
 
+                    rawData = newData;
                     computeCounts(rawData);
                     populateFilters(rawData);
-                    setupStatusCheckboxes();
 
-                    selectedStatuses.clear();
-                    selectedStatuses.add('covered');
-                    selectedStatuses.add('pending');
-                    selectedSubjects.clear();
-                    selectedTopics.clear();
-                    selectedJobs.clear();
-
-                    cbCovered.classList.add('checked');
-                    cbPending.classList.add('checked');
-
-                    refreshAllFilters();
-                    applyFiltersAndRender();
+                    if (isManualRefresh) {
+                        // Keep existing selections but re-validate them against fresh data.
+                        // If a selection no longer exists, pruneSelections() inside refreshAllFilters handles it.
+                        refreshAllFilters();
+                        applyFiltersAndRender();
+                        showToast('Data refreshed');
+                    } else {
+                        setupStatusCheckboxes();
+                        resetFiltersToDefault();
+                        refreshAllFilters();
+                        applyFiltersAndRender();
+                    }
 
                 } catch (error) {
                     console.error('Load error:', error);
-                    cardsContainer.innerHTML = `
-                        <div class="state-message">
-                            <i class="fas fa-exclamation-triangle" style="color:#c06b4a;"></i>
-                            <div style="margin-bottom:0.3rem;"><strong>Couldn't load sheet</strong></div>
-                            <div style="font-size:0.75rem; opacity:0.8;">${escapeHtml(error.message)}</div>
-                            <div style="margin-top:0.8rem; font-size:0.75rem;">Check browser console (F12) for details.</div>
-                        </div>`;
+                    if (isManualRefresh) {
+                        showToast('Refresh failed — check console');
+                    } else {
+                        cardsContainer.innerHTML = `
+                            <div class="state-message">
+                                <i class="fas fa-exclamation-triangle" style="color:#c06b4a;"></i>
+                                <div style="margin-bottom:0.3rem;"><strong>Couldn't load sheet</strong></div>
+                                <div style="font-size:0.75rem; opacity:0.8;">${escapeHtml(error.message)}</div>
+                                <div style="margin-top:0.8rem; font-size:0.75rem;">Check browser console (F12) for details.</div>
+                            </div>`;
+                    }
+                } finally {
+                    if (isManualRefresh) setRefreshLoading(false);
                 }
             }
 
-            loadData();
+            // Wire up floating refresh button
+            fabRefresh.addEventListener('click', () => {
+                loadData(true);
+            });
+
+            // Initial load
+            loadData(false);
         })();
     </script>
 </body>
