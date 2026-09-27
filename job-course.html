@@ -1000,7 +1000,6 @@
         (function() {
             const SHEET_ID = '1D_wCGy3Rks9MXt84qpC4Ea2Qjo3uSgm0b-JBIh2_mmc';
             const GID = '0';
-            // Using /export?format=csv which preserves all columns AND multi-line cells better than gviz/tq
             const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
 
             const cardsContainer = document.getElementById('cardsContainer');
@@ -1050,7 +1049,7 @@
             let rebuildJobSelect = null;
 
             /* ============================================ */
-            /* ========== CSV PARSER (ROBUST) ============= */
+            /* ========== CSV PARSER ====================== */
             /* ============================================ */
             function parseCSV(csvText) {
                 const rows = [];
@@ -1095,6 +1094,16 @@
 
             /* ============================================ */
             /* ========== ROW -> OBJECT MAPPER ============ */
+            /* Column A(0): Srno                              */
+            /* Column B(1): Subject with Marks                */
+            /* Column C(2): Topic                             */
+            /* Column D(3): Subtopic                          */
+            /* Column E(4): Job                               */
+            /* Column F(5): URL                               */
+            /* Column G(6): PDF URL                           */
+            /* Column H(7): Last Update                       */
+            /* Column I(8): markdown_topic_notes  <-- notes   */
+            /* Column J(9): flag (1 = has markdown) <-- NEW   */
             /* ============================================ */
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
@@ -1104,7 +1113,6 @@
                 console.log('===== CSV DEBUG =====');
                 console.log('Header row:', rows[0]);
                 console.log('Header column count:', rows[0] ? rows[0].length : 0);
-                console.log('First 3 data rows:', dataRows.slice(0, 3));
 
                 for (const row of dataRows) {
                     if (row.length < 3) continue;
@@ -1117,9 +1125,18 @@
                     const url = (row[5] || '').trim();
                     const pdfUrl = (row[6] || '').trim();
                     const lastUpdate = (row[7] || '').trim();
-                    const markdownNotes = (row[8] || '').trim();
+                    const markdownNotes = (row[8] || '').trim();   // Column I
+                    const markdownFlag = (row[9] || '').trim();    // Column J
 
-                    console.log(`Row "${srno}": columns=${row.length}, markdown present=${markdownNotes.length > 0}`);
+                    // ---- Check Column J flag ----
+                    // Row HAS markdown ONLY if:
+                    //   1) Column J equals "1" (or 1)
+                    //   2) Column I actually contains text
+                    const flagIsOne = (markdownFlag === '1' || markdownFlag === '1.0');
+                    const notesHasText = markdownNotes.length > 0 && markdownNotes !== '—';
+                    const hasMarkdown = flagIsOne && notesHasText;
+
+                    console.log(`Row "${srno}": J="${markdownFlag}" I-len=${markdownNotes.length} -> Read=${hasMarkdown}`);
 
                     let subject = subjectWithMarks;
                     let marks = '';
@@ -1131,7 +1148,6 @@
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
                     const hasPdf = pdfUrl && pdfUrl !== '#' && pdfUrl !== '—' && pdfUrl.trim() !== '';
-                    const hasMarkdown = markdownNotes && markdownNotes !== '—' && markdownNotes.trim() !== '';
                     const status = hasUrl ? 'covered' : 'pending';
                     const displayTopic = subTopic || mainTopic;
 
@@ -1724,7 +1740,7 @@ Correct answer as per choices`;
             }
 
             /* ============================================ */
-            /* ========== MODAL OPEN / CLOSE ============== */
+            /* ========== MODAL =========================== */
             /* ============================================ */
             function openNotesModal(item) {
                 if (!item.hasMarkdown) return;
@@ -1900,7 +1916,7 @@ Correct answer as per choices`;
                     const rightCluster = document.createElement('div');
                     rightCluster.className = 'card-right-cluster';
 
-                    // READ BUTTON
+                    // ===== READ BUTTON — ONLY IF COLUMN J = 1 AND COLUMN I HAS NOTES =====
                     if (item.hasMarkdown) {
                         const readBtn = document.createElement('button');
                         readBtn.type = 'button';
@@ -1913,6 +1929,7 @@ Correct answer as per choices`;
                         });
                         rightCluster.appendChild(readBtn);
                     }
+                    // =====================================================================
 
                     if (item.hasUrl) {
                         const coveredBadge = document.createElement('a');
