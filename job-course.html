@@ -275,7 +275,6 @@
         .topic-card.pending { border-left: 3px solid #e6a017; cursor: pointer; }
         .topic-card.pending:hover { background: #fffdf7; }
 
-        /* Top-right corner stack: job badge + date */
         .card-corner {
             position: absolute;
             top: 0.4rem;
@@ -312,7 +311,6 @@
             text-align: right;
         }
 
-        /* Row 1 */
         .card-top-row {
             display: flex; align-items: flex-start; gap: 0.4rem;
             margin-bottom: 0.05rem; flex-wrap: wrap;
@@ -350,7 +348,6 @@
         }
         .subtopic-name:hover .search-icon { opacity: 1; }
 
-        /* Row 2 */
         .card-main-topic-row {
             display: flex; align-items: center; gap: 0.3rem;
             flex-wrap: wrap; margin-bottom: 0.02rem;
@@ -371,7 +368,6 @@
             white-space: nowrap; flex-shrink: 0;
         }
 
-        /* Row 3 */
         .card-subject-row {
             display: flex; align-items: center; justify-content: space-between;
             gap: 0.4rem; flex-wrap: wrap;
@@ -623,7 +619,6 @@
         }
         .modal-body::-webkit-scrollbar-thumb:hover { background: #a3c6de; }
 
-        /* Markdown rendered styles */
         .modal-body h1 {
             font-size: 1.15rem;
             font-weight: 700;
@@ -715,7 +710,6 @@
         }
         .modal-body a:hover { color: #0c4b6b; }
 
-        /* Markdown tables */
         .modal-body table {
             width: 100%;
             border-collapse: collapse;
@@ -970,7 +964,7 @@
         <div id="cardsContainer" class="cards-grid"></div>
     </div>
 
-    <!-- ===== MODAL ===== -->
+    <!-- MODAL -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
             <div class="modal-header">
@@ -1006,7 +1000,8 @@
         (function() {
             const SHEET_ID = '1D_wCGy3Rks9MXt84qpC4Ea2Qjo3uSgm0b-JBIh2_mmc';
             const GID = '0';
-            const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+            // Using /export?format=csv which preserves all columns AND multi-line cells better than gviz/tq
+            const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
 
             const cardsContainer = document.getElementById('cardsContainer');
             const statTotal = document.getElementById('statTotal');
@@ -1024,7 +1019,6 @@
             const topicCountHint = document.getElementById('topicCountHint');
             const jobCountHint = document.getElementById('jobCountHint');
 
-            // Modal elements
             const modalOverlay = document.getElementById('modalOverlay');
             const modalTitleText = document.getElementById('modalTitleText');
             const modalSubtitle = document.getElementById('modalSubtitle');
@@ -1055,6 +1049,9 @@
             let rebuildTopicSelect = null;
             let rebuildJobSelect = null;
 
+            /* ============================================ */
+            /* ========== CSV PARSER (ROBUST) ============= */
+            /* ============================================ */
             function parseCSV(csvText) {
                 const rows = [];
                 let currentRow = [];
@@ -1075,15 +1072,14 @@
                     } else if (char === ',' && !insideQuotes) {
                         currentRow.push(currentField);
                         currentField = '';
-                    } else if (char === '\n' && !insideQuotes) {
+                    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+                        if (char === '\r' && nextChar === '\n') i++;
                         currentRow.push(currentField);
                         if (currentRow.length > 1 || (currentRow.length === 1 && currentRow[0].trim() !== '')) {
                             rows.push(currentRow);
                         }
                         currentRow = [];
                         currentField = '';
-                    } else if (char === '\r') {
-                        continue;
                     } else {
                         currentField += char;
                     }
@@ -1097,14 +1093,18 @@
                 return rows;
             }
 
-            // ============ 9-COLUMN PARSER ============
-            // A: Srno | B: Subject with Marks | C: Topic | D: Subtopic
-            // E: job | F: URL | G: pdf files url | H: last update date
-            // I: markdown_topic_notes  <-- NEW
+            /* ============================================ */
+            /* ========== ROW -> OBJECT MAPPER ============ */
+            /* ============================================ */
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
                 const dataRows = rows.slice(1);
                 const result = [];
+
+                console.log('===== CSV DEBUG =====');
+                console.log('Header row:', rows[0]);
+                console.log('Header column count:', rows[0] ? rows[0].length : 0);
+                console.log('First 3 data rows:', dataRows.slice(0, 3));
 
                 for (const row of dataRows) {
                     if (row.length < 3) continue;
@@ -1117,7 +1117,9 @@
                     const url = (row[5] || '').trim();
                     const pdfUrl = (row[6] || '').trim();
                     const lastUpdate = (row[7] || '').trim();
-                    const markdownNotes = (row[8] || '').trim(); // Column I
+                    const markdownNotes = (row[8] || '').trim();
+
+                    console.log(`Row "${srno}": columns=${row.length}, markdown present=${markdownNotes.length > 0}`);
 
                     let subject = subjectWithMarks;
                     let marks = '';
@@ -1151,6 +1153,11 @@
                         lastUpdate: lastUpdate || ''
                     });
                 }
+
+                const withMd = result.filter(r => r.hasMarkdown).length;
+                console.log(`Total rows: ${result.length}, Rows with markdown: ${withMd}`);
+                console.log('=====================');
+
                 return result;
             }
 
@@ -1543,23 +1550,19 @@ Correct answer as per choices`;
                 }, 1800);
             }
 
-            /* ===================================================== */
-            /* ========== SIMPLE MARKDOWN RENDERER ================= */
-            /* ===================================================== */
+            /* ============================================ */
+            /* ========== MARKDOWN RENDERER =============== */
+            /* ============================================ */
             function renderMarkdown(md) {
                 if (!md) return '';
                 let html = md;
-
-                // Normalize line endings
                 html = html.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-                // Escape HTML (except we'll re-add our own tags)
                 html = html
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;');
 
-                // Extract fenced code blocks first to protect them
                 const codeBlocks = [];
                 html = html.replace(/```([\s\S]*?)```/g, (match, code) => {
                     const idx = codeBlocks.length;
@@ -1567,13 +1570,11 @@ Correct answer as per choices`;
                     return `\u0000CODEBLOCK${idx}\u0000`;
                 });
 
-                // Split into lines for block processing
                 const lines = html.split('\n');
                 const output = [];
                 let inTable = false;
-                let tableHeaderDone = false;
                 let inList = false;
-                let listType = null; // 'ul' or 'ol'
+                let listType = null;
                 let inBlockquote = false;
 
                 function closeList() {
@@ -1587,7 +1588,6 @@ Correct answer as per choices`;
                     if (inTable) {
                         output.push('</tbody></table>');
                         inTable = false;
-                        tableHeaderDone = false;
                     }
                 }
                 function closeBlockquote() {
@@ -1600,7 +1600,6 @@ Correct answer as per choices`;
                 for (let i = 0; i < lines.length; i++) {
                     let line = lines[i];
 
-                    // Code block placeholder
                     const cbMatch = line.match(/^\u0000CODEBLOCK(\d+)\u0000\s*$/);
                     if (cbMatch) {
                         closeList(); closeTable(); closeBlockquote();
@@ -1609,7 +1608,6 @@ Correct answer as per choices`;
                         continue;
                     }
 
-                    // Table detection: line with pipes and next line is separator
                     const isTableRow = /^\s*\|.*\|\s*$/.test(line);
                     const nextLine = lines[i + 1] || '';
                     const isSeparator = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)+\|?\s*$/.test(nextLine);
@@ -1617,12 +1615,11 @@ Correct answer as per choices`;
                     if (isTableRow && isSeparator && !inTable) {
                         closeList(); closeBlockquote();
                         inTable = true;
-                        tableHeaderDone = false;
                         output.push('<table><thead>');
                         const cells = parseTableRow(line);
                         output.push('<tr>' + cells.map(c => `<th>${inlineFormat(c.trim())}</th>`).join('') + '</tr>');
                         output.push('</thead><tbody>');
-                        i++; // skip separator line
+                        i++;
                         continue;
                     }
 
@@ -1636,7 +1633,6 @@ Correct answer as per choices`;
                         closeTable();
                     }
 
-                    // Blockquote
                     if (/^\s*>\s?/.test(line)) {
                         if (!inBlockquote) {
                             closeList();
@@ -1649,7 +1645,6 @@ Correct answer as per choices`;
                         closeBlockquote();
                     }
 
-                    // Headings
                     const h1 = line.match(/^#\s+(.*)$/);
                     const h2 = line.match(/^##\s+(.*)$/);
                     const h3 = line.match(/^###\s+(.*)$/);
@@ -1659,14 +1654,12 @@ Correct answer as per choices`;
                     if (h3) { closeList(); closeTable(); closeBlockquote(); output.push(`<h3>${inlineFormat(h3[1])}</h3>`); continue; }
                     if (h4) { closeList(); closeTable(); closeBlockquote(); output.push(`<h4>${inlineFormat(h4[1])}</h4>`); continue; }
 
-                    // HR
                     if (/^\s*(---|\*\*\*|___)\s*$/.test(line)) {
                         closeList(); closeTable(); closeBlockquote();
                         output.push('<hr>');
                         continue;
                     }
 
-                    // Unordered list
                     const ulMatch = line.match(/^\s*[-*+]\s+(.*)$/);
                     if (ulMatch) {
                         closeTable(); closeBlockquote();
@@ -1680,7 +1673,6 @@ Correct answer as per choices`;
                         continue;
                     }
 
-                    // Ordered list
                     const olMatch = line.match(/^\s*\d+\.\s+(.*)$/);
                     if (olMatch) {
                         closeTable(); closeBlockquote();
@@ -1694,7 +1686,6 @@ Correct answer as per choices`;
                         continue;
                     }
 
-                    // Empty line
                     if (line.trim() === '') {
                         closeList();
                         closeTable();
@@ -1702,7 +1693,6 @@ Correct answer as per choices`;
                         continue;
                     }
 
-                    // Paragraph
                     closeList(); closeTable(); closeBlockquote();
                     output.push(`<p>${inlineFormat(line)}</p>`);
                 }
@@ -1724,26 +1714,18 @@ Correct answer as per choices`;
             function inlineFormat(text) {
                 if (!text) return '';
                 let s = text;
-                // Inline code
                 s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
-                // Bold
                 s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
                 s = s.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-                // Italic
                 s = s.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
                 s = s.replace(/_([^_\n]+)_/g, '<em>$1</em>');
-                // Links [text](url)
                 s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-                // Restore code block placeholders inside inline (unlikely but safe)
-                s = s.replace(/\u0000CODEBLOCK(\d+)\u0000/g, (m, i) => {
-                    return '';
-                });
                 return s;
             }
 
-            /* ===================================================== */
-            /* ========== MODAL OPEN / CLOSE ======================= */
-            /* ===================================================== */
+            /* ============================================ */
+            /* ========== MODAL OPEN / CLOSE ============== */
+            /* ============================================ */
             function openNotesModal(item) {
                 if (!item.hasMarkdown) return;
 
@@ -1752,7 +1734,6 @@ Correct answer as per choices`;
 
                 modalTitleText.textContent = currentModalTitle;
 
-                // Build subtitle: main topic • subject • job
                 const parts = [];
                 if (item.mainTopic && item.mainTopic !== '—') parts.push(item.mainTopic);
                 if (item.subject && item.subject !== '—') parts.push(item.subject);
@@ -1762,8 +1743,6 @@ Correct answer as per choices`;
                 modalBody.innerHTML = renderMarkdown(item.markdownNotes);
                 modalOverlay.classList.add('open');
                 document.body.style.overflow = 'hidden';
-
-                // Scroll body to top
                 modalBody.scrollTop = 0;
             }
 
@@ -1805,9 +1784,9 @@ Correct answer as per choices`;
                 }
             });
 
-            /* ===================================================== */
-            /* ========== CARD RENDERING =========================== */
-            /* ===================================================== */
+            /* ============================================ */
+            /* ========== CARD RENDERING ================== */
+            /* ============================================ */
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1837,7 +1816,6 @@ Correct answer as per choices`;
                         });
                     }
 
-                    // Top-right corner: job badge + last update date (stacked)
                     if ((showJobBadge && item.job && item.job !== '—') || item.lastUpdate) {
                         const corner = document.createElement('div');
                         corner.className = 'card-corner';
@@ -1861,7 +1839,6 @@ Correct answer as per choices`;
                         card.appendChild(corner);
                     }
 
-                    // ROW 1: Srno + Subtopic
                     const topRow = document.createElement('div');
                     topRow.className = 'card-top-row';
                     const subtopicDiv = document.createElement('div');
@@ -1888,7 +1865,6 @@ Correct answer as per choices`;
                     topRow.appendChild(subtopicDiv);
                     card.appendChild(topRow);
 
-                    // ROW 2: Main topic + count
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
@@ -1901,7 +1877,6 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
-                    // ROW 3: Subject + coverage% + status + PDF + READ
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
 
@@ -1925,12 +1900,12 @@ Correct answer as per choices`;
                     const rightCluster = document.createElement('div');
                     rightCluster.className = 'card-right-cluster';
 
-                    // READ BUTTON (only if markdown notes exist)
+                    // READ BUTTON
                     if (item.hasMarkdown) {
                         const readBtn = document.createElement('button');
                         readBtn.type = 'button';
                         readBtn.className = 'read-btn';
-                        readBtn.title = `Read notes for "${currentModalTitle || item.subTopic}"`;
+                        readBtn.title = `Read notes for "${item.subTopic}"`;
                         readBtn.innerHTML = `<i class="fas fa-book-open"></i> Read`;
                         readBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -2048,7 +2023,7 @@ Correct answer as per choices`;
                     const csvText = await response.text();
 
                     if (csvText.trim().startsWith('<!DOCTYPE') || csvText.trim().startsWith('<html')) {
-                        throw new Error('Received HTML instead of CSV');
+                        throw new Error('Sheet is not public. Share it as "Anyone with link can view".');
                     }
 
                     const rows = parseCSV(csvText);
@@ -2081,57 +2056,8 @@ Correct answer as per choices`;
                             <i class="fas fa-exclamation-triangle" style="color:#c06b4a;"></i>
                             <div style="margin-bottom:0.3rem;"><strong>Couldn't load sheet</strong></div>
                             <div style="font-size:0.75rem; opacity:0.8;">${escapeHtml(error.message)}</div>
-                            <div style="margin-top:0.8rem; font-size:0.75rem;">Showing sample cards.</div>
+                            <div style="margin-top:0.8rem; font-size:0.75rem;">Check browser console (F12) for details.</div>
                         </div>`;
-
-                    setTimeout(() => {
-                        const sampleMd = `# Human Resource Management (HRM) – Sample Notes
-
-## What is HRM?
-Human Resource Management (HRM) is the **strategic approach** to managing people in an organization.
-
-### Core Functions:
-1. Planning
-2. Recruitment & Selection
-3. Training & Development
-4. Performance Appraisal
-5. Compensation & Benefits
-
-| Concept | Explanation |
-|---------|-------------|
-| **Job Analysis** | Systematic study of a job |
-| **Recruitment** | Attracting candidates |
-| **Selection** | Choosing the best candidate |
-
-> This is a sample note rendered from markdown.
-
-\`\`\`
-Sample code block
-\`\`\`
-`;
-
-                        const sample = [
-                            { srno: '1', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: 'Percentages', url: 'https://chat.deepseek.com/share/x2gdwyy9txdzvcadm', hasUrl: true, pdfUrl: 'https://example.com/sol1.pdf', hasPdf: true, markdownNotes: sampleMd, hasMarkdown: true, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-20' },
-                            { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, pdfUrl: 'https://example.com/sol2.pdf', hasPdf: true, markdownNotes: '', hasMarkdown: false, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-21' },
-                            { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, pdfUrl: '', hasPdf: false, markdownNotes: '# Averages\n\nSome notes about averages...', hasMarkdown: true, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-22' },
-                            { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, pdfUrl: '', hasPdf: false, markdownNotes: '', hasMarkdown: false, status: 'pending', job: 'css-2027-mpt', lastUpdate: '' },
-                            { srno: '5', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: '#', hasUrl: false, pdfUrl: 'https://example.com/sol5.pdf', hasPdf: true, markdownNotes: '## Synonyms\n\n- Happy = Joyful\n- Sad = Unhappy', hasMarkdown: true, status: 'pending', job: 'css-2027-mpt', lastUpdate: '2026-09-23' }
-                        ];
-                        rawData = sample;
-                        computeCounts(rawData);
-                        populateFilters(rawData);
-                        setupStatusCheckboxes();
-                        selectedStatuses.clear();
-                        selectedStatuses.add('covered');
-                        selectedStatuses.add('pending');
-                        selectedSubjects.clear();
-                        selectedTopics.clear();
-                        selectedJobs.clear();
-                        cbCovered.classList.add('checked');
-                        cbPending.classList.add('checked');
-                        refreshAllFilters();
-                        applyFiltersAndRender();
-                    }, 200);
                 }
             }
 
