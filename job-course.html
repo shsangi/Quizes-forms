@@ -414,6 +414,8 @@
             gap: 0.3rem;
             flex-shrink: 0;
             margin-left: auto;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .status-badge-inline {
@@ -453,6 +455,34 @@
             font-size: 0.45rem; margin-left: 0.1rem; opacity: 0.75;
         }
 
+        /* READ BUTTON */
+        .read-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: linear-gradient(135deg, #e8f2fc, #d6e9f8);
+            color: #0c4b6b;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.15rem 0.55rem 0.15rem 0.4rem;
+            border-radius: 30px;
+            text-decoration: none;
+            border: 1px solid #b8d4e8;
+            transition: 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .read-btn:hover {
+            background: linear-gradient(135deg, #d6e9f8, #c0dcf0);
+            border-color: #8fbcd8;
+            color: #083a52;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px -3px rgba(20, 106, 138, 0.3);
+        }
+        .read-btn i { font-size: 0.55rem; }
+
         /* PDF link */
         .pdf-link {
             display: inline-flex;
@@ -478,6 +508,290 @@
         .pdf-link i { font-size: 0.55rem; }
         .pdf-link .pdf-label { font-weight: 700; letter-spacing: 0.2px; }
 
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 28, 42, 0.55);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 820px;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 60px -12px rgba(0, 20, 40, 0.45);
+            border: 1px solid #d9e6f2;
+            overflow: hidden;
+            transform: translateY(15px) scale(0.98);
+            transition: transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
+        }
+        .modal-overlay.open .modal-box {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #0f3a52, #14587a);
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        .modal-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+            min-width: 0;
+            flex: 1;
+        }
+        .modal-header-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.25;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .modal-header-title i {
+            color: #7dd3fc;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .modal-header-sub {
+            font-size: 0.62rem;
+            font-weight: 500;
+            color: #b9d9ee;
+            opacity: 0.95;
+            word-break: break-word;
+        }
+        .modal-close {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 1rem 1.1rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            flex: 1 1 auto;
+            font-size: 0.78rem;
+            line-height: 1.55;
+            color: #1a2b3c;
+            background: #fbfdff;
+        }
+        .modal-body::-webkit-scrollbar { width: 8px; }
+        .modal-body::-webkit-scrollbar-track { background: #f0f6fb; }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #c0d8ea;
+            border-radius: 8px;
+        }
+        .modal-body::-webkit-scrollbar-thumb:hover { background: #a3c6de; }
+
+        /* Markdown rendered styles */
+        .modal-body h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0c334a;
+            margin: 0.4rem 0 0.6rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 2px solid #e0eef8;
+            line-height: 1.3;
+        }
+        .modal-body h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f3a52;
+            margin: 1rem 0 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #eaf2f9;
+            line-height: 1.3;
+        }
+        .modal-body h3 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #14587a;
+            margin: 0.85rem 0 0.4rem;
+            line-height: 1.3;
+        }
+        .modal-body h4 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #1a6e96;
+            margin: 0.7rem 0 0.35rem;
+        }
+        .modal-body p {
+            margin: 0.45rem 0;
+            word-break: break-word;
+        }
+        .modal-body strong { font-weight: 700; color: #0c334a; }
+        .modal-body em { font-style: italic; color: #2c5777; }
+        .modal-body ul, .modal-body ol {
+            margin: 0.45rem 0 0.45rem 1.2rem;
+            padding-left: 0.3rem;
+        }
+        .modal-body li {
+            margin: 0.2rem 0;
+            word-break: break-word;
+        }
+        .modal-body code {
+            background: #eef5fb;
+            color: #b03060;
+            padding: 0.08rem 0.35rem;
+            border-radius: 5px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.72rem;
+            word-break: break-word;
+        }
+        .modal-body pre {
+            background: #0f2b3d;
+            color: #e2eef7;
+            padding: 0.7rem 0.85rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 0.6rem 0;
+            font-size: 0.7rem;
+            line-height: 1.5;
+        }
+        .modal-body pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: 0.7rem;
+        }
+        .modal-body blockquote {
+            border-left: 3px solid #7dd3fc;
+            background: #f0f8ff;
+            padding: 0.5rem 0.8rem;
+            margin: 0.6rem 0;
+            border-radius: 0 8px 8px 0;
+            color: #2c5777;
+            font-style: italic;
+        }
+        .modal-body hr {
+            border: none;
+            border-top: 1px dashed #cfe2f0;
+            margin: 1rem 0;
+        }
+        .modal-body a {
+            color: #146a8a;
+            text-decoration: underline;
+            word-break: break-word;
+        }
+        .modal-body a:hover { color: #0c4b6b; }
+
+        /* Markdown tables */
+        .modal-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.7rem 0;
+            font-size: 0.72rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px -2px rgba(0, 30, 50, 0.1);
+        }
+        .modal-body thead {
+            background: linear-gradient(135deg, #14587a, #1a6e96);
+            color: #ffffff;
+        }
+        .modal-body th {
+            padding: 0.45rem 0.6rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.68rem;
+            letter-spacing: 0.2px;
+            border: 1px solid #0f3a52;
+            word-break: break-word;
+        }
+        .modal-body td {
+            padding: 0.4rem 0.6rem;
+            border: 1px solid #dceaf4;
+            vertical-align: top;
+            word-break: break-word;
+            color: #1a2b3c;
+        }
+        .modal-body tbody tr:nth-child(even) { background: #f5fafd; }
+        .modal-body tbody tr:hover { background: #eaf4fb; }
+
+        .modal-footer {
+            padding: 0.6rem 1rem;
+            background: #f5fafd;
+            border-top: 1px solid #e2eef8;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.4rem;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .modal-footer button {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.4rem 0.9rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .modal-footer .btn-close {
+            background: #ffffff;
+            color: #4a6a80;
+            border-color: #d9e6f0;
+        }
+        .modal-footer .btn-close:hover {
+            background: #f0f7ff;
+            border-color: #b0cde0;
+            color: #1a2b3c;
+        }
+        .modal-footer .btn-copy {
+            background: linear-gradient(135deg, #146a8a, #1a86a8);
+            color: #ffffff;
+            border-color: #146a8a;
+        }
+        .modal-footer .btn-copy:hover {
+            background: linear-gradient(135deg, #0c4b6b, #146a8a);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px -4px rgba(20, 106, 138, 0.45);
+        }
+
         /* TOAST */
         .toast {
             position: fixed;
@@ -491,7 +805,7 @@
             font-size: 0.75rem;
             font-weight: 500;
             box-shadow: 0 8px 24px -6px rgba(0, 20, 40, 0.4);
-            z-index: 1000;
+            z-index: 3000;
             display: none;
             align-items: center;
             gap: 0.5rem;
@@ -550,6 +864,19 @@
             .filter-bar { padding: 0.5rem 0.6rem; }
             .card-job-badge { font-size: 0.45rem; }
             .card-last-update { font-size: 0.45rem; }
+
+            .modal-overlay { padding: 0.4rem; }
+            .modal-box { max-height: 94vh; border-radius: 14px; }
+            .modal-header { padding: 0.6rem 0.75rem; }
+            .modal-header-title { font-size: 0.82rem; }
+            .modal-header-sub { font-size: 0.58rem; }
+            .modal-body { padding: 0.8rem 0.85rem; font-size: 0.75rem; }
+            .modal-body h1 { font-size: 1.05rem; }
+            .modal-body h2 { font-size: 0.92rem; }
+            .modal-body h3 { font-size: 0.82rem; }
+            .modal-body table { font-size: 0.66rem; }
+            .modal-body th, .modal-body td { padding: 0.35rem 0.45rem; }
+            .modal-footer { padding: 0.5rem 0.75rem; }
         }
 
         @media (max-width: 380px) {
@@ -558,6 +885,7 @@
             .checkbox-item .cb-text { font-size: 0.65rem; }
             .subtopic-name { font-size: 0.75rem; }
             .card-srno { font-size: 0.5rem; padding: 0.05rem 0.3rem; }
+            .read-btn { font-size: 0.55rem; padding: 0.12rem 0.45rem; }
         }
     </style>
 </head>
@@ -642,6 +970,33 @@
         <div id="cardsContainer" class="cards-grid"></div>
     </div>
 
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-header">
+                <div class="modal-header-text">
+                    <div class="modal-header-title" id="modalTitle">
+                        <i class="fas fa-book-open"></i>
+                        <span id="modalTitleText">Topic Notes</span>
+                    </div>
+                    <div class="modal-header-sub" id="modalSubtitle"></div>
+                </div>
+                <button class="modal-close" id="modalCloseBtn" title="Close" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-close" id="modalCloseBtn2">
+                    <i class="fas fa-times"></i> Close
+                </button>
+                <button class="btn-copy" id="modalCopyBtn">
+                    <i class="fas fa-copy"></i> Copy Notes
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast">
         <i class="fas fa-check-circle"></i>
         <span id="toastMessage">Copied!</span>
@@ -668,6 +1023,18 @@
             const subjectCountHint = document.getElementById('subjectCountHint');
             const topicCountHint = document.getElementById('topicCountHint');
             const jobCountHint = document.getElementById('jobCountHint');
+
+            // Modal elements
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalTitleText = document.getElementById('modalTitleText');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+            const modalCloseBtn2 = document.getElementById('modalCloseBtn2');
+            const modalCopyBtn = document.getElementById('modalCopyBtn');
+
+            let currentModalMarkdown = '';
+            let currentModalTitle = '';
 
             let rawData = [];
             let filteredData = [];
@@ -730,9 +1097,10 @@
                 return rows;
             }
 
-            // ============ 8-COLUMN PARSER ============
+            // ============ 9-COLUMN PARSER ============
             // A: Srno | B: Subject with Marks | C: Topic | D: Subtopic
             // E: job | F: URL | G: pdf files url | H: last update date
+            // I: markdown_topic_notes  <-- NEW
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
                 const dataRows = rows.slice(1);
@@ -749,6 +1117,7 @@
                     const url = (row[5] || '').trim();
                     const pdfUrl = (row[6] || '').trim();
                     const lastUpdate = (row[7] || '').trim();
+                    const markdownNotes = (row[8] || '').trim(); // Column I
 
                     let subject = subjectWithMarks;
                     let marks = '';
@@ -760,6 +1129,7 @@
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
                     const hasPdf = pdfUrl && pdfUrl !== '#' && pdfUrl !== '—' && pdfUrl.trim() !== '';
+                    const hasMarkdown = markdownNotes && markdownNotes !== '—' && markdownNotes.trim() !== '';
                     const status = hasUrl ? 'covered' : 'pending';
                     const displayTopic = subTopic || mainTopic;
 
@@ -774,6 +1144,8 @@
                         hasUrl: hasUrl,
                         pdfUrl: hasPdf ? pdfUrl : '',
                         hasPdf: hasPdf,
+                        markdownNotes: hasMarkdown ? markdownNotes : '',
+                        hasMarkdown: hasMarkdown,
                         status: status,
                         job: job || '—',
                         lastUpdate: lastUpdate || ''
@@ -1171,6 +1543,271 @@ Correct answer as per choices`;
                 }, 1800);
             }
 
+            /* ===================================================== */
+            /* ========== SIMPLE MARKDOWN RENDERER ================= */
+            /* ===================================================== */
+            function renderMarkdown(md) {
+                if (!md) return '';
+                let html = md;
+
+                // Normalize line endings
+                html = html.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+                // Escape HTML (except we'll re-add our own tags)
+                html = html
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+
+                // Extract fenced code blocks first to protect them
+                const codeBlocks = [];
+                html = html.replace(/```([\s\S]*?)```/g, (match, code) => {
+                    const idx = codeBlocks.length;
+                    codeBlocks.push(code);
+                    return `\u0000CODEBLOCK${idx}\u0000`;
+                });
+
+                // Split into lines for block processing
+                const lines = html.split('\n');
+                const output = [];
+                let inTable = false;
+                let tableHeaderDone = false;
+                let inList = false;
+                let listType = null; // 'ul' or 'ol'
+                let inBlockquote = false;
+
+                function closeList() {
+                    if (inList) {
+                        output.push(listType === 'ol' ? '</ol>' : '</ul>');
+                        inList = false;
+                        listType = null;
+                    }
+                }
+                function closeTable() {
+                    if (inTable) {
+                        output.push('</tbody></table>');
+                        inTable = false;
+                        tableHeaderDone = false;
+                    }
+                }
+                function closeBlockquote() {
+                    if (inBlockquote) {
+                        output.push('</blockquote>');
+                        inBlockquote = false;
+                    }
+                }
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+
+                    // Code block placeholder
+                    const cbMatch = line.match(/^\u0000CODEBLOCK(\d+)\u0000\s*$/);
+                    if (cbMatch) {
+                        closeList(); closeTable(); closeBlockquote();
+                        const code = codeBlocks[parseInt(cbMatch[1], 10)];
+                        output.push(`<pre><code>${code}</code></pre>`);
+                        continue;
+                    }
+
+                    // Table detection: line with pipes and next line is separator
+                    const isTableRow = /^\s*\|.*\|\s*$/.test(line);
+                    const nextLine = lines[i + 1] || '';
+                    const isSeparator = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)+\|?\s*$/.test(nextLine);
+
+                    if (isTableRow && isSeparator && !inTable) {
+                        closeList(); closeBlockquote();
+                        inTable = true;
+                        tableHeaderDone = false;
+                        output.push('<table><thead>');
+                        const cells = parseTableRow(line);
+                        output.push('<tr>' + cells.map(c => `<th>${inlineFormat(c.trim())}</th>`).join('') + '</tr>');
+                        output.push('</thead><tbody>');
+                        i++; // skip separator line
+                        continue;
+                    }
+
+                    if (inTable && isTableRow) {
+                        const cells = parseTableRow(line);
+                        output.push('<tr>' + cells.map(c => `<td>${inlineFormat(c.trim())}</td>`).join('') + '</tr>');
+                        continue;
+                    }
+
+                    if (inTable && !isTableRow) {
+                        closeTable();
+                    }
+
+                    // Blockquote
+                    if (/^\s*>\s?/.test(line)) {
+                        if (!inBlockquote) {
+                            closeList();
+                            output.push('<blockquote>');
+                            inBlockquote = true;
+                        }
+                        output.push(inlineFormat(line.replace(/^\s*>\s?/, '')));
+                        continue;
+                    } else if (inBlockquote) {
+                        closeBlockquote();
+                    }
+
+                    // Headings
+                    const h1 = line.match(/^#\s+(.*)$/);
+                    const h2 = line.match(/^##\s+(.*)$/);
+                    const h3 = line.match(/^###\s+(.*)$/);
+                    const h4 = line.match(/^####\s+(.*)$/);
+                    if (h1) { closeList(); closeTable(); closeBlockquote(); output.push(`<h1>${inlineFormat(h1[1])}</h1>`); continue; }
+                    if (h2) { closeList(); closeTable(); closeBlockquote(); output.push(`<h2>${inlineFormat(h2[1])}</h2>`); continue; }
+                    if (h3) { closeList(); closeTable(); closeBlockquote(); output.push(`<h3>${inlineFormat(h3[1])}</h3>`); continue; }
+                    if (h4) { closeList(); closeTable(); closeBlockquote(); output.push(`<h4>${inlineFormat(h4[1])}</h4>`); continue; }
+
+                    // HR
+                    if (/^\s*(---|\*\*\*|___)\s*$/.test(line)) {
+                        closeList(); closeTable(); closeBlockquote();
+                        output.push('<hr>');
+                        continue;
+                    }
+
+                    // Unordered list
+                    const ulMatch = line.match(/^\s*[-*+]\s+(.*)$/);
+                    if (ulMatch) {
+                        closeTable(); closeBlockquote();
+                        if (!inList || listType !== 'ul') {
+                            closeList();
+                            output.push('<ul>');
+                            inList = true;
+                            listType = 'ul';
+                        }
+                        output.push(`<li>${inlineFormat(ulMatch[1])}</li>`);
+                        continue;
+                    }
+
+                    // Ordered list
+                    const olMatch = line.match(/^\s*\d+\.\s+(.*)$/);
+                    if (olMatch) {
+                        closeTable(); closeBlockquote();
+                        if (!inList || listType !== 'ol') {
+                            closeList();
+                            output.push('<ol>');
+                            inList = true;
+                            listType = 'ol';
+                        }
+                        output.push(`<li>${inlineFormat(olMatch[1])}</li>`);
+                        continue;
+                    }
+
+                    // Empty line
+                    if (line.trim() === '') {
+                        closeList();
+                        closeTable();
+                        closeBlockquote();
+                        continue;
+                    }
+
+                    // Paragraph
+                    closeList(); closeTable(); closeBlockquote();
+                    output.push(`<p>${inlineFormat(line)}</p>`);
+                }
+
+                closeList();
+                closeTable();
+                closeBlockquote();
+
+                return output.join('\n');
+            }
+
+            function parseTableRow(line) {
+                let trimmed = line.trim();
+                if (trimmed.startsWith('|')) trimmed = trimmed.slice(1);
+                if (trimmed.endsWith('|')) trimmed = trimmed.slice(0, -1);
+                return trimmed.split('|');
+            }
+
+            function inlineFormat(text) {
+                if (!text) return '';
+                let s = text;
+                // Inline code
+                s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+                // Bold
+                s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                s = s.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+                // Italic
+                s = s.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+                s = s.replace(/_([^_\n]+)_/g, '<em>$1</em>');
+                // Links [text](url)
+                s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+                // Restore code block placeholders inside inline (unlikely but safe)
+                s = s.replace(/\u0000CODEBLOCK(\d+)\u0000/g, (m, i) => {
+                    return '';
+                });
+                return s;
+            }
+
+            /* ===================================================== */
+            /* ========== MODAL OPEN / CLOSE ======================= */
+            /* ===================================================== */
+            function openNotesModal(item) {
+                if (!item.hasMarkdown) return;
+
+                currentModalMarkdown = item.markdownNotes;
+                currentModalTitle = item.subTopic !== '—' ? item.subTopic : item.displayTopic;
+
+                modalTitleText.textContent = currentModalTitle;
+
+                // Build subtitle: main topic • subject • job
+                const parts = [];
+                if (item.mainTopic && item.mainTopic !== '—') parts.push(item.mainTopic);
+                if (item.subject && item.subject !== '—') parts.push(item.subject);
+                if (item.job && item.job !== '—') parts.push(item.job);
+                modalSubtitle.textContent = parts.join('  •  ');
+
+                modalBody.innerHTML = renderMarkdown(item.markdownNotes);
+                modalOverlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+
+                // Scroll body to top
+                modalBody.scrollTop = 0;
+            }
+
+            function closeNotesModal() {
+                modalOverlay.classList.remove('open');
+                document.body.style.overflow = '';
+                currentModalMarkdown = '';
+                currentModalTitle = '';
+            }
+
+            modalCloseBtn.addEventListener('click', closeNotesModal);
+            modalCloseBtn2.addEventListener('click', closeNotesModal);
+
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeNotesModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('open')) {
+                    closeNotesModal();
+                }
+            });
+
+            modalCopyBtn.addEventListener('click', () => {
+                if (!currentModalMarkdown) return;
+                const success = fallbackCopy(currentModalMarkdown);
+                if (success) {
+                    showToast('Notes copied to clipboard');
+                    return;
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(currentModalMarkdown).then(() => {
+                        showToast('Notes copied to clipboard');
+                    }).catch(() => {
+                        showToast('Copy failed — please copy manually');
+                    });
+                } else {
+                    showToast('Copy failed — please copy manually');
+                }
+            });
+
+            /* ===================================================== */
+            /* ========== CARD RENDERING =========================== */
+            /* ===================================================== */
             function renderCards(data) {
                 if (!data.length) {
                     cardsContainer.innerHTML = `
@@ -1195,6 +1832,7 @@ Correct answer as per choices`;
                             if (e.target.closest('.status-badge-inline')) return;
                             if (e.target.closest('.subtopic-name')) return;
                             if (e.target.closest('.pdf-link')) return;
+                            if (e.target.closest('.read-btn')) return;
                             copyPrompt(item);
                         });
                     }
@@ -1263,7 +1901,7 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
-                    // ROW 3: Subject + coverage% + status + PDF
+                    // ROW 3: Subject + coverage% + status + PDF + READ
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
 
@@ -1286,6 +1924,20 @@ Correct answer as per choices`;
 
                     const rightCluster = document.createElement('div');
                     rightCluster.className = 'card-right-cluster';
+
+                    // READ BUTTON (only if markdown notes exist)
+                    if (item.hasMarkdown) {
+                        const readBtn = document.createElement('button');
+                        readBtn.type = 'button';
+                        readBtn.className = 'read-btn';
+                        readBtn.title = `Read notes for "${currentModalTitle || item.subTopic}"`;
+                        readBtn.innerHTML = `<i class="fas fa-book-open"></i> Read`;
+                        readBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            openNotesModal(item);
+                        });
+                        rightCluster.appendChild(readBtn);
+                    }
 
                     if (item.hasUrl) {
                         const coveredBadge = document.createElement('a');
@@ -1433,12 +2085,37 @@ Correct answer as per choices`;
                         </div>`;
 
                     setTimeout(() => {
+                        const sampleMd = `# Human Resource Management (HRM) – Sample Notes
+
+## What is HRM?
+Human Resource Management (HRM) is the **strategic approach** to managing people in an organization.
+
+### Core Functions:
+1. Planning
+2. Recruitment & Selection
+3. Training & Development
+4. Performance Appraisal
+5. Compensation & Benefits
+
+| Concept | Explanation |
+|---------|-------------|
+| **Job Analysis** | Systematic study of a job |
+| **Recruitment** | Attracting candidates |
+| **Selection** | Choosing the best candidate |
+
+> This is a sample note rendered from markdown.
+
+\`\`\`
+Sample code block
+\`\`\`
+`;
+
                         const sample = [
-                            { srno: '1', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: 'Percentages', url: 'https://chat.deepseek.com/share/x2gdwyy9txdzvcadm', hasUrl: true, pdfUrl: 'https://example.com/sol1.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-20' },
-                            { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, pdfUrl: 'https://example.com/sol2.pdf', hasPdf: true, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-21' },
-                            { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, pdfUrl: '', hasPdf: false, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-22' },
-                            { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, pdfUrl: '', hasPdf: false, status: 'pending', job: 'css-2027-mpt', lastUpdate: '' },
-                            { srno: '5', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: '#', hasUrl: false, pdfUrl: 'https://example.com/sol5.pdf', hasPdf: true, status: 'pending', job: 'css-2027-mpt', lastUpdate: '2026-09-23' }
+                            { srno: '1', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Percentages', displayTopic: 'Percentages', url: 'https://chat.deepseek.com/share/x2gdwyy9txdzvcadm', hasUrl: true, pdfUrl: 'https://example.com/sol1.pdf', hasPdf: true, markdownNotes: sampleMd, hasMarkdown: true, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-20' },
+                            { srno: '2', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Ratios', displayTopic: 'Ratios', url: 'https://chat.deepseek.com/share/530rmdlusu59699v7s', hasUrl: true, pdfUrl: 'https://example.com/sol2.pdf', hasPdf: true, markdownNotes: '', hasMarkdown: false, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-21' },
+                            { srno: '3', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Averages', displayTopic: 'Averages', url: 'https://chat.deepseek.com/share/mamnna7iv3btqf2wb3', hasUrl: true, pdfUrl: '', hasPdf: false, markdownNotes: '# Averages\n\nSome notes about averages...', hasMarkdown: true, status: 'covered', job: 'css-2027-mpt', lastUpdate: '2026-09-22' },
+                            { srno: '4', subject: 'General Abilities', marks: '60', mainTopic: 'Basic Arithmetic', subTopic: 'Profit/Loss', displayTopic: 'Profit/Loss', url: '#', hasUrl: false, pdfUrl: '', hasPdf: false, markdownNotes: '', hasMarkdown: false, status: 'pending', job: 'css-2027-mpt', lastUpdate: '' },
+                            { srno: '5', subject: 'English', marks: '50', mainTopic: 'Vocabulary', subTopic: 'Synonyms', displayTopic: 'Synonyms', url: '#', hasUrl: false, pdfUrl: 'https://example.com/sol5.pdf', hasPdf: true, markdownNotes: '## Synonyms\n\n- Happy = Joyful\n- Sad = Unhappy', hasMarkdown: true, status: 'pending', job: 'css-2027-mpt', lastUpdate: '2026-09-23' }
                         ];
                         rawData = sample;
                         computeCounts(rawData);
