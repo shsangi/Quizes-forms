@@ -245,7 +245,7 @@
         }
         .checkbox-item .cb-text { font-size: 0.7rem; font-weight: 500; }
 
-        /* RESET BUTTON (rightmost of status row) */
+        /* RESET BUTTON */
         .reset-btn {
             margin-left: auto;
             display: inline-flex; align-items: center; gap: 0.3rem;
@@ -267,12 +267,8 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 10px -4px rgba(185, 28, 28, 0.25);
         }
-        .reset-btn:active {
-            transform: translateY(0) scale(0.97);
-        }
-        .reset-btn:hover i {
-            transform: rotate(-180deg);
-        }
+        .reset-btn:active { transform: translateY(0) scale(0.97); }
+        .reset-btn:hover i { transform: rotate(-180deg); }
 
         /* CARDS GRID */
         .cards-grid {
@@ -444,21 +440,32 @@
         }
         .read-btn i { font-size: 0.55rem; }
 
-        /* PDF link */
-        .pdf-link {
+        /* SOL FILE link (generic — any file type) */
+        .sol-link {
             display: inline-flex; align-items: center; gap: 0.25rem;
-            background: #fff0f0; color: #b91c1c;
+            background: #fff5eb; color: #b45309;
             font-size: 0.6rem; font-weight: 700;
             padding: 0.1rem 0.5rem 0.1rem 0.3rem;
             border-radius: 30px; text-decoration: none;
-            border: 1px solid #f3c0c0; transition: 0.15s;
+            border: 1px solid #f3d0a0; transition: 0.15s;
             white-space: nowrap; flex-shrink: 0;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .pdf-link:hover { background: #ffe0e0; border-color: #e89a9a; color: #991b1b; }
-        .pdf-link i { font-size: 0.55rem; }
-        .pdf-link .pdf-label { font-weight: 700; letter-spacing: 0.2px; }
+        .sol-link:hover {
+            background: #ffe9d0; border-color: #e8b878; color: #8a3d00;
+        }
+        .sol-link i { font-size: 0.55rem; flex-shrink: 0; }
+        .sol-link .sol-label {
+            font-weight: 700; letter-spacing: 0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70px;
+        }
 
-        /* ===== FLOATING ACTION STACK (BOTTOM-LEFT) ===== */
+        /* FLOATING ACTION STACK (BOTTOM-LEFT) */
         .fab-stack {
             position: fixed;
             bottom: 1.2rem;
@@ -487,7 +494,6 @@
         }
         .fab-btn i { font-size: 1.15rem; transition: transform 0.5s ease; }
 
-        /* Refresh — primary (blue) */
         .fab-refresh {
             background: linear-gradient(135deg, #146a8a, #1a86a8);
             box-shadow: 0 6px 18px -4px rgba(20, 106, 138, 0.55),
@@ -510,7 +516,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Scroll buttons — secondary (soft blue/white) */
         .fab-scroll {
             background: linear-gradient(135deg, #ffffff, #eaf3fb);
             color: #146a8a;
@@ -529,7 +534,6 @@
         .fab-scroll:active { transform: translateY(0) scale(0.96); }
         .fab-scroll i { font-size: 1.05rem; }
 
-        /* Small "pressed" feedback arrow moves */
         .fab-scroll.to-top:hover i { transform: translateY(-3px); }
         .fab-scroll.to-bottom:hover i { transform: translateY(3px); }
 
@@ -799,6 +803,9 @@
             .fab-btn i { font-size: 1.05rem; }
             .fab-scroll i { font-size: 0.95rem; }
 
+            .sol-link { max-width: 80px; }
+            .sol-link .sol-label { max-width: 55px; }
+
             .modal-overlay { padding: 0.4rem; }
             .modal-box { max-height: 94vh; border-radius: 14px; }
             .modal-header { padding: 0.6rem 0.75rem; }
@@ -915,7 +922,7 @@
         <div id="cardsContainer" class="cards-grid"></div>
     </div>
 
-    <!-- FLOATING ACTION STACK (BOTTOM-LEFT) -->
+    <!-- FLOATING ACTION STACK -->
     <div class="fab-stack">
         <button class="fab-btn fab-scroll to-top" id="fabScrollTop" title="Scroll to top" aria-label="Scroll to top">
             <i class="fas fa-arrow-up"></i>
@@ -968,7 +975,6 @@
 
             const EXPECTED_COLUMNS = 9;
 
-            /* ===== localStorage keys ===== */
             const LS_DATA_KEY = 'tracker_data_v1';
             const LS_FILTERS_KEY = 'tracker_filters_v1';
             const LS_SCROLL_KEY = 'tracker_scroll_v1';
@@ -1038,9 +1044,7 @@
                         jobs: Array.from(selectedJobs),
                         statuses: Array.from(selectedStatuses)
                     }));
-                } catch (e) {
-                    console.warn('saveFilters failed:', e);
-                }
+                } catch (e) { console.warn('saveFilters failed:', e); }
             }
 
             function loadFiltersFromStorage() {
@@ -1065,9 +1069,7 @@
                 try {
                     localStorage.setItem(LS_DATA_KEY, JSON.stringify(data));
                     localStorage.setItem(LS_TS_KEY, String(Date.now()));
-                } catch (e) {
-                    console.warn('saveData failed:', e);
-                }
+                } catch (e) { console.warn('saveData failed:', e); }
             }
 
             function loadDataFromStorage() {
@@ -1084,9 +1086,8 @@
             }
 
             function saveScrollPosition() {
-                try {
-                    localStorage.setItem(LS_SCROLL_KEY, String(window.scrollY || 0));
-                } catch (e) { /* ignore */ }
+                try { localStorage.setItem(LS_SCROLL_KEY, String(window.scrollY || 0)); }
+                catch (e) { /* ignore */ }
             }
 
             function getSavedScrollPosition() {
@@ -1101,8 +1102,34 @@
                 try {
                     localStorage.removeItem(LS_DATA_KEY);
                     localStorage.removeItem(LS_TS_KEY);
-                    // Note: we keep filters + scroll intact even across refresh
                 } catch (e) { /* ignore */ }
+            }
+
+            /* ============================================ */
+            /* ========== HELPERS ========================= */
+            /* ============================================ */
+            /* Extract a friendly filename from a URL.
+               Works for any file type. Falls back to "sol". */
+            function extractFileName(url) {
+                if (!url || url === '#') return 'sol';
+                try {
+                    // Strip query + hash
+                    let clean = url.split('#')[0].split('?')[0];
+                    // Get last path segment
+                    const parts = clean.split('/');
+                    let last = parts[parts.length - 1] || '';
+                    // Decode percent-encoding
+                    try { last = decodeURIComponent(last); } catch (e) {}
+                    // If empty or looks like a bare domain, fallback
+                    if (!last || last.indexOf('.') === -1 && !/\w/.test(last)) return 'sol';
+                    // Trim very long names
+                    if (last.length > 24) {
+                        last = last.slice(0, 21) + '…';
+                    }
+                    return last || 'sol';
+                } catch (e) {
+                    return 'sol';
+                }
             }
 
             /* ============================================ */
@@ -1203,7 +1230,7 @@
                     const subTopic = (row[3] || '').trim();
                     const job = (row[4] || '').trim();
                     const url = (row[5] || '').trim();
-                    const pdfUrl = (row[6] || '').trim();
+                    const solUrl = (row[6] || '').trim();
                     const lastUpdate = (row[7] || '').trim();
                     const markdownNotes = (row[8] || '').trim();
 
@@ -1216,9 +1243,19 @@
                     }
 
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
-                    const hasPdf = pdfUrl && pdfUrl !== '#' && pdfUrl !== '—' && pdfUrl.trim() !== '';
+                    const hasSol = solUrl && solUrl !== '#' && solUrl !== '—' && solUrl.trim() !== '';
                     const hasMarkdown = looksLikeMarkdown(markdownNotes);
-                    const status = hasUrl ? 'covered' : 'pending';
+
+                    /* ============================================
+                       STATUS LOGIC (UPDATED):
+                       A row is "covered" (Done) if it has ANY of:
+                         - a URL (chat link)
+                         - a Sol file link (any file type)
+                         - Markdown notes
+                       Only rows with NONE of the three are "pending".
+                       ============================================ */
+                    const status = (hasUrl || hasSol || hasMarkdown) ? 'covered' : 'pending';
+
                     const displayTopic = subTopic || mainTopic;
 
                     result.push({
@@ -1230,8 +1267,9 @@
                         displayTopic: displayTopic || '—',
                         url: hasUrl ? url : '#',
                         hasUrl: hasUrl,
-                        pdfUrl: hasPdf ? pdfUrl : '',
-                        hasPdf: hasPdf,
+                        solUrl: hasSol ? solUrl : '',
+                        hasSol: hasSol,
+                        solFileName: hasSol ? extractFileName(solUrl) : '',
                         markdownNotes: hasMarkdown ? markdownNotes : '',
                         hasMarkdown: hasMarkdown,
                         status: status,
@@ -1470,8 +1508,7 @@
                                 }
                                 onUpdate();
                                 updateTriggerText();
-
-                                // ===== AUTO-CLOSE DROPDOWN after selection =====
+                                // Auto-close after selection
                                 closeDropdown();
                             });
                             dropdown.appendChild(div);
@@ -1941,7 +1978,7 @@ Correct answer as per choices`;
                         card.addEventListener('click', (e) => {
                             if (e.target.closest('.status-badge-inline')) return;
                             if (e.target.closest('.subtopic-name')) return;
-                            if (e.target.closest('.pdf-link')) return;
+                            if (e.target.closest('.sol-link')) return;
                             if (e.target.closest('.read-btn')) return;
                             copyPrompt(item);
                         });
@@ -2055,34 +2092,38 @@ Correct answer as per choices`;
                         `;
                         rightCluster.appendChild(coveredBadge);
                     } else {
+                        // No chat URL → still might be covered by sol / markdown
+                        const isCovered = item.status === 'covered';
                         const pendingBadge = document.createElement('span');
-                        pendingBadge.className = 'status-badge-inline pending';
-                        pendingBadge.title = 'Click card to copy DeepSeek prompt';
-                        pendingBadge.innerHTML = `
-                            <span class="status-check"><i class="fas fa-clock"></i></span>
-                            <span>Pending</span>
-                            <i class="fas fa-copy copy-icon"></i>
-                        `;
-                        pendingBadge.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            copyPrompt(item);
-                        });
+                        pendingBadge.className = 'status-badge-inline ' + (isCovered ? 'covered' : 'pending');
+                        pendingBadge.title = isCovered
+                            ? 'Marked done (has sol / notes)'
+                            : 'Click card to copy DeepSeek prompt';
+                        pendingBadge.innerHTML = isCovered
+                            ? `<span class="status-check"><i class="fas fa-check"></i></span><span>Done</span>`
+                            : `<span class="status-check"><i class="fas fa-clock"></i></span><span>Pending</span><i class="fas fa-copy copy-icon"></i>`;
+                        if (!isCovered) {
+                            pendingBadge.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                copyPrompt(item);
+                            });
+                        }
                         rightCluster.appendChild(pendingBadge);
                     }
 
-                    if (item.hasPdf) {
-                        const pdfLink = document.createElement('a');
-                        pdfLink.href = item.pdfUrl;
-                        pdfLink.target = '_blank';
-                        pdfLink.rel = 'noopener noreferrer';
-                        pdfLink.className = 'pdf-link';
-                        pdfLink.title = 'Open PDF: sol.pdf';
-                        pdfLink.innerHTML = `
-                            <i class="fas fa-file-pdf"></i>
-                            <span class="pdf-label">sol.pdf</span>
+                    if (item.hasSol) {
+                        const solLink = document.createElement('a');
+                        solLink.href = item.solUrl;
+                        solLink.target = '_blank';
+                        solLink.rel = 'noopener noreferrer';
+                        solLink.className = 'sol-link';
+                        solLink.title = 'Open solution file: ' + item.solFileName;
+                        solLink.innerHTML = `
+                            <i class="fas fa-file-alt"></i>
+                            <span class="sol-label">${escapeHtml(item.solFileName)}</span>
                         `;
-                        pdfLink.addEventListener('click', (e) => e.stopPropagation());
-                        rightCluster.appendChild(pdfLink);
+                        solLink.addEventListener('click', (e) => e.stopPropagation());
+                        rightCluster.appendChild(solLink);
                     }
 
                     subjectRow.appendChild(rightCluster);
@@ -2163,20 +2204,17 @@ Correct answer as per choices`;
                 }
             }
 
-            // Smooth scroll to top
             fabScrollTop.addEventListener('click', () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 try { localStorage.setItem(LS_SCROLL_KEY, '0'); } catch (e) {}
             });
 
-            // Smooth scroll to bottom
             fabScrollBottom.addEventListener('click', () => {
                 const target = document.documentElement.scrollHeight || document.body.scrollHeight;
                 window.scrollTo({ top: target, behavior: 'smooth' });
                 try { localStorage.setItem(LS_SCROLL_KEY, String(target)); } catch (e) {}
             });
 
-            // Hide "scroll to top" when already at top; hide "scroll to bottom" when at bottom
             function updateScrollButtons() {
                 const y = window.scrollY || window.pageYOffset || 0;
                 const maxY = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.innerHeight;
@@ -2194,7 +2232,6 @@ Correct answer as per choices`;
                 }
             }
 
-            // Throttle scroll event for performance
             let scrollTick = false;
             window.addEventListener('scroll', () => {
                 if (scrollTick) return;
@@ -2206,11 +2243,9 @@ Correct answer as per choices`;
                 });
             }, { passive: true });
 
-            // Restore scroll position after render
             function restoreScrollPosition() {
                 const y = getSavedScrollPosition();
                 if (y > 0) {
-                    // Use rAF to ensure layout has settled
                     requestAnimationFrame(() => {
                         window.scrollTo(0, y);
                     });
@@ -2247,21 +2282,17 @@ Correct answer as per choices`;
                 if (opts.isFirstLoad) {
                     setupStatusCheckboxes();
 
-                    // Apply loaded filters to checkboxes
                     cbCovered.classList.toggle('checked', selectedStatuses.has('covered'));
                     cbPending.classList.toggle('checked', selectedStatuses.has('pending'));
 
                     refreshAllFilters();
                     applyFiltersAndRender();
-
-                    // Restore scroll AFTER render
                     restoreScrollPosition();
                 } else {
                     refreshAllFilters();
                     applyFiltersAndRender();
                 }
 
-                // Update scroll button visibility (after layout settles)
                 requestAnimationFrame(updateScrollButtons);
             }
 
@@ -2302,21 +2333,16 @@ Correct answer as per choices`;
                 }
             }
 
-            /* ===== INITIAL LOAD ===== */
             (async function init() {
-                // 1. Restore filters from localStorage
                 loadFiltersFromStorage();
 
-                // Ensure checkboxes reflect restored statuses
                 cbCovered.classList.toggle('checked', selectedStatuses.has('covered'));
                 cbPending.classList.toggle('checked', selectedStatuses.has('pending'));
 
-                // 2. Try loading cached data from localStorage
                 const cached = loadDataFromStorage();
                 if (cached) {
                     applyDataAndRender(cached, { isFirstLoad: true });
                 } else {
-                    // No cache → show spinner then fetch
                     cardsContainer.innerHTML = `
                         <div class="state-message">
                             <div class="spinner"></div>
@@ -2339,14 +2365,11 @@ Correct answer as per choices`;
                 }
             })();
 
-            /* ===== REFRESH BUTTON ===== */
             fabRefresh.addEventListener('click', () => {
                 clearPersistedData();
-                // NOTE: We keep filters + scroll intact on manual refresh
                 refreshFromNetwork({ isManual: true, isFirstLoad: false });
             });
 
-            /* ===== Save scroll on unload (best effort) ===== */
             window.addEventListener('beforeunload', saveScrollPosition);
         })();
     </script>
