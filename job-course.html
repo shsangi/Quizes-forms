@@ -285,31 +285,29 @@
             white-space: nowrap; text-align: right;
         }
 
-        .card-top-row {
-            display: flex; align-items: flex-start; gap: 0.4rem;
-            margin-bottom: 0.05rem; flex-wrap: wrap;
+        /* ===== SUBTOPIC HEADER (TOP, BLUE, PROMINENT) ===== */
+        .card-subtopic-header {
+            display: flex; align-items: flex-start; gap: 0.35rem;
+            margin-bottom: 0.15rem;
             padding-right: 0.2rem;
-        }
-        .card-subtopic {
-            display: flex; align-items: flex-start; gap: 0.3rem;
-            min-width: 0; flex: 1 1 auto;
-            overflow-wrap: break-word; word-break: break-word;
+            flex-wrap: wrap;
         }
         .card-srno {
             background: #e9f0f7; border-radius: 30px;
-            padding: 0.05rem 0.4rem; font-size: 0.55rem;
+            padding: 0.08rem 0.45rem; font-size: 0.55rem;
             font-weight: 700; color: #1a4a66;
-            white-space: nowrap; flex-shrink: 0; margin-top: 0.1rem;
+            white-space: nowrap; flex-shrink: 0; margin-top: 0.15rem;
         }
         .subtopic-name {
-            font-weight: 700; color: #0c334a; font-size: 0.85rem;
+            font-weight: 800; color: #0a6ebd; font-size: 1rem;
             word-break: break-word; overflow-wrap: break-word; line-height: 1.25;
             text-decoration: none; cursor: pointer; transition: 0.15s;
-            display: inline-flex; align-items: center; gap: 0.2rem;
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            letter-spacing: -0.01em;
         }
-        .subtopic-name:hover { color: #18668a; text-decoration: underline; }
+        .subtopic-name:hover { color: #084a80; text-decoration: underline; }
         .subtopic-name .search-icon {
-            font-size: 0.6rem; opacity: 0.5; transition: 0.15s;
+            font-size: 0.7rem; opacity: 0.55; transition: 0.15s;
         }
         .subtopic-name:hover .search-icon { opacity: 1; }
 
@@ -696,7 +694,7 @@
             .filter-group { flex: 1 1 0; min-width: 80px; }
             .cards-grid { grid-template-columns: 1fr; gap: 0.5rem; }
             .topic-card { padding: 0.5rem 0.65rem; }
-            .subtopic-name { font-size: 0.8rem; }
+            .subtopic-name { font-size: 0.95rem; }
             .status-checkboxes { gap: 0.4rem; }
             .filter-bar { padding: 0.5rem 0.6rem; }
             .card-job-badge { font-size: 0.45rem; }
@@ -720,7 +718,7 @@
             .stat-chip .chip-label { font-size: 0.35rem; }
             .stat-chip .chip-value { font-size: 0.75rem; }
             .checkbox-item .cb-text { font-size: 0.65rem; }
-            .subtopic-name { font-size: 0.75rem; }
+            .subtopic-name { font-size: 0.88rem; }
             .card-srno { font-size: 0.5rem; padding: 0.05rem 0.3rem; }
             .read-btn { font-size: 0.55rem; padding: 0.12rem 0.45rem; }
         }
@@ -968,25 +966,11 @@
                 const dataRows = rows.slice(1);
                 const result = [];
 
-                console.log('===== CSV DEBUG =====');
-                console.log('Header row:', rows[0]);
-                console.log('Header column count:', rows[0] ? rows[0].length : 0);
-
-                // Pad every row to EXPECTED_COLUMNS so indices always align
                 const paddedRows = dataRows.map(r => {
                     const copy = r.slice();
                     while (copy.length < EXPECTED_COLUMNS) copy.push('');
                     return copy;
                 });
-
-                // Column count distribution
-                const colCounts = {};
-                dataRows.forEach(r => {
-                    const c = r.length;
-                    colCounts[c] = (colCounts[c] || 0) + 1;
-                });
-                console.log('Column count distribution (BEFORE padding):', colCounts);
-                console.log('All rows padded to:', EXPECTED_COLUMNS);
 
                 for (const row of paddedRows) {
                     if (row.length < 3) continue;
@@ -1015,12 +999,6 @@
                     const status = hasUrl ? 'covered' : 'pending';
                     const displayTopic = subTopic || mainTopic;
 
-                    if (hasMarkdown) {
-                        console.log(`✓ MD row #${srno} | subtopic="${subTopic}" | len=${markdownNotes.length} | preview="${markdownNotes.substring(0,50).replace(/\n/g,' ')}..."`);
-                    } else if (markdownNotes) {
-                        console.log(`✗ Row #${srno} has Column I content but NOT markdown: "${markdownNotes.substring(0,60).replace(/\n/g,' ')}"`);
-                    }
-
                     result.push({
                         srno: srno || '—',
                         subject: subject || '—',
@@ -1040,8 +1018,6 @@
                     });
                 }
 
-                console.log(`Total: ${result.length} rows | With markdown: ${result.filter(r => r.hasMarkdown).length}`);
-                console.log('=====================');
                 return result;
             }
 
@@ -1700,6 +1676,7 @@ Correct answer as per choices`;
                         });
                     }
 
+                    /* ----- CORNER BADGES (job + last update) ----- */
                     if ((showJobBadge && item.job && item.job !== '—') || item.lastUpdate) {
                         const corner = document.createElement('div');
                         corner.className = 'card-corner';
@@ -1723,15 +1700,14 @@ Correct answer as per choices`;
                         card.appendChild(corner);
                     }
 
-                    const topRow = document.createElement('div');
-                    topRow.className = 'card-top-row';
-                    const subtopicDiv = document.createElement('div');
-                    subtopicDiv.className = 'card-subtopic';
+                    /* ----- 1) SUBTOPIC HEADER (TOP, BLUE, PROMINENT) ----- */
+                    const subtopicHeader = document.createElement('div');
+                    subtopicHeader.className = 'card-subtopic-header';
 
                     const srnoSpan = document.createElement('span');
                     srnoSpan.className = 'card-srno';
                     srnoSpan.textContent = `#${item.srno}`;
-                    subtopicDiv.appendChild(srnoSpan);
+                    subtopicHeader.appendChild(srnoSpan);
 
                     const subtopicLink = document.createElement('a');
                     subtopicLink.className = 'subtopic-name';
@@ -1744,11 +1720,11 @@ Correct answer as per choices`;
                         <i class="fas fa-search search-icon"></i>
                     `;
                     subtopicLink.addEventListener('click', (e) => e.stopPropagation());
-                    subtopicDiv.appendChild(subtopicLink);
+                    subtopicHeader.appendChild(subtopicLink);
 
-                    topRow.appendChild(subtopicDiv);
-                    card.appendChild(topRow);
+                    card.appendChild(subtopicHeader);
 
+                    /* ----- 2) MAIN TOPIC ROW ----- */
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
@@ -1761,6 +1737,7 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
+                    /* ----- 3) SUBJECT ROW + ACTIONS ----- */
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
 
