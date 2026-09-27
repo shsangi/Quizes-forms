@@ -196,7 +196,7 @@
             background: #f0f7ff; border-color: #b0cde0;
         }
 
-        /* STATUS ROW (checkboxes + reset button) */
+        /* STATUS ROW */
         .status-row {
             display: flex; align-items: center; gap: 0.4rem;
             flex-wrap: wrap; padding: 0.1rem 0;
@@ -319,7 +319,7 @@
             white-space: nowrap; text-align: right;
         }
 
-        /* SUBTOPIC HEADER (TOP, BLUE, PROMINENT) */
+        /* SUBTOPIC HEADER */
         .card-subtopic-header {
             display: flex; align-items: flex-start; gap: 0.35rem;
             margin-bottom: 0.15rem;
@@ -387,12 +387,8 @@
             white-space: nowrap; flex-shrink: 0;
             border: 1px solid #b8e0cd;
         }
-        .card-coverage.full {
-            background: #d0ede0; border-color: #9fd4b9;
-        }
-        .card-coverage.low {
-            background: #fef3e0; color: #a8690e; border-color: #f2d9a8;
-        }
+        .card-coverage.full { background: #d0ede0; border-color: #9fd4b9; }
+        .card-coverage.low { background: #fef3e0; color: #a8690e; border-color: #f2d9a8; }
 
         .card-right-cluster {
             display: flex; align-items: center; gap: 0.3rem;
@@ -410,26 +406,18 @@
         .status-badge-inline.covered {
             background: #e2f5ec; color: #147a4a; border-color: #b8e0cd;
         }
-        .status-badge-inline.covered:hover {
-            background: #d0ede0; border-color: #9fd4b9;
-        }
+        .status-badge-inline.covered:hover { background: #d0ede0; border-color: #9fd4b9; }
         .status-badge-inline.pending {
             background: #fef3e0; color: #a8690e; border-color: #f2d9a8;
         }
-        .status-badge-inline.pending:hover {
-            background: #fde9c8; border-color: #e8c892;
-        }
+        .status-badge-inline.pending:hover { background: #fde9c8; border-color: #e8c892; }
         .status-badge-inline .status-check {
             display: inline-flex; align-items: center; justify-content: center;
             width: 13px; height: 13px; border-radius: 50%;
             flex-shrink: 0; font-size: 0.45rem;
         }
-        .status-badge-inline.covered .status-check {
-            background: #2e9b6e; color: white;
-        }
-        .status-badge-inline.pending .status-check {
-            background: #e6a017; color: white;
-        }
+        .status-badge-inline.covered .status-check { background: #2e9b6e; color: white; }
+        .status-badge-inline.pending .status-check { background: #e6a017; color: white; }
         .status-badge-inline .external-icon {
             font-size: 0.45rem; margin-left: 0.05rem; opacity: 0.7;
         }
@@ -466,37 +454,44 @@
             border: 1px solid #f3c0c0; transition: 0.15s;
             white-space: nowrap; flex-shrink: 0;
         }
-        .pdf-link:hover {
-            background: #ffe0e0; border-color: #e89a9a; color: #991b1b;
-        }
+        .pdf-link:hover { background: #ffe0e0; border-color: #e89a9a; color: #991b1b; }
         .pdf-link i { font-size: 0.55rem; }
         .pdf-link .pdf-label { font-weight: 700; letter-spacing: 0.2px; }
 
-        /* FLOATING REFRESH BUTTON (BOTTOM-LEFT) */
-        .fab-refresh {
+        /* ===== FLOATING ACTION STACK (BOTTOM-LEFT) ===== */
+        .fab-stack {
             position: fixed;
             bottom: 1.2rem;
             left: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            z-index: 1500;
+            align-items: center;
+        }
+
+        .fab-btn {
             width: 52px;
             height: 52px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #146a8a, #1a86a8);
             color: #ffffff;
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 18px -4px rgba(20, 106, 138, 0.55),
-                        0 2px 6px -1px rgba(0, 30, 50, 0.25);
-            z-index: 1500;
-            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s, opacity 0.2s;
             -webkit-tap-highlight-color: transparent;
             font-family: 'Inter', sans-serif;
+            position: relative;
         }
-        .fab-refresh i {
-            font-size: 1.15rem;
-            transition: transform 0.6s ease;
+        .fab-btn i { font-size: 1.15rem; transition: transform 0.5s ease; }
+
+        /* Refresh — primary (blue) */
+        .fab-refresh {
+            background: linear-gradient(135deg, #146a8a, #1a86a8);
+            box-shadow: 0 6px 18px -4px rgba(20, 106, 138, 0.55),
+                        0 2px 6px -1px rgba(0, 30, 50, 0.25);
         }
         .fab-refresh:hover {
             background: linear-gradient(135deg, #0c4b6b, #146a8a);
@@ -504,30 +499,45 @@
             box-shadow: 0 10px 26px -6px rgba(20, 106, 138, 0.65),
                         0 3px 8px -1px rgba(0, 30, 50, 0.3);
         }
-        .fab-refresh:active {
-            transform: translateY(0) scale(0.96);
-        }
+        .fab-refresh:active { transform: translateY(0) scale(0.96); }
         .fab-refresh.loading {
             pointer-events: none;
             background: linear-gradient(135deg, #4a8aa8, #6aa8c0);
         }
-        .fab-refresh.loading i {
-            animation: fab-spin 0.9s linear infinite;
-        }
+        .fab-refresh.loading i { animation: fab-spin 0.9s linear infinite; }
         @keyframes fab-spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        .fab-refresh::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 2px solid rgba(20, 106, 138, 0.25);
-            opacity: 0;
-            transition: opacity 0.2s;
+
+        /* Scroll buttons — secondary (soft blue/white) */
+        .fab-scroll {
+            background: linear-gradient(135deg, #ffffff, #eaf3fb);
+            color: #146a8a;
+            border: 1.5px solid #cfe2f0;
+            box-shadow: 0 4px 12px -4px rgba(20, 106, 138, 0.3),
+                        0 1px 4px -1px rgba(0, 30, 50, 0.15);
         }
-        .fab-refresh:hover::after { opacity: 1; }
+        .fab-scroll:hover {
+            background: linear-gradient(135deg, #eaf3fb, #d6e9f8);
+            border-color: #8fbcd8;
+            color: #0c4b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -6px rgba(20, 106, 138, 0.4),
+                        0 2px 6px -1px rgba(0, 30, 50, 0.2);
+        }
+        .fab-scroll:active { transform: translateY(0) scale(0.96); }
+        .fab-scroll i { font-size: 1.05rem; }
+
+        /* Small "pressed" feedback arrow moves */
+        .fab-scroll.to-top:hover i { transform: translateY(-3px); }
+        .fab-scroll.to-bottom:hover i { transform: translateY(3px); }
+
+        .fab-hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.7);
+        }
 
         /* MODAL */
         .modal-overlay {
@@ -551,9 +561,7 @@
             transform: translateY(15px) scale(0.98);
             transition: transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
-        .modal-overlay.open .modal-box {
-            transform: translateY(0) scale(1);
-        }
+        .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
 
         .modal-header {
             background: linear-gradient(135deg, #0f3a52, #14587a);
@@ -572,9 +580,7 @@
             word-break: break-word;
             display: flex; align-items: center; gap: 0.4rem;
         }
-        .modal-header-title i {
-            color: #7dd3fc; font-size: 0.85rem; flex-shrink: 0;
-        }
+        .modal-header-title i { color: #7dd3fc; font-size: 0.85rem; flex-shrink: 0; }
         .modal-header-sub {
             font-size: 0.62rem; font-weight: 500;
             color: #b9d9ee; opacity: 0.95; word-break: break-word;
@@ -602,9 +608,7 @@
         }
         .modal-body::-webkit-scrollbar { width: 8px; }
         .modal-body::-webkit-scrollbar-track { background: #f0f6fb; }
-        .modal-body::-webkit-scrollbar-thumb {
-            background: #c0d8ea; border-radius: 8px;
-        }
+        .modal-body::-webkit-scrollbar-thumb { background: #c0d8ea; border-radius: 8px; }
         .modal-body::-webkit-scrollbar-thumb:hover { background: #a3c6de; }
 
         .modal-body h1 {
@@ -627,18 +631,14 @@
             font-size: 0.8rem; font-weight: 700;
             color: #1a6e96; margin: 0.7rem 0 0.35rem;
         }
-        .modal-body p {
-            margin: 0.45rem 0; word-break: break-word;
-        }
+        .modal-body p { margin: 0.45rem 0; word-break: break-word; }
         .modal-body strong { font-weight: 700; color: #0c334a; }
         .modal-body em { font-style: italic; color: #2c5777; }
         .modal-body ul, .modal-body ol {
             margin: 0.45rem 0 0.45rem 1.2rem;
             padding-left: 0.3rem;
         }
-        .modal-body li {
-            margin: 0.2rem 0; word-break: break-word;
-        }
+        .modal-body li { margin: 0.2rem 0; word-break: break-word; }
         .modal-body code {
             background: #eef5fb; color: #b03060;
             padding: 0.08rem 0.35rem; border-radius: 5px;
@@ -791,19 +791,13 @@
             .card-job-badge { font-size: 0.45rem; }
             .card-last-update { font-size: 0.45rem; }
 
-            .reset-btn {
-                padding: 0.25rem 0.55rem;
-                font-size: 0.6rem;
-            }
+            .reset-btn { padding: 0.25rem 0.55rem; font-size: 0.6rem; }
             .reset-btn i { font-size: 0.55rem; }
 
-            .fab-refresh {
-                width: 48px;
-                height: 48px;
-                bottom: 1rem;
-                left: 1rem;
-            }
-            .fab-refresh i { font-size: 1.05rem; }
+            .fab-stack { bottom: 1rem; left: 1rem; gap: 0.5rem; }
+            .fab-btn { width: 48px; height: 48px; }
+            .fab-btn i { font-size: 1.05rem; }
+            .fab-scroll i { font-size: 0.95rem; }
 
             .modal-overlay { padding: 0.4rem; }
             .modal-box { max-height: 94vh; border-radius: 14px; }
@@ -826,8 +820,10 @@
             .subtopic-name { font-size: 0.88rem; }
             .card-srno { font-size: 0.5rem; padding: 0.05rem 0.3rem; }
             .read-btn { font-size: 0.55rem; padding: 0.12rem 0.45rem; }
-            .fab-refresh { width: 44px; height: 44px; bottom: 0.8rem; left: 0.8rem; }
-            .fab-refresh i { font-size: 1rem; }
+            .fab-stack { bottom: 0.7rem; left: 0.7rem; gap: 0.4rem; }
+            .fab-btn { width: 44px; height: 44px; }
+            .fab-btn i { font-size: 1rem; }
+            .fab-scroll i { font-size: 0.9rem; }
             .reset-btn { font-size: 0.55rem; padding: 0.22rem 0.5rem; }
         }
     </style>
@@ -919,10 +915,18 @@
         <div id="cardsContainer" class="cards-grid"></div>
     </div>
 
-    <!-- FLOATING REFRESH BUTTON (BOTTOM-LEFT) -->
-    <button class="fab-refresh" id="fabRefresh" title="Refresh data from sheet" aria-label="Refresh data">
-        <i class="fas fa-sync-alt"></i>
-    </button>
+    <!-- FLOATING ACTION STACK (BOTTOM-LEFT) -->
+    <div class="fab-stack">
+        <button class="fab-btn fab-scroll to-top" id="fabScrollTop" title="Scroll to top" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <button class="fab-btn fab-scroll to-bottom" id="fabScrollBottom" title="Scroll to bottom" aria-label="Scroll to bottom">
+            <i class="fas fa-arrow-down"></i>
+        </button>
+        <button class="fab-btn fab-refresh" id="fabRefresh" title="Refresh data from sheet (clears cache)" aria-label="Refresh data">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
 
     <!-- MODAL -->
     <div class="modal-overlay" id="modalOverlay">
@@ -962,7 +966,13 @@
             const GID = '0';
             const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
 
-            const EXPECTED_COLUMNS = 9; // A..I
+            const EXPECTED_COLUMNS = 9;
+
+            /* ===== localStorage keys ===== */
+            const LS_DATA_KEY = 'tracker_data_v1';
+            const LS_FILTERS_KEY = 'tracker_filters_v1';
+            const LS_SCROLL_KEY = 'tracker_scroll_v1';
+            const LS_TS_KEY = 'tracker_ts_v1';
 
             const cardsContainer = document.getElementById('cardsContainer');
             const statTotal = document.getElementById('statTotal');
@@ -976,6 +986,8 @@
             const pageTitle = document.getElementById('pageTitle');
             const titleText = document.getElementById('titleText');
             const fabRefresh = document.getElementById('fabRefresh');
+            const fabScrollTop = document.getElementById('fabScrollTop');
+            const fabScrollBottom = document.getElementById('fabScrollBottom');
             const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
             const subjectCountHint = document.getElementById('subjectCountHint');
@@ -1016,6 +1028,84 @@
             let isLoading = false;
 
             /* ============================================ */
+            /* ========== PERSISTENCE ===================== */
+            /* ============================================ */
+            function saveFiltersToStorage() {
+                try {
+                    localStorage.setItem(LS_FILTERS_KEY, JSON.stringify({
+                        subjects: Array.from(selectedSubjects),
+                        topics: Array.from(selectedTopics),
+                        jobs: Array.from(selectedJobs),
+                        statuses: Array.from(selectedStatuses)
+                    }));
+                } catch (e) {
+                    console.warn('saveFilters failed:', e);
+                }
+            }
+
+            function loadFiltersFromStorage() {
+                try {
+                    const raw = localStorage.getItem(LS_FILTERS_KEY);
+                    if (!raw) return false;
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed.subjects)) selectedSubjects = new Set(parsed.subjects);
+                    if (Array.isArray(parsed.topics)) selectedTopics = new Set(parsed.topics);
+                    if (Array.isArray(parsed.jobs)) selectedJobs = new Set(parsed.jobs);
+                    if (Array.isArray(parsed.statuses) && parsed.statuses.length > 0) {
+                        selectedStatuses = new Set(parsed.statuses);
+                    }
+                    return true;
+                } catch (e) {
+                    console.warn('loadFilters failed:', e);
+                    return false;
+                }
+            }
+
+            function saveDataToStorage(data) {
+                try {
+                    localStorage.setItem(LS_DATA_KEY, JSON.stringify(data));
+                    localStorage.setItem(LS_TS_KEY, String(Date.now()));
+                } catch (e) {
+                    console.warn('saveData failed:', e);
+                }
+            }
+
+            function loadDataFromStorage() {
+                try {
+                    const raw = localStorage.getItem(LS_DATA_KEY);
+                    if (!raw) return null;
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                    return null;
+                } catch (e) {
+                    console.warn('loadData failed:', e);
+                    return null;
+                }
+            }
+
+            function saveScrollPosition() {
+                try {
+                    localStorage.setItem(LS_SCROLL_KEY, String(window.scrollY || 0));
+                } catch (e) { /* ignore */ }
+            }
+
+            function getSavedScrollPosition() {
+                try {
+                    const v = localStorage.getItem(LS_SCROLL_KEY);
+                    if (!v) return 0;
+                    return parseInt(v, 10) || 0;
+                } catch (e) { return 0; }
+            }
+
+            function clearPersistedData() {
+                try {
+                    localStorage.removeItem(LS_DATA_KEY);
+                    localStorage.removeItem(LS_TS_KEY);
+                    // Note: we keep filters + scroll intact even across refresh
+                } catch (e) { /* ignore */ }
+            }
+
+            /* ============================================ */
             /* ========== FAST FILTER REFRESH ============= */
             /* ============================================ */
             function scheduleFastFilterRefresh() {
@@ -1025,11 +1115,12 @@
                     filterRefreshScheduled = false;
                     refreshAllFilters();
                     applyFiltersAndRender();
+                    saveFiltersToStorage();
                 });
             }
 
             /* ============================================ */
-            /* ========== CSV PARSER (ROBUST) ============= */
+            /* ========== CSV PARSER ====================== */
             /* ============================================ */
             function parseCSV(csvText) {
                 const rows = [];
@@ -1072,9 +1163,6 @@
                 return rows;
             }
 
-            /* ============================================ */
-            /* ========== MARKDOWN DETECTOR =============== */
-            /* ============================================ */
             function looksLikeMarkdown(text) {
                 if (!text) return false;
                 const t = text.trim();
@@ -1095,9 +1183,6 @@
                 return signals >= 2 || (signals >= 1 && t.length > 100);
             }
 
-            /* ============================================ */
-            /* ========== ROW -> OBJECT MAPPER ============ */
-            /* ============================================ */
             function mapRowsToObjects(rows) {
                 if (!rows.length) return [];
                 const dataRows = rows.slice(1);
@@ -1210,15 +1295,6 @@
                 }
             }
 
-            /* ============================================ */
-            /* ========== AVAILABLE OPTIONS =============== */
-            /* ============================================ */
-            /* For the filter we're building options for:
-               - If it has NO selections → show all values matching the OTHER filters.
-               - If it HAS selections    → narrow to only those selections
-                 (still respecting the OTHER filters).
-               This gives instant visual feedback when you pick something.
-               'none' is used by pruneSelections to validate against everything. */
             function getAvailableOptions(excludeFilter) {
                 const applySubjects = excludeFilter === 'subject' ? new Set() : selectedSubjects;
                 const applyTopics   = excludeFilter === 'topic'   ? new Set() : selectedTopics;
@@ -1229,10 +1305,8 @@
                 const jobs = new Set();
 
                 rawData.forEach(item => {
-                    // Status always applies
                     if (selectedStatuses.size > 0 && !selectedStatuses.has(item.status)) return;
 
-                    // Other filters
                     if (applySubjects.size > 0 && !applySubjects.has(item.subject)) return;
                     if (applyTopics.size > 0 && !applyTopics.has(item.displayTopic)) return;
                     if (applyJobs.size > 0 && !applyJobs.has(item.job)) return;
@@ -1277,20 +1351,18 @@
             }
 
             /* ============================================ */
-            /* ========== MULTI-SELECT BUILD (FIXED) ====== */
+            /* ========== MULTI-SELECT BUILD ============== */
             /* ============================================ */
-            /* The bug that was fixed: the trigger click listener was attached
-               once and captured the FIRST rebuild's renderDropdown closure.
-               After rebuild() was called with new options, the trigger still
-               referenced the old closure — so it rendered STALE options.
-               Fix: store the latest rebuild on the container and have the
-               trigger always call container._latestRebuild._render(). */
             function buildMultiSelect(container, options, selectedSet, onUpdate, enableSearch) {
                 const dropdown = container.querySelector('.multi-select-dropdown');
                 const trigger = container.querySelector('.multi-select-trigger');
                 const placeholder = container.querySelector('.placeholder');
 
-                // Attach trigger + outside-click listeners ONCE
+                function closeDropdown() {
+                    dropdown.classList.remove('open');
+                    trigger.classList.remove('open');
+                }
+
                 if (!trigger.dataset.listenerAttached) {
                     trigger.dataset.listenerAttached = '1';
 
@@ -1318,8 +1390,7 @@
 
                     document.addEventListener('click', (e) => {
                         if (!container.contains(e.target)) {
-                            dropdown.classList.remove('open');
-                            trigger.classList.remove('open');
+                            closeDropdown();
                         }
                     });
                 }
@@ -1397,8 +1468,11 @@
                                 } else {
                                     selectedSet.add(opt.value);
                                 }
-                                onUpdate(); updateTriggerText();
-                                renderDropdown(searchInput ? searchInput.value : '');
+                                onUpdate();
+                                updateTriggerText();
+
+                                // ===== AUTO-CLOSE DROPDOWN after selection =====
+                                closeDropdown();
                             });
                             dropdown.appendChild(div);
                         });
@@ -1498,9 +1572,6 @@
                 scheduleFastFilterRefresh();
             }
 
-            /* ============================================ */
-            /* ========== RESET FILTERS =================== */
-            /* ============================================ */
             function resetAllFilters(silent) {
                 selectedSubjects.clear();
                 selectedTopics.clear();
@@ -1512,9 +1583,9 @@
                 cbCovered.classList.add('checked');
                 cbPending.classList.add('checked');
 
-                // Rebuild filter options from full dataset
                 refreshAllFilters();
                 applyFiltersAndRender();
+                saveFiltersToStorage();
 
                 if (!silent) showToast('Filters reset to default');
             }
@@ -1696,9 +1767,7 @@ Correct answer as per choices`;
                         continue;
                     }
 
-                    if (inTable && !isTableRow) {
-                        closeTable();
-                    }
+                    if (inTable && !isTableRow) closeTable();
 
                     if (/^\s*>\s?/.test(line)) {
                         if (!inBlockquote) {
@@ -1754,9 +1823,7 @@ Correct answer as per choices`;
                     }
 
                     if (line.trim() === '') {
-                        closeList();
-                        closeTable();
-                        closeBlockquote();
+                        closeList(); closeTable(); closeBlockquote();
                         continue;
                     }
 
@@ -1764,10 +1831,7 @@ Correct answer as per choices`;
                     output.push(`<p>${inlineFormat(line)}</p>`);
                 }
 
-                closeList();
-                closeTable();
-                closeBlockquote();
-
+                closeList(); closeTable(); closeBlockquote();
                 return output.join('\n');
             }
 
@@ -1791,7 +1855,7 @@ Correct answer as per choices`;
             }
 
             /* ============================================ */
-            /* ========== MODAL OPEN / CLOSE ============== */
+            /* ========== MODAL =========================== */
             /* ============================================ */
             function openNotesModal(item) {
                 if (!item.hasMarkdown) return;
@@ -1906,7 +1970,6 @@ Correct answer as per choices`;
                         card.appendChild(corner);
                     }
 
-                    /* ----- SUBTOPIC HEADER ----- */
                     const subtopicHeader = document.createElement('div');
                     subtopicHeader.className = 'card-subtopic-header';
 
@@ -1930,7 +1993,6 @@ Correct answer as per choices`;
 
                     card.appendChild(subtopicHeader);
 
-                    /* ----- MAIN TOPIC ----- */
                     const mainTopicRow = document.createElement('div');
                     mainTopicRow.className = 'card-main-topic-row';
                     const mainCount = mainTopicCounts[item.mainTopic] || 1;
@@ -1943,7 +2005,6 @@ Correct answer as per choices`;
                     mainTopicRow.appendChild(mainGroup);
                     card.appendChild(mainTopicRow);
 
-                    /* ----- SUBJECT + ACTIONS ----- */
                     const subjectRow = document.createElement('div');
                     subjectRow.className = 'card-subject-row';
 
@@ -2089,7 +2150,7 @@ Correct answer as per choices`;
             }
 
             /* ============================================ */
-            /* ========== FLOATING REFRESH BUTTON ========= */
+            /* ========== FLOATING ACTIONS ================ */
             /* ============================================ */
             function setRefreshLoading(loading) {
                 isLoading = loading;
@@ -2098,14 +2159,117 @@ Correct answer as per choices`;
                     fabRefresh.title = 'Refreshing…';
                 } else {
                     fabRefresh.classList.remove('loading');
-                    fabRefresh.title = 'Refresh data from sheet';
+                    fabRefresh.title = 'Refresh data from sheet (clears cache)';
                 }
             }
 
-            async function loadData(isManualRefresh) {
-                if (isLoading && isManualRefresh) return;
+            // Smooth scroll to top
+            fabScrollTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                try { localStorage.setItem(LS_SCROLL_KEY, '0'); } catch (e) {}
+            });
 
-                if (isManualRefresh) {
+            // Smooth scroll to bottom
+            fabScrollBottom.addEventListener('click', () => {
+                const target = document.documentElement.scrollHeight || document.body.scrollHeight;
+                window.scrollTo({ top: target, behavior: 'smooth' });
+                try { localStorage.setItem(LS_SCROLL_KEY, String(target)); } catch (e) {}
+            });
+
+            // Hide "scroll to top" when already at top; hide "scroll to bottom" when at bottom
+            function updateScrollButtons() {
+                const y = window.scrollY || window.pageYOffset || 0;
+                const maxY = (document.documentElement.scrollHeight || document.body.scrollHeight) - window.innerHeight;
+
+                if (y < 40) {
+                    fabScrollTop.classList.add('fab-hidden');
+                } else {
+                    fabScrollTop.classList.remove('fab-hidden');
+                }
+
+                if (maxY <= 0 || y >= maxY - 40) {
+                    fabScrollBottom.classList.add('fab-hidden');
+                } else {
+                    fabScrollBottom.classList.remove('fab-hidden');
+                }
+            }
+
+            // Throttle scroll event for performance
+            let scrollTick = false;
+            window.addEventListener('scroll', () => {
+                if (scrollTick) return;
+                scrollTick = true;
+                requestAnimationFrame(() => {
+                    scrollTick = false;
+                    updateScrollButtons();
+                    saveScrollPosition();
+                });
+            }, { passive: true });
+
+            // Restore scroll position after render
+            function restoreScrollPosition() {
+                const y = getSavedScrollPosition();
+                if (y > 0) {
+                    // Use rAF to ensure layout has settled
+                    requestAnimationFrame(() => {
+                        window.scrollTo(0, y);
+                    });
+                }
+            }
+
+            /* ============================================ */
+            /* ========== LOAD / REFRESH ================== */
+            /* ============================================ */
+            async function fetchFreshData() {
+                const bust = `&_=${Date.now()}`;
+                const response = await fetch(CSV_URL + bust, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const csvText = await response.text();
+
+                if (csvText.trim().startsWith('<!DOCTYPE') || csvText.trim().startsWith('<html')) {
+                    throw new Error('Sheet is not public. Share it as "Anyone with link can view".');
+                }
+
+                const rows = parseCSV(csvText);
+                if (rows.length < 2) throw new Error('No data rows');
+
+                const data = mapRowsToObjects(rows);
+                if (data.length === 0) throw new Error('No parsed data');
+                return data;
+            }
+
+            function applyDataAndRender(data, opts) {
+                opts = opts || {};
+                rawData = data;
+                computeCounts(rawData);
+                populateFilters(rawData);
+
+                if (opts.isFirstLoad) {
+                    setupStatusCheckboxes();
+
+                    // Apply loaded filters to checkboxes
+                    cbCovered.classList.toggle('checked', selectedStatuses.has('covered'));
+                    cbPending.classList.toggle('checked', selectedStatuses.has('pending'));
+
+                    refreshAllFilters();
+                    applyFiltersAndRender();
+
+                    // Restore scroll AFTER render
+                    restoreScrollPosition();
+                } else {
+                    refreshAllFilters();
+                    applyFiltersAndRender();
+                }
+
+                // Update scroll button visibility (after layout settles)
+                requestAnimationFrame(updateScrollButtons);
+            }
+
+            async function refreshFromNetwork(opts) {
+                opts = opts || {};
+                if (isLoading) return;
+
+                if (opts.isManual) {
                     setRefreshLoading(true);
                 } else {
                     cardsContainer.innerHTML = `
@@ -2116,44 +2280,13 @@ Correct answer as per choices`;
                 }
 
                 try {
-                    const bust = `&_=${Date.now()}`;
-                    const response = await fetch(CSV_URL + bust, { cache: 'no-store' });
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const csvText = await response.text();
-
-                    if (csvText.trim().startsWith('<!DOCTYPE') || csvText.trim().startsWith('<html')) {
-                        throw new Error('Sheet is not public. Share it as "Anyone with link can view".');
-                    }
-
-                    const rows = parseCSV(csvText);
-                    if (rows.length < 2) throw new Error('No data rows');
-
-                    const newData = mapRowsToObjects(rows);
-                    if (newData.length === 0) throw new Error('No parsed data');
-
-                    rawData = newData;
-                    computeCounts(rawData);
-                    populateFilters(rawData);
-
-                    if (isManualRefresh) {
-                        refreshAllFilters();
-                        applyFiltersAndRender();
-                        showToast('Data refreshed');
-                    } else {
-                        setupStatusCheckboxes();
-                        // Ensure defaults on first load
-                        selectedStatuses.clear();
-                        selectedStatuses.add('covered');
-                        selectedStatuses.add('pending');
-                        cbCovered.classList.add('checked');
-                        cbPending.classList.add('checked');
-                        refreshAllFilters();
-                        applyFiltersAndRender();
-                    }
-
+                    const fresh = await fetchFreshData();
+                    saveDataToStorage(fresh);
+                    applyDataAndRender(fresh, { isFirstLoad: opts.isFirstLoad });
+                    if (opts.isManual) showToast('Data refreshed from sheet');
                 } catch (error) {
-                    console.error('Load error:', error);
-                    if (isManualRefresh) {
+                    console.error('Fetch error:', error);
+                    if (opts.isManual) {
                         showToast('Refresh failed — check console');
                     } else {
                         cardsContainer.innerHTML = `
@@ -2165,15 +2298,56 @@ Correct answer as per choices`;
                             </div>`;
                     }
                 } finally {
-                    if (isManualRefresh) setRefreshLoading(false);
+                    if (opts.isManual) setRefreshLoading(false);
                 }
             }
 
+            /* ===== INITIAL LOAD ===== */
+            (async function init() {
+                // 1. Restore filters from localStorage
+                loadFiltersFromStorage();
+
+                // Ensure checkboxes reflect restored statuses
+                cbCovered.classList.toggle('checked', selectedStatuses.has('covered'));
+                cbPending.classList.toggle('checked', selectedStatuses.has('pending'));
+
+                // 2. Try loading cached data from localStorage
+                const cached = loadDataFromStorage();
+                if (cached) {
+                    applyDataAndRender(cached, { isFirstLoad: true });
+                } else {
+                    // No cache → show spinner then fetch
+                    cardsContainer.innerHTML = `
+                        <div class="state-message">
+                            <div class="spinner"></div>
+                            <div style="font-size:0.85rem;">Loading topics…</div>
+                        </div>`;
+                    try {
+                        const fresh = await fetchFreshData();
+                        saveDataToStorage(fresh);
+                        applyDataAndRender(fresh, { isFirstLoad: true });
+                    } catch (error) {
+                        console.error('Initial fetch error:', error);
+                        cardsContainer.innerHTML = `
+                            <div class="state-message">
+                                <i class="fas fa-exclamation-triangle" style="color:#c06b4a;"></i>
+                                <div style="margin-bottom:0.3rem;"><strong>Couldn't load sheet</strong></div>
+                                <div style="font-size:0.75rem; opacity:0.8;">${escapeHtml(error.message)}</div>
+                                <div style="margin-top:0.8rem; font-size:0.75rem;">Check browser console (F12) for details.</div>
+                            </div>`;
+                    }
+                }
+            })();
+
+            /* ===== REFRESH BUTTON ===== */
             fabRefresh.addEventListener('click', () => {
-                loadData(true);
+                clearPersistedData();
+                // NOTE: We keep filters + scroll intact on manual refresh
+                refreshFromNetwork({ isManual: true, isFirstLoad: false });
             });
 
-            loadData(false);
+            /* ===== Save scroll on unload (best effort) ===== */
+            window.addEventListener('beforeunload', saveScrollPosition);
         })();
     </script>
 </body>
