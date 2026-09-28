@@ -9,7 +9,7 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; padding: 0; }
     body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
       background: linear-gradient(135deg, #0f0e17 0%, #1b1a2e 100%);
       display: flex;
@@ -18,67 +18,45 @@
       padding: 0.75rem;
     }
     .app-card {
-      max-width: 980px;
-      width: 100%;
+      max-width: 980px; width: 100%;
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-radius: 1.75rem;
       padding: 1.25rem 1.25rem 1.75rem;
-      box-shadow: 0 30px 45px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      box-shadow: 0 30px 45px -15px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     h1 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: #f0eef7;
-      margin: 0 0 0.35rem 0;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+      font-size: 1.4rem; font-weight: 600;
+      color: #f0eef7; margin: 0 0 0.35rem 0;
+      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
     }
     h1 span {
-      background: #b7a9ff;
-      color: #0b0b1a;
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 0.2rem 0.75rem;
-      border-radius: 100px;
+      background: #b7a9ff; color: #0b0b1a;
+      font-size: 0.72rem; font-weight: 600;
+      padding: 0.2rem 0.75rem; border-radius: 100px;
     }
     .subhead {
-      color: #a9a5c9;
-      margin-bottom: 1.2rem;
-      font-size: 0.85rem;
-      border-left: 3px solid #7f6bff;
-      padding-left: 0.75rem;
-      line-height: 1.4;
+      color: #a9a5c9; margin-bottom: 1.2rem;
+      font-size: 0.85rem; border-left: 3px solid #7f6bff;
+      padding-left: 0.75rem; line-height: 1.4;
     }
     textarea {
-      width: 100%;
-      background: rgba(10, 10, 20, 0.7);
-      border: 1px solid #3e3b5a;
-      border-radius: 1.25rem;
-      padding: 1rem 1.1rem;
-      color: #f0edff;
-      font-size: 1rem;
-      line-height: 1.5;
-      resize: vertical;
-      min-height: 110px;
-      outline: none;
-      font-family: inherit;
-      margin-bottom: 1.2rem;
+      width: 100%; background: rgba(10, 10, 20, 0.7);
+      border: 1px solid #3e3b5a; border-radius: 1.25rem;
+      padding: 1rem 1.1rem; color: #f0edff;
+      font-size: 1rem; line-height: 1.5;
+      resize: vertical; min-height: 100px;
+      outline: none; font-family: inherit; margin-bottom: 1rem;
     }
     textarea:focus {
       border-color: #8f7bff;
       box-shadow: 0 0 0 3px rgba(143, 123, 255, 0.2);
     }
     .controls-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-      margin-bottom: 1.2rem;
+      display: grid; grid-template-columns: 1fr;
+      gap: 1rem; margin-bottom: 1.2rem;
     }
     @media (min-width: 720px) {
       .app-card { padding: 2rem 2rem 2.5rem; border-radius: 2.5rem; }
@@ -96,68 +74,64 @@
       .control-panel { border-radius: 1.75rem; padding: 1.4rem 1.5rem 1.6rem; }
     }
     .panel-title {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #b7adf0;
-      margin-bottom: 0.8rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
+      font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #b7adf0;
+      margin-bottom: 0.8rem; font-weight: 600;
+      display: flex; align-items: center; gap: 0.4rem;
     }
     .chip-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
     .chip {
-      background: #26233a;
-      border: 1px solid #423e62;
-      color: #d7d2f0;
-      padding: 0.5rem 0.85rem;
-      border-radius: 3rem;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
+      background: #26233a; border: 1px solid #423e62;
+      color: #d7d2f0; padding: 0.5rem 0.85rem;
+      border-radius: 3rem; font-size: 0.8rem;
+      font-weight: 500; cursor: pointer;
       user-select: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: inline-flex; align-items: center; justify-content: center;
       transition: 0.15s;
     }
     .chip:hover { background: #353152; border-color: #7b6ed6; }
     .chip.active {
-      background: #7c6aff;
-      border-color: #b3a6ff;
-      color: #0e0c1a;
-      font-weight: 600;
+      background: #7c6aff; border-color: #b3a6ff;
+      color: #0e0c1a; font-weight: 600;
       box-shadow: 0 6px 14px rgba(124, 106, 255, 0.4);
     }
     .chip.small { font-size: 0.72rem; padding: 0.4rem 0.75rem; }
     .voice-selector {
       margin-top: 0.4rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .voice-selector .label-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem;
     }
     .voice-selector label {
-      font-size: 0.8rem;
-      color: #beb8e0;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
+      font-size: 0.8rem; color: #beb8e0;
+      font-weight: 500; display: flex;
+      align-items: center; gap: 0.4rem;
     }
+    .load-voices-btn {
+      background: #4a3f7a;
+      border: 1px solid #7c6aff;
+      color: #e8e2ff;
+      padding: 0.3rem 0.7rem;
+      border-radius: 3rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+      white-space: nowrap;
+    }
+    .load-voices-btn:hover { background: #5c4d94; }
+    .load-voices-btn:active { transform: scale(0.96); }
     select {
       background: #19172a;
       border: 1px solid #3f3b60;
       border-radius: 0.9rem;
       padding: 0.75rem 2.5rem 0.75rem 1rem;
-      color: #f0edff;
-      font-size: 0.9rem;
-      outline: none;
-      width: 100%;
-      cursor: pointer;
+      color: #f0edff; font-size: 0.9rem;
+      outline: none; width: 100%; cursor: pointer;
       font-weight: 500;
-      -webkit-appearance: none;
-      appearance: none;
+      -webkit-appearance: none; appearance: none;
       background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b7a9ff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
       background-repeat: no-repeat;
       background-position: right 1rem center;
@@ -165,306 +139,211 @@
     select:focus { border-color: #8f7bff; }
     select option { background: #1b192b; color: #f0edff; font-size: 0.9rem; }
     .gender-filter {
-      display: flex;
-      gap: 0.4rem;
-      margin: 0.6rem 0;
-      align-items: center;
-      flex-wrap: wrap;
+      display: flex; gap: 0.4rem;
+      margin: 0.6rem 0; align-items: center; flex-wrap: wrap;
     }
     .gender-filter .radio-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      background: #26233a;
-      border: 1px solid #423e62;
-      padding: 0.4rem 0.75rem;
-      border-radius: 3rem;
-      cursor: pointer;
-      font-size: 0.78rem;
-      color: #d7d2f0;
-      font-weight: 500;
-      user-select: none;
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: #26233a; border: 1px solid #423e62;
+      padding: 0.4rem 0.75rem; border-radius: 3rem;
+      cursor: pointer; font-size: 0.78rem;
+      color: #d7d2f0; font-weight: 500; user-select: none;
     }
     .gender-filter input[type="radio"] {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 2px solid #7a749e;
-      background: transparent;
-      margin: 0;
-      position: relative;
-      flex-shrink: 0;
+      appearance: none; -webkit-appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid #7a749e; background: transparent;
+      margin: 0; position: relative; flex-shrink: 0;
     }
     .gender-filter input[type="radio"]:checked {
-      border-color: #b7a9ff;
-      background: #7c6aff;
+      border-color: #b7a9ff; background: #7c6aff;
       box-shadow: inset 0 0 0 2px #1b1a2e;
     }
     .gender-filter .radio-label:has(input[type="radio"]:checked) {
-      background: #3d355f;
-      border-color: #8f7bff;
-      color: #fff;
+      background: #3d355f; border-color: #8f7bff; color: #fff;
     }
     .rate-control {
-      margin-top: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      flex-wrap: wrap;
+      margin-top: 0.7rem; display: flex;
+      align-items: center; gap: 0.6rem; flex-wrap: wrap;
     }
     .rate-control label { font-size: 0.8rem; color: #beb8e0; font-weight: 500; }
     input[type="range"] { flex: 1; min-width: 100px; accent-color: #8b78ff; height: 6px; }
     .rate-value { color: #d7d2f0; font-size: 0.8rem; font-weight: 600; min-width: 42px; text-align: right; }
     .custom-timing {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.8rem;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-top: 0.8rem; flex-wrap: wrap;
     }
     .custom-timing label { color: #beb8e0; font-size: 0.8rem; font-weight: 500; }
     input[type="number"] {
-      background: #19172a;
-      border: 1px solid #3f3b60;
-      border-radius: 2rem;
-      padding: 0.5rem 0.8rem;
-      color: white;
-      width: 75px;
-      font-size: 0.85rem;
-      outline: none;
-      font-weight: 500;
+      background: #19172a; border: 1px solid #3f3b60;
+      border-radius: 2rem; padding: 0.5rem 0.8rem;
+      color: white; width: 75px; font-size: 0.85rem;
+      outline: none; font-weight: 500;
     }
-    /* Punctuation toggle */
     .punct-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.6rem;
-      margin-top: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.6rem; margin-top: 0.9rem;
       padding: 0.7rem 0.9rem;
       background: rgba(124, 106, 255, 0.08);
       border: 1px solid rgba(124, 106, 255, 0.25);
       border-radius: 1rem;
     }
     .punct-toggle .toggle-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.15rem;
-      flex: 1;
-      min-width: 0;
+      display: flex; flex-direction: column; gap: 0.15rem;
+      flex: 1; min-width: 0;
     }
     .punct-toggle .toggle-title {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #d7d2f0;
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
+      font-size: 0.8rem; font-weight: 600;
+      color: #d7d2f0; display: flex; align-items: center; gap: 0.35rem;
     }
     .punct-toggle .toggle-desc {
-      font-size: 0.68rem;
-      color: #9b93c9;
-      line-height: 1.3;
+      font-size: 0.68rem; color: #9b93c9; line-height: 1.3;
     }
     .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 24px;
-      flex-shrink: 0;
+      position: relative; display: inline-block;
+      width: 44px; height: 24px; flex-shrink: 0;
     }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+    .switch input { opacity: 0; width: 0; height: 0; }
     .slider-switch {
-      position: absolute;
-      cursor: pointer;
+      position: absolute; cursor: pointer;
       top: 0; left: 0; right: 0; bottom: 0;
       background-color: #3a3554;
       border: 1px solid #4d4772;
-      transition: .25s;
-      border-radius: 24px;
+      transition: .25s; border-radius: 24px;
     }
     .slider-switch:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 2px;
-      bottom: 2px;
+      position: absolute; content: "";
+      height: 18px; width: 18px;
+      left: 2px; bottom: 2px;
       background-color: #b7a9ff;
-      transition: .25s;
-      border-radius: 50%;
+      transition: .25s; border-radius: 50%;
     }
     .switch input:checked + .slider-switch {
-      background-color: #7c6aff;
-      border-color: #b3a6ff;
+      background-color: #7c6aff; border-color: #b3a6ff;
     }
     .switch input:checked + .slider-switch:before {
-      transform: translateX(20px);
-      background-color: #fff;
+      transform: translateX(20px); background-color: #fff;
     }
     .action-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
+      display: flex; flex-direction: column;
+      gap: 0.75rem; margin-top: 0.5rem;
     }
     @media (min-width: 560px) {
       .action-bar { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
     }
     .playback-controls { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
     .btn {
-      background: #2f2b46;
-      border: none;
-      border-radius: 3rem;
-      padding: 0.8rem 1.5rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #ece9ff;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      border: 1px solid #4b466e;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-      flex: 1;
-      min-width: 110px;
-      transition: 0.15s;
+      background: #2f2b46; border: none;
+      border-radius: 3rem; padding: 0.8rem 1.5rem;
+      font-weight: 600; font-size: 0.95rem;
+      color: #ece9ff; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.5rem; border: 1px solid #4b466e;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      flex: 1; min-width: 110px; transition: 0.15s;
     }
     .btn-primary {
       background: linear-gradient(145deg, #8b78ff, #6a55f0);
-      border: 1px solid #b9adff;
-      color: #0d0a1f;
+      border: 1px solid #b9adff; color: #0d0a1f;
       font-weight: 700;
       box-shadow: 0 12px 18px -8px #4a37c0;
     }
     .btn-reset {
       background: linear-gradient(145deg, #2eb872, #1e9e5c);
-      border: 1px solid #7ff0b0;
-      color: #052a14;
+      border: 1px solid #7ff0b0; color: #052a14;
       font-weight: 700;
       box-shadow: 0 10px 18px -8px #1e8a4f;
     }
-    .btn-reset:hover { background: linear-gradient(145deg, #3ed485, #23b06a); }
     .btn:active { transform: scale(0.97); }
     .btn:disabled { opacity: 0.4; pointer-events: none; filter: grayscale(0.6); }
     .status-badge {
-      background: #1b1929;
-      padding: 0.6rem 1.2rem;
-      border-radius: 3rem;
-      font-size: 0.82rem;
-      font-weight: 500;
-      border: 1px solid #39365a;
-      color: #cbc4f0;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      white-space: nowrap;
-      justify-content: center;
+      background: #1b1929; padding: 0.6rem 1.2rem;
+      border-radius: 3rem; font-size: 0.82rem;
+      font-weight: 500; border: 1px solid #39365a;
+      color: #cbc4f0; display: flex;
+      align-items: center; gap: 0.6rem;
+      white-space: nowrap; justify-content: center;
     }
     .status-badge .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
+      width: 10px; height: 10px; border-radius: 50%;
       background: #4cd964;
-      box-shadow: 0 0 8px #4cd964;
-      flex-shrink: 0;
+      box-shadow: 0 0 8px #4cd964; flex-shrink: 0;
     }
     .status-badge .dot.inactive { background: #5a5870; box-shadow: none; }
     .progress {
-      margin-top: 1.2rem;
-      background: #1d1b2e;
-      height: 8px;
-      border-radius: 100px;
-      overflow: hidden;
-      border: 1px solid #2f2c46;
+      margin-top: 1.2rem; background: #1d1b2e;
+      height: 8px; border-radius: 100px;
+      overflow: hidden; border: 1px solid #2f2c46;
     }
     .progress-fill {
-      height: 100%;
-      width: 0%;
+      height: 100%; width: 0%;
       background: linear-gradient(90deg, #9d8cff, #c6b9ff);
-      border-radius: 100px;
-      transition: width 0.1s linear;
+      border-radius: 100px; transition: width 0.1s linear;
     }
     .current-readout {
-      margin-top: 0.8rem;
-      color: #cbc5f0;
-      font-size: 0.9rem;
-      min-height: 3.5rem;
+      margin-top: 0.8rem; color: #cbc5f0;
+      font-size: 0.9rem; min-height: 3.5rem;
       background: rgba(255, 255, 255, 0.02);
-      border-radius: 0.9rem;
-      padding: 0.9rem 1rem;
+      border-radius: 0.9rem; padding: 0.9rem 1rem;
       border: 1px dashed #3d3960;
-      word-break: break-word;
-      line-height: 1.5;
+      word-break: break-word; line-height: 1.5;
     }
     .current-readout strong {
-      color: white;
-      background: #3a3360;
-      padding: 0.2rem 0.55rem;
-      border-radius: 1rem;
-      margin-right: 0.3rem;
-      font-weight: 600;
-      font-size: 0.85rem;
+      color: white; background: #3a3360;
+      padding: 0.2rem 0.55rem; border-radius: 1rem;
+      margin-right: 0.3rem; font-weight: 600; font-size: 0.85rem;
     }
     .current-readout .punct-highlight {
-      background: #6b4f1a;
-      color: #ffd98a;
-      padding: 0.1rem 0.35rem;
-      border-radius: 0.4rem;
-      font-weight: 600;
-      font-size: 0.78rem;
-      margin: 0 0.1rem;
+      background: #6b4f1a; color: #ffd98a;
+      padding: 0.1rem 0.35rem; border-radius: 0.4rem;
+      font-weight: 600; font-size: 0.78rem; margin: 0 0.1rem;
     }
     .footer-note {
-      margin-top: 1.2rem;
-      color: #716c99;
-      font-size: 0.72rem;
-      text-align: center;
+      margin-top: 1.2rem; color: #716c99;
+      font-size: 0.72rem; text-align: center;
       border-top: 1px solid #2b2940;
-      padding-top: 1rem;
-      line-height: 1.5;
+      padding-top: 1rem; line-height: 1.5;
     }
     .toast {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
+      position: fixed; bottom: 1.5rem; left: 50%;
       transform: translateX(-50%) translateY(150%);
-      background: #2c2547;
-      color: #f0edff;
-      padding: 0.9rem 1.3rem;
-      border-radius: 2rem;
+      background: #2c2547; color: #f0edff;
+      padding: 0.9rem 1.3rem; border-radius: 2rem;
       border: 1px solid #5a4a9c;
       box-shadow: 0 15px 25px rgba(0,0,0,0.6);
-      font-size: 0.85rem;
-      z-index: 9999;
-      transition: transform 0.3s;
-      max-width: 90vw;
+      font-size: 0.85rem; z-index: 9999;
+      transition: transform 0.3s; max-width: 90vw;
       text-align: center;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.success { background: #1e3a2a; border-color: #4cd964; color: #b8ffd0; }
+    .toast.warn { background: #3a2e1a; border-color: #ffb84d; color: #ffdc9e; }
     .reset-hint {
-      font-size: 0.7rem;
-      color: #7fd4a1;
+      font-size: 0.7rem; color: #7fd4a1;
       margin-top: 0.35rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
+      display: flex; align-items: center; gap: 0.3rem;
       line-height: 1.4;
     }
+    /* Diagnose panel */
+    .diag {
+      margin-top: 0.5rem;
+      background: rgba(0,0,0,0.3);
+      border: 1px dashed #4a4370;
+      border-radius: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.7rem;
+      color: #9b93c9;
+      line-height: 1.5;
+      display: none;
+    }
+    .diag.show { display: block; }
+    .diag strong { color: #c8bfff; }
   </style>
 </head>
 <body>
 <div class="app-card">
   <h1>📖 Reading Pace <span>punctuation-aware</span></h1>
-  <div class="subhead">Paste text → choose chunk size, voice & speed → hit play. Toggle <b>Speak Punctuation</b> to hear symbols like “full stop”, “comma”, “quotation mark”.</div>
+  <div class="subhead">Paste text → choose chunk size, voice & speed → hit play.</div>
 
   <textarea id="inputText" placeholder="Paste or type your text here...">Hello, world! "This is a test." Can you read it? Yes — I can. Use: colons; semicolons, and (parentheses). The price is $5.50 and 100% correct. Why? Because it's important!</textarea>
 
@@ -482,11 +361,10 @@
         <div class="chip" data-chunk="full">full text</div>
       </div>
 
-      <!-- Punctuation toggle -->
       <div class="punct-toggle">
         <div class="toggle-info">
           <div class="toggle-title">🔊 Speak Punctuation</div>
-          <div class="toggle-desc">Say symbol names aloud: full stop, comma, quotation mark, question mark, exclamation mark, etc.</div>
+          <div class="toggle-desc">Say symbol names aloud: full stop, comma, quotation mark, etc.</div>
         </div>
         <label class="switch">
           <input type="checkbox" id="punctToggle" checked>
@@ -505,10 +383,14 @@
       </div>
 
       <div class="voice-selector">
-        <label for="voiceSelect">🗣️ Voice</label>
+        <div class="label-row">
+          <label for="voiceSelect">🗣️ Voice</label>
+          <button class="load-voices-btn" id="reloadVoicesBtn" type="button">🔄 Reload</button>
+        </div>
         <select id="voiceSelect">
-          <option value="">Tap here to load voices</option>
+          <option value="">Loading voices…</option>
         </select>
+        <div class="diag" id="diagPanel"></div>
       </div>
 
       <div class="rate-control">
@@ -543,7 +425,7 @@
     <div class="playback-controls">
       <button class="btn btn-primary" id="playBtn">▶ Read</button>
       <button class="btn" id="stopBtn" disabled>⏹ Stop</button>
-      <button class="btn btn-reset" id="resetBtn" title="Reset to natural reading settings">🔄 Reset to Normal</button>
+      <button class="btn btn-reset" id="resetBtn">🔄 Reset to Normal</button>
     </div>
     <div class="status-badge">
       <span class="dot inactive" id="statusDot"></span>
@@ -551,12 +433,12 @@
     </div>
   </div>
 
-  <div class="reset-hint">💡 <span>Normal reading = sentence chunks · 0s delay · 1.0x rate · natural voice</span></div>
+  <div class="reset-hint">💡 <span>Normal = sentence chunks · 0s delay · 1.0x rate · natural voice</span></div>
 
   <div class="progress"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
   <div class="current-readout" id="currentChunkDisplay">⏳ <strong>Preview</strong> — chunk will appear here</div>
 
-  <div class="footer-note">⚡ Smooth natural speech with voice, gender, rate & punctuation controls.<br>Works best in Chrome, Edge, or Safari.</div>
+  <div class="footer-note">⚡ If no voices appear, tap <b>🔄 Reload</b> or interact with the page first.<br>Works best in Chrome, Edge, or Safari.</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -582,15 +464,11 @@
     const rateValue = document.getElementById('rateValue');
     const genderRadios = document.querySelectorAll('input[name="gender"]');
     const punctToggle = document.getElementById('punctToggle');
+    const reloadVoicesBtn = document.getElementById('reloadVoicesBtn');
+    const diagPanel = document.getElementById('diagPanel');
     const toast = document.getElementById('toast');
 
-    // ===== NORMAL READING DEFAULTS =====
-    const NORMAL = {
-      chunk: 'sentence',
-      delaySec: 0,
-      rate: 1.0,
-      gender: 'all'
-    };
+    const NORMAL = { chunk: 'sentence', delaySec: 0, rate: 1.0, gender: 'all' };
 
     let currentChunkMode = NORMAL.chunk;
     let currentDelayMs = NORMAL.delaySec * 1000;
@@ -599,125 +477,94 @@
     let allVoices = [];
     let filteredVoices = [];
     let currentGenderFilter = NORMAL.gender;
-    let speakPunctuation = true;   // default ON for this feature
+    let speakPunctuation = true;
     let chunks = [];
     let currentIndex = 0;
     let isPlaying = false;
     let timeoutId = null;
     let utterance = null;
     let voicesReady = false;
+    let synthSupported = ('speechSynthesis' in window);
 
     function showToast(msg, ms, type) {
       toast.textContent = msg;
-      toast.classList.remove('success');
-      if (type === 'success') toast.classList.add('success');
+      toast.classList.remove('success', 'warn');
+      if (type) toast.classList.add(type);
       toast.classList.add('show');
       clearTimeout(toast._t);
       toast._t = setTimeout(() => toast.classList.remove('show'), ms || 3000);
     }
 
-    // =====================================================
-    // ===== PUNCTUATION MAP ================================
-    // =====================================================
-    // Each symbol maps to a spoken name. Longer/multi-char
-    // symbols must come first so they match before single chars.
+    // ===== PUNCTUATION =====
     const PUNCTUATION_MAP = [
-      // Multi-character symbols first
-      { symbol: '...',  name: 'ellipsis' },
-      { symbol: '---',  name: 'em dash' },
-      { symbol: '–',    name: 'en dash' },
-      { symbol: '—',    name: 'em dash' },
-      { symbol: '–',    name: 'dash' },
-      { symbol: '...',  name: 'dots' },
-      // Brackets / quotes (double & single, curly & straight)
-      { symbol: '"',    name: 'quotation mark' },
-      { symbol: '"',    name: 'left double quotation mark' },
-      { symbol: '"',    name: 'right double quotation mark' },
-      { symbol: '„',    name: 'low quotation mark' },
-      { symbol: ''',    name: 'apostrophe' },
-      { symbol: ''',    name: 'left single quotation mark' },
-      { symbol: ''',    name: 'right single quotation mark' },
-      { symbol: '«',    name: 'left guillemet' },
-      { symbol: '»',    name: 'right guillemet' },
-      { symbol: '(',    name: 'left parenthesis' },
-      { symbol: ')',    name: 'right parenthesis' },
-      { symbol: '[',    name: 'left square bracket' },
-      { symbol: ']',    name: 'right square bracket' },
-      { symbol: '{',    name: 'left curly bracket' },
-      { symbol: '}',    name: 'right curly bracket' },
-      { symbol: '<',    name: 'less than' },
-      { symbol: '>',    name: 'greater than' },
-      // Common punctuation
-      { symbol: '.',    name: 'full stop' },
-      { symbol: ',',    name: 'comma' },
-      { symbol: '?',    name: 'question mark' },
-      { symbol: '!',    name: 'exclamation mark' },
-      { symbol: ':',    name: 'colon' },
-      { symbol: ';',    name: 'semicolon' },
-      // Other symbols
-      { symbol: '&',    name: 'ampersand' },
-      { symbol: '*',    name: 'asterisk' },
-      { symbol: '@',    name: 'at sign' },
-      { symbol: '#',    name: 'hash' },
-      { symbol: '$',    name: 'dollar sign' },
-      { symbol: '%',    name: 'percent sign' },
-      { symbol: '^',    name: 'caret' },
-      { symbol: '~',    name: 'tilde' },
-      { symbol: '`',    name: 'backtick' },
-      { symbol: '|',    name: 'vertical bar' },
-      { symbol: '\\',   name: 'backslash' },
-      { symbol: '/',    name: 'forward slash' },
-      { symbol: '=',    name: 'equals sign' },
-      { symbol: '+',    name: 'plus sign' },
-      { symbol: '-',    name: 'hyphen' },
-      { symbol: '_',    name: 'underscore' }
+      { symbol: '...', name: 'ellipsis' },
+      { symbol: '–', name: 'en dash' },
+      { symbol: '—', name: 'em dash' },
+      { symbol: '"', name: 'quotation mark' },
+      { symbol: '"', name: 'left double quotation mark' },
+      { symbol: '"', name: 'right double quotation mark' },
+      { symbol: ''', name: 'apostrophe' },
+      { symbol: ''', name: 'left single quotation mark' },
+      { symbol: ''', name: 'right single quotation mark' },
+      { symbol: '«', name: 'left guillemet' },
+      { symbol: '»', name: 'right guillemet' },
+      { symbol: '(', name: 'left parenthesis' },
+      { symbol: ')', name: 'right parenthesis' },
+      { symbol: '[', name: 'left square bracket' },
+      { symbol: ']', name: 'right square bracket' },
+      { symbol: '{', name: 'left curly bracket' },
+      { symbol: '}', name: 'right curly bracket' },
+      { symbol: '.', name: 'full stop' },
+      { symbol: ',', name: 'comma' },
+      { symbol: '?', name: 'question mark' },
+      { symbol: '!', name: 'exclamation mark' },
+      { symbol: ':', name: 'colon' },
+      { symbol: ';', name: 'semicolon' },
+      { symbol: '&', name: 'ampersand' },
+      { symbol: '*', name: 'asterisk' },
+      { symbol: '@', name: 'at sign' },
+      { symbol: '#', name: 'hash' },
+      { symbol: '$', name: 'dollar sign' },
+      { symbol: '%', name: 'percent sign' },
+      { symbol: '^', name: 'caret' },
+      { symbol: '~', name: 'tilde' },
+      { symbol: '`', name: 'backtick' },
+      { symbol: '|', name: 'vertical bar' },
+      { symbol: '\\', name: 'backslash' },
+      { symbol: '/', name: 'forward slash' },
+      { symbol: '=', name: 'equals sign' },
+      { symbol: '+', name: 'plus sign' },
+      { symbol: '-', name: 'hyphen' },
+      { symbol: '_', name: 'underscore' }
     ];
-
-    // Sort so multi-char symbols come first (longest first)
     PUNCTUATION_MAP.sort((a, b) => b.symbol.length - a.symbol.length);
 
-    /**
-     * Replace punctuation symbols in text with their spoken names.
-     * Used ONLY for speech (TTS), not for the visible preview.
-     */
     function punctuateForSpeech(text) {
       if (!speakPunctuation) return text;
       let result = text;
-      // Replace multi-char and special symbols first
       for (const { symbol, name } of PUNCTUATION_MAP) {
         if (!result.includes(symbol)) continue;
-        // Escape regex special chars in the symbol
         const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const re = new RegExp(escaped, 'g');
-        result = result.replace(re, ` ${name} `);
+        result = result.replace(new RegExp(escaped, 'g'), ` ${name} `);
       }
-      // Collapse multiple spaces
-      result = result.replace(/\s+/g, ' ').trim();
-      return result;
+      return result.replace(/\s+/g, ' ').trim();
     }
 
-    /**
-     * Get the readable name of a punctuation symbol (for preview display).
-     */
     function getPunctName(ch) {
-      const match = PUNCTUATION_MAP.find(p => p.symbol === ch);
-      return match ? match.name : null;
+      const m = PUNCTUATION_MAP.find(p => p.symbol === ch);
+      return m ? m.name : null;
     }
 
-    // =====================================================
-    // ===== END PUNCTUATION ===============================
-    // =====================================================
-
-    const femaleKeywords = ['female', 'woman', 'girl', 'samantha', 'victoria', 'karen', 'moira', 'tessa',
-      'fiona', 'veena', 'susan', 'allison', 'ava', 'zira', 'catherine', 'joanna', 'salli',
-      'kimberly', 'ivy', 'ruth', 'tina', 'linda', 'heather', 'lisa', 'laura', 'emma',
-      'olivia', 'sophia', 'chloe', 'mia', 'ella', 'zuzana', 'paulina', 'yelda', 'mariska',
-      'kanya', 'lekha', 'helena', 'carmit', 'damayanti', 'monica', 'mónica', 'raveena',
-      'shruti', 'neerja', 'kalpana', 'sushma'];
-    const maleKeywords = ['male', 'man', 'boy', 'david', 'alex', 'daniel', 'fred', 'george',
-      'james', 'mark', 'richard', 'tom', 'oliver', 'thomas', 'diego', 'jorge',
-      'juan', 'carlos', 'liam', 'noah', 'ethan', 'lucas', 'maged', 'tarik',
-      'rishi', 'ravi', 'prabhat', 'hemant', 'matthew', 'justin', 'ryan'];
+    // ===== VOICE GENDER DETECTION =====
+    const femaleKeywords = ['female','woman','girl','samantha','victoria','karen','moira','tessa',
+      'fiona','veena','susan','allison','ava','zira','catherine','joanna','salli',
+      'kimberly','ivy','ruth','tina','linda','heather','lisa','laura','emma',
+      'olivia','sophia','chloe','mia','ella','zuzana','paulina','yelda','mariska',
+      'kanya','lekha','helena','carmit','damayanti','monica','mónica','raveena'];
+    const maleKeywords = ['male','man','boy','david','alex','daniel','fred','george',
+      'james','mark','richard','tom','oliver','thomas','diego','jorge',
+      'juan','carlos','liam','noah','ethan','lucas','maged','tarik',
+      'rishi','ravi','prabhat','hemant','matthew','justin','ryan'];
 
     function detectGender(voice) {
       const name = (voice.name || '').toLowerCase();
@@ -728,27 +575,33 @@
 
     // ===== VOICE LOADING =====
     function loadVoices() {
-      if (!('speechSynthesis' in window)) {
+      if (!synthSupported) {
         voiceSelect.innerHTML = '<option value="">Speech not supported</option>';
         voiceSelect.disabled = true;
-        return;
+        diagPanel.innerHTML = '❌ <strong>speechSynthesis is not available</strong> in this browser.';
+        diagPanel.classList.add('show');
+        return false;
       }
       const voices = window.speechSynthesis.getVoices();
-      if (!voices || voices.length === 0) return;
-      if (voicesReady && voices.length === allVoices.length) return;
+      if (!voices || voices.length === 0) {
+        // Not ready yet
+        return false;
+      }
       allVoices = voices;
       voicesReady = true;
       buildVoiceDropdown();
+      diagPanel.innerHTML = `✅ Loaded <strong>${voices.length}</strong> voices. Filter: <strong>${currentGenderFilter}</strong>. Showing: <strong>${filteredVoices.length}</strong>.`;
+      diagPanel.classList.add('show');
+      return true;
     }
 
     function buildVoiceDropdown() {
-      filteredVoices = allVoices.filter(voice => {
+      filteredVoices = allVoices.filter(v => {
         if (currentGenderFilter === 'all') return true;
-        return detectGender(voice) === currentGenderFilter;
+        return detectGender(v) === currentGenderFilter;
       });
       filteredVoices.sort((a, b) => {
-        const aEn = a.lang.startsWith('en');
-        const bEn = b.lang.startsWith('en');
+        const aEn = a.lang.startsWith('en'), bEn = b.lang.startsWith('en');
         if (aEn && !bEn) return -1;
         if (!aEn && bEn) return 1;
         return a.name.localeCompare(b.name);
@@ -766,6 +619,7 @@
         selectedVoice = null;
         return;
       }
+
       const defOpt = document.createElement('option');
       defOpt.value = '';
       defOpt.textContent = 'Default (system)';
@@ -801,33 +655,90 @@
       }
     }
 
+    // ===== AGGRESSIVE VOICE LOADING =====
+    let loadAttempts = 0;
+    const MAX_ATTEMPTS = 30;
+
     function kickOffVoiceLoading() {
-      if (!('speechSynthesis' in window)) return;
-      loadVoices();
-      setTimeout(loadVoices, 100);
-      setTimeout(loadVoices, 300);
-      setTimeout(loadVoices, 800);
-      setTimeout(loadVoices, 1500);
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-      let polls = 0;
+      if (!synthSupported) return;
+      loadAttempts = 0;
+
+      // Immediate attempt
+      if (loadVoices()) return;
+
+      // Listen for voiceschanged event (main mechanism)
+      try {
+        window.speechSynthesis.onvoiceschanged = () => {
+          if (loadVoices()) {
+            showToast(`✅ Loaded ${allVoices.length} voices`, 2500, 'success');
+          }
+        };
+      } catch (e) { /* some browsers don't allow */ }
+
+      // Poll aggressively — many mobile browsers need this
       const poll = setInterval(() => {
-        loadVoices();
-        if (voicesReady || ++polls > 10) clearInterval(poll);
-      }, 400);
+        loadAttempts++;
+        if (loadVoices()) {
+          clearInterval(poll);
+          return;
+        }
+        if (loadAttempts >= MAX_ATTEMPTS) {
+          clearInterval(poll);
+          // Final fallback
+          if (!voicesReady) {
+            diagPanel.innerHTML = `⚠️ <strong>No voices loaded after ${MAX_ATTEMPTS} attempts.</strong><br>
+              • Try tapping the page anywhere<br>
+              • Or tap <b>🔄 Reload</b> to try again<br>
+              • Check if your device has TTS voices installed`;
+            diagPanel.classList.add('show');
+          }
+        }
+      }, 200);
     }
 
-    ['click', 'touchstart', 'keydown', 'pointerdown'].forEach(evt => {
-      document.addEventListener(evt, function once() {
-        kickOffVoiceLoading();
-        document.removeEventListener(evt, once);
-      }, { once: true, passive: true });
+    // Load voices on ANY user interaction (crucial for mobile)
+    ['click', 'touchstart', 'keydown', 'pointerdown', 'touchend', 'mousedown'].forEach(evt => {
+      document.addEventListener(evt, function onFirstInteract() {
+        if (!voicesReady) {
+          loadVoices();
+        }
+        document.removeEventListener(evt, onFirstInteract);
+      }, { passive: true });
     });
+
+    // Start loading immediately
     kickOffVoiceLoading();
 
-    voiceSelect.addEventListener('focus', () => { if (!voicesReady) kickOffVoiceLoading(); });
-    voiceSelect.addEventListener('mousedown', () => { if (!voicesReady) kickOffVoiceLoading(); });
-    voiceSelect.addEventListener('touchstart', () => { if (!voicesReady) kickOffVoiceLoading(); }, { passive: true });
+    // Reload button
+    reloadVoicesBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      selectedVoice = null;
+      voicesReady = false;
+      loadAttempts = 0;
+      voiceSelect.innerHTML = '<option value="">Loading voices…</option>';
+      diagPanel.classList.remove('show');
+      if (synthSupported) {
+        try { window.speechSynthesis.cancel(); } catch (err) {}
+        // Force a refresh
+        window.speechSynthesis.getVoices();
+      }
+      if (loadVoices()) {
+        showToast(`✅ Loaded ${allVoices.length} voices`, 2500, 'success');
+      } else {
+        showToast('⏳ Still loading… try again in a moment', 2500, 'warn');
+        kickOffVoiceLoading();
+      }
+    });
 
+    // Also focus/tap on select triggers load
+    ['focus', 'mousedown', 'touchstart'].forEach(evt => {
+      voiceSelect.addEventListener(evt, () => {
+        if (!voicesReady) loadVoices();
+      }, { passive: true });
+    });
+
+    // ===== VOICE SELECT CHANGE =====
     voiceSelect.addEventListener('change', () => {
       const val = voiceSelect.value;
       if (val === '') selectedVoice = null;
@@ -836,18 +747,19 @@
         if (!isNaN(idx) && filteredVoices[idx]) selectedVoice = filteredVoices[idx];
       }
       if (isPlaying && currentIndex < chunks.length) {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (synthSupported) window.speechSynthesis.cancel();
         if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
       }
     });
 
+    // ===== GENDER FILTER =====
     genderRadios.forEach(r => {
       r.addEventListener('change', e => {
         currentGenderFilter = e.target.value;
         selectedVoice = null;
-        buildVoiceDropdown();
+        if (voicesReady) buildVoiceDropdown();
         if (isPlaying && currentIndex < chunks.length) {
-          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          if (synthSupported) window.speechSynthesis.cancel();
           if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
         }
       });
@@ -858,16 +770,13 @@
       rateValue.textContent = speechRate.toFixed(2) + 'x';
     });
 
-    // Punctuation toggle
     punctToggle.addEventListener('change', () => {
       speakPunctuation = punctToggle.checked;
       if (isPlaying && currentIndex < chunks.length) {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (synthSupported) window.speechSynthesis.cancel();
         if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
       }
-      showToast(speakPunctuation
-        ? '🔊 Punctuation names will be spoken'
-        : '🔇 Punctuation will be silent', 2000);
+      showToast(speakPunctuation ? '🔊 Punctuation ON' : '🔇 Punctuation OFF', 1800);
     });
 
     // ===== CHUNKING =====
@@ -897,7 +806,6 @@
       updateProgressAndPreview();
     }
 
-    // Build preview HTML with punctuation names shown
     function renderChunkPreview(chunkText, showPunct) {
       if (!showPunct) return esc(chunkText);
       let out = '';
@@ -938,17 +846,20 @@
 
     // ===== SPEAK =====
     function speakText(text) {
-      if (!('speechSynthesis' in window)) return;
+      if (!synthSupported) return;
       try { window.speechSynthesis.cancel(); } catch (e) {}
-
-      // Convert punctuation to spoken names (if enabled)
       const spokenText = punctuateForSpeech(text);
-
       utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.rate = speechRate;
       utterance.pitch = 1;
       utterance.volume = 1;
       if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.onerror = (e) => {
+        // Silently ignore "interrupted" / "canceled" errors — they're normal
+        if (e.error && !/interrupted|canceled/i.test(e.error)) {
+          console.warn('Speech error:', e.error);
+        }
+      };
       setTimeout(() => {
         try { window.speechSynthesis.speak(utterance); } catch (e) {}
       }, 40);
@@ -958,7 +869,7 @@
     function stopReading(resetIndex) {
       if (resetIndex === undefined) resetIndex = true;
       if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
-      if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+      if (synthSupported) { try { window.speechSynthesis.cancel(); } catch (e) {} }
       isPlaying = false;
       playBtn.disabled = false;
       stopBtn.disabled = true;
@@ -980,7 +891,7 @@
         statusText.textContent = 'Finished';
         updateProgressAndPreview();
         currentChunkDisplay.innerHTML = `✅ <strong>Finished</strong> — all ${chunks.length} chunks read.`;
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (synthSupported) window.speechSynthesis.cancel();
         return;
       }
       const chunk = chunks[currentIndex];
@@ -995,13 +906,21 @@
     // ===== START =====
     function startReading() {
       if (isPlaying) return;
-      if (!('speechSynthesis' in window)) {
-        showToast('Your browser does not support speech synthesis');
+      if (!synthSupported) {
+        showToast('❌ Your browser does not support speech synthesis', 3500, 'warn');
         return;
       }
-      if (!voicesReady) loadVoices();
+      // Try to load voices one more time if not loaded
+      if (!voicesReady) {
+        loadVoices();
+        if (!voicesReady) {
+          showToast('⏳ Voices still loading — try again in a moment', 3000, 'warn');
+          kickOffVoiceLoading();
+          return;
+        }
+      }
       if (!chunks.length || currentIndex >= chunks.length) rebuildChunks();
-      if (!chunks.length) { showToast('Please enter some text first'); return; }
+      if (!chunks.length) { showToast('Please enter some text first', 2500, 'warn'); return; }
       if (currentIndex >= chunks.length) currentIndex = 0;
 
       isPlaying = true;
@@ -1059,40 +978,25 @@
       }
     });
 
-    // ===== RESET TO NORMAL =====
+    // ===== RESET =====
     resetBtn.addEventListener('click', () => {
       if (isPlaying) stopReading(true);
-
       currentChunkMode = NORMAL.chunk;
-      chunkChips.forEach(c => {
-        c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk);
-      });
-
+      chunkChips.forEach(c => c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk));
       currentDelayMs = NORMAL.delaySec * 1000;
       customDelayInput.value = NORMAL.delaySec;
-      timingChips.forEach(c => {
-        c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec);
-      });
-
+      timingChips.forEach(c => c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec));
       speechRate = NORMAL.rate;
       rateSlider.value = speechRate;
       rateValue.textContent = speechRate.toFixed(2) + 'x';
-
       currentGenderFilter = NORMAL.gender;
-      genderRadios.forEach(r => {
-        r.checked = (r.value === NORMAL.gender);
-      });
-
+      genderRadios.forEach(r => { r.checked = (r.value === NORMAL.gender); });
       selectedVoice = null;
-      buildVoiceDropdown();
-
-      // Keep punctuation toggle as user had it — Reset means "normal reading pace",
-      // not "silence punctuation". But we can note it in the toast.
+      if (voicesReady) buildVoiceDropdown();
       rebuildChunks();
-
       statusText.textContent = 'Normal';
       const punctNote = speakPunctuation ? ' · punctuation ON' : ' · punctuation OFF';
-      showToast('✅ Reset to normal reading (sentence · 0s · 1.0x)' + punctNote, 2800, 'success');
+      showToast('✅ Reset to normal' + punctNote, 2500, 'success');
     });
 
     playBtn.addEventListener('click', startReading);
@@ -1105,29 +1009,26 @@
 
     // ===== INIT =====
     (function init() {
-      chunkChips.forEach(c => {
-        c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk);
-      });
-      timingChips.forEach(c => {
-        c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec);
-      });
-      genderRadios.forEach(r => {
-        r.checked = (r.value === NORMAL.gender);
-      });
+      chunkChips.forEach(c => c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk));
+      timingChips.forEach(c => c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec));
+      genderRadios.forEach(r => { r.checked = (r.value === NORMAL.gender); });
       rateSlider.value = NORMAL.rate;
       rateValue.textContent = NORMAL.rate.toFixed(2) + 'x';
       customDelayInput.value = NORMAL.delaySec;
-
-      // Punctuation default ON
       punctToggle.checked = true;
       speakPunctuation = true;
 
-      if (!('speechSynthesis' in window)) {
+      if (!synthSupported) {
         statusText.textContent = 'No speech support';
         voiceSelect.disabled = true;
         rateSlider.disabled = true;
-        showToast('Speech synthesis not supported in this browser', 5000);
+        diagPanel.innerHTML = '❌ <strong>speechSynthesis</strong> not available in this browser.';
+        diagPanel.classList.add('show');
+        showToast('Speech synthesis not supported', 5000, 'warn');
       } else {
+        // Show diagnostic panel with initial status
+        diagPanel.innerHTML = `⏳ Waiting for voices…<br>If nothing appears, tap <b>🔄 Reload</b> or interact with the page.`;
+        diagPanel.classList.add('show');
         kickOffVoiceLoading();
       }
 
@@ -1137,7 +1038,7 @@
 
     window.addEventListener('beforeunload', () => {
       if (timeoutId) clearTimeout(timeoutId);
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (synthSupported) window.speechSynthesis.cancel();
     });
 
   })();
