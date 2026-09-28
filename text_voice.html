@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="theme-color" content="#0f0e17">
-  <title>📖 Reading Pace · Voice & Chunk Reader</title>
+  <title>📖 Reading Pace · Voice & Punctuation Reader</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; padding: 0; }
@@ -29,7 +29,7 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 600;
       letter-spacing: -0.02em;
       color: #f0eef7;
@@ -42,7 +42,7 @@
     h1 span {
       background: #b7a9ff;
       color: #0b0b1a;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       padding: 0.2rem 0.75rem;
       border-radius: 100px;
@@ -236,6 +236,78 @@
       outline: none;
       font-weight: 500;
     }
+    /* Punctuation toggle */
+    .punct-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      margin-top: 0.9rem;
+      padding: 0.7rem 0.9rem;
+      background: rgba(124, 106, 255, 0.08);
+      border: 1px solid rgba(124, 106, 255, 0.25);
+      border-radius: 1rem;
+    }
+    .punct-toggle .toggle-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      flex: 1;
+      min-width: 0;
+    }
+    .punct-toggle .toggle-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #d7d2f0;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .punct-toggle .toggle-desc {
+      font-size: 0.68rem;
+      color: #9b93c9;
+      line-height: 1.3;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider-switch {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #3a3554;
+      border: 1px solid #4d4772;
+      transition: .25s;
+      border-radius: 24px;
+    }
+    .slider-switch:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #b7a9ff;
+      transition: .25s;
+      border-radius: 50%;
+    }
+    .switch input:checked + .slider-switch {
+      background-color: #7c6aff;
+      border-color: #b3a6ff;
+    }
+    .switch input:checked + .slider-switch:before {
+      transform: translateX(20px);
+      background-color: #fff;
+    }
     .action-bar {
       display: flex;
       flex-direction: column;
@@ -279,9 +351,7 @@
       font-weight: 700;
       box-shadow: 0 10px 18px -8px #1e8a4f;
     }
-    .btn-reset:hover {
-      background: linear-gradient(145deg, #3ed485, #23b06a);
-    }
+    .btn-reset:hover { background: linear-gradient(145deg, #3ed485, #23b06a); }
     .btn:active { transform: scale(0.97); }
     .btn:disabled { opacity: 0.4; pointer-events: none; filter: grayscale(0.6); }
     .status-badge {
@@ -343,6 +413,15 @@
       font-weight: 600;
       font-size: 0.85rem;
     }
+    .current-readout .punct-highlight {
+      background: #6b4f1a;
+      color: #ffd98a;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.4rem;
+      font-weight: 600;
+      font-size: 0.78rem;
+      margin: 0 0.1rem;
+    }
     .footer-note {
       margin-top: 1.2rem;
       color: #716c99;
@@ -378,15 +457,16 @@
       display: flex;
       align-items: center;
       gap: 0.3rem;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
 <div class="app-card">
-  <h1>📖 Reading Pace <span>smooth & natural</span></h1>
-  <div class="subhead">Paste text → choose chunk size, voice & speed → hit play. Or tap <b>Reset to Normal</b> for instant natural reading.</div>
+  <h1>📖 Reading Pace <span>punctuation-aware</span></h1>
+  <div class="subhead">Paste text → choose chunk size, voice & speed → hit play. Toggle <b>Speak Punctuation</b> to hear symbols like “full stop”, “comma”, “quotation mark”.</div>
 
-  <textarea id="inputText" placeholder="Paste or type your text here...">The quick brown fox jumps over the lazy dog. This web app reads text smoothly with adjustable chunk sizes and a natural voice. You can select male or female voices, filter by gender, and control the speaking rate for a comfortable listening experience.</textarea>
+  <textarea id="inputText" placeholder="Paste or type your text here...">Hello, world! "This is a test." Can you read it? Yes — I can. Use: colons; semicolons, and (parentheses). The price is $5.50 and 100% correct. Why? Because it's important!</textarea>
 
   <div class="controls-grid">
     <div class="control-panel">
@@ -400,6 +480,18 @@
         <div class="chip active" data-chunk="sentence">sentence</div>
         <div class="chip" data-chunk="paragraph">paragraph</div>
         <div class="chip" data-chunk="full">full text</div>
+      </div>
+
+      <!-- Punctuation toggle -->
+      <div class="punct-toggle">
+        <div class="toggle-info">
+          <div class="toggle-title">🔊 Speak Punctuation</div>
+          <div class="toggle-desc">Say symbol names aloud: full stop, comma, quotation mark, question mark, exclamation mark, etc.</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="punctToggle" checked>
+          <span class="slider-switch"></span>
+        </label>
       </div>
     </div>
 
@@ -464,7 +556,7 @@
   <div class="progress"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
   <div class="current-readout" id="currentChunkDisplay">⏳ <strong>Preview</strong> — chunk will appear here</div>
 
-  <div class="footer-note">⚡ Smooth natural speech with voice, gender & rate control.<br>Works best in Chrome, Edge, or Safari.</div>
+  <div class="footer-note">⚡ Smooth natural speech with voice, gender, rate & punctuation controls.<br>Works best in Chrome, Edge, or Safari.</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -489,14 +581,15 @@
     const rateSlider = document.getElementById('rateSlider');
     const rateValue = document.getElementById('rateValue');
     const genderRadios = document.querySelectorAll('input[name="gender"]');
+    const punctToggle = document.getElementById('punctToggle');
     const toast = document.getElementById('toast');
 
     // ===== NORMAL READING DEFAULTS =====
     const NORMAL = {
-      chunk: 'sentence',   // whole sentences
-      delaySec: 0,         // no pause between chunks
-      rate: 1.0,           // normal human speed
-      gender: 'all'        // don't filter voices
+      chunk: 'sentence',
+      delaySec: 0,
+      rate: 1.0,
+      gender: 'all'
     };
 
     let currentChunkMode = NORMAL.chunk;
@@ -506,6 +599,7 @@
     let allVoices = [];
     let filteredVoices = [];
     let currentGenderFilter = NORMAL.gender;
+    let speakPunctuation = true;   // default ON for this feature
     let chunks = [];
     let currentIndex = 0;
     let isPlaying = false;
@@ -521,6 +615,98 @@
       clearTimeout(toast._t);
       toast._t = setTimeout(() => toast.classList.remove('show'), ms || 3000);
     }
+
+    // =====================================================
+    // ===== PUNCTUATION MAP ================================
+    // =====================================================
+    // Each symbol maps to a spoken name. Longer/multi-char
+    // symbols must come first so they match before single chars.
+    const PUNCTUATION_MAP = [
+      // Multi-character symbols first
+      { symbol: '...',  name: 'ellipsis' },
+      { symbol: '---',  name: 'em dash' },
+      { symbol: '–',    name: 'en dash' },
+      { symbol: '—',    name: 'em dash' },
+      { symbol: '–',    name: 'dash' },
+      { symbol: '...',  name: 'dots' },
+      // Brackets / quotes (double & single, curly & straight)
+      { symbol: '"',    name: 'quotation mark' },
+      { symbol: '"',    name: 'left double quotation mark' },
+      { symbol: '"',    name: 'right double quotation mark' },
+      { symbol: '„',    name: 'low quotation mark' },
+      { symbol: ''',    name: 'apostrophe' },
+      { symbol: ''',    name: 'left single quotation mark' },
+      { symbol: ''',    name: 'right single quotation mark' },
+      { symbol: '«',    name: 'left guillemet' },
+      { symbol: '»',    name: 'right guillemet' },
+      { symbol: '(',    name: 'left parenthesis' },
+      { symbol: ')',    name: 'right parenthesis' },
+      { symbol: '[',    name: 'left square bracket' },
+      { symbol: ']',    name: 'right square bracket' },
+      { symbol: '{',    name: 'left curly bracket' },
+      { symbol: '}',    name: 'right curly bracket' },
+      { symbol: '<',    name: 'less than' },
+      { symbol: '>',    name: 'greater than' },
+      // Common punctuation
+      { symbol: '.',    name: 'full stop' },
+      { symbol: ',',    name: 'comma' },
+      { symbol: '?',    name: 'question mark' },
+      { symbol: '!',    name: 'exclamation mark' },
+      { symbol: ':',    name: 'colon' },
+      { symbol: ';',    name: 'semicolon' },
+      // Other symbols
+      { symbol: '&',    name: 'ampersand' },
+      { symbol: '*',    name: 'asterisk' },
+      { symbol: '@',    name: 'at sign' },
+      { symbol: '#',    name: 'hash' },
+      { symbol: '$',    name: 'dollar sign' },
+      { symbol: '%',    name: 'percent sign' },
+      { symbol: '^',    name: 'caret' },
+      { symbol: '~',    name: 'tilde' },
+      { symbol: '`',    name: 'backtick' },
+      { symbol: '|',    name: 'vertical bar' },
+      { symbol: '\\',   name: 'backslash' },
+      { symbol: '/',    name: 'forward slash' },
+      { symbol: '=',    name: 'equals sign' },
+      { symbol: '+',    name: 'plus sign' },
+      { symbol: '-',    name: 'hyphen' },
+      { symbol: '_',    name: 'underscore' }
+    ];
+
+    // Sort so multi-char symbols come first (longest first)
+    PUNCTUATION_MAP.sort((a, b) => b.symbol.length - a.symbol.length);
+
+    /**
+     * Replace punctuation symbols in text with their spoken names.
+     * Used ONLY for speech (TTS), not for the visible preview.
+     */
+    function punctuateForSpeech(text) {
+      if (!speakPunctuation) return text;
+      let result = text;
+      // Replace multi-char and special symbols first
+      for (const { symbol, name } of PUNCTUATION_MAP) {
+        if (!result.includes(symbol)) continue;
+        // Escape regex special chars in the symbol
+        const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(escaped, 'g');
+        result = result.replace(re, ` ${name} `);
+      }
+      // Collapse multiple spaces
+      result = result.replace(/\s+/g, ' ').trim();
+      return result;
+    }
+
+    /**
+     * Get the readable name of a punctuation symbol (for preview display).
+     */
+    function getPunctName(ch) {
+      const match = PUNCTUATION_MAP.find(p => p.symbol === ch);
+      return match ? match.name : null;
+    }
+
+    // =====================================================
+    // ===== END PUNCTUATION ===============================
+    // =====================================================
 
     const femaleKeywords = ['female', 'woman', 'girl', 'samantha', 'victoria', 'karen', 'moira', 'tessa',
       'fiona', 'veena', 'susan', 'allison', 'ava', 'zira', 'catherine', 'joanna', 'salli',
@@ -540,7 +726,7 @@
       return 'unknown';
     }
 
-    // ===== VOICE LOADING (mobile-safe) =====
+    // ===== VOICE LOADING =====
     function loadVoices() {
       if (!('speechSynthesis' in window)) {
         voiceSelect.innerHTML = '<option value="">Speech not supported</option>';
@@ -642,7 +828,6 @@
     voiceSelect.addEventListener('mousedown', () => { if (!voicesReady) kickOffVoiceLoading(); });
     voiceSelect.addEventListener('touchstart', () => { if (!voicesReady) kickOffVoiceLoading(); }, { passive: true });
 
-    // ===== VOICE SELECT CHANGE =====
     voiceSelect.addEventListener('change', () => {
       const val = voiceSelect.value;
       if (val === '') selectedVoice = null;
@@ -656,7 +841,6 @@
       }
     });
 
-    // ===== GENDER FILTER =====
     genderRadios.forEach(r => {
       r.addEventListener('change', e => {
         currentGenderFilter = e.target.value;
@@ -672,6 +856,18 @@
     rateSlider.addEventListener('input', e => {
       speechRate = parseFloat(e.target.value);
       rateValue.textContent = speechRate.toFixed(2) + 'x';
+    });
+
+    // Punctuation toggle
+    punctToggle.addEventListener('change', () => {
+      speakPunctuation = punctToggle.checked;
+      if (isPlaying && currentIndex < chunks.length) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
+      }
+      showToast(speakPunctuation
+        ? '🔊 Punctuation names will be spoken'
+        : '🔇 Punctuation will be silent', 2000);
     });
 
     // ===== CHUNKING =====
@@ -701,6 +897,22 @@
       updateProgressAndPreview();
     }
 
+    // Build preview HTML with punctuation names shown
+    function renderChunkPreview(chunkText, showPunct) {
+      if (!showPunct) return esc(chunkText);
+      let out = '';
+      for (let i = 0; i < chunkText.length; i++) {
+        const ch = chunkText[i];
+        const name = getPunctName(ch);
+        if (name) {
+          out += `<span class="punct-highlight" title="${esc(name)}">${esc(ch)} → ${esc(name)}</span>`;
+        } else {
+          out += esc(ch);
+        }
+      }
+      return out;
+    }
+
     function updateProgressAndPreview() {
       if (!chunks.length) {
         progressFill.style.width = '0%';
@@ -711,7 +923,8 @@
       progressFill.style.width = `${(currentIndex / total) * 100}%`;
       if (currentIndex < total && currentIndex >= 0) {
         const c = chunks[currentIndex];
-        currentChunkDisplay.innerHTML = `📌 <strong>Chunk ${currentIndex + 1}/${total}</strong> — “${esc(c.text)}”`;
+        const previewHtml = renderChunkPreview(c.text, speakPunctuation);
+        currentChunkDisplay.innerHTML = `📌 <strong>Chunk ${currentIndex + 1}/${total}</strong> — “${previewHtml}”`;
       } else if (currentIndex >= total) {
         currentChunkDisplay.innerHTML = `✅ <strong>Finished</strong> — all ${total} chunks read.`;
       } else {
@@ -727,7 +940,11 @@
     function speakText(text) {
       if (!('speechSynthesis' in window)) return;
       try { window.speechSynthesis.cancel(); } catch (e) {}
-      utterance = new SpeechSynthesisUtterance(text);
+
+      // Convert punctuation to spoken names (if enabled)
+      const spokenText = punctuateForSpeech(text);
+
+      utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.rate = speechRate;
       utterance.pitch = 1;
       utterance.volume = 1;
@@ -844,42 +1061,38 @@
 
     // ===== RESET TO NORMAL =====
     resetBtn.addEventListener('click', () => {
-      // Stop any current playback
       if (isPlaying) stopReading(true);
 
-      // 1. Chunk mode -> sentence (natural reading unit)
       currentChunkMode = NORMAL.chunk;
       chunkChips.forEach(c => {
         c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk);
       });
 
-      // 2. Delay -> 0s
       currentDelayMs = NORMAL.delaySec * 1000;
       customDelayInput.value = NORMAL.delaySec;
       timingChips.forEach(c => {
         c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec);
       });
 
-      // 3. Rate -> 1.0x
       speechRate = NORMAL.rate;
       rateSlider.value = speechRate;
       rateValue.textContent = speechRate.toFixed(2) + 'x';
 
-      // 4. Gender filter -> All
       currentGenderFilter = NORMAL.gender;
       genderRadios.forEach(r => {
         r.checked = (r.value === NORMAL.gender);
       });
 
-      // 5. Voice -> best natural voice
       selectedVoice = null;
-      buildVoiceDropdown();   // autoSelectBest() will pick natural voice
+      buildVoiceDropdown();
 
-      // 6. Rebuild chunks
+      // Keep punctuation toggle as user had it — Reset means "normal reading pace",
+      // not "silence punctuation". But we can note it in the toast.
       rebuildChunks();
 
       statusText.textContent = 'Normal';
-      showToast('✅ Reset to normal reading (sentence · 0s · 1.0x)', 2800, 'success');
+      const punctNote = speakPunctuation ? ' · punctuation ON' : ' · punctuation OFF';
+      showToast('✅ Reset to normal reading (sentence · 0s · 1.0x)' + punctNote, 2800, 'success');
     });
 
     playBtn.addEventListener('click', startReading);
@@ -892,7 +1105,6 @@
 
     // ===== INIT =====
     (function init() {
-      // Apply NORMAL defaults visually
       chunkChips.forEach(c => {
         c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk);
       });
@@ -905,6 +1117,10 @@
       rateSlider.value = NORMAL.rate;
       rateValue.textContent = NORMAL.rate.toFixed(2) + 'x';
       customDelayInput.value = NORMAL.delaySec;
+
+      // Punctuation default ON
+      punctToggle.checked = true;
+      speakPunctuation = true;
 
       if (!('speechSynthesis' in window)) {
         statusText.textContent = 'No speech support';
