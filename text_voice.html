@@ -29,7 +29,6 @@
       box-shadow: 0 30px 45px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
-    /* Version badge */
     .version-badge {
       position: absolute;
       top: 0.85rem;
@@ -78,7 +77,6 @@
       line-height: 1.4;
     }
 
-    /* === NEW: preferences display under title === */
     .prefs-display {
       display: flex;
       flex-wrap: wrap;
@@ -510,18 +508,17 @@
 </head>
 <body>
 <div class="app-card">
-  <div class="version-badge" aria-label="App version">v2.2.0</div>
+  <div class="version-badge" aria-label="App version">v2.3.0</div>
 
   <h1>📖 Reading Pace <span>smooth & natural</span></h1>
   <div class="subhead">Paste text → choose chunk size, voice & speed → hit play.</div>
 
-  <!-- Preferences display under title -->
   <div class="prefs-display" id="prefsDisplay"></div>
 
   <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
 
   <div class="reset-row">
-    <button class="btn-reset" id="resetBtn" title="Reset text and settings">↺ Reset</button>
+    <button class="btn-reset" id="resetBtn" title="Clear text (keeps your preferences)">🧹 Clear Text</button>
     <label class="toggle-symbols" for="symbolToggle">
       <input type="checkbox" id="symbolToggle">
       <span class="label-text">🔣 Read symbols as words <span style="font-size:0.7rem;opacity:0.7;">(full-stop, comma...)</span></span>
@@ -610,8 +607,34 @@
   (function() {
     'use strict';
 
-    // ===== STORAGE KEY =====
     const STORAGE_KEY = 'readingPacePrefs_v2';
+    const DEFAULT_TEXT_KEY = 'readingPaceDefaultText_v1';
+
+    // ===== DEFAULT HELP TEXT =====
+    const DEFAULT_HELP_TEXT =
+`📖 Welcome to Reading Pace!
+
+This app reads your text aloud with a smooth, natural voice. Here is everything you can do:
+
+▶ READ — Press the "Read" button to start listening. The app splits your text into small chunks and reads them one by one.
+
+⏹ STOP — Press "Stop" to pause or end the reading at any time.
+
+🧹 CLEAR TEXT — Use the "Clear Text" button below to empty the text box. Your settings will be remembered.
+
+🔣 SYMBOLS TOGGLE — Turn on "Read symbols as words" to hear punctuation like full-stop, comma, question mark, and exclamation mark spoken aloud.
+
+📦 CHUNK SIZE — Choose how many words to read at a time: 1, 2, 3, 4, 5 words, a whole sentence, a paragraph, or the full text.
+
+🎙️ VOICE — Pick from available system voices. Use the gender filter (All / Female / Male) to narrow the list.
+
+⏩ RATE — Adjust the speaking speed from 0.5x (slower) to 1.5x (faster).
+
+⏱️ DELAY — Set a pause between each chunk (0s to 5s) or enter a custom value.
+
+💾 AUTO-SAVE — Your preferences (chunk size, voice, rate, delay, gender, symbols) are saved automatically in your browser. They will be restored when you come back.
+
+✍️ TIP — Replace this text with your own and press "Read" to begin!`;
 
     const textarea = document.getElementById('inputText');
     const chunkChips = document.querySelectorAll('#chunkGroup .chip');
@@ -656,43 +679,56 @@
       setTimeout(() => toast.classList.remove('show'), ms || 3000);
     }
 
+    // ===== DEFAULT TEXT HANDLING =====
+    function getInitialText() {
+      try {
+        const custom = localStorage.getItem(DEFAULT_TEXT_KEY);
+        if (custom !== null) return custom;
+      } catch (e) {}
+      return DEFAULT_HELP_TEXT;
+    }
+
+    function saveUserText(text) {
+      try {
+        // If the text matches the default help text, don't persist a custom one
+        if (text === DEFAULT_HELP_TEXT) {
+          localStorage.removeItem(DEFAULT_TEXT_KEY);
+        } else {
+          localStorage.setItem(DEFAULT_TEXT_KEY, text);
+        }
+      } catch (e) {}
+    }
+
     // ===== PREFERENCES DISPLAY =====
     function updatePrefsDisplay() {
       const pills = [];
 
-      // Chunk mode
       const chunkLabels = {
         '1': '1 word', '2': '2 words', '3': '3 words', '4': '4 words', '5': '5 words',
         'sentence': 'Sentence', 'paragraph': 'Paragraph', 'full': 'Full text'
       };
       pills.push({ label: 'Chunk', value: chunkLabels[currentChunkMode] || currentChunkMode });
 
-      // Delay
       const delaySec = (currentDelayMs / 1000).toFixed(1).replace(/\.0$/, '');
       pills.push({ label: 'Delay', value: delaySec + 's' });
 
-      // Rate
       pills.push({ label: 'Rate', value: speechRate.toFixed(2) + 'x' });
 
-      // Voice
       let voiceVal = 'Default';
       if (selectedVoice) {
         const g = detectGender(selectedVoice);
         const icon = g === 'female' ? '👩' : g === 'male' ? '👨' : '🎤';
-        // Shorten name
         let vname = selectedVoice.name;
         if (vname.length > 22) vname = vname.substring(0, 20) + '…';
         voiceVal = `${icon} ${vname}`;
       }
       pills.push({ label: 'Voice', value: voiceVal });
 
-      // Gender filter
       if (currentGenderFilter !== 'all') {
         const gLabel = currentGenderFilter === 'female' ? '👩 Female' : '👨 Male';
         pills.push({ label: 'Filter', value: gLabel });
       }
 
-      // Symbols
       pills.push({ label: 'Symbols', value: expandSymbols ? '🔣 On' : 'Off' });
 
       prefsDisplay.innerHTML = pills.map(p =>
@@ -700,7 +736,6 @@
       ).join('');
     }
 
-    // ===== SAVE PREFERENCES =====
     function savePreferences() {
       try {
         const prefs = {
@@ -713,10 +748,9 @@
           voiceLang: selectedVoice ? selectedVoice.lang : null
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
-      } catch (e) { /* storage may be unavailable */ }
+      } catch (e) {}
     }
 
-    // ===== LOAD PREFERENCES =====
     function loadPreferences() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -736,37 +770,29 @@
       } catch (e) { return false; }
     }
 
-    // ===== APPLY PREFERENCES TO UI =====
     function applyPrefsToUI() {
-      // Chunk chips
       chunkChips.forEach(c => {
         c.classList.toggle('active', c.dataset.chunk === currentChunkMode);
       });
 
-      // Delay chips
       const delaySec = currentDelayMs / 1000;
-      let matchedTiming = false;
       timingChips.forEach(c => {
         const d = parseFloat(c.dataset.delay);
         if (Math.abs(d - delaySec) < 0.01) {
           c.classList.add('active');
-          matchedTiming = true;
         } else {
           c.classList.remove('active');
         }
       });
       customDelayInput.value = delaySec;
 
-      // Rate
       rateSlider.value = speechRate;
       rateValue.textContent = speechRate.toFixed(2) + 'x';
 
-      // Gender radio
       genderRadios.forEach(r => {
         r.checked = (r.value === currentGenderFilter);
       });
 
-      // Symbol toggle
       symbolToggle.checked = expandSymbols;
 
       updatePrefsDisplay();
@@ -791,7 +817,6 @@
       return 'unknown';
     }
 
-    // ===== VOICE LOADING =====
     function loadVoices() {
       if (!('speechSynthesis' in window)) {
         voiceSelect.innerHTML = '<option value="">Speech not supported</option>';
@@ -799,11 +824,9 @@
         showToast('Your browser does not support speech synthesis');
         return;
       }
-
       const voices = window.speechSynthesis.getVoices();
       if (!voices || voices.length === 0) return;
       if (voicesReady && voices.length === allVoices.length) return;
-
       allVoices = voices;
       voicesReady = true;
       buildVoiceDropdown();
@@ -852,7 +875,6 @@
         voiceSelect.appendChild(opt);
       });
 
-      // Try to restore saved voice
       if (savedVoiceName && savedVoiceLang) {
         const idx = filteredVoices.findIndex(v =>
           v.name === savedVoiceName && v.lang === savedVoiceLang);
@@ -952,7 +974,6 @@
     });
     rateSlider.addEventListener('change', savePreferences);
 
-    // ===== SYMBOL EXPANSION MAP =====
     const symbolMap = {
       '.': 'full-stop', ',': 'comma', '!': 'exclamation mark', '?': 'question mark',
       ';': 'semicolon', ':': 'colon', '-': 'hyphen', '—': 'em dash', '–': 'en dash',
@@ -973,7 +994,6 @@
       return text.replace(regex, (match) => ' ' + symbolMap[match] + ' ');
     }
 
-    // ===== CHUNKING =====
     function splitIntoChunks(text, mode) {
       const trimmed = text.trim();
       if (!trimmed) return [];
@@ -1025,7 +1045,6 @@
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
 
-    // ===== SPEAK =====
     function speakText(text) {
       if (!('speechSynthesis' in window)) {
         showToast('Speech synthesis not supported');
@@ -1042,7 +1061,6 @@
       }, 40);
     }
 
-    // ===== STOP =====
     function stopReading(resetIndex) {
       if (resetIndex === undefined) resetIndex = true;
       if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
@@ -1056,7 +1074,6 @@
       updateProgressAndPreview();
     }
 
-    // ===== READ NEXT =====
     function readNextChunk() {
       if (!isPlaying) return;
       if (!chunks.length) { stopReading(true); return; }
@@ -1080,7 +1097,6 @@
       }
     }
 
-    // ===== START =====
     function startReading() {
       if (isPlaying) return;
       if (!('speechSynthesis' in window)) {
@@ -1101,7 +1117,6 @@
       readNextChunk();
     }
 
-    // ===== CHUNK CHIPS =====
     chunkChips.forEach(chip => {
       chip.addEventListener('click', () => {
         const mode = chip.dataset.chunk;
@@ -1116,7 +1131,6 @@
       });
     });
 
-    // ===== TIMING CHIPS =====
     timingChips.forEach(chip => {
       chip.addEventListener('click', () => {
         const sec = parseFloat(chip.dataset.delay);
@@ -1156,12 +1170,13 @@
     playBtn.addEventListener('click', startReading);
     stopBtn.addEventListener('click', () => stopReading(true));
 
+    // Auto-save text as user types
     textarea.addEventListener('input', () => {
       if (isPlaying) stopReading(true);
       rebuildChunks();
+      saveUserText(textarea.value);
     });
 
-    // ===== SYMBOL TOGGLE =====
     symbolToggle.addEventListener('change', (e) => {
       expandSymbols = e.target.checked;
       if (isPlaying) stopReading(true);
@@ -1170,58 +1185,24 @@
       updatePrefsDisplay();
     });
 
-    // ===== RESET BUTTON =====
+    // ===== CLEAR TEXT BUTTON =====
+    // Clears the textarea only. Keeps preferences intact.
     resetBtn.addEventListener('click', () => {
       if (isPlaying) stopReading(true);
-
-      // Clear text
       textarea.value = '';
-
-      // Reset chunk mode
-      currentChunkMode = '1';
-      chunkChips.forEach(c => c.classList.remove('active'));
-      document.querySelector('#chunkGroup .chip[data-chunk="1"]').classList.add('active');
-
-      // Reset delay
-      currentDelayMs = 1000;
-      timingChips.forEach(c => c.classList.remove('active'));
-      document.querySelector('#timingGroup .chip[data-delay="1"]').classList.add('active');
-      customDelayInput.value = '1.0';
-
-      // Reset rate
-      speechRate = 0.95;
-      rateSlider.value = speechRate;
-      rateValue.textContent = speechRate.toFixed(2) + 'x';
-
-      // Reset gender filter
-      currentGenderFilter = 'all';
-      genderRadios.forEach(r => { if (r.value === 'all') r.checked = true; });
-      selectedVoice = null;
-      savedVoiceName = null;
-      savedVoiceLang = null;
-      buildVoiceDropdown();
-
-      // Reset symbol toggle
-      symbolToggle.checked = false;
-      expandSymbols = false;
-
-      // Clear storage
-      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-
+      saveUserText('');
       rebuildChunks();
-      updatePrefsDisplay();
-
-      showToast('↺ Reset complete');
+      textarea.focus();
+      showToast('🧹 Text cleared (preferences kept)', 2000);
     });
 
     // ===== INIT =====
     (function init() {
-      // Load saved preferences first
       const hadPrefs = loadPreferences();
       applyPrefsToUI();
 
-      // Clear initial textarea content (user requested no initial messages)
-      textarea.value = '';
+      // Populate textarea with user's saved text, or the default help text
+      textarea.value = getInitialText();
 
       if (!('speechSynthesis' in window)) {
         statusText.textContent = 'No speech support';
