@@ -193,6 +193,59 @@
       background: #1b192b;
       color: #f0edff;
     }
+    /* Gender radio group */
+    .gender-filter {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .gender-filter .radio-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #26233a;
+      border: 1px solid #423e62;
+      padding: 0.4rem 0.9rem;
+      border-radius: 3rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: #d7d2f0;
+      font-weight: 500;
+      transition: 0.15s;
+      user-select: none;
+    }
+    .gender-filter .radio-label:hover {
+      background: #353152;
+      border-color: #7b6ed6;
+    }
+    .gender-filter input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #7a749e;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin: 0;
+      transition: 0.15s;
+      position: relative;
+    }
+    .gender-filter input[type="radio"]:checked {
+      border-color: #b7a9ff;
+      background: #7c6aff;
+      box-shadow: inset 0 0 0 2px #1b1a2e;
+    }
+    .gender-filter .radio-label:has(input[type="radio"]:checked) {
+      background: #3d355f;
+      border-color: #8f7bff;
+      color: #fff;
+    }
     .rate-control {
       margin-top: 0.8rem;
       display: flex;
@@ -365,14 +418,8 @@
       padding-top: 1.25rem;
       letter-spacing: 0.02em;
     }
-    .badge-voice {
-      background: #2f2b4a;
-      font-size: 0.7rem;
-      padding: 0.15rem 0.6rem;
-      border-radius: 2rem;
-      color: #b7adf0;
-      margin-left: 0.4rem;
-      font-weight: 500;
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
@@ -388,10 +435,10 @@
 
   <!-- Text input -->
   <div class="text-input-area">
-    <textarea id="inputText" placeholder="Paste or type your text here...">The quick brown fox jumps over the lazy dog. This web app reads text smoothly with adjustable chunk sizes and a natural voice. You can select different voices and control the speaking rate for a comfortable listening experience.</textarea>
+    <textarea id="inputText" placeholder="Paste or type your text here...">The quick brown fox jumps over the lazy dog. This web app reads text smoothly with adjustable chunk sizes and a natural voice. You can select male or female voices, filter by gender, and control the speaking rate for a comfortable listening experience.</textarea>
   </div>
 
-  <!-- Controls grid: left = chunk size, right = voice & timing -->
+  <!-- Controls grid -->
   <div class="controls-grid">
     <!-- chunk size panel -->
     <div class="control-panel">
@@ -412,6 +459,19 @@
     <div class="control-panel">
       <div class="panel-title"><i>🎙️</i> VOICE & TIMING</div>
       
+      <!-- Gender filter radio buttons -->
+      <div class="gender-filter" id="genderFilter">
+        <label class="radio-label">
+          <input type="radio" name="gender" value="all" checked> All
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="gender" value="female"> 👩 Female
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="gender" value="male"> 👨 Male
+        </label>
+      </div>
+
       <!-- Voice selector -->
       <div class="voice-selector">
         <label for="voiceSelect">🗣️ Voice</label>
@@ -471,7 +531,7 @@
   </div>
 
   <div class="footer-note">
-    ⚡ Smooth natural speech with voice & rate control. Works best in Chrome, Edge, or Safari.
+    ⚡ Smooth natural speech with voice, gender & rate control. Works best in Chrome, Edge, or Safari.
   </div>
 </div>
 
@@ -492,27 +552,89 @@
     const voiceSelect = document.getElementById('voiceSelect');
     const rateSlider = document.getElementById('rateSlider');
     const rateValue = document.getElementById('rateValue');
+    const genderRadios = document.querySelectorAll('input[name="gender"]');
 
     // ----- state -----
     let currentChunkMode = '1';
-    let currentDelayMs = 1000;            // default 1 second delay (smooth normal)
-    let speechRate = 0.95;                // default natural rate
-    let selectedVoice = null;             // SpeechSynthesisVoice object
+    let currentDelayMs = 1000;
+    let speechRate = 0.95;
+    let selectedVoice = null;
+    let allVoices = [];                // full list of SpeechSynthesisVoice
+    let filteredVoices = [];           // voices after gender filter
+    let currentGenderFilter = 'all';   // 'all', 'male', 'female'
     let chunks = [];
     let currentIndex = 0;
     let isPlaying = false;
     let timeoutId = null;
     let utterance = null;
 
-    // ----- populate voices -----
+    // ----- Voice gender detection heuristics -----
+    // Known female voice name keywords (lowercase)
+    const femaleKeywords = [
+      'female', 'woman', 'girl', 'samantha', 'victoria', 'karen', 'moira', 'tessa',
+      'fiona', 'veena', 'susan', 'allison', 'ava', 'zira', 'catherine', 'amelie',
+      'joanna', 'salli', 'kimberly', 'ivy', 'ruth', 'tina', 'linda', 'heather',
+      'lisa', 'laura', 'emma', 'olivia', 'sophia', 'chloe', 'mia', 'ella',
+      'google uk english female', 'google us english female', 'microsoft zira',
+      'microsoft hazel', 'microsoft susan', 'microsoft heera', 'microsoft eva',
+      'siri female', 'female voice'
+    ];
+    // Known male voice name keywords (lowercase)
+    const maleKeywords = [
+      'male', 'man', 'boy', 'david', 'alex', 'daniel', 'fred', 'george',
+      'james', 'mark', 'richard', 'tom', 'oliver', 'thomas', 'diego', 'jorge',
+      'juan', 'carlos', 'liam', 'noah', 'ethan', 'lucas', 'google uk english male',
+      'google us english male', 'microsoft david', 'microsoft mark', 'microsoft george',
+      'microsoft ravi', 'microsoft james', 'siri male', 'male voice'
+    ];
+
+    function detectGender(voice) {
+      const name = voice.name.toLowerCase();
+      const lang = voice.lang.toLowerCase();
+      
+      // Check female keywords first
+      for (const kw of femaleKeywords) {
+        if (name.includes(kw)) return 'female';
+      }
+      // Check male keywords
+      for (const kw of maleKeywords) {
+        if (name.includes(kw)) return 'male';
+      }
+      
+      // Heuristic: some common female names without "female" keyword
+      const femaleNames = ['samantha', 'victoria', 'karen', 'moira', 'tessa', 'fiona', 
+                          'veena', 'susan', 'allison', 'ava', 'zira', 'catherine', 
+                          'joanna', 'salli', 'kimberly', 'ivy', 'ruth', 'tina'];
+      for (const fn of femaleNames) {
+        if (name.includes(fn)) return 'female';
+      }
+      
+      // Heuristic: some common male names
+      const maleNames = ['david', 'alex', 'daniel', 'fred', 'george', 'james', 
+                        'mark', 'richard', 'tom', 'oliver', 'thomas', 'diego'];
+      for (const mn of maleNames) {
+        if (name.includes(mn)) return 'male';
+      }
+      
+      // Unknown
+      return 'unknown';
+    }
+
+    // ----- Populate voice list based on gender filter -----
     function populateVoiceList() {
       if (!('speechSynthesis' in window)) return;
-      const voices = window.speechSynthesis.getVoices();
-      // clear select but keep the default option
-      voiceSelect.innerHTML = '<option value="">Default (system)</option>';
       
-      // sort voices: English first, then others
-      const sortedVoices = [...voices].sort((a, b) => {
+      allVoices = window.speechSynthesis.getVoices();
+      
+      // Apply gender filter
+      filteredVoices = allVoices.filter(voice => {
+        if (currentGenderFilter === 'all') return true;
+        const gender = detectGender(voice);
+        return gender === currentGenderFilter;
+      });
+
+      // Sort: English first, then alphabetical
+      filteredVoices.sort((a, b) => {
         const aIsEn = a.lang.startsWith('en');
         const bIsEn = b.lang.startsWith('en');
         if (aIsEn && !bIsEn) return -1;
@@ -520,84 +642,113 @@
         return a.name.localeCompare(b.name);
       });
 
-      sortedVoices.forEach((voice, index) => {
+      // Rebuild select dropdown
+      voiceSelect.innerHTML = '<option value="">Default (system)</option>';
+      
+      filteredVoices.forEach((voice, index) => {
         const option = document.createElement('option');
         option.value = index;
-        option.textContent = `${voice.name} (${voice.lang})${voice.default ? ' • default' : ''}`;
-        // store voice data on option
+        const genderIcon = detectGender(voice) === 'female' ? '👩' 
+                          : detectGender(voice) === 'male' ? '👨' 
+                          : '🎤';
+        option.textContent = `${genderIcon} ${voice.name} (${voice.lang})${voice.default ? ' • default' : ''}`;
         option.dataset.voiceName = voice.name;
         option.dataset.voiceLang = voice.lang;
         voiceSelect.appendChild(option);
       });
 
-      // try to auto-select a natural default voice (first English or default)
-      if (sortedVoices.length > 0) {
-        // find a good default: prefer an English voice that is not "Google US English" (which can be robotic) — but let's pick first English or first available
-        const defaultVoice = sortedVoices.find(v => v.lang.startsWith('en') && v.name.includes('Natural')) 
-          || sortedVoices.find(v => v.lang.startsWith('en'))
-          || sortedVoices[0];
-        
-        if (defaultVoice) {
-          // find its index in the select (since we sorted, we can find option)
-          const options = Array.from(voiceSelect.options);
-          const matchOption = options.find(opt => 
-            opt.dataset.voiceName === defaultVoice.name && opt.dataset.voiceLang === defaultVoice.lang
-          );
-          if (matchOption) {
-            voiceSelect.value = matchOption.value;
-            selectedVoice = defaultVoice;
-          } else {
-            // fallback: set first non-default option
-            if (voiceSelect.options.length > 1) {
-              voiceSelect.selectedIndex = 1;
-              // get the voice from original array
-              const idx = parseInt(voiceSelect.value, 10);
-              if (!isNaN(idx) && sortedVoices[idx]) {
-                selectedVoice = sortedVoices[idx];
-              }
-            }
-          }
+      // Try to preserve selection if still exists
+      if (selectedVoice) {
+        const stillExists = filteredVoices.findIndex(v => 
+          v.name === selectedVoice.name && v.lang === selectedVoice.lang
+        );
+        if (stillExists >= 0) {
+          voiceSelect.value = stillExists;
+        } else {
+          // Try auto-select first filtered voice
+          autoSelectBestVoice();
         }
+      } else {
+        autoSelectBestVoice();
+      }
+
+      // If no voices match filter, show a message
+      if (filteredVoices.length === 0 && allVoices.length > 0) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = `No ${currentGenderFilter} voices found`;
+        option.disabled = true;
+        voiceSelect.appendChild(option);
+        selectedVoice = null;
       }
     }
 
-    // ----- voice select change -----
+    // Auto-select the best natural voice from filtered list
+    function autoSelectBestVoice() {
+      if (filteredVoices.length === 0) {
+        selectedVoice = null;
+        return;
+      }
+      
+      // Prefer a natural English voice
+      const best = filteredVoices.find(v => 
+        v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Neural'))
+      ) || filteredVoices.find(v => v.lang.startsWith('en'))
+        || filteredVoices[0];
+      
+      if (best) {
+        const idx = filteredVoices.indexOf(best);
+        voiceSelect.value = idx;
+        selectedVoice = best;
+      }
+    }
+
+    // ----- Voice select change -----
     voiceSelect.addEventListener('change', () => {
       const selectedIndex = voiceSelect.value;
       if (selectedIndex === '') {
-        selectedVoice = null; // default system voice
+        selectedVoice = null;
       } else {
-        const voices = window.speechSynthesis.getVoices();
-        const sortedVoices = [...voices].sort((a, b) => {
-          const aIsEn = a.lang.startsWith('en');
-          const bIsEn = b.lang.startsWith('en');
-          if (aIsEn && !bIsEn) return -1;
-          if (!aIsEn && bIsEn) return 1;
-          return a.name.localeCompare(b.name);
-        });
         const idx = parseInt(selectedIndex, 10);
-        if (!isNaN(idx) && sortedVoices[idx]) {
-          selectedVoice = sortedVoices[idx];
+        if (!isNaN(idx) && filteredVoices[idx]) {
+          selectedVoice = filteredVoices[idx];
         }
       }
-      // if currently playing, restart speech with new voice for the current chunk
+      
+      // If currently playing, restart speech with new voice
       if (isPlaying && currentIndex < chunks.length) {
-        // stop current speech and restart from current chunk
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        // speak current chunk again
         if (currentIndex < chunks.length) {
           speakText(chunks[currentIndex].text);
         }
       }
     });
 
-    // ----- rate slider -----
+    // ----- Gender radio filter -----
+    genderRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        currentGenderFilter = e.target.value;
+        // Reset selected voice and repopulate
+        selectedVoice = null;
+        populateVoiceList();
+        
+        // If playing, restart speech with new voice (or default)
+        if (isPlaying && currentIndex < chunks.length) {
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          if (currentIndex < chunks.length) {
+            speakText(chunks[currentIndex].text);
+          }
+        }
+      });
+    });
+
+    // ----- Rate slider -----
     rateSlider.addEventListener('input', (e) => {
       speechRate = parseFloat(e.target.value);
       rateValue.textContent = speechRate.toFixed(2) + 'x';
     });
 
-    // ----- helper: split text into chunks (same as before, but with sentence handling) -----
+    // ----- Chunk splitting -----
     function splitIntoChunks(text, mode) {
       const trimmed = text.trim();
       if (!trimmed) return [];
@@ -634,7 +785,6 @@
       }
     }
 
-    // ----- rebuild chunks -----
     function rebuildChunks() {
       const text = textarea.value;
       chunks = splitIntoChunks(text, currentChunkMode);
@@ -642,7 +792,7 @@
       updateProgressAndPreview();
     }
 
-    // ----- update progress & preview -----
+    // ----- Progress & preview -----
     function updateProgressAndPreview() {
       if (!chunks.length) {
         progressFill.style.width = '0%';
@@ -672,10 +822,9 @@
         .replace(/'/g, "&#039;");
     }
 
-    // ----- speak with current settings -----
+    // ----- Speak -----
     function speakText(text) {
       if (!('speechSynthesis' in window)) return;
-      // cancel any ongoing speech
       window.speechSynthesis.cancel();
       
       utterance = new SpeechSynthesisUtterance(text);
@@ -683,16 +832,14 @@
       utterance.pitch = 1;
       utterance.volume = 1;
       
-      // set voice if selected
       if (selectedVoice) {
         utterance.voice = selectedVoice;
       }
       
-      // small delay to avoid overlapping with cancel sometimes
       window.speechSynthesis.speak(utterance);
     }
 
-    // ----- stop reading -----
+    // ----- Stop reading -----
     function stopReading(resetIndex = true) {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -712,7 +859,7 @@
       updateProgressAndPreview();
     }
 
-    // ----- read next chunk (smooth loop) -----
+    // ----- Read next chunk -----
     function readNextChunk() {
       if (!isPlaying) return;
       if (!chunks.length) {
@@ -743,11 +890,10 @@
       }
     }
 
-    // ----- start reading -----
+    // ----- Start reading -----
     function startReading() {
       if (isPlaying) return;
 
-      // if at end or no chunks, rebuild and reset
       if (!chunks.length || currentIndex >= chunks.length) {
         rebuildChunks();
       }
@@ -775,9 +921,9 @@
       readNextChunk();
     }
 
-    // ----- UI event listeners -----
+    // ----- UI events -----
 
-    // chunk chips
+    // Chunk chips
     chunkChips.forEach(chip => {
       chip.addEventListener('click', () => {
         const newMode = chip.dataset.chunk;
@@ -792,94 +938,9 @@
       });
     });
 
-    // timing chips
+    // Timing chips
     timingChips.forEach(chip => {
       chip.addEventListener('click', () => {
         const delaySec = parseFloat(chip.dataset.delay);
         if (isNaN(delaySec)) return;
-        timingChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        currentDelayMs = delaySec * 1000;
-        customDelayInput.value = delaySec;
-        if (isPlaying) {
-          const wasIndex = currentIndex;
-          stopReading(false);
-          currentIndex = wasIndex;
-          startReading();
-        }
-      });
-    });
-
-    // apply custom delay
-    applyCustomBtn.addEventListener('click', () => {
-      let val = parseFloat(customDelayInput.value);
-      if (isNaN(val) || val < 0) val = 0;
-      if (val > 60) val = 60;
-      customDelayInput.value = val;
-      currentDelayMs = val * 1000;
-      timingChips.forEach(c => c.classList.remove('active'));
-      if (isPlaying) {
-        const wasIndex = currentIndex;
-        stopReading(false);
-        currentIndex = wasIndex;
-        startReading();
-      }
-    });
-
-    // play button
-    playBtn.addEventListener('click', startReading);
-
-    // stop button
-    stopBtn.addEventListener('click', () => {
-      stopReading(true);
-    });
-
-    // textarea changes
-    textarea.addEventListener('input', () => {
-      if (isPlaying) {
-        stopReading(true);
-      }
-      rebuildChunks();
-    });
-
-    // ----- initialization -----
-    function init() {
-      // set default variables
-      currentChunkMode = '1';
-      currentDelayMs = 1000;        // 1 second delay for smooth natural reading
-      speechRate = 0.95;
-      rateSlider.value = speechRate;
-      rateValue.textContent = speechRate.toFixed(2) + 'x';
-      
-      // populate voices (may need to wait for voices to load)
-      if ('speechSynthesis' in window) {
-        // load voices now, and also on voiceschanged
-        populateVoiceList();
-        window.speechSynthesis.onvoiceschanged = () => {
-          populateVoiceList();
-        };
-      } else {
-        statusText.textContent = 'Ready (no speech)';
-        voiceSelect.disabled = true;
-        rateSlider.disabled = true;
-      }
-
-      // rebuild chunks from textarea
-      rebuildChunks();
-
-      // stop button disabled initially
-      stopBtn.disabled = true;
-    }
-
-    init();
-
-    // cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    });
-
-  })();
-</script>
-</body>
-</html>
+        timingChips.forEach(c =>
