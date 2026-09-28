@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📖 Reading Pace · Word Group Reader</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .app-card {
+      max-width: 960px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 2.5rem;
+      padding: 2rem 2rem 2.5rem;
+      box-shadow: 0 30px 45px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #f0eef7;
+      margin: 0 0 0.35rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    h1 span {
+      background: #b7a9ff;
+      color: #0b0b1a;
+      font-size: 1.1rem;
+      font-weight: 500;
+      padding: 0.2rem 1rem;
+      border-radius: 100px;
+      letter-spacing: 0.02em;
+    }
+    .subhead {
+      color: #a9a5c9;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+      border-left: 3px solid #7f6bff;
+      padding-left: 1rem;
+    }
+    .text-input-area {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    textarea {
+      width: 100%;
+      background: rgba(10, 10, 20, 0.7);
+      border: 1px solid #3e3b5a;
+      border-radius: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      color: #f0edff;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      resize: vertical;
+      min-height: 140px;
+      outline: none;
+      transition: 0.2s;
+      font-family: 'Inter', system-ui, sans-serif;
+      letter-spacing: 0.01em;
+    }
+    textarea:focus {
+      border-color: #8f7bff;
+      box-shadow: 0 0 0 4px rgba(143, 123, 255, 0.2);
+      background: rgba(10, 10, 22, 0.9);
+    }
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem 1.5rem;
+      margin-bottom: 2.25rem;
+    }
+    @media (max-width: 650px) {
+      .controls-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .app-card {
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
+    .control-panel {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 1.75rem;
+      padding: 1.4rem 1.5rem 1.6rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+    .panel-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #b7adf0;
+      margin-bottom: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .panel-title i {
+      font-style: normal;
+      font-size: 1.2rem;
+    }
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 0.8rem;
+    }
+    .chip {
+      background: #26233a;
+      border: 1px solid #423e62;
+      color: #d7d2f0;
+      padding: 0.6rem 1rem;
+      border-radius: 3rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.15s;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .chip:hover {
+      background: #353152;
+      border-color: #7b6ed6;
+    }
+    .chip.active {
+      background: #7c6aff;
+      border-color: #b3a6ff;
+      color: #0e0c1a;
+      font-weight: 600;
+      box-shadow: 0 6px 14px rgba(124, 106, 255, 0.4);
+    }
+    .chip.small {
+      font-size: 0.8rem;
+      padding: 0.45rem 0.9rem;
+    }
+    .custom-timing {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .custom-timing label {
+      color: #beb8e0;
+      font-size: 0.9rem;
+    }
+    input[type="number"] {
+      background: #19172a;
+      border: 1px solid #3f3b60;
+      border-radius: 2rem;
+      padding: 0.6rem 1rem;
+      color: white;
+      width: 90px;
+      font-size: 0.95rem;
+      outline: none;
+      font-weight: 500;
+    }
+    input[type="number"]:focus {
+      border-color: #8f7bff;
+    }
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+    }
+    .playback-controls {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+    .btn {
+      background: #2f2b46;
+      border: none;
+      border-radius: 3rem;
+      padding: 0.85rem 1.8rem;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #ece9ff;
+      cursor: pointer;
+      transition: 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid #4b466e;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      letter-spacing: 0.01em;
+    }
+    .btn-primary {
+      background: linear-gradient(145deg, #8b78ff, #6a55f0);
+      border: 1px solid #b9adff;
+      color: #0d0a1f;
+      font-weight: 700;
+      box-shadow: 0 12px 18px -8px #4a37c0;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(145deg, #9d8cff, #7a66ff);
+      transform: scale(1.01);
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      filter: grayscale(0.6);
+    }
+    .status-badge {
+      background: #1b1929;
+      padding: 0.6rem 1.4rem;
+      border-radius: 3rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1px solid #39365a;
+      color: #cbc4f0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      white-space: nowrap;
+    }
+    .status-badge .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4cd964;
+      box-shadow: 0 0 8px #4cd964;
+    }
+    .status-badge .dot.inactive {
+      background: #5a5870;
+      box-shadow: none;
+    }
+    .progress {
+      margin-top: 1.5rem;
+      background: #1d1b2e;
+      height: 8px;
+      border-radius: 100px;
+      overflow: hidden;
+      border: 1px solid #2f2c46;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #9d8cff, #c6b9ff);
+      border-radius: 100px;
+      transition: width 0.1s linear;
+    }
+    .current-readout {
+      margin-top: 1rem;
+      color: #cbc5f0;
+      font-size: 0.95rem;
+      padding: 0.5rem 0.2rem;
+      min-height: 3.5rem;
+      font-style: italic;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 1rem;
+      padding: 1rem 1.2rem;
+      border: 1px dashed #3d3960;
+      word-break: break-word;
+    }
+    .current-readout strong {
+      color: white;
+      font-style: normal;
+      background: #3a3360;
+      padding: 0.2rem 0.6rem;
+      border-radius: 1rem;
+      margin-right: 0.3rem;
+    }
+    .footer-note {
+      margin-top: 1.5rem;
+      color: #716c99;
+      font-size: 0.8rem;
+      text-align: center;
+      border-top: 1px solid #2b2940;
+      padding-top: 1.25rem;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+<div class="app-card">
+  <h1>
+    📖 Reading Pace
+    <span>word‑by‑word</span>
+  </h1>
+  <div class="subhead">
+    Paste your text → choose chunk size & timing → hit play.
+  </div>
+
+  <!-- Text input -->
+  <div class="text-input-area">
+    <textarea id="inputText" placeholder="Paste or type your text here...&#10;Example: The quick brown fox jumps over the lazy dog. Reading practice becomes easy with adjustable word groups.">The quick brown fox jumps over the lazy dog. This web app lets you read one word, two words, or whole sentences. Perfect for speed reading or focus training. Adjust the timing between chunks to match your pace.</textarea>
+  </div>
+
+  <!-- Controls grid: left = chunk size, right = timing -->
+  <div class="controls-grid">
+    <!-- chunk size panel -->
+    <div class="control-panel">
+      <div class="panel-title"><i>📦</i> CHUNK SIZE</div>
+      <div class="chip-group" id="chunkGroup">
+        <div class="chip active" data-chunk="1">1 word</div>
+        <div class="chip" data-chunk="2">2 words</div>
+        <div class="chip" data-chunk="3">3 words</div>
+        <div class="chip" data-chunk="4">4 words</div>
+        <div class="chip" data-chunk="5">5 words</div>
+        <div class="chip" data-chunk="sentence">sentence</div>
+        <div class="chip" data-chunk="paragraph">paragraph</div>
+        <div class="chip" data-chunk="full">full text</div>
+      </div>
+    </div>
+
+    <!-- timing panel -->
+    <div class="control-panel">
+      <div class="panel-title"><i>⏱️</i> DELAY AFTER EACH CHUNK</div>
+      <div class="chip-group" id="timingGroup">
+        <div class="chip small" data-delay="0">0s (instant)</div>
+        <div class="chip small" data-delay="1">1s</div>
+        <div class="chip small active" data-delay="2">2s</div>
+        <div class="chip small" data-delay="3">3s</div>
+        <div class="chip small" data-delay="4">4s</div>
+        <div class="chip small" data-delay="5">5s</div>
+        <div class="chip small" data-delay="7">7s</div>
+        <div class="chip small" data-delay="8">8s</div>
+        <div class="chip small" data-delay="9">9s</div>
+        <div class="chip small" data-delay="10">10s</div>
+      </div>
+      <div class="custom-timing">
+        <label>⏲️ Custom (sec):</label>
+        <input type="number" id="customDelayInput" min="0" max="60" step="0.5" value="2.0" placeholder="2.0">
+        <button class="chip small" id="applyCustomDelay" style="padding:0.6rem 1rem;">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action bar & status -->
+  <div class="action-bar">
+    <div class="playback-controls">
+      <button class="btn btn-primary" id="playBtn">▶ Read</button>
+      <button class="btn" id="stopBtn" disabled>⏹ Stop</button>
+    </div>
+    <div class="status-badge" id="statusBadge">
+      <span class="dot inactive" id="statusDot"></span>
+      <span id="statusText">Ready</span>
+    </div>
+  </div>
+
+  <!-- progress & current chunk preview -->
+  <div class="progress">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="current-readout" id="currentChunkDisplay">
+    ⏳ <strong>Preview</strong> — chunk will appear here
+  </div>
+
+  <div class="footer-note">
+    ⚡ Each chunk is spoken (if your browser supports speech synthesis) and shown above.
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- DOM elements -----
+    const textarea = document.getElementById('inputText');
+    const chunkChips = document.querySelectorAll('#chunkGroup .chip');
+    const timingChips = document.querySelectorAll('#timingGroup .chip');
+    const customDelayInput = document.getElementById('customDelayInput');
+    const applyCustomBtn = document.getElementById('applyCustomDelay');
+    const playBtn = document.getElementById('playBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const progressFill = document.getElementById('progressFill');
+    const currentChunkDisplay = document.getElementById('currentChunkDisplay');
+
+    // ----- state -----
+    let currentChunkMode = '1';           // '1','2','3','4','5','sentence','paragraph','full'
+    let currentDelayMs = 2000;            // default 2 seconds
+    let chunks = [];                      // array of { text, index }
+    let currentIndex = 0;
+    let isPlaying = false;
+    let timeoutId = null;
+    let utterance = null;                 // for speech
+
+    // ----- helper: split text into chunks based on mode -----
+    function splitIntoChunks(text, mode) {
+      // trim and handle empty
+      const trimmed = text.trim();
+      if (!trimmed) return [];
+
+      // For sentence / paragraph / full we need different logic
+      if (mode === 'sentence') {
+        // split by sentence boundaries: . ! ? followed by space or end
+        const rawSentences = trimmed.split(/(?<=[.!?])\s+/);
+        return rawSentences.filter(s => s.trim().length > 0).map((s, idx) => ({
+          text: s.trim(),
+          index: idx
+        }));
+      } 
+      else if (mode === 'paragraph') {
+        // split by one or more newlines (double newline or more)
+        const paras = trimmed.split(/\n\s*\n/);
+        // further trim each and filter out empty
+        const nonEmpty = paras.map(p => p.trim()).filter(p => p.length > 0);
+        if (nonEmpty.length === 0) return [];
+        return nonEmpty.map((p, idx) => ({ text: p, index: idx }));
+      } 
+      else if (mode === 'full') {
+        // whole text as one chunk
+        return [{ text: trimmed, index: 0 }];
+      } 
+      else {
+        // numeric chunk sizes: '1','2','3','4','5'
+        const size = parseInt(mode, 10);
+        // split by whitespace (words)
+        const words = trimmed.split(/\s+/);
+        const result = [];
+        for (let i = 0; i < words.length; i += size) {
+          const chunkWords = words.slice(i, i + size);
+          if (chunkWords.length === 0) continue;
+          result.push({
+            text: chunkWords.join(' '),
+            index: result.length
+          });
+        }
+        return result;
+      }
+    }
+
+    // ----- refresh chunks from textarea & current mode -----
+    function rebuildChunks() {
+      const text = textarea.value;
+      chunks = splitIntoChunks(text, currentChunkMode);
+      currentIndex = 0;
+      updateProgressAndPreview();
+    }
+
+    // ----- update progress bar and preview -----
+    function updateProgressAndPreview() {
+      if (!chunks.length) {
+        progressFill.style.width = '0%';
+        currentChunkDisplay.innerHTML = `⏳ <strong>No chunks</strong> — add some text`;
+        return;
+      }
+      const total = chunks.length;
+      const percent = total > 0 ? ((currentIndex) / total) * 100 : 0;
+      progressFill.style.width = `${percent}%`;
+
+      // show current chunk (if playing or after stop, show current chunk if index within bounds)
+      if (currentIndex < total && currentIndex >= 0) {
+        const chunk = chunks[currentIndex];
+        currentChunkDisplay.innerHTML = `📌 <strong>Chunk ${currentIndex+1}/${total}</strong> — “${escapeHtml(chunk.text)}”`;
+      } else if (currentIndex >= total) {
+        currentChunkDisplay.innerHTML = `✅ <strong>Finished</strong> — all ${total} chunks read.`;
+      } else {
+        currentChunkDisplay.innerHTML = `⏳ <strong>Preview</strong> — ready`;
+      }
+    }
+
+    // tiny helper to avoid XSS when showing chunk text
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // ----- speak using SpeechSynthesis (if available) -----
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) return;
+      // cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;      // slightly slower for clarity
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      // optionally choose a voice – we skip, default is fine
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // ----- stop reading (clear timers, speech, reset state) -----
+    function stopReading(resetIndex = true) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isPlaying = false;
+      playBtn.disabled = false;
+      stopBtn.disabled = true;
+      statusDot.classList.add('inactive');
+      statusText.textContent = 'Ready';
+      if (resetIndex) {
+        currentIndex = 0;
+      }
+      updateProgressAndPreview();
+    }
+
+    // ----- read next chunk (core loop) -----
+    function readNextChunk() {
+      // stop if not playing or no chunks
+      if (!isPlaying) return;
+      if (!chunks.length) {
+        stopReading(true);
+        return;
+      }
+      // if we've reached the end
+      if (currentIndex >= chunks.length) {
+        // finished
+        isPlaying = false;
+        playBtn.disabled = false;
+        stopBtn.disabled = true;
+        statusDot.classList.add('inactive');
+        statusText.textContent = 'Finished';
+        updateProgressAndPreview();
+        currentChunkDisplay.innerHTML = `✅ <strong>Finished</strong> — all ${chunks.length} chunks read.`;
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        return;
+      }
+
+      // get current chunk
+      const chunk = chunks[currentIndex];
+      // update display (progress and preview)
+      updateProgressAndPreview();
+      // speak
+      speakText(chunk.text);
+
+      // move to next index for the *next* iteration
+      currentIndex++;
+
+      // schedule next chunk after delay
+      if (isPlaying) {
+        timeoutId = setTimeout(() => {
+          readNextChunk();
+        }, currentDelayMs);
+      }
+    }
+
+    // ----- start reading (from current index, reset if finished) -----
+    function startReading() {
+      // if already playing do nothing
+      if (isPlaying) return;
+
+      // if chunks are empty or we are at the end, rebuild and reset
+      if (!chunks.length || currentIndex >= chunks.length) {
+        rebuildChunks();  // this resets currentIndex to 0
+      }
+
+      // double-check after rebuild
+      if (!chunks.length) {
+        alert('No text to read. Please enter some text.');
+        return;
+      }
+
+      // if we somehow still have index >= length (should not happen after rebuild)
+      if (currentIndex >= chunks.length) {
+        currentIndex = 0;
+      }
+
+      // set playing state
+      isPlaying = true;
+      playBtn.disabled = true;
+      stopBtn.disabled = false;
+      statusDot.classList.remove('inactive');
+      statusText.textContent = 'Reading...';
+
+      // clear any pending timeout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+
+      // start reading from current index
+      readNextChunk();
+    }
+
+    // ----- UI event listeners -----
+
+    // chunk size chips
+    chunkChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        // ignore if same
+        const newMode = chip.dataset.chunk;
+        if (newMode === currentChunkMode) return;
+
+        // update active class
+        chunkChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentChunkMode = newMode;
+
+        // stop any reading in progress
+        if (isPlaying) {
+          stopReading(true);
+        } else {
+          // if not playing, just rebuild chunks and reset index
+          rebuildChunks();
+        }
+        // if it was playing, stopReading already resets and rebuild? we need to rebuild after stop
+        if (!isPlaying) {
+          rebuildChunks();
+        } else {
+          // after stopReading(true), chunks are still old -> rebuild
+          rebuildChunks();
+        }
+      });
+    });
+
+    // timing chips
+    timingChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const delaySec = parseFloat(chip.dataset.delay);
+        if (isNaN(delaySec)) return;
+        // update active class
+        timingChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentDelayMs = delaySec * 1000;
+        // also sync custom input field
+        customDelayInput.value = delaySec;
+        // if playing, we need to restart the timer with new delay — we'll stop and restart
+        if (isPlaying) {
+          // stop but don't reset index, then start again from same spot
+          const wasIndex = currentIndex;
+          stopReading(false); // keep currentIndex
+          currentIndex = wasIndex;
+          // but we need to restart from currentIndex
+          startReading();
+        }
+      });
+    });
+
+    // apply custom delay
+    applyCustomBtn.addEventListener('click', () => {
+      let val = parseFloat(customDelayInput.value);
+      if (isNaN(val) || val < 0) val = 0;
+      // clamp to 60 sec max
+      if (val > 60) val = 60;
+      customDelayInput.value = val;
+      currentDelayMs = val * 1000;
+
+      // remove active from all timing chips, add custom active? we'll create visual: none active.
+      // but we can deactivate all
+      timingChips.forEach(c => c.classList.remove('active'));
+
+      // if playing, restart with new delay
+      if (isPlaying) {
+        const wasIndex = currentIndex;
+        stopReading(false);
+        currentIndex = wasIndex;
+        startReading();
+      }
+    });
+
+    // play button
+    playBtn.addEventListener('click', startReading);
+
+    // stop button
+    stopBtn.addEventListener('click', () => {
+      stopReading(true); // reset index to 0
+    });
+
+    // textarea changes: rebuild chunks, stop reading
+    textarea.addEventListener('input', () => {
+      if (isPlaying) {
+        stopReading(true);
+      } else {
+        // if not playing, rebuild chunks, keep index 0
+        rebuildChunks();
+      }
+      // if we stopped, rebuildChunks already called inside stopReading? stopReading(true) resets index but doesn't rebuild.
+      // so we explicitly rebuild after stop.
+      if (!isPlaying) {
+        rebuildChunks();
+      } else {
+        // if it was playing, stopReading calls reset, then we rebuild
+        rebuildChunks();
+      }
+    });
+
+    // ----- initialization -----
+    function init() {
+      // set default active states already in HTML, but sync variables
+      // chunk mode default '1' active, delay default 2s active
+      currentChunkMode = '1';
+      currentDelayMs = 2000;
+
+      // rebuild chunks from textarea
+      rebuildChunks();
+
+      // if speech synthesis not available, show note (optional)
+      if (!('speechSynthesis' in window)) {
+        console.warn('Speech synthesis not supported in this browser.');
+        statusText.textContent = 'Ready (no speech)';
+      }
+
+      // ensure stop button disabled initially
+      stopBtn.disabled = true;
+    }
+
+    init();
+
+    // also handle when textarea loses focus? not needed
+    // prevent accidental form submit etc. not needed.
+
+    // Cleanup on page unload (good practice)
+    window.addEventListener('beforeunload', () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    });
+
+  })();
+</script>
+</body>
+</html>
