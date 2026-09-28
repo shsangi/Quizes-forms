@@ -2,21 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#0f0e17">
   <title>📖 Reading Pace · Voice & Chunk Reader</title>
   <style>
     * {
       box-sizing: border-box;
-      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
     }
     body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
       min-height: 100vh;
-      margin: 0;
       background: linear-gradient(135deg, #0f0e17 0%, #1b1a2e 100%);
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 1.5rem;
+      align-items: flex-start;
+      padding: 0.75rem;
     }
     .app-card {
       max-width: 980px;
@@ -24,115 +29,131 @@
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border-radius: 2.5rem;
-      padding: 2rem 2rem 2.5rem;
+      border-radius: 1.75rem;
+      padding: 1.25rem 1.25rem 1.75rem;
       box-shadow: 0 30px 45px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.2s;
     }
     h1 {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 600;
       letter-spacing: -0.02em;
       color: #f0eef7;
       margin: 0 0 0.35rem 0;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
     h1 span {
       background: #b7a9ff;
       color: #0b0b1a;
-      font-size: 1rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      padding: 0.2rem 1rem;
+      padding: 0.2rem 0.75rem;
       border-radius: 100px;
       letter-spacing: 0.02em;
     }
     .subhead {
       color: #a9a5c9;
-      margin-bottom: 1.8rem;
-      font-size: 0.98rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.85rem;
       border-left: 3px solid #7f6bff;
-      padding-left: 1rem;
+      padding-left: 0.75rem;
+      line-height: 1.4;
     }
     .text-input-area {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1.8rem;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
     }
     textarea {
       width: 100%;
       background: rgba(10, 10, 20, 0.7);
       border: 1px solid #3e3b5a;
-      border-radius: 1.5rem;
-      padding: 1.25rem 1.5rem;
+      border-radius: 1.25rem;
+      padding: 1rem 1.1rem;
       color: #f0edff;
-      font-size: 1.05rem;
-      line-height: 1.6;
+      font-size: 1rem;
+      line-height: 1.5;
       resize: vertical;
-      min-height: 130px;
+      min-height: 110px;
       outline: none;
       transition: 0.2s;
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: inherit;
       letter-spacing: 0.01em;
     }
     textarea:focus {
       border-color: #8f7bff;
-      box-shadow: 0 0 0 4px rgba(143, 123, 255, 0.2);
+      box-shadow: 0 0 0 3px rgba(143, 123, 255, 0.2);
       background: rgba(10, 10, 22, 0.9);
     }
     .controls-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem 1.5rem;
-      margin-bottom: 2rem;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
     }
-    @media (max-width: 680px) {
-      .controls-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
+    @media (min-width: 720px) {
       .app-card {
-        padding: 1.5rem;
+        padding: 2rem 2rem 2.5rem;
+        border-radius: 2.5rem;
       }
       h1 {
-        font-size: 1.6rem;
+        font-size: 2rem;
+      }
+      h1 span {
+        font-size: 1rem;
+        padding: 0.2rem 1rem;
+      }
+      .subhead {
+        font-size: 0.98rem;
+        margin-bottom: 1.8rem;
+      }
+      .controls-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem 1.5rem;
+        margin-bottom: 2rem;
       }
     }
     .control-panel {
       background: rgba(0, 0, 0, 0.25);
-      border-radius: 1.75rem;
-      padding: 1.4rem 1.5rem 1.6rem;
+      border-radius: 1.25rem;
+      padding: 1rem 1rem 1.2rem;
       border: 1px solid rgba(255, 255, 255, 0.05);
       box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
     }
+    @media (min-width: 720px) {
+      .control-panel {
+        border-radius: 1.75rem;
+        padding: 1.4rem 1.5rem 1.6rem;
+      }
+    }
     .panel-title {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: #b7adf0;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     .chip-group {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.55rem;
-      margin-bottom: 0.5rem;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
     }
     .chip {
       background: #26233a;
       border: 1px solid #423e62;
       color: #d7d2f0;
-      padding: 0.55rem 1rem;
+      padding: 0.5rem 0.85rem;
       border-radius: 3rem;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
       transition: 0.15s;
@@ -155,17 +176,17 @@
       box-shadow: 0 6px 14px rgba(124, 106, 255, 0.4);
     }
     .chip.small {
-      font-size: 0.78rem;
-      padding: 0.45rem 0.9rem;
+      font-size: 0.72rem;
+      padding: 0.4rem 0.75rem;
     }
     .voice-selector {
-      margin-top: 0.5rem;
+      margin-top: 0.4rem;
       display: flex;
       flex-direction: column;
-      gap: 0.6rem;
+      gap: 0.4rem;
     }
     .voice-selector label {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #beb8e0;
       font-weight: 500;
       display: flex;
@@ -175,8 +196,8 @@
     select {
       background: #19172a;
       border: 1px solid #3f3b60;
-      border-radius: 2rem;
-      padding: 0.7rem 1rem;
+      border-radius: 0.9rem;
+      padding: 0.75rem 1rem;
       color: #f0edff;
       font-size: 0.9rem;
       outline: none;
@@ -184,6 +205,12 @@
       cursor: pointer;
       font-weight: 500;
       transition: 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b7a9ff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
     }
     select:focus {
       border-color: #8f7bff;
@@ -192,12 +219,13 @@
     select option {
       background: #1b192b;
       color: #f0edff;
+      font-size: 0.9rem;
     }
-    /* Gender radio group */
     .gender-filter {
       display: flex;
-      gap: 0.5rem;
-      margin-top: 0.7rem;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+      margin-bottom: 0.6rem;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -207,18 +235,17 @@
       gap: 0.35rem;
       background: #26233a;
       border: 1px solid #423e62;
-      padding: 0.4rem 0.9rem;
+      padding: 0.4rem 0.75rem;
       border-radius: 3rem;
       cursor: pointer;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: #d7d2f0;
       font-weight: 500;
       transition: 0.15s;
       user-select: none;
     }
-    .gender-filter .radio-label:hover {
-      background: #353152;
-      border-color: #7b6ed6;
+    .gender-filter .radio-label:active {
+      transform: scale(0.97);
     }
     .gender-filter input[type="radio"] {
       appearance: none;
@@ -247,51 +274,51 @@
       color: #fff;
     }
     .rate-control {
-      margin-top: 0.8rem;
+      margin-top: 0.7rem;
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
     }
     .rate-control label {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #beb8e0;
       font-weight: 500;
     }
     input[type="range"] {
       flex: 1;
-      min-width: 120px;
+      min-width: 100px;
       accent-color: #8b78ff;
       height: 6px;
       border-radius: 10px;
     }
     .rate-value {
       color: #d7d2f0;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      min-width: 45px;
+      min-width: 42px;
       text-align: right;
     }
     .custom-timing {
       display: flex;
       align-items: center;
-      gap: 0.7rem;
-      margin-top: 1rem;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
       flex-wrap: wrap;
     }
     .custom-timing label {
       color: #beb8e0;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
     }
     input[type="number"] {
       background: #19172a;
       border: 1px solid #3f3b60;
       border-radius: 2rem;
-      padding: 0.55rem 0.9rem;
+      padding: 0.5rem 0.8rem;
       color: white;
-      width: 85px;
-      font-size: 0.9rem;
+      width: 75px;
+      font-size: 0.85rem;
       outline: none;
       font-weight: 500;
     }
@@ -300,15 +327,21 @@
     }
     .action-bar {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 1rem;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 0.75rem;
       margin-top: 0.5rem;
+    }
+    @media (min-width: 560px) {
+      .action-bar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+      }
     }
     .playback-controls {
       display: flex;
-      gap: 0.8rem;
+      gap: 0.6rem;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -316,18 +349,21 @@
       background: #2f2b46;
       border: none;
       border-radius: 3rem;
-      padding: 0.85rem 1.8rem;
+      padding: 0.8rem 1.5rem;
       font-weight: 600;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: #ece9ff;
       cursor: pointer;
       transition: 0.15s;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
       border: 1px solid #4b466e;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
       letter-spacing: 0.01em;
+      flex: 1;
+      min-width: 110px;
     }
     .btn-primary {
       background: linear-gradient(145deg, #8b78ff, #6a55f0);
@@ -338,7 +374,6 @@
     }
     .btn-primary:hover {
       background: linear-gradient(145deg, #9d8cff, #7a66ff);
-      transform: scale(1.01);
     }
     .btn:active {
       transform: scale(0.97);
@@ -350,16 +385,17 @@
     }
     .status-badge {
       background: #1b1929;
-      padding: 0.6rem 1.4rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 3rem;
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       font-weight: 500;
       border: 1px solid #39365a;
       color: #cbc4f0;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.6rem;
       white-space: nowrap;
+      justify-content: center;
     }
     .status-badge .dot {
       width: 10px;
@@ -368,13 +404,14 @@
       background: #4cd964;
       box-shadow: 0 0 8px #4cd964;
       transition: 0.2s;
+      flex-shrink: 0;
     }
     .status-badge .dot.inactive {
       background: #5a5870;
       box-shadow: none;
     }
     .progress {
-      margin-top: 1.5rem;
+      margin-top: 1.2rem;
       background: #1d1b2e;
       height: 8px;
       border-radius: 100px;
@@ -389,13 +426,13 @@
       transition: width 0.1s linear;
     }
     .current-readout {
-      margin-top: 1rem;
+      margin-top: 0.8rem;
       color: #cbc5f0;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       min-height: 3.5rem;
       background: rgba(255, 255, 255, 0.02);
-      border-radius: 1rem;
-      padding: 1rem 1.2rem;
+      border-radius: 0.9rem;
+      padding: 0.9rem 1rem;
       border: 1px dashed #3d3960;
       word-break: break-word;
       line-height: 1.5;
@@ -404,22 +441,21 @@
       color: white;
       font-style: normal;
       background: #3a3360;
-      padding: 0.2rem 0.6rem;
+      padding: 0.2rem 0.55rem;
       border-radius: 1rem;
       margin-right: 0.3rem;
       font-weight: 600;
+      font-size: 0.85rem;
     }
     .footer-note {
-      margin-top: 1.5rem;
+      margin-top: 1.2rem;
       color: #716c99;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       text-align: center;
       border-top: 1px solid #2b2940;
-      padding-top: 1.25rem;
+      padding-top: 1rem;
       letter-spacing: 0.02em;
-    }
-    .hidden {
-      display: none !important;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -433,14 +469,12 @@
     Paste text → choose chunk size, voice & speed → hit play.
   </div>
 
-  <!-- Text input -->
   <div class="text-input-area">
     <textarea id="inputText" placeholder="Paste or type your text here...">The quick brown fox jumps over the lazy dog. This web app reads text smoothly with adjustable chunk sizes and a natural voice. You can select male or female voices, filter by gender, and control the speaking rate for a comfortable listening experience.</textarea>
   </div>
 
-  <!-- Controls grid -->
   <div class="controls-grid">
-    <!-- chunk size panel -->
+    <!-- Chunk size panel -->
     <div class="control-panel">
       <div class="panel-title"><i>📦</i> CHUNK SIZE</div>
       <div class="chip-group" id="chunkGroup">
@@ -455,11 +489,11 @@
       </div>
     </div>
 
-    <!-- voice & timing panel -->
+    <!-- Voice & timing panel -->
     <div class="control-panel">
       <div class="panel-title"><i>🎙️</i> VOICE & TIMING</div>
-      
-      <!-- Gender filter radio buttons -->
+
+      <!-- Gender filter -->
       <div class="gender-filter" id="genderFilter">
         <label class="radio-label">
           <input type="radio" name="gender" value="all" checked> All
@@ -476,7 +510,7 @@
       <div class="voice-selector">
         <label for="voiceSelect">🗣️ Voice</label>
         <select id="voiceSelect">
-          <option value="">Default (system)</option>
+          <option value="">Loading voices…</option>
         </select>
       </div>
 
@@ -488,8 +522,8 @@
       </div>
 
       <!-- Delay chips -->
-      <div style="margin-top: 0.9rem;">
-        <div class="panel-title" style="margin-bottom: 0.7rem;"><i>⏱️</i> DELAY AFTER EACH CHUNK</div>
+      <div style="margin-top: 0.8rem;">
+        <div class="panel-title" style="margin-bottom: 0.6rem;"><i>⏱️</i> DELAY AFTER EACH CHUNK</div>
         <div class="chip-group" id="timingGroup">
           <div class="chip small" data-delay="0">0s</div>
           <div class="chip small" data-delay="0.5">0.5s</div>
@@ -504,13 +538,13 @@
 
       <div class="custom-timing">
         <label>⏲️ Custom (sec):</label>
-        <input type="number" id="customDelayInput" min="0" max="60" step="0.5" value="1.0">
-        <button class="chip small" id="applyCustomDelay" style="padding:0.5rem 1rem;">Apply</button>
+        <input type="number" id="customDelayInput" min="0" max="60" step="0.5" value="1.0" inputmode="decimal">
+        <button class="chip small" id="applyCustomDelay" style="padding:0.5rem 0.9rem;">Apply</button>
       </div>
     </div>
   </div>
 
-  <!-- Action bar & status -->
+  <!-- Action bar -->
   <div class="action-bar">
     <div class="playback-controls">
       <button class="btn btn-primary" id="playBtn">▶ Read</button>
@@ -522,7 +556,7 @@
     </div>
   </div>
 
-  <!-- progress & current chunk preview -->
+  <!-- Progress & preview -->
   <div class="progress">
     <div class="progress-fill" id="progressFill" style="width:0%"></div>
   </div>
@@ -531,12 +565,15 @@
   </div>
 
   <div class="footer-note">
-    ⚡ Smooth natural speech with voice, gender & rate control. Works best in Chrome, Edge, or Safari.
+    ⚡ Smooth natural speech with voice, gender & rate control.<br>
+    Works best in Chrome, Edge, or Safari on mobile & desktop.
   </div>
 </div>
 
 <script>
   (function() {
+    'use strict';
+
     // ----- DOM elements -----
     const textarea = document.getElementById('inputText');
     const chunkChips = document.querySelectorAll('#chunkGroup .chip');
@@ -554,22 +591,22 @@
     const rateValue = document.getElementById('rateValue');
     const genderRadios = document.querySelectorAll('input[name="gender"]');
 
-    // ----- state -----
+    // ----- State -----
     let currentChunkMode = '1';
     let currentDelayMs = 1000;
     let speechRate = 0.95;
     let selectedVoice = null;
-    let allVoices = [];                // full list of SpeechSynthesisVoice
-    let filteredVoices = [];           // voices after gender filter
-    let currentGenderFilter = 'all';   // 'all', 'male', 'female'
+    let allVoices = [];
+    let filteredVoices = [];
+    let currentGenderFilter = 'all';
     let chunks = [];
     let currentIndex = 0;
     let isPlaying = false;
     let timeoutId = null;
     let utterance = null;
+    let voicesLoaded = false;
 
-    // ----- Voice gender detection heuristics -----
-    // Known female voice name keywords (lowercase)
+    // ----- Gender keywords -----
     const femaleKeywords = [
       'female', 'woman', 'girl', 'samantha', 'victoria', 'karen', 'moira', 'tessa',
       'fiona', 'veena', 'susan', 'allison', 'ava', 'zira', 'catherine', 'amelie',
@@ -577,55 +614,62 @@
       'lisa', 'laura', 'emma', 'olivia', 'sophia', 'chloe', 'mia', 'ella',
       'google uk english female', 'google us english female', 'microsoft zira',
       'microsoft hazel', 'microsoft susan', 'microsoft heera', 'microsoft eva',
-      'siri female', 'female voice'
+      'siri female', 'female voice', 'zuzana', 'paulina', 'yelda', 'mariska',
+      'kanya', 'lekha', 'google español', 'mónica', 'monica', 'helena', 'carmit',
+      'damayanti', 'google हिन्दी'
     ];
-    // Known male voice name keywords (lowercase)
     const maleKeywords = [
       'male', 'man', 'boy', 'david', 'alex', 'daniel', 'fred', 'george',
       'james', 'mark', 'richard', 'tom', 'oliver', 'thomas', 'diego', 'jorge',
       'juan', 'carlos', 'liam', 'noah', 'ethan', 'lucas', 'google uk english male',
       'google us english male', 'microsoft david', 'microsoft mark', 'microsoft george',
-      'microsoft ravi', 'microsoft james', 'siri male', 'male voice'
+      'microsoft ravi', 'microsoft james', 'siri male', 'male voice', 'maged',
+      'tarik', 'rishi', 'ravi', 'prabhat', 'hemant'
     ];
 
     function detectGender(voice) {
-      const name = voice.name.toLowerCase();
-      const lang = voice.lang.toLowerCase();
-      
-      // Check female keywords first
+      const name = (voice.name || '').toLowerCase();
       for (const kw of femaleKeywords) {
         if (name.includes(kw)) return 'female';
       }
-      // Check male keywords
       for (const kw of maleKeywords) {
         if (name.includes(kw)) return 'male';
       }
-      
-      // Heuristic: some common female names without "female" keyword
-      const femaleNames = ['samantha', 'victoria', 'karen', 'moira', 'tessa', 'fiona', 
-                          'veena', 'susan', 'allison', 'ava', 'zira', 'catherine', 
-                          'joanna', 'salli', 'kimberly', 'ivy', 'ruth', 'tina'];
+      // Extra heuristics
+      const femaleNames = ['samantha', 'victoria', 'karen', 'moira', 'tessa', 'fiona',
+                          'veena', 'susan', 'allison', 'ava', 'zira', 'catherine',
+                          'joanna', 'salli', 'kimberly', 'ivy', 'ruth', 'tina',
+                          'zuzana', 'paulina', 'yelda', 'mariska', 'kanya', 'lekha',
+                          'helena', 'carmit', 'damayanti', 'monica', 'mónica'];
       for (const fn of femaleNames) {
         if (name.includes(fn)) return 'female';
       }
-      
-      // Heuristic: some common male names
-      const maleNames = ['david', 'alex', 'daniel', 'fred', 'george', 'james', 
-                        'mark', 'richard', 'tom', 'oliver', 'thomas', 'diego'];
+      const maleNames = ['david', 'alex', 'daniel', 'fred', 'george', 'james',
+                        'mark', 'richard', 'tom', 'oliver', 'thomas', 'diego',
+                        'maged', 'tarik', 'rishi', 'ravi', 'prabhat', 'hemant'];
       for (const mn of maleNames) {
         if (name.includes(mn)) return 'male';
       }
-      
-      // Unknown
       return 'unknown';
     }
 
-    // ----- Populate voice list based on gender filter -----
+    // ----- Populate voice list -----
     function populateVoiceList() {
-      if (!('speechSynthesis' in window)) return;
-      
-      allVoices = window.speechSynthesis.getVoices();
-      
+      if (!('speechSynthesis' in window)) {
+        voiceSelect.innerHTML = '<option value="">Speech not supported</option>';
+        voiceSelect.disabled = true;
+        return;
+      }
+
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) {
+        // Voices not loaded yet — keep the loading message
+        return;
+      }
+
+      allVoices = voices;
+      voicesLoaded = true;
+
       // Apply gender filter
       filteredVoices = allVoices.filter(voice => {
         if (currentGenderFilter === 'all') return true;
@@ -642,60 +686,62 @@
         return a.name.localeCompare(b.name);
       });
 
-      // Rebuild select dropdown
-      voiceSelect.innerHTML = '<option value="">Default (system)</option>';
-      
+      // Rebuild select
+      voiceSelect.innerHTML = '';
+
+      if (filteredVoices.length === 0) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = allVoices.length === 0 
+          ? 'No voices available' 
+          : `No ${currentGenderFilter} voices found`;
+        option.disabled = true;
+        voiceSelect.appendChild(option);
+        selectedVoice = null;
+        return;
+      }
+
+      // Add default option
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Default (system)';
+      voiceSelect.appendChild(defaultOption);
+
       filteredVoices.forEach((voice, index) => {
         const option = document.createElement('option');
         option.value = index;
-        const genderIcon = detectGender(voice) === 'female' ? '👩' 
-                          : detectGender(voice) === 'male' ? '👨' 
-                          : '🎤';
-        option.textContent = `${genderIcon} ${voice.name} (${voice.lang})${voice.default ? ' • default' : ''}`;
-        option.dataset.voiceName = voice.name;
-        option.dataset.voiceLang = voice.lang;
+        const gender = detectGender(voice);
+        const icon = gender === 'female' ? '👩' : gender === 'male' ? '👨' : '🎤';
+        option.textContent = `${icon} ${voice.name} (${voice.lang})`;
         voiceSelect.appendChild(option);
       });
 
-      // Try to preserve selection if still exists
+      // Restore selection if still available
       if (selectedVoice) {
-        const stillExists = filteredVoices.findIndex(v => 
+        const idx = filteredVoices.findIndex(v =>
           v.name === selectedVoice.name && v.lang === selectedVoice.lang
         );
-        if (stillExists >= 0) {
-          voiceSelect.value = stillExists;
+        if (idx >= 0) {
+          voiceSelect.value = idx;
         } else {
-          // Try auto-select first filtered voice
+          selectedVoice = null;
           autoSelectBestVoice();
         }
       } else {
         autoSelectBestVoice();
       }
-
-      // If no voices match filter, show a message
-      if (filteredVoices.length === 0 && allVoices.length > 0) {
-        const option = document.createElement('option');
-        option.value = '';
-        option.textContent = `No ${currentGenderFilter} voices found`;
-        option.disabled = true;
-        voiceSelect.appendChild(option);
-        selectedVoice = null;
-      }
     }
 
-    // Auto-select the best natural voice from filtered list
     function autoSelectBestVoice() {
       if (filteredVoices.length === 0) {
         selectedVoice = null;
         return;
       }
-      
-      // Prefer a natural English voice
-      const best = filteredVoices.find(v => 
+      const best = filteredVoices.find(v =>
         v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Neural'))
       ) || filteredVoices.find(v => v.lang.startsWith('en'))
         || filteredVoices[0];
-      
+
       if (best) {
         const idx = filteredVoices.indexOf(best);
         voiceSelect.value = idx;
@@ -705,17 +751,16 @@
 
     // ----- Voice select change -----
     voiceSelect.addEventListener('change', () => {
-      const selectedIndex = voiceSelect.value;
-      if (selectedIndex === '') {
+      const val = voiceSelect.value;
+      if (val === '') {
         selectedVoice = null;
       } else {
-        const idx = parseInt(selectedIndex, 10);
+        const idx = parseInt(val, 10);
         if (!isNaN(idx) && filteredVoices[idx]) {
           selectedVoice = filteredVoices[idx];
         }
       }
-      
-      // If currently playing, restart speech with new voice
+      // If playing, restart speech for the current chunk with new voice
       if (isPlaying && currentIndex < chunks.length) {
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         if (currentIndex < chunks.length) {
@@ -724,15 +769,12 @@
       }
     });
 
-    // ----- Gender radio filter -----
+    // ----- Gender filter -----
     genderRadios.forEach(radio => {
       radio.addEventListener('change', (e) => {
         currentGenderFilter = e.target.value;
-        // Reset selected voice and repopulate
         selectedVoice = null;
         populateVoiceList();
-        
-        // If playing, restart speech with new voice (or default)
         if (isPlaying && currentIndex < chunks.length) {
           if ('speechSynthesis' in window) window.speechSynthesis.cancel();
           if (currentIndex < chunks.length) {
@@ -759,16 +801,16 @@
           text: s.trim(),
           index: idx
         }));
-      } 
+      }
       else if (mode === 'paragraph') {
         const paras = trimmed.split(/\n\s*\n/);
         const nonEmpty = paras.map(p => p.trim()).filter(p => p.length > 0);
         if (nonEmpty.length === 0) return [];
         return nonEmpty.map((p, idx) => ({ text: p, index: idx }));
-      } 
+      }
       else if (mode === 'full') {
         return [{ text: trimmed, index: 0 }];
-      } 
+      }
       else {
         const size = parseInt(mode, 10);
         const words = trimmed.split(/\s+/);
@@ -776,18 +818,14 @@
         for (let i = 0; i < words.length; i += size) {
           const chunkWords = words.slice(i, i + size);
           if (chunkWords.length === 0) continue;
-          result.push({
-            text: chunkWords.join(' '),
-            index: result.length
-          });
+          result.push({ text: chunkWords.join(' '), index: result.length });
         }
         return result;
       }
     }
 
     function rebuildChunks() {
-      const text = textarea.value;
-      chunks = splitIntoChunks(text, currentChunkMode);
+      chunks = splitIntoChunks(textarea.value, currentChunkMode);
       currentIndex = 0;
       updateProgressAndPreview();
     }
@@ -800,12 +838,12 @@
         return;
       }
       const total = chunks.length;
-      const percent = total > 0 ? ((currentIndex) / total) * 100 : 0;
+      const percent = total > 0 ? (currentIndex / total) * 100 : 0;
       progressFill.style.width = `${percent}%`;
 
       if (currentIndex < total && currentIndex >= 0) {
         const chunk = chunks[currentIndex];
-        currentChunkDisplay.innerHTML = `📌 <strong>Chunk ${currentIndex+1}/${total}</strong> — “${escapeHtml(chunk.text)}”`;
+        currentChunkDisplay.innerHTML = `📌 <strong>Chunk ${currentIndex + 1}/${total}</strong> — “${escapeHtml(chunk.text)}”`;
       } else if (currentIndex >= total) {
         currentChunkDisplay.innerHTML = `✅ <strong>Finished</strong> — all ${total} chunks read.`;
       } else {
@@ -814,133 +852,53 @@
     }
 
     function escapeHtml(unsafe) {
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+      return String(unsafe)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     // ----- Speak -----
     function speakText(text) {
       if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) { /* ignore */ }
+
       utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = speechRate;
       utterance.pitch = 1;
       utterance.volume = 1;
-      
       if (selectedVoice) {
         utterance.voice = selectedVoice;
       }
-      
-      window.speechSynthesis.speak(utterance);
+      // Small timeout helps on some mobile browsers
+      setTimeout(() => {
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch (e) { /* ignore */ }
+      }, 30);
     }
 
-    // ----- Stop reading -----
-    function stopReading(resetIndex = true) {
+    // ----- Stop -----
+    function stopReading(resetIndex) {
+      if (resetIndex === undefined) resetIndex = true;
       if (timeoutId) {
         clearTimeout(timeoutId);
         timeoutId = null;
       }
       if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+        try { window.speechSynthesis.cancel(); } catch (e) {}
       }
       isPlaying = false;
       playBtn.disabled = false;
       stopBtn.disabled = true;
       statusDot.classList.add('inactive');
       statusText.textContent = 'Ready';
-      if (resetIndex) {
-        currentIndex = 0;
-      }
+      if (resetIndex) currentIndex = 0;
       updateProgressAndPreview();
     }
 
-    // ----- Read next chunk -----
-    function readNextChunk() {
-      if (!isPlaying) return;
-      if (!chunks.length) {
-        stopReading(true);
-        return;
-      }
-      if (currentIndex >= chunks.length) {
-        isPlaying = false;
-        playBtn.disabled = false;
-        stopBtn.disabled = true;
-        statusDot.classList.add('inactive');
-        statusText.textContent = 'Finished';
-        updateProgressAndPreview();
-        currentChunkDisplay.innerHTML = `✅ <strong>Finished</strong> — all ${chunks.length} chunks read.`;
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        return;
-      }
-
-      const chunk = chunks[currentIndex];
-      updateProgressAndPreview();
-      speakText(chunk.text);
-      currentIndex++;
-
-      if (isPlaying) {
-        timeoutId = setTimeout(() => {
-          readNextChunk();
-        }, currentDelayMs);
-      }
-    }
-
-    // ----- Start reading -----
-    function startReading() {
-      if (isPlaying) return;
-
-      if (!chunks.length || currentIndex >= chunks.length) {
-        rebuildChunks();
-      }
-
-      if (!chunks.length) {
-        alert('No text to read. Please enter some text.');
-        return;
-      }
-
-      if (currentIndex >= chunks.length) {
-        currentIndex = 0;
-      }
-
-      isPlaying = true;
-      playBtn.disabled = true;
-      stopBtn.disabled = false;
-      statusDot.classList.remove('inactive');
-      statusText.textContent = 'Reading...';
-
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-
-      readNextChunk();
-    }
-
-    // ----- UI events -----
-
-    // Chunk chips
-    chunkChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        const newMode = chip.dataset.chunk;
-        if (newMode === currentChunkMode) return;
-        chunkChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        currentChunkMode = newMode;
-        if (isPlaying) {
-          stopReading(true);
-        }
-        rebuildChunks();
-      });
-    });
-
-    // Timing chips
-    timingChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        const delaySec = parseFloat(chip.dataset.delay);
-        if (isNaN(delaySec)) return;
-        timingChips.forEach(c =>
+    // ----- Read next -----
