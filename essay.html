@@ -51,16 +51,24 @@
             flex-direction: column;
             height: 100%;
             box-sizing: border-box;
-            position: relative;
         }
 
-        /* Card Header: SRNO, TITLE */
+        /* Card Header: SRNO, TITLE, and READ BUTTON */
         .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .card-title-group {
             display: flex;
             align-items: baseline;
             gap: 8px;
-            margin-bottom: 5px;
+            flex-grow: 1;
         }
+
         .card-srno {
             font-size: 0.85em;
             font-weight: bold;
@@ -98,41 +106,6 @@
             margin-bottom: 15px;
         }
 
-        /* Vocabulary Toggle Section */
-        .vocab-toggle-btn {
-            background: #f0f4f8;
-            color: var(--primary);
-            border: 1px solid #dcdde1;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            margin-bottom: 10px;
-            transition: background 0.2s;
-        }
-        .vocab-toggle-btn:hover { background: #e1e8ed; }
-        
-        .vocab-content {
-            display: none; /* Hidden by default */
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 15px;
-            max-height: 250px;
-            overflow-y: auto;
-            font-size: 0.85em;
-        }
-        .vocab-content.active { display: block; }
-        
-        /* Table styles inside card */
-        .vocab-content table { width: 100%; border-collapse: collapse; }
-        .vocab-content th, .vocab-content td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-        .vocab-content th { background-color: #f2f2f2; }
-
         /* Classification */
         .card-classification {
             font-size: 0.8em;
@@ -144,25 +117,66 @@
             margin-bottom: 15px;
         }
 
-        /* Card Actions */
-        .card-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: auto;
+        /* Vocabulary Toggle Section (At the bottom) */
+        .vocab-section {
+            margin-top: auto; 
+            border-top: 1px solid #eee;
+            padding-top: 15px;
         }
+
+        .vocab-toggle-btn {
+            background: #f0f4f8;
+            color: var(--primary);
+            border: 1px solid #dcdde1;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+        .vocab-toggle-btn:hover { background: #e1e8ed; }
+        
+        .vocab-content {
+            display: none; 
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 0.85em;
+        }
+        .vocab-content.active { display: block; }
+        
+        /* Table styles inside card */
+        .vocab-content table { width: 100%; border-collapse: collapse; }
+        .vocab-content th, .vocab-content td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        .vocab-content th { background-color: #f2f2f2; }
+
+        /* Card Actions (Read Essay Button top right) */
         .read-essay-btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 6px;
-            font-size: 0.9em;
+            font-size: 0.8em;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 5px;
             transition: background 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .read-essay-btn:hover { background: var(--primary-hover); }
 
@@ -199,7 +213,7 @@
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-        /* Modal Header: LEFT "Reading Essay", RIGHT Buttons */
+        /* Modal Header */
         .modal-header {
             padding: 12px 15px; background: #f8f9fa; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
@@ -208,9 +222,7 @@
         .modal-header-title {
             font-weight: bold; font-size: 1.1em; color: #2c3e50;
         }
-        .modal-header-actions {
-            display: flex; gap: 10px;
-        }
+        .modal-header-actions { display: flex; gap: 10px; }
         
         .action-btn {
             border: none; border-radius: 6px; cursor: pointer;
@@ -339,10 +351,14 @@
                                 vocabHtml = marked.parse(vocabSplit[1]);
                             }
 
-                            // 4. Extract Essay Body (Everything before the Vocabulary section, minus the headers/meta)
+                            // 4. Extract Essay Body (Everything before the Vocabulary section, minus the headers/meta/subtitle)
                             let essayBody = vocabSplit[0]; 
                             
                             if (titleMatch) essayBody = essayBody.replace(titleMatch[0], '');
+                            
+                            // Remove the subtitle e.g. **(PCS 1978, 89)**
+                            essayBody = essayBody.replace(/\*\*\(PCS.*?\)\*\*/g, '');
+                            
                             essayBody = essayBody.replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '');
                             essayBody = essayBody.replace(/\*\*Date:\*\*.*?(?=\n\n|\n---|$)/is, '');
                             essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
@@ -397,9 +413,11 @@
                 let vocabSection = '';
                 if (essay.vocabHtml) {
                     vocabSection = `
-                        <button class="vocab-toggle-btn" onclick="toggleVocab(event, ${index})">📚 Show Vocabulary</button>
-                        <div class="vocab-content" id="vocab-${index}">
-                            ${essay.vocabHtml}
+                        <div class="vocab-section">
+                            <button class="vocab-toggle-btn" onclick="toggleVocab(event, ${index})">📚 Show Vocabulary</button>
+                            <div class="vocab-content" id="vocab-${index}">
+                                ${essay.vocabHtml}
+                            </div>
                         </div>
                     `;
                 }
@@ -417,23 +435,22 @@
                 const cardHTML = `
                     <div class="essay-card" id="card-${index}">
                         <div class="card-header">
-                            <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
-                            <span class="card-title">${essay.title}</span>
+                            <div class="card-title-group">
+                                <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
+                                <span class="card-title">${essay.title}</span>
+                            </div>
+                            <button class="read-essay-btn" onclick="openModal(${index})">
+                                Read 
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </button>
                         </div>
                         <div class="card-meta">
                             ${metaString}
                         </div>
                         <div class="card-preview">${essay.previewText}</div>
                         
-                        ${vocabSection}
                         ${classificationSection}
-                        
-                        <div class="card-actions">
-                            <button class="read-essay-btn" onclick="openModal(${index})">
-                                Read Essay 
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                            </button>
-                        </div>
+                        ${vocabSection}
                     </div>
                 `;
                 
@@ -443,9 +460,11 @@
 
         // --- VOCABULARY TOGGLE LOGIC ---
         function toggleVocab(event, index) {
+            event.preventDefault(); // Prevent any default button behavior
             event.stopPropagation(); // Prevent card click
+            
             const vocabDiv = document.getElementById(`vocab-${index}`);
-            const btn = event.target;
+            const btn = event.currentTarget;
             
             if (vocabDiv.classList.contains('active')) {
                 vocabDiv.classList.remove('active');
@@ -503,7 +522,6 @@
             const textToCopy = `${essay.title}\n\n${essay.bodyMarkdown}`;
             
             navigator.clipboard.writeText(textToCopy).then(() => {
-                // Success feedback
                 copyBtn.innerHTML = `✅ Copied!`;
                 copyBtn.classList.add('copied');
                 
