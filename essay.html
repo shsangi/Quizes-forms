@@ -89,8 +89,33 @@
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
         }
 
+        /* Card Meta Information (SR No, Date, etc.) */
+        .card-meta {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 10px;
+        }
+        
+        .card-meta span {
+            background: #f0f4f8;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
         .card-preview {
-            font-size: 0.95em;
+            font-size: 0.9em;
             color: #555;
             flex-grow: 1;
             display: -webkit-box;
@@ -162,17 +187,19 @@
             background-color: rgba(0, 0, 0, 0.7);
             z-index: 1000;
             justify-content: center;
-            align-items: flex-end; /* Mobile slide up */
+            align-items: flex-end; /* Mobile: Starts from bottom */
         }
 
         @media (min-width: 768px) {
-            .modal-overlay { align-items: center; } /* Desktop center */
+            .modal-overlay { align-items: center; } /* Desktop: Centered */
         }
 
         .modal-content {
             background: #fff;
             width: 100%;
-            height: 95vh;
+            /* Fix for mobile height and header visibility */
+            height: 90vh; 
+            max-height: 100vh;
             max-width: 900px;
             border-radius: 20px 20px 0 0;
             display: flex;
@@ -207,6 +234,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0; /* Prevents header from shrinking */
+            gap: 15px;
         }
 
         .modal-title {
@@ -216,15 +245,15 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 80%;
+            flex-grow: 1;
         }
 
         .close-btn {
             background: #e74c3c;
             color: white;
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             font-size: 18px;
             font-weight: bold;
@@ -233,6 +262,7 @@
             justify-content: center;
             align-items: center;
             transition: background 0.2s;
+            flex-shrink: 0; /* Prevents button from being squished */
         }
 
         .close-btn:hover {
@@ -244,9 +274,10 @@
             overflow-y: auto;
             color: var(--text);
             -webkit-overflow-scrolling: touch;
+            flex-grow: 1;
         }
 
-        /* Markdown Styles */
+        /* Reading View Markdown Styles */
         .modal-body h1, .modal-body h2, .modal-body h3 {
             color: #2c3e50;
             margin-top: 1.5em;
@@ -265,29 +296,8 @@
             padding: 10px 15px;
             border-radius: 0 5px 5px 0;
         }
-        
-        /* Table Styles for Vocabulary */
-        .modal-body table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 0.9em;
-            display: block;
-            overflow-x: auto;
-        }
-        
-        .modal-body th, .modal-body td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        
-        .modal-body th {
-            background-color: #f2f2f2;
-            color: #2c3e50;
-        }
 
-        /* Urdu Text Styling */
+        /* Urdu Text Styling (Only used if Urdu remains in the body) */
         .urdu-text, [lang="ur"] {
             font-family: 'Noto Nastaliq Urdu', serif;
             direction: rtl;
@@ -335,7 +345,6 @@
 
     <script>
         // --- CONFIGURATION ---
-        // Your published CSV link
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
 
         // --- STATE MANAGEMENT ---
@@ -345,37 +354,90 @@
         const modalTitle = document.getElementById('modalTitle');
         const refreshBtn = document.getElementById('refreshBtn');
         
-        let essaysData = []; // Stores the fetched essays
-        let currentEssayIndex = null; // Tracks which essay is open
+        let essaysData = []; 
+        let currentEssayIndex = null; 
         let scrollSaveTimeout;
 
-        // --- DATA FETCHING ---
+        // --- DATA FETCHING & PARSING ---
         function loadEssays(forceRefresh = false) {
-            // Show loading state
             if (!forceRefresh && essaysData.length === 0) {
                 container.innerHTML = '<div class="loading">Loading essays...</div>';
             }
             refreshBtn.classList.add('loading');
 
-            // Add a cache-busting parameter to the URL to ensure fresh data on refresh
             const fetchUrl = forceRefresh ? csvUrl + '&t=' + new Date().getTime() : csvUrl;
 
             Papa.parse(fetchUrl, {
                 download: true,
-                header: false, // We will access columns by index
+                header: false, 
                 dynamicTyping: true,
                 complete: function(results) {
                     refreshBtn.classList.remove('loading');
-                    // Extract only Column B (Index 1). Skip the header row (index 0).
                     const rawRows = results.data.slice(1); 
                     
-                    // Filter out empty rows and map to our object structure
+                    // Process rows and extract relevant info
                     essaysData = rawRows
-                        .map((row, index) => ({
-                            id: index,
-                            markdown: row[1] ? String(row[1]).trim() : ''
-                        }))
-                        .filter(item => item.markdown !== '');
+                        .map((row, index) => {
+                            const fullMarkdown = row[1] ? String(row[1]).trim() : '';
+                            if (!fullMarkdown) return null;
+
+                            // 1. Extract Title
+                            let titleMatch = fullMarkdown.match(/^#\s+(.+)$/m);
+                            let title = titleMatch ? titleMatch[1].trim() : `Essay ${index + 1}`;
+
+                            // 2. Extract Card Meta (SR No, Date, Word Count, Classification)
+                            let srNoMatch = fullMarkdown.match(/\*\*SR No:\*\*\s*(.+)/);
+                            let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/);
+                            let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
+                            
+                            // Look for classification line
+                            let classMatch = fullMarkdown.match(/\*\*Primary Type:\*\*\s*(.+)/);
+                            
+                            let meta = {
+                                srNo: srNoMatch ? srNoMatch[1].trim() : '',
+                                date: dateMatch ? dateMatch[1].trim() : '',
+                                wordCount: wordCountMatch ? wordCountMatch[1].trim() : '',
+                                classification: classMatch ? classMatch[1].trim() : ''
+                            };
+
+                            // 3. Extract ONLY the Essay Body
+                            // We will split the text to remove everything before the first paragraph and everything after the Vocabulary section.
+                            
+                            let essayBody = fullMarkdown;
+                            
+                            // Remove the Title header line
+                            if (titleMatch) {
+                                essayBody = essayBody.replace(titleMatch[0], '');
+                            }
+                            
+                            // Remove SR No, Date, Word count, Classification, Outline sections
+                            essayBody = essayBody.replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '');
+                            essayBody = essayBody.replace(/\*\*Date:\*\*.*?(?=\n\n|\n---|$)/is, '');
+                            essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
+                            essayBody = essayBody.replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '');
+                            essayBody = essayBody.replace(/### Outline:[\s\S]*?(?=\n---)/i, '');
+                            
+                            // Remove anything after the Vocabulary section
+                            essayBody = essayBody.split(/### 📚 Vocabulary/i)[0];
+
+                            // Clean up extra dashes/newlines at the start
+                            essayBody = essayBody.replace(/^[\s-]+/, '').trim();
+
+                            // Create a clean preview text from the body
+                            const plainText = essayBody
+                                .replace(/[#*`>_|]/g, '') 
+                                .replace(/\n/g, ' ')      
+                                .substring(0, 200) + '...';
+
+                            return {
+                                id: index,
+                                title: title,
+                                meta: meta,
+                                bodyMarkdown: essayBody,
+                                previewText: plainText
+                            };
+                        })
+                        .filter(item => item !== null);
 
                     if (essaysData.length === 0) {
                         container.innerHTML = '<div class="error">No valid essay data found in Column B.</div>';
@@ -383,8 +445,6 @@
                     }
 
                     renderCards();
-                    
-                    // If a modal was previously open, try to restore it
                     restoreLastState();
                 },
                 error: function(error) {
@@ -394,30 +454,23 @@
             });
         }
 
-        // --- RENDERING ---
+        // --- RENDERING CARDS ---
         function renderCards() {
             container.innerHTML = ''; 
 
             essaysData.forEach((essay, index) => {
-                // Create a plain text preview by stripping Markdown
-                const plainText = essay.markdown
-                    .replace(/[#*`>_|]/g, '') // Remove markdown chars
-                    .replace(/\n/g, ' ')      // Replace newlines with spaces
-                    .substring(0, 200) + '...';
-                
-                // Try to extract a title from the first line of the markdown
-                let titleMatch = essay.markdown.match(/^#\s+(.+)$/m);
-                let cardTitle = titleMatch ? titleMatch[1] : `Essay ${index + 1}`;
-                
-                // Truncate title for the card
-                if (cardTitle.length > 60) cardTitle = cardTitle.substring(0, 60) + '...';
+                // Build the meta HTML (only adds elements if data exists)
+                let metaHtml = '';
+                if (essay.meta.srNo) metaHtml += `<span><strong>SR:</strong> ${essay.meta.srNo}</span>`;
+                if (essay.meta.date) metaHtml += `<span><strong>Date:</strong> ${essay.meta.date}</span>`;
+                if (essay.meta.wordCount) metaHtml += `<span><strong>Words:</strong> ${essay.meta.wordCount}</span>`;
+                if (essay.meta.classification) metaHtml += `<span><strong>Type:</strong> ${essay.meta.classification}</span>`;
 
                 const cardHTML = `
                     <div class="essay-card" onclick="openModal(${index})" id="card-${index}">
-                        <div class="card-preview">
-                            <strong style="color: #2c3e50; display: block; margin-bottom: 8px;">${cardTitle}</strong>
-                            ${plainText}
-                        </div>
+                        ${metaHtml ? `<div class="card-meta">${metaHtml}</div>` : ''}
+                        <div class="card-title">${essay.title}</div>
+                        <div class="card-preview">${essay.previewText}</div>
                         <div class="read-more">
                             Read Full Essay 
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -434,31 +487,28 @@
             if (!essaysData[index]) return;
             
             currentEssayIndex = index;
-            const rawMarkdown = essaysData[index].markdown;
+            const essay = essaysData[index];
             
-            // Parse Markdown to HTML
-            modalBody.innerHTML = marked.parse(rawMarkdown);
+            // Parse ONLY the body markdown into HTML
+            modalBody.innerHTML = marked.parse(essay.bodyMarkdown);
             
-            // Update Title
-            let titleMatch = rawMarkdown.match(/^#\s+(.+)$/m);
-            modalTitle.innerText = titleMatch ? titleMatch[1] : `Essay ${index + 1}`;
+            // Set ONLY the title in the header
+            modalTitle.innerText = essay.title;
             
             // Show Modal
             modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.style.overflow = 'hidden'; 
 
-            // Restore scroll position if it exists for this specific essay
+            // Restore scroll position
             const savedScroll = localStorage.getItem(`essay_scroll_${index}`);
             if (savedScroll) {
-                // Timeout ensures DOM is fully rendered before scrolling
                 setTimeout(() => {
                     modalBody.scrollTop = parseInt(savedScroll, 10);
                 }, 50);
             } else {
-                modalBody.scrollTop = 0; // Start at top for new essays
+                modalBody.scrollTop = 0; 
             }
 
-            // Save state to localStorage
             localStorage.setItem('last_open_essay', index);
         }
 
@@ -466,7 +516,6 @@
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
             
-            // Clear the "currently open" state, but keep the scroll position saved
             localStorage.removeItem('last_open_essay');
             currentEssayIndex = null;
         }
@@ -474,7 +523,6 @@
         // --- STATE PERSISTENCE ---
         function saveScrollPosition() {
             if (currentEssayIndex !== null) {
-                // Debounce the scroll saving to prevent performance issues
                 clearTimeout(scrollSaveTimeout);
                 scrollSaveTimeout = setTimeout(() => {
                     localStorage.setItem(`essay_scroll_${currentEssayIndex}`, modalBody.scrollTop);
@@ -483,40 +531,30 @@
         }
 
         function restoreLastState() {
-            // Check if we were reading an essay before reload
             const lastEssay = localStorage.getItem('last_open_essay');
             if (lastEssay !== null && essaysData[lastEssay]) {
-                // Reopen the modal for that essay
                 openModal(parseInt(lastEssay, 10));
             }
         }
 
         // --- REFRESH LOGIC ---
         function forceRefresh() {
-            // 1. Clear all saved states to ensure truly fresh data
             localStorage.clear();
-            
-            // 2. Close modal if open
             closeModal();
-            
-            // 3. Fetch fresh data
             loadEssays(true);
         }
 
         // --- EVENT LISTENERS ---
-        // Close modal on outside click
         window.onclick = function(event) {
             if (event.target === modal) closeModal();
         }
 
-        // Close modal on Escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape' && modal.style.display === 'flex') {
                 closeModal();
             }
         });
 
-        // Initial Load
         window.onload = () => loadEssays(false);
     </script>
 
