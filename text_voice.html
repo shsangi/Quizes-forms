@@ -59,7 +59,7 @@
       align-items: center;
       gap: 0.5rem;
       flex-wrap: wrap;
-      padding-right: 3.2rem; /* space for version badge on small screens */
+      padding-right: 3.2rem;
     }
     h1 span {
       background: #b7a9ff;
@@ -77,6 +77,51 @@
       padding-left: 0.75rem;
       line-height: 1.4;
     }
+
+    /* === NEW: preferences display under title === */
+    .prefs-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+      min-height: 1.8rem;
+      align-items: center;
+    }
+    .prefs-display:empty {
+      display: none;
+    }
+    .pref-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(124, 106, 255, 0.12);
+      border: 1px solid rgba(124, 106, 255, 0.35);
+      color: #cfc5ff;
+      padding: 0.25rem 0.7rem;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pref-pill .pref-label {
+      color: #9d92d6;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.6rem;
+      letter-spacing: 0.05em;
+    }
+    .pref-pill .pref-value {
+      color: #ece9ff;
+      font-weight: 600;
+    }
+    @media (min-width: 720px) {
+      .pref-pill { font-size: 0.78rem; padding: 0.3rem 0.85rem; }
+      .pref-pill .pref-label { font-size: 0.65rem; }
+    }
+
     textarea {
       width: 100%;
       background: rgba(10, 10, 20, 0.7);
@@ -96,7 +141,6 @@
       border-color: #8f7bff;
       box-shadow: 0 0 0 3px rgba(143, 123, 255, 0.2);
     }
-    /* reset row below textarea */
     .reset-row {
       display: flex;
       flex-wrap: wrap;
@@ -444,7 +488,6 @@
       padding-top: 1rem;
       line-height: 1.5;
     }
-    /* Toast for errors */
     .toast {
       position: fixed;
       bottom: 1.5rem;
@@ -467,15 +510,16 @@
 </head>
 <body>
 <div class="app-card">
-  <!-- version badge top-right -->
-  <div class="version-badge" aria-label="App version">v2.1.0</div>
+  <div class="version-badge" aria-label="App version">v2.2.0</div>
 
   <h1>📖 Reading Pace <span>smooth & natural</span></h1>
   <div class="subhead">Paste text → choose chunk size, voice & speed → hit play.</div>
 
-  <textarea id="inputText" placeholder="Paste or type your text here...">The quick brown fox jumps over the lazy dog. This web app reads text smoothly with adjustable chunk sizes and a natural voice. You can select male or female voices, filter by gender, and control the speaking rate for a comfortable listening experience.</textarea>
+  <!-- Preferences display under title -->
+  <div class="prefs-display" id="prefsDisplay"></div>
 
-  <!-- ===== RESET BUTTON + SYMBOL TOGGLE (below textarea) ===== -->
+  <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
+
   <div class="reset-row">
     <button class="btn-reset" id="resetBtn" title="Reset text and settings">↺ Reset</button>
     <label class="toggle-symbols" for="symbolToggle">
@@ -566,6 +610,9 @@
   (function() {
     'use strict';
 
+    // ===== STORAGE KEY =====
+    const STORAGE_KEY = 'readingPacePrefs_v2';
+
     const textarea = document.getElementById('inputText');
     const chunkChips = document.querySelectorAll('#chunkGroup .chip');
     const timingChips = document.querySelectorAll('#timingGroup .chip');
@@ -584,6 +631,7 @@
     const toast = document.getElementById('toast');
     const resetBtn = document.getElementById('resetBtn');
     const symbolToggle = document.getElementById('symbolToggle');
+    const prefsDisplay = document.getElementById('prefsDisplay');
 
     let currentChunkMode = '1';
     let currentDelayMs = 1000;
@@ -599,11 +647,129 @@
     let utterance = null;
     let voicesReady = false;
     let expandSymbols = false;
+    let savedVoiceName = null;
+    let savedVoiceLang = null;
 
     function showToast(msg, ms) {
       toast.textContent = msg;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), ms || 3000);
+    }
+
+    // ===== PREFERENCES DISPLAY =====
+    function updatePrefsDisplay() {
+      const pills = [];
+
+      // Chunk mode
+      const chunkLabels = {
+        '1': '1 word', '2': '2 words', '3': '3 words', '4': '4 words', '5': '5 words',
+        'sentence': 'Sentence', 'paragraph': 'Paragraph', 'full': 'Full text'
+      };
+      pills.push({ label: 'Chunk', value: chunkLabels[currentChunkMode] || currentChunkMode });
+
+      // Delay
+      const delaySec = (currentDelayMs / 1000).toFixed(1).replace(/\.0$/, '');
+      pills.push({ label: 'Delay', value: delaySec + 's' });
+
+      // Rate
+      pills.push({ label: 'Rate', value: speechRate.toFixed(2) + 'x' });
+
+      // Voice
+      let voiceVal = 'Default';
+      if (selectedVoice) {
+        const g = detectGender(selectedVoice);
+        const icon = g === 'female' ? '👩' : g === 'male' ? '👨' : '🎤';
+        // Shorten name
+        let vname = selectedVoice.name;
+        if (vname.length > 22) vname = vname.substring(0, 20) + '…';
+        voiceVal = `${icon} ${vname}`;
+      }
+      pills.push({ label: 'Voice', value: voiceVal });
+
+      // Gender filter
+      if (currentGenderFilter !== 'all') {
+        const gLabel = currentGenderFilter === 'female' ? '👩 Female' : '👨 Male';
+        pills.push({ label: 'Filter', value: gLabel });
+      }
+
+      // Symbols
+      pills.push({ label: 'Symbols', value: expandSymbols ? '🔣 On' : 'Off' });
+
+      prefsDisplay.innerHTML = pills.map(p =>
+        `<span class="pref-pill"><span class="pref-label">${p.label}</span> <span class="pref-value">${esc(p.value)}</span></span>`
+      ).join('');
+    }
+
+    // ===== SAVE PREFERENCES =====
+    function savePreferences() {
+      try {
+        const prefs = {
+          currentChunkMode,
+          currentDelayMs,
+          speechRate,
+          currentGenderFilter,
+          expandSymbols,
+          voiceName: selectedVoice ? selectedVoice.name : null,
+          voiceLang: selectedVoice ? selectedVoice.lang : null
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      } catch (e) { /* storage may be unavailable */ }
+    }
+
+    // ===== LOAD PREFERENCES =====
+    function loadPreferences() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const prefs = JSON.parse(raw);
+        if (!prefs || typeof prefs !== 'object') return false;
+
+        if (prefs.currentChunkMode) currentChunkMode = prefs.currentChunkMode;
+        if (typeof prefs.currentDelayMs === 'number') currentDelayMs = prefs.currentDelayMs;
+        if (typeof prefs.speechRate === 'number') speechRate = prefs.speechRate;
+        if (prefs.currentGenderFilter) currentGenderFilter = prefs.currentGenderFilter;
+        if (typeof prefs.expandSymbols === 'boolean') expandSymbols = prefs.expandSymbols;
+        if (prefs.voiceName) savedVoiceName = prefs.voiceName;
+        if (prefs.voiceLang) savedVoiceLang = prefs.voiceLang;
+
+        return true;
+      } catch (e) { return false; }
+    }
+
+    // ===== APPLY PREFERENCES TO UI =====
+    function applyPrefsToUI() {
+      // Chunk chips
+      chunkChips.forEach(c => {
+        c.classList.toggle('active', c.dataset.chunk === currentChunkMode);
+      });
+
+      // Delay chips
+      const delaySec = currentDelayMs / 1000;
+      let matchedTiming = false;
+      timingChips.forEach(c => {
+        const d = parseFloat(c.dataset.delay);
+        if (Math.abs(d - delaySec) < 0.01) {
+          c.classList.add('active');
+          matchedTiming = true;
+        } else {
+          c.classList.remove('active');
+        }
+      });
+      customDelayInput.value = delaySec;
+
+      // Rate
+      rateSlider.value = speechRate;
+      rateValue.textContent = speechRate.toFixed(2) + 'x';
+
+      // Gender radio
+      genderRadios.forEach(r => {
+        r.checked = (r.value === currentGenderFilter);
+      });
+
+      // Symbol toggle
+      symbolToggle.checked = expandSymbols;
+
+      updatePrefsDisplay();
     }
 
     const femaleKeywords = ['female', 'woman', 'girl', 'samantha', 'victoria', 'karen', 'moira', 'tessa',
@@ -625,7 +791,7 @@
       return 'unknown';
     }
 
-    // ===== VOICE LOADING (mobile-safe) =====
+    // ===== VOICE LOADING =====
     function loadVoices() {
       if (!('speechSynthesis' in window)) {
         voiceSelect.innerHTML = '<option value="">Speech not supported</option>';
@@ -668,6 +834,7 @@
         opt.disabled = true;
         voiceSelect.appendChild(opt);
         selectedVoice = null;
+        updatePrefsDisplay();
         return;
       }
 
@@ -685,7 +852,19 @@
         voiceSelect.appendChild(opt);
       });
 
-      if (selectedVoice) {
+      // Try to restore saved voice
+      if (savedVoiceName && savedVoiceLang) {
+        const idx = filteredVoices.findIndex(v =>
+          v.name === savedVoiceName && v.lang === savedVoiceLang);
+        if (idx >= 0) {
+          selectedVoice = filteredVoices[idx];
+          voiceSelect.value = idx;
+        } else {
+          savedVoiceName = null;
+          savedVoiceLang = null;
+          autoSelectBest();
+        }
+      } else if (selectedVoice) {
         const idx = filteredVoices.findIndex(v =>
           v.name === selectedVoice.name && v.lang === selectedVoice.lang);
         if (idx >= 0) voiceSelect.value = idx;
@@ -693,10 +872,11 @@
       } else {
         autoSelectBest();
       }
+      updatePrefsDisplay();
     }
 
     function autoSelectBest() {
-      if (!filteredVoices.length) { selectedVoice = null; return; }
+      if (!filteredVoices.length) { selectedVoice = null; updatePrefsDisplay(); return; }
       const best = filteredVoices.find(v => v.lang.startsWith('en') && /natural|neural/i.test(v.name))
         || filteredVoices.find(v => v.lang.startsWith('en'))
         || filteredVoices[0];
@@ -704,6 +884,7 @@
         selectedVoice = best;
         voiceSelect.value = filteredVoices.indexOf(best);
       }
+      updatePrefsDisplay();
     }
 
     function kickOffVoiceLoading() {
@@ -730,15 +911,9 @@
 
     kickOffVoiceLoading();
 
-    voiceSelect.addEventListener('focus', () => {
-      if (!voicesReady) kickOffVoiceLoading();
-    });
-    voiceSelect.addEventListener('mousedown', () => {
-      if (!voicesReady) kickOffVoiceLoading();
-    });
-    voiceSelect.addEventListener('touchstart', () => {
-      if (!voicesReady) kickOffVoiceLoading();
-    }, { passive: true });
+    voiceSelect.addEventListener('focus', () => { if (!voicesReady) kickOffVoiceLoading(); });
+    voiceSelect.addEventListener('mousedown', () => { if (!voicesReady) kickOffVoiceLoading(); });
+    voiceSelect.addEventListener('touchstart', () => { if (!voicesReady) kickOffVoiceLoading(); }, { passive: true });
 
     voiceSelect.addEventListener('change', () => {
       const val = voiceSelect.value;
@@ -747,6 +922,8 @@
         const idx = parseInt(val, 10);
         if (!isNaN(idx) && filteredVoices[idx]) selectedVoice = filteredVoices[idx];
       }
+      savePreferences();
+      updatePrefsDisplay();
       if (isPlaying && currentIndex < chunks.length) {
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
@@ -757,7 +934,10 @@
       r.addEventListener('change', e => {
         currentGenderFilter = e.target.value;
         selectedVoice = null;
+        savedVoiceName = null;
+        savedVoiceLang = null;
         buildVoiceDropdown();
+        savePreferences();
         if (isPlaying && currentIndex < chunks.length) {
           if ('speechSynthesis' in window) window.speechSynthesis.cancel();
           if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
@@ -768,52 +948,21 @@
     rateSlider.addEventListener('input', e => {
       speechRate = parseFloat(e.target.value);
       rateValue.textContent = speechRate.toFixed(2) + 'x';
+      updatePrefsDisplay();
     });
+    rateSlider.addEventListener('change', savePreferences);
 
     // ===== SYMBOL EXPANSION MAP =====
     const symbolMap = {
-      '.': 'full-stop',
-      ',': 'comma',
-      '!': 'exclamation mark',
-      '?': 'question mark',
-      ';': 'semicolon',
-      ':': 'colon',
-      '-': 'hyphen',
-      '—': 'em dash',
-      '–': 'en dash',
-      '(': 'open parenthesis',
-      ')': 'close parenthesis',
-      '[': 'open bracket',
-      ']': 'close bracket',
-      '{': 'open brace',
-      '}': 'close brace',
-      '"': 'quotation mark',
-      "'": 'apostrophe',
-      '…': 'ellipsis',
-      '/': 'slash',
-      '\\': 'backslash',
-      '&': 'ampersand',
-      '*': 'asterisk',
-      '+': 'plus',
-      '=': 'equals',
-      '<': 'less than',
-      '>': 'greater than',
-      '@': 'at sign',
-      '#': 'hash',
-      '$': 'dollar sign',
-      '%': 'percent',
-      '^': 'caret',
-      '~': 'tilde',
-      '|': 'pipe',
-      '·': 'middle dot',
-      '•': 'bullet',
-      '©': 'copyright',
-      '®': 'registered',
-      '™': 'trademark',
-      '°': 'degree',
-      '±': 'plus minus',
-      '×': 'multiplication',
-      '÷': 'division'
+      '.': 'full-stop', ',': 'comma', '!': 'exclamation mark', '?': 'question mark',
+      ';': 'semicolon', ':': 'colon', '-': 'hyphen', '—': 'em dash', '–': 'en dash',
+      '(': 'open parenthesis', ')': 'close parenthesis', '[': 'open bracket', ']': 'close bracket',
+      '{': 'open brace', '}': 'close brace', '"': 'quotation mark', "'": 'apostrophe',
+      '…': 'ellipsis', '/': 'slash', '\\': 'backslash', '&': 'ampersand', '*': 'asterisk',
+      '+': 'plus', '=': 'equals', '<': 'less than', '>': 'greater than', '@': 'at sign',
+      '#': 'hash', '$': 'dollar sign', '%': 'percent', '^': 'caret', '~': 'tilde',
+      '|': 'pipe', '·': 'middle dot', '•': 'bullet', '©': 'copyright', '®': 'registered',
+      '™': 'trademark', '°': 'degree', '±': 'plus minus', '×': 'multiplication', '÷': 'division'
     };
 
     function expandSymbolsInText(text) {
@@ -821,16 +970,13 @@
       const symbols = Object.keys(symbolMap);
       const escaped = symbols.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       const regex = new RegExp(escaped.join('|'), 'g');
-      return text.replace(regex, (match) => {
-        return ' ' + symbolMap[match] + ' ';
-      });
+      return text.replace(regex, (match) => ' ' + symbolMap[match] + ' ');
     }
 
     // ===== CHUNKING =====
     function splitIntoChunks(text, mode) {
       const trimmed = text.trim();
       if (!trimmed) return [];
-      
       const processed = expandSymbols ? expandSymbolsInText(trimmed) : trimmed;
       const normalized = processed.replace(/\s+/g, ' ').trim();
 
@@ -941,9 +1087,7 @@
         showToast('Your browser does not support speech synthesis');
         return;
       }
-      if (!voicesReady) {
-        loadVoices();
-      }
+      if (!voicesReady) loadVoices();
       if (!chunks.length || currentIndex >= chunks.length) rebuildChunks();
       if (!chunks.length) { showToast('Please enter some text first'); return; }
       if (currentIndex >= chunks.length) currentIndex = 0;
@@ -967,6 +1111,8 @@
         currentChunkMode = mode;
         if (isPlaying) stopReading(true);
         rebuildChunks();
+        savePreferences();
+        updatePrefsDisplay();
       });
     });
 
@@ -979,6 +1125,8 @@
         chip.classList.add('active');
         currentDelayMs = sec * 1000;
         customDelayInput.value = sec;
+        savePreferences();
+        updatePrefsDisplay();
         if (isPlaying) {
           const keep = currentIndex;
           stopReading(false);
@@ -995,6 +1143,8 @@
       customDelayInput.value = v;
       currentDelayMs = v * 1000;
       timingChips.forEach(c => c.classList.remove('active'));
+      savePreferences();
+      updatePrefsDisplay();
       if (isPlaying) {
         const keep = currentIndex;
         stopReading(false);
@@ -1016,13 +1166,15 @@
       expandSymbols = e.target.checked;
       if (isPlaying) stopReading(true);
       rebuildChunks();
+      savePreferences();
+      updatePrefsDisplay();
     });
 
     // ===== RESET BUTTON =====
     resetBtn.addEventListener('click', () => {
       if (isPlaying) stopReading(true);
 
-      // Reset text
+      // Clear text
       textarea.value = '';
 
       // Reset chunk mode
@@ -1045,22 +1197,31 @@
       currentGenderFilter = 'all';
       genderRadios.forEach(r => { if (r.value === 'all') r.checked = true; });
       selectedVoice = null;
+      savedVoiceName = null;
+      savedVoiceLang = null;
       buildVoiceDropdown();
 
       // Reset symbol toggle
       symbolToggle.checked = false;
       expandSymbols = false;
 
-      // Rebuild with empty text
+      // Clear storage
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+
       rebuildChunks();
+      updatePrefsDisplay();
 
       showToast('↺ Reset complete');
     });
 
     // ===== INIT =====
     (function init() {
-      rateSlider.value = speechRate;
-      rateValue.textContent = speechRate.toFixed(2) + 'x';
+      // Load saved preferences first
+      const hadPrefs = loadPreferences();
+      applyPrefsToUI();
+
+      // Clear initial textarea content (user requested no initial messages)
+      textarea.value = '';
 
       if (!('speechSynthesis' in window)) {
         statusText.textContent = 'No speech support';
@@ -1073,10 +1234,15 @@
 
       rebuildChunks();
       stopBtn.disabled = true;
+
+      if (hadPrefs) {
+        showToast('✓ Preferences restored', 2000);
+      }
     })();
 
     window.addEventListener('beforeunload', () => {
       if (timeoutId) clearTimeout(timeoutId);
+      savePreferences();
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     });
 
