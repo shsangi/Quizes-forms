@@ -18,6 +18,7 @@
       padding: 0.75rem;
     }
     .app-card {
+      position: relative;
       max-width: 980px;
       width: 100%;
       background: rgba(255, 255, 255, 0.04);
@@ -27,6 +28,26 @@
       padding: 1.25rem 1.25rem 1.75rem;
       box-shadow: 0 30px 45px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    /* Version badge */
+    .version-badge {
+      position: absolute;
+      top: 0.85rem;
+      right: 1rem;
+      font-size: 0.65rem;
+      color: #8d87b0;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid #3a365a;
+      padding: 0.15rem 0.55rem;
+      border-radius: 100px;
+      letter-spacing: 0.03em;
+      font-weight: 500;
+      pointer-events: none;
+      user-select: none;
+      z-index: 5;
+    }
+    @media (min-width: 720px) {
+      .version-badge { top: 1.1rem; right: 1.4rem; font-size: 0.72rem; padding: 0.2rem 0.7rem; }
     }
     h1 {
       font-size: 1.5rem;
@@ -38,6 +59,7 @@
       align-items: center;
       gap: 0.5rem;
       flex-wrap: wrap;
+      padding-right: 3.2rem; /* space for version badge on small screens */
     }
     h1 span {
       background: #b7a9ff;
@@ -68,12 +90,95 @@
       min-height: 110px;
       outline: none;
       font-family: inherit;
-      margin-bottom: 1.2rem;
+      margin-bottom: 0.75rem;
     }
     textarea:focus {
       border-color: #8f7bff;
       box-shadow: 0 0 0 3px rgba(143, 123, 255, 0.2);
     }
+    /* reset row below textarea */
+    .reset-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.2rem;
+      justify-content: space-between;
+    }
+    .btn-reset {
+      background: #2f2b46;
+      border: 1px solid #5b527a;
+      border-radius: 3rem;
+      padding: 0.6rem 1.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #ece9ff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      transition: 0.1s;
+      flex: 0 0 auto;
+    }
+    .btn-reset:active { transform: scale(0.97); background: #3e3860; }
+    .toggle-symbols {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #26233a;
+      border: 1px solid #423e62;
+      border-radius: 3rem;
+      padding: 0.3rem 0.8rem 0.3rem 0.5rem;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.8rem;
+      color: #d7d2f0;
+      font-weight: 500;
+      transition: 0.1s;
+    }
+    .toggle-symbols:hover { background: #302c48; }
+    .toggle-symbols input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 38px;
+      height: 22px;
+      background: #3a3558;
+      border-radius: 100px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: 1px solid #57507b;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .toggle-symbols input[type="checkbox"]::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #b7adf0;
+      border-radius: 50%;
+      top: 1px;
+      left: 1px;
+      transition: transform 0.2s, background 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .toggle-symbols input[type="checkbox"]:checked {
+      background: #7c6aff;
+      border-color: #b3a6ff;
+    }
+    .toggle-symbols input[type="checkbox"]:checked::after {
+      transform: translateX(16px);
+      background: #ffffff;
+    }
+    .toggle-symbols .label-text {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
     .controls-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -82,7 +187,7 @@
     }
     @media (min-width: 720px) {
       .app-card { padding: 2rem 2rem 2.5rem; border-radius: 2.5rem; }
-      h1 { font-size: 2rem; }
+      h1 { font-size: 2rem; padding-right: 4.5rem; }
       h1 span { font-size: 1rem; padding: 0.2rem 1rem; }
       .controls-grid { grid-template-columns: 1fr 1fr; gap: 2rem 1.5rem; }
     }
@@ -362,10 +467,22 @@
 </head>
 <body>
 <div class="app-card">
+  <!-- version badge top-right -->
+  <div class="version-badge" aria-label="App version">v2.1.0</div>
+
   <h1>📖 Reading Pace <span>smooth & natural</span></h1>
   <div class="subhead">Paste text → choose chunk size, voice & speed → hit play.</div>
 
   <textarea id="inputText" placeholder="Paste or type your text here...">The quick brown fox jumps over the lazy dog. This web app reads text smoothly with adjustable chunk sizes and a natural voice. You can select male or female voices, filter by gender, and control the speaking rate for a comfortable listening experience.</textarea>
+
+  <!-- ===== RESET BUTTON + SYMBOL TOGGLE (below textarea) ===== -->
+  <div class="reset-row">
+    <button class="btn-reset" id="resetBtn" title="Reset text and settings">↺ Reset</button>
+    <label class="toggle-symbols" for="symbolToggle">
+      <input type="checkbox" id="symbolToggle">
+      <span class="label-text">🔣 Read symbols as words <span style="font-size:0.7rem;opacity:0.7;">(full-stop, comma...)</span></span>
+    </label>
+  </div>
 
   <div class="controls-grid">
     <div class="control-panel">
@@ -465,6 +582,8 @@
     const rateValue = document.getElementById('rateValue');
     const genderRadios = document.querySelectorAll('input[name="gender"]');
     const toast = document.getElementById('toast');
+    const resetBtn = document.getElementById('resetBtn');
+    const symbolToggle = document.getElementById('symbolToggle');
 
     let currentChunkMode = '1';
     let currentDelayMs = 1000;
@@ -479,6 +598,7 @@
     let timeoutId = null;
     let utterance = null;
     let voicesReady = false;
+    let expandSymbols = false;
 
     function showToast(msg, ms) {
       toast.textContent = msg;
@@ -515,8 +635,8 @@
       }
 
       const voices = window.speechSynthesis.getVoices();
-      if (!voices || voices.length === 0) return; // Not ready yet
-      if (voicesReady && voices.length === allVoices.length) return; // Already loaded same set
+      if (!voices || voices.length === 0) return;
+      if (voicesReady && voices.length === allVoices.length) return;
 
       allVoices = voices;
       voicesReady = true;
@@ -524,13 +644,11 @@
     }
 
     function buildVoiceDropdown() {
-      // Apply gender filter
       filteredVoices = allVoices.filter(voice => {
         if (currentGenderFilter === 'all') return true;
         return detectGender(voice) === currentGenderFilter;
       });
 
-      // Sort English first
       filteredVoices.sort((a, b) => {
         const aEn = a.lang.startsWith('en');
         const bEn = b.lang.startsWith('en');
@@ -567,7 +685,6 @@
         voiceSelect.appendChild(opt);
       });
 
-      // Restore or auto-select
       if (selectedVoice) {
         const idx = filteredVoices.findIndex(v =>
           v.name === selectedVoice.name && v.lang === selectedVoice.lang);
@@ -589,19 +706,14 @@
       }
     }
 
-    // Try loading voices several ways
     function kickOffVoiceLoading() {
       if (!('speechSynthesis' in window)) return;
-      // Immediate attempt
       loadVoices();
-      // Some browsers need a slight delay
       setTimeout(loadVoices, 100);
       setTimeout(loadVoices, 300);
       setTimeout(loadVoices, 800);
       setTimeout(loadVoices, 1500);
-      // The proper event
       window.speechSynthesis.onvoiceschanged = loadVoices;
-      // Also poll briefly
       let polls = 0;
       const poll = setInterval(() => {
         loadVoices();
@@ -609,7 +721,6 @@
       }, 400);
     }
 
-    // Trigger voice loading on many possible first-interaction events
     ['click', 'touchstart', 'keydown', 'pointerdown'].forEach(evt => {
       document.addEventListener(evt, function once() {
         kickOffVoiceLoading();
@@ -617,10 +728,8 @@
       }, { once: true, passive: true });
     });
 
-    // Also try immediately
     kickOffVoiceLoading();
 
-    // When user clicks select but voices not loaded, try again
     voiceSelect.addEventListener('focus', () => {
       if (!voicesReady) kickOffVoiceLoading();
     });
@@ -631,7 +740,6 @@
       if (!voicesReady) kickOffVoiceLoading();
     }, { passive: true });
 
-    // ===== VOICE SELECT CHANGE =====
     voiceSelect.addEventListener('change', () => {
       const val = voiceSelect.value;
       if (val === '') selectedVoice = null;
@@ -645,7 +753,6 @@
       }
     });
 
-    // ===== GENDER FILTER =====
     genderRadios.forEach(r => {
       r.addEventListener('change', e => {
         currentGenderFilter = e.target.value;
@@ -663,19 +770,79 @@
       rateValue.textContent = speechRate.toFixed(2) + 'x';
     });
 
+    // ===== SYMBOL EXPANSION MAP =====
+    const symbolMap = {
+      '.': 'full-stop',
+      ',': 'comma',
+      '!': 'exclamation mark',
+      '?': 'question mark',
+      ';': 'semicolon',
+      ':': 'colon',
+      '-': 'hyphen',
+      '—': 'em dash',
+      '–': 'en dash',
+      '(': 'open parenthesis',
+      ')': 'close parenthesis',
+      '[': 'open bracket',
+      ']': 'close bracket',
+      '{': 'open brace',
+      '}': 'close brace',
+      '"': 'quotation mark',
+      "'": 'apostrophe',
+      '…': 'ellipsis',
+      '/': 'slash',
+      '\\': 'backslash',
+      '&': 'ampersand',
+      '*': 'asterisk',
+      '+': 'plus',
+      '=': 'equals',
+      '<': 'less than',
+      '>': 'greater than',
+      '@': 'at sign',
+      '#': 'hash',
+      '$': 'dollar sign',
+      '%': 'percent',
+      '^': 'caret',
+      '~': 'tilde',
+      '|': 'pipe',
+      '·': 'middle dot',
+      '•': 'bullet',
+      '©': 'copyright',
+      '®': 'registered',
+      '™': 'trademark',
+      '°': 'degree',
+      '±': 'plus minus',
+      '×': 'multiplication',
+      '÷': 'division'
+    };
+
+    function expandSymbolsInText(text) {
+      if (!expandSymbols) return text;
+      const symbols = Object.keys(symbolMap);
+      const escaped = symbols.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      const regex = new RegExp(escaped.join('|'), 'g');
+      return text.replace(regex, (match) => {
+        return ' ' + symbolMap[match] + ' ';
+      });
+    }
+
     // ===== CHUNKING =====
     function splitIntoChunks(text, mode) {
       const trimmed = text.trim();
       if (!trimmed) return [];
+      
+      const processed = expandSymbols ? expandSymbolsInText(trimmed) : trimmed;
+      const normalized = processed.replace(/\s+/g, ' ').trim();
+
       if (mode === 'sentence') {
-        return trimmed.split(/(?<=[.!?])\s+/).filter(s => s.trim()).map((s, i) => ({ text: s.trim(), index: i }));
+        return normalized.split(/(?<=[.!?])\s+/).filter(s => s.trim()).map((s, i) => ({ text: s.trim(), index: i }));
       }
       if (mode === 'paragraph') {
-        return trimmed.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map((p, i) => ({ text: p, index: i }));
+        return normalized.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map((p, i) => ({ text: p, index: i }));
       }
-      if (mode === 'full') return [{ text: trimmed, index: 0 }];
+      if (mode === 'full') return [{ text: normalized, index: 0 }];
       const size = parseInt(mode, 10);
-      const words = trimmed.split(/\s+/);
+      const words = normalized.split(/\s+/);
       const out = [];
       for (let i = 0; i < words.length; i += size) {
         const w = words.slice(i, i + size);
@@ -724,7 +891,6 @@
       utterance.pitch = 1;
       utterance.volume = 1;
       if (selectedVoice) utterance.voice = selectedVoice;
-      // Slight delay helps on some mobile browsers
       setTimeout(() => {
         try { window.speechSynthesis.speak(utterance); } catch (e) {}
       }, 40);
@@ -775,7 +941,6 @@
         showToast('Your browser does not support speech synthesis');
         return;
       }
-      // Ensure voices loaded (needed on mobile)
       if (!voicesReady) {
         loadVoices();
       }
@@ -846,6 +1011,52 @@
       rebuildChunks();
     });
 
+    // ===== SYMBOL TOGGLE =====
+    symbolToggle.addEventListener('change', (e) => {
+      expandSymbols = e.target.checked;
+      if (isPlaying) stopReading(true);
+      rebuildChunks();
+    });
+
+    // ===== RESET BUTTON =====
+    resetBtn.addEventListener('click', () => {
+      if (isPlaying) stopReading(true);
+
+      // Reset text
+      textarea.value = '';
+
+      // Reset chunk mode
+      currentChunkMode = '1';
+      chunkChips.forEach(c => c.classList.remove('active'));
+      document.querySelector('#chunkGroup .chip[data-chunk="1"]').classList.add('active');
+
+      // Reset delay
+      currentDelayMs = 1000;
+      timingChips.forEach(c => c.classList.remove('active'));
+      document.querySelector('#timingGroup .chip[data-delay="1"]').classList.add('active');
+      customDelayInput.value = '1.0';
+
+      // Reset rate
+      speechRate = 0.95;
+      rateSlider.value = speechRate;
+      rateValue.textContent = speechRate.toFixed(2) + 'x';
+
+      // Reset gender filter
+      currentGenderFilter = 'all';
+      genderRadios.forEach(r => { if (r.value === 'all') r.checked = true; });
+      selectedVoice = null;
+      buildVoiceDropdown();
+
+      // Reset symbol toggle
+      symbolToggle.checked = false;
+      expandSymbols = false;
+
+      // Rebuild with empty text
+      rebuildChunks();
+
+      showToast('↺ Reset complete');
+    });
+
     // ===== INIT =====
     (function init() {
       rateSlider.value = speechRate;
@@ -857,7 +1068,6 @@
         rateSlider.disabled = true;
         showToast('Speech synthesis not supported in this browser', 5000);
       } else {
-        // Kick off loading immediately and after user gestures
         kickOffVoiceLoading();
       }
 
