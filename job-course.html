@@ -916,7 +916,7 @@
             </div>
         </div>
 
-        <!-- GLOBAL SEARCH BAR (placed above status line per request) -->
+        <!-- GLOBAL SEARCH BAR (above status line) -->
         <div class="global-search-bar">
             <i class="fas fa-search"></i>
             <input type="text" id="globalSearchInput" placeholder="Search all columns (srno, subject, topic, job, notes...) — case‑insensitive" autocomplete="off" spellcheck="false">
@@ -1085,9 +1085,6 @@
             let subjectCounts = {};
             let mainTopicCounts = {};
 
-            /* ============================================
-               SUBJECT COVERAGE — scoped to active job(s)
-               ============================================ */
             let subjectCoverageScoped = {};
 
             let toastTimer = null;
@@ -1209,7 +1206,6 @@
             function matchesGlobalSearch(item, term) {
                 if (!term || term.trim() === '') return true;
                 const q = term.toLowerCase().trim();
-                // Search across all relevant string fields, case-insensitive
                 const fields = [
                     String(item.srno),
                     String(item.subject),
@@ -1219,7 +1215,7 @@
                     String(item.displayTopic),
                     String(item.job),
                     String(item.lastUpdate),
-                    String(item.markdownNotes).substring(0, 500), // limit to 500 chars for performance
+                    String(item.markdownNotes).substring(0, 500),
                     String(item.url),
                     String(item.solFileName)
                 ];
@@ -2301,10 +2297,11 @@ Correct answer as per choices`;
                 const topicOptions = Array.from(topics).sort().map(t => ({ value: t, label: t }));
                 const jobOptions = Array.from(jobs).sort().map(j => ({ value: j, label: j }));
 
+                // ★★★ SUBJECT DROPDOWN NOW HAS SEARCH ENABLED (last arg = true) ★★★
                 const subjectWrap = document.getElementById('subjectMultiWrap');
                 subjectWrap.dataset.type = 'subjects';
                 if (!rebuildSubjectSelect) {
-                    rebuildSubjectSelect = buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, onFilterChange, false);
+                    rebuildSubjectSelect = buildMultiSelect(subjectWrap, subjectOptions, selectedSubjects, onFilterChange, true);
                 } else {
                     rebuildSubjectSelect(subjectOptions);
                 }
@@ -2511,7 +2508,6 @@ Correct answer as per choices`;
                 cbCovered.classList.toggle('checked', selectedStatuses.has('covered'));
                 cbPending.classList.toggle('checked', selectedStatuses.has('pending'));
 
-                // Set global search from storage
                 if (globalSearchTerm) {
                     globalSearchInput.value = globalSearchTerm;
                 }
