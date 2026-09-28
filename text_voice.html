@@ -778,3 +778,153 @@
     // ===== START =====
     function startReading() {
       if (isPlaying) return;
+      if (!('speechSynthesis' in window)) {
+        showToast('Your browser does not support speech synthesis');
+        return;
+      }
+      if (!voicesReady) loadVoices();
+      if (!chunks.length || currentIndex >= chunks.length) rebuildChunks();
+      if (!chunks.length) { showToast('Please enter some text first'); return; }
+      if (currentIndex >= chunks.length) currentIndex = 0;
+
+      isPlaying = true;
+      playBtn.disabled = true;
+      stopBtn.disabled = false;
+      statusDot.classList.remove('inactive');
+      statusText.textContent = 'Reading...';
+      if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
+      readNextChunk();
+    }
+
+    // ===== CHUNK CHIPS =====
+    chunkChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const mode = chip.dataset.chunk;
+        if (mode === currentChunkMode) return;
+        chunkChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentChunkMode = mode;
+        if (isPlaying) stopReading(true);
+        rebuildChunks();
+      });
+    });
+
+    // ===== TIMING CHIPS =====
+    timingChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const sec = parseFloat(chip.dataset.delay);
+        if (isNaN(sec)) return;
+        timingChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentDelayMs = sec * 1000;
+        customDelayInput.value = sec;
+        if (isPlaying) {
+          const keep = currentIndex;
+          stopReading(false);
+          currentIndex = keep;
+          startReading();
+        }
+      });
+    });
+
+    applyCustomBtn.addEventListener('click', () => {
+      let v = parseFloat(customDelayInput.value);
+      if (isNaN(v) || v < 0) v = 0;
+      if (v > 60) v = 60;
+      customDelayInput.value = v;
+      currentDelayMs = v * 1000;
+      timingChips.forEach(c => c.classList.remove('active'));
+      if (isPlaying) {
+        const keep = currentIndex;
+        stopReading(false);
+        currentIndex = keep;
+        startReading();
+      }
+    });
+
+    // ===== RESET TO NORMAL =====
+    resetBtn.addEventListener('click', () => {
+      // Stop any current playback
+      if (isPlaying) stopReading(true);
+
+      // 1. Chunk mode -> sentence (natural reading unit)
+      currentChunkMode = NORMAL.chunk;
+      chunkChips.forEach(c => {
+        c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk);
+      });
+
+      // 2. Delay -> 0s
+      currentDelayMs = NORMAL.delaySec * 1000;
+      customDelayInput.value = NORMAL.delaySec;
+      timingChips.forEach(c => {
+        c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec);
+      });
+
+      // 3. Rate -> 1.0x
+      speechRate = NORMAL.rate;
+      rateSlider.value = speechRate;
+      rateValue.textContent = speechRate.toFixed(2) + 'x';
+
+      // 4. Gender filter -> All
+      currentGenderFilter = NORMAL.gender;
+      genderRadios.forEach(r => {
+        r.checked = (r.value === NORMAL.gender);
+      });
+
+      // 5. Voice -> best natural voice
+      selectedVoice = null;
+      buildVoiceDropdown();   // autoSelectBest() will pick natural voice
+
+      // 6. Rebuild chunks
+      rebuildChunks();
+
+      statusText.textContent = 'Normal';
+      showToast('✅ Reset to normal reading (sentence · 0s · 1.0x)', 2800, 'success');
+    });
+
+    playBtn.addEventListener('click', startReading);
+    stopBtn.addEventListener('click', () => stopReading(true));
+
+    textarea.addEventListener('input', () => {
+      if (isPlaying) stopReading(true);
+      rebuildChunks();
+    });
+
+    // ===== INIT =====
+    (function init() {
+      // Apply NORMAL defaults visually
+      chunkChips.forEach(c => {
+        c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk);
+      });
+      timingChips.forEach(c => {
+        c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec);
+      });
+      genderRadios.forEach(r => {
+        r.checked = (r.value === NORMAL.gender);
+      });
+      rateSlider.value = NORMAL.rate;
+      rateValue.textContent = NORMAL.rate.toFixed(2) + 'x';
+      customDelayInput.value = NORMAL.delaySec;
+
+      if (!('speechSynthesis' in window)) {
+        statusText.textContent = 'No speech support';
+        voiceSelect.disabled = true;
+        rateSlider.disabled = true;
+        showToast('Speech synthesis not supported in this browser', 5000);
+      } else {
+        kickOffVoiceLoading();
+      }
+
+      rebuildChunks();
+      stopBtn.disabled = true;
+    })();
+
+    window.addEventListener('beforeunload', () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    });
+
+  })();
+</script>
+</body>
+</html>
