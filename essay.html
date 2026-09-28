@@ -8,8 +8,8 @@
     <!-- 1. Load Marked.js (converts Markdown to HTML) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
-    <!-- 2. Load SheetJS (reads Excel .xlsx files) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- 2. Load PapaParse (reads CSV files easily) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
         body {
@@ -52,6 +52,8 @@
         /* Styles for the Markdown content */
         .essay-content h1, .essay-content h2, .essay-content h3 {
             color: #2c3e50;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
         }
         .essay-content blockquote {
             border-left: 4px solid #3498db;
@@ -61,6 +63,9 @@
             font-style: italic;
             background: #f9f9f9;
             padding: 10px 15px;
+        }
+        .essay-content p {
+            margin-bottom: 1em;
         }
         .loading {
             text-align: center;
@@ -87,87 +92,72 @@
     </div>
 
     <script>
-        // Your original Google Sheets URL
-        const rawUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=xlsx';
-        
-        // We must use a CORS proxy to allow the browser to fetch the Excel file from Google
-        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(rawUrl);
+        // Your exact published CSV link
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
 
         const container = document.getElementById('essays-container');
 
-        async function loadEssays() {
-            try {
-                // Fetch the file through the proxy
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error("Network response was not ok");
-                
-                // Get the raw binary data
-                const arrayBuffer = await response.arrayBuffer();
-                
-                // Parse the Excel file using SheetJS
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                
-                // Get the first sheet
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                // Convert the sheet data to JSON
-                const data = XLSX.utils.sheet_to_json(worksheet);
-                
-                renderEssays(data);
-                
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = `<div class="error">Error loading data. Please check the browser console for details. <br><br>Note: If you are opening this file directly from your computer (file://), your browser might block the request. Try using a local server or upload this HTML file to a website.</div>`;
-            }
+        // Function to fetch and display data
+        function loadEssays() {
+            Papa.parse(csvUrl, {
+                download: true,
+                header: true, // Treats the first row as headers (srno, essay_markdown, date)
+                dynamicTyping: true,
+                complete: function(results) {
+                    renderEssays(results.data);
+                },
+                error: function(error) {
+                    container.innerHTML = `<div class="error">Error loading data: ${error.message}. Ensure the URL is correct and published to the web.</div>`;
+                }
+            });
         }
 
+        // Function to render the essays to the HTML
         function renderEssays(data) {
             container.innerHTML = ''; // Clear loading message
 
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div class="error">No data found in the spreadsheet.</div>';
+            // Filter out empty rows and check for the essay column
+            const validData = data.filter(row => row.essay_markdown && row.essay_markdown.trim() !== '');
+
+            if (validData.length === 0) {
+                container.innerHTML = '<div class="error">No valid essay data found. Please check that your column header is exactly "essay_markdown" and contains data.</div>';
                 return;
             }
 
-            // Map through the rows. Ensure your headers exactly match: srno, essay_markdown, date
-            data.forEach(row => {
-                // Check if the required column exists
-                if (row.essay_markdown) {
-                    
-                    // Convert Markdown to HTML
-                    const parsedMarkdown = marked.parse(row.essay_markdown);
-                    
-                    // Format the date (checks if date is an Excel number or a string)
-                    let dateStr = 'No date';
-                    if (row.date) {
-                        if (typeof row.date === 'number') {
-                            // Convert Excel serial date to JS Date
-                            dateStr = new Date((row.date - 25569) * 86400 * 1000).toLocaleDateString();
-                        } else {
-                            dateStr = new Date(row.date).toLocaleDateString();
-                        }
+            validData.forEach(row => {
+                // Extract data based on headers
+                const srNo = row.srno || 'N/A';
+                const rawMarkdown = row.essay_markdown || '';
+                const rawDate = row.date || 'No date';
+                
+                // Convert Markdown to HTML using marked.js
+                const parsedMarkdown = marked.parse(rawMarkdown);
+                
+                // Format the date
+                let dateStr = rawDate;
+                if (rawDate && rawDate !== 'No date') {
+                    const dateObj = new Date(rawDate);
+                    // Check if it's a valid date
+                    if (!isNaN(dateObj.getTime())) {
+                        dateStr = dateObj.toLocaleDateString();
                     }
-
-                    const cardHTML = `
-                        <div class="essay-card">
-                            <div class="essay-header">
-                                <span><strong>SR No:</strong> ${row.srno || 'N/A'}</span>
-                                <span><strong>Date:</strong> ${dateStr}</span>
-                            </div>
-                            <div class="essay-content">
-                                ${parsedMarkdown}
-                            </div>
-                        </div>
-                    `;
-                    
-                    container.insertAdjacentHTML('beforeend', cardHTML);
                 }
-            });
 
-            if (container.innerHTML === '') {
-                container.innerHTML = '<div class="error">No valid essays found. Please check that your column header is exactly "essay_markdown".</div>';
-            }
+                // Create the card HTML
+                const cardHTML = `
+                    <div class="essay-card">
+                        <div class="essay-header">
+                            <span><strong>SR No:</strong> ${srNo}</span>
+                            <span><strong>Date:</strong> ${dateStr}</span>
+                        </div>
+                        <div class="essay-content">
+                            ${parsedMarkdown}
+                        </div>
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', cardHTML);
+            });
         }
 
         // Run the function on page load
