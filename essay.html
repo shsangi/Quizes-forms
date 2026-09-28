@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Essays Dashboard</title>
+    <title>Essay Collection</title>
     
     <!-- 1. Load Marked.js (converts Markdown to HTML) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
-    <!-- 2. Load PapaParse (reads CSV files easily) -->
+    <!-- 2. Load PapaParse (reads CSV files) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
@@ -21,7 +21,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 800px;
+            max-width: 1200px; /* Wider to fit a grid */
             margin: 0 auto;
         }
         h1 {
@@ -29,33 +29,144 @@
             color: #2c3e50;
             margin-bottom: 30px;
         }
+        
+        /* Grid Layout for Cards */
+        .essay-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
         .essay-card {
             background: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 25px;
-            margin-bottom: 25px;
+            padding: 20px;
             border-top: 5px solid #3498db;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-sizing: border-box;
         }
+
+        .essay-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
         .essay-header {
             display: flex;
             justify-content: space-between;
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
             margin-bottom: 15px;
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #7f8c8d;
         }
-        .essay-content {
-            font-size: 1.05em;
+
+        .essay-preview {
+            font-size: 0.95em;
+            color: #555;
+            flex-grow: 1;
+            /* Limit to 4 lines */
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        /* Styles for the Markdown content */
-        .essay-content h1, .essay-content h2, .essay-content h3 {
+
+        .read-more-btn {
+            margin-top: 15px;
+            text-align: right;
+            color: #3498db;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .close-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #c0392b;
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            color: #333;
+        }
+
+        /* Markdown Styles inside Modal */
+        .modal-body h1, .modal-body h2, .modal-body h3 {
             color: #2c3e50;
             margin-top: 1.5em;
             margin-bottom: 0.5em;
         }
-        .essay-content blockquote {
+        .modal-body blockquote {
             border-left: 4px solid #3498db;
             margin: 0;
             padding-left: 15px;
@@ -64,13 +175,15 @@
             background: #f9f9f9;
             padding: 10px 15px;
         }
-        .essay-content p {
+        .modal-body p {
             margin-bottom: 1em;
         }
+
         .loading {
             text-align: center;
             font-size: 1.2em;
             color: #7f8c8d;
+            grid-column: 1 / -1;
         }
         .error {
             color: #e74c3c;
@@ -79,6 +192,7 @@
             background: #fadbd8;
             padding: 15px;
             border-radius: 5px;
+            grid-column: 1 / -1;
         }
     </style>
 </head>
@@ -86,22 +200,36 @@
 
     <div class="container">
         <h1>Essay Collection</h1>
-        <div id="essays-container">
+        <div id="essays-container" class="essay-grid">
             <div class="loading">Loading essays... Please wait.</div>
         </div>
     </div>
 
+    <!-- Modal Structure -->
+    <div id="essayModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-info" id="modalInfo"></div>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
     <script>
-        // Your exact published CSV link
+        // Your published CSV link
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
 
         const container = document.getElementById('essays-container');
+        const modal = document.getElementById('essayModal');
+        const modalBody = document.getElementById('modalBody');
+        const modalInfo = document.getElementById('modalInfo');
 
         // Function to fetch and display data
         function loadEssays() {
             Papa.parse(csvUrl, {
                 download: true,
-                header: true, // Treats the first row as headers (srno, essay_markdown, date)
+                header: true,
                 dynamicTyping: true,
                 complete: function(results) {
                     renderEssays(results.data);
@@ -112,53 +240,101 @@
             });
         }
 
-        // Function to render the essays to the HTML
+        // Function to render the essay cards
         function renderEssays(data) {
             container.innerHTML = ''; // Clear loading message
 
-            // Filter out empty rows and check for the essay column
             const validData = data.filter(row => row.essay_markdown && row.essay_markdown.trim() !== '');
 
             if (validData.length === 0) {
-                container.innerHTML = '<div class="error">No valid essay data found. Please check that your column header is exactly "essay_markdown" and contains data.</div>';
+                container.innerHTML = '<div class="error">No valid essay data found.</div>';
                 return;
             }
 
-            validData.forEach(row => {
-                // Extract data based on headers
+            validData.forEach((row, index) => {
                 const srNo = row.srno || 'N/A';
                 const rawMarkdown = row.essay_markdown || '';
                 const rawDate = row.date || 'No date';
                 
-                // Convert Markdown to HTML using marked.js
+                // Convert full Markdown to HTML
                 const parsedMarkdown = marked.parse(rawMarkdown);
                 
+                // Create a plain text preview (strip markdown symbols for the card)
+                const plainTextPreview = rawMarkdown
+                                            .replace(/[#*`>_]/g, '') // Remove common markdown chars
+                                            .substring(0, 200) + '...';
+                
                 // Format the date
-                let dateStr = rawDate;
-                if (rawDate && rawDate !== 'No date') {
-                    const dateObj = new Date(rawDate);
-                    // Check if it's a valid date
-                    if (!isNaN(dateObj.getTime())) {
-                        dateStr = dateObj.toLocaleDateString();
-                    }
-                }
+                let dateStr = formatDate(rawDate);
 
                 // Create the card HTML
+                // We store the full HTML content in a data attribute (encoded to prevent breaking HTML)
                 const cardHTML = `
-                    <div class="essay-card">
+                    <div class="essay-card" onclick="openModal('${encodeURIComponent(parsedMarkdown)}', '${srNo}', '${dateStr}')">
                         <div class="essay-header">
                             <span><strong>SR No:</strong> ${srNo}</span>
                             <span><strong>Date:</strong> ${dateStr}</span>
                         </div>
-                        <div class="essay-content">
-                            ${parsedMarkdown}
+                        <div class="essay-preview">
+                            ${plainTextPreview}
                         </div>
+                        <div class="read-more-btn">Read Full Essay &rarr;</div>
                     </div>
                 `;
                 
                 container.insertAdjacentHTML('beforeend', cardHTML);
             });
         }
+
+        // Date formatting helper function
+        function formatDate(rawDate) {
+            if (!rawDate || rawDate === 'No date') return 'No date';
+            
+            const dateObj = new Date(rawDate);
+            if (isNaN(dateObj.getTime())) return rawDate; // Return raw string if invalid date
+
+            if (rawDate.toString().includes(':')) {
+                return dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString();
+            } else {
+                return dateObj.toLocaleDateString();
+            }
+        }
+
+        // Modal Functions
+        function openModal(encodedHtml, srNo, dateStr) {
+            // Decode the HTML content back to normal
+            const decodedHtml = decodeURIComponent(encodedHtml);
+            
+            // Set the content in the modal
+            modalInfo.innerHTML = `<strong>SR No:</strong> ${srNo} &nbsp;|&nbsp; <strong>Date:</strong> ${dateStr}`;
+            modalBody.innerHTML = decodedHtml;
+            
+            // Show the modal
+            modal.style.display = 'flex';
+            
+            // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            // Restore background scrolling
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal if user clicks outside the content area
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal if user presses "Escape" key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && modal.style.display === 'flex') {
+                closeModal();
+            }
+        });
 
         // Run the function on page load
         window.onload = loadEssays;
