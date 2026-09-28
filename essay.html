@@ -148,18 +148,36 @@
             background: #f9f9f9;
             border: 1px solid #eee;
             border-radius: 6px;
-            padding: 10px;
+            padding: 15px;
             margin-top: 10px;
-            max-height: 250px;
+            max-height: 300px;
             overflow-y: auto;
             font-size: 0.85em;
         }
         .vocab-content.active { display: block; }
         
-        /* Table styles inside card */
-        .vocab-content table { width: 100%; border-collapse: collapse; }
-        .vocab-content th, .vocab-content td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-        .vocab-content th { background-color: #f2f2f2; }
+        /* Vocabulary list styling */
+        .vocab-content p { margin: 0 0 10px 0; }
+        .vocab-content strong { color: #2c3e50; display: block; margin-bottom: 2px; }
+        .vocab-content .urdu-text { 
+            font-family: 'Noto Nastaliq Urdu', serif; 
+            direction: rtl; 
+            text-align: right; 
+            font-size: 1.1em; 
+            line-height: 2;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        .vocab-content .vocab-item {
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .vocab-content .vocab-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
 
         /* Card Actions (Read Essay Button top right) */
         .read-essay-btn {
@@ -326,11 +344,11 @@
                             const fullMarkdown = row[1] ? String(row[1]).trim() : '';
                             if (!fullMarkdown) return null;
 
-                            // 1. Extract Title
+                            // 1. Extract Title (Only the H1)
                             let titleMatch = fullMarkdown.match(/^#\s+(.+)$/m);
                             let title = titleMatch ? titleMatch[1].trim() : `Essay ${index + 1}`;
 
-                            // 2. Extract Meta
+                            // 2. Extract Meta (SR No, Date, Word Count, Classification)
                             let srNoMatch = fullMarkdown.match(/\*\*SR No:\*\*\s*(.+)/);
                             let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/);
                             let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
@@ -347,8 +365,17 @@
                             let vocabHtml = '';
                             let vocabSplit = fullMarkdown.split(/### 📚 Vocabulary/i);
                             if (vocabSplit.length > 1) {
-                                // Parse the vocabulary markdown to HTML
-                                vocabHtml = marked.parse(vocabSplit[1]);
+                                let rawVocab = vocabSplit[1];
+                                
+                                // Format the vocabulary list
+                                // We want to convert **01 Word** \n * Urdu... into HTML blocks
+                                let formattedVocab = rawVocab
+                                    .replace(/\*\*(\d+)\s+(.+?)\*\*/g, '<div class="vocab-item"><strong>$1. $2</strong>') // Match "01 Word"
+                                    .replace(/\*   \*\*Urdu:\*\*\s*(.+)/g, '<div class="urdu-text">$1</div>') // Match Urdu
+                                    .replace(/\*   \*\*Synonyms:\*\*\s*(.+)/g, '<div><strong>Synonyms:</strong> $1</div>') // Match Synonyms
+                                    .replace(/\*   \*\*Antonyms:\*\*\s*(.+)/g, '<div><strong>Antonyms:</strong> $1</div></div>'); // Match Antonyms & close div
+                                
+                                vocabHtml = formattedVocab;
                             }
 
                             // 4. Extract Essay Body (Everything before the Vocabulary section, minus the headers/meta/subtitle)
@@ -356,7 +383,7 @@
                             
                             if (titleMatch) essayBody = essayBody.replace(titleMatch[0], '');
                             
-                            // Remove the subtitle e.g. **(PCS 1978, 89)**
+                            // Remove subtitle **(PCS 1978, 89)** if it exists
                             essayBody = essayBody.replace(/\*\*\(PCS.*?\)\*\*/g, '');
                             
                             essayBody = essayBody.replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '');
@@ -460,8 +487,8 @@
 
         // --- VOCABULARY TOGGLE LOGIC ---
         function toggleVocab(event, index) {
-            event.preventDefault(); // Prevent any default button behavior
-            event.stopPropagation(); // Prevent card click
+            event.preventDefault(); 
+            event.stopPropagation(); 
             
             const vocabDiv = document.getElementById(`vocab-${index}`);
             const btn = event.currentTarget;
@@ -469,109 +496,4 @@
             if (vocabDiv.classList.contains('active')) {
                 vocabDiv.classList.remove('active');
                 btn.innerHTML = '📚 Show Vocabulary';
-            } else {
-                vocabDiv.classList.add('active');
-                btn.innerHTML = '📚 Hide Vocabulary';
             }
-        }
-
-        // --- MODAL LOGIC ---
-        function openModal(index) {
-            if (!essaysData[index]) return;
-            
-            currentEssayIndex = index;
-            const essay = essaysData[index];
-            
-            // Parse ONLY the body markdown into HTML
-            modalBody.innerHTML = marked.parse(essay.bodyMarkdown);
-            
-            // Reset copy button state
-            copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
-            copyBtn.classList.remove('copied');
-            
-            // Show Modal
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; 
-
-            // Restore scroll position
-            const savedScroll = localStorage.getItem(`essay_scroll_${index}`);
-            if (savedScroll) {
-                setTimeout(() => {
-                    modalBody.scrollTop = parseInt(savedScroll, 10);
-                }, 50);
-            } else {
-                modalBody.scrollTop = 0; 
-            }
-
-            localStorage.setItem('last_open_essay', index);
-        }
-
-        function closeModal() {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            
-            localStorage.removeItem('last_open_essay');
-            currentEssayIndex = null;
-        }
-
-        // --- COPY TO CLIPBOARD LOGIC ---
-        function copyEssayText() {
-            if (currentEssayIndex === null) return;
-            
-            const essay = essaysData[currentEssayIndex];
-            const textToCopy = `${essay.title}\n\n${essay.bodyMarkdown}`;
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                copyBtn.innerHTML = `✅ Copied!`;
-                copyBtn.classList.add('copied');
-                
-                setTimeout(() => {
-                    copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
-                    copyBtn.classList.remove('copied');
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                alert('Failed to copy text. Please try again.');
-            });
-        }
-
-        // --- STATE PERSISTENCE ---
-        function saveScrollPosition() {
-            if (currentEssayIndex !== null) {
-                clearTimeout(scrollSaveTimeout);
-                scrollSaveTimeout = setTimeout(() => {
-                    localStorage.setItem(`essay_scroll_${currentEssayIndex}`, modalBody.scrollTop);
-                }, 100);
-            }
-        }
-
-        function restoreLastState() {
-            const lastEssay = localStorage.getItem('last_open_essay');
-            if (lastEssay !== null && essaysData[lastEssay]) {
-                openModal(parseInt(lastEssay, 10));
-            }
-        }
-
-        // --- REFRESH LOGIC ---
-        function forceRefresh() {
-            localStorage.clear();
-            closeModal();
-            loadEssays(true);
-        }
-
-        // --- EVENT LISTENERS ---
-        window.onclick = function(event) {
-            if (event.target === modal) closeModal();
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && modal.style.display === 'flex') {
-                closeModal();
-            }
-        });
-
-        window.onload = () => loadEssays(false);
-    </script>
-
-</body>
-</html>
