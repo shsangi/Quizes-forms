@@ -23,14 +23,11 @@
             --danger: #dc2626;
             --radius: 14px;
             --radius-sm: 10px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -59,7 +56,6 @@
             font-weight: 700;
             margin: 0 0 4px;
             letter-spacing: -0.03em;
-            color: var(--text);
         }
 
         .subtitle {
@@ -68,7 +64,6 @@
             color: var(--text-secondary);
         }
 
-        /* Grid */
         .essay-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -85,7 +80,6 @@
             .essay-grid { grid-template-columns: repeat(3, 1fr); gap: 22px; }
         }
 
-        /* Cards */
         .essay-card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -122,9 +116,7 @@
             cursor: pointer;
         }
 
-        .card-title-group:active {
-            opacity: 0.75;
-        }
+        .card-title-group:active { opacity: 0.75; }
 
         .card-srno {
             font-size: 0.85rem;
@@ -151,17 +143,10 @@
             justify-content: center;
             flex-shrink: 0;
             cursor: pointer;
-            transition: background 0.2s;
         }
 
-        .card-nav-icon:active {
-            background: #dbeafe;
-        }
-
-        .card-nav-icon svg {
-            width: 20px;
-            height: 20px;
-        }
+        .card-nav-icon:active { background: #dbeafe; }
+        .card-nav-icon svg { width: 20px; height: 20px; }
 
         .card-meta {
             font-size: 0.8rem;
@@ -185,7 +170,7 @@
             line-height: 1.4;
         }
 
-        /* ===== VOCABULARY - Modern Professional Style ===== */
+        /* Vocabulary */
         .vocab-section {
             margin-top: auto;
             padding-top: 14px;
@@ -206,12 +191,9 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: all 0.2s;
         }
 
-        .vocab-toggle-btn:active {
-            background: #f1f5f9;
-        }
+        .vocab-toggle-btn:active { background: #f1f5f9; }
 
         .vocab-content {
             display: none;
@@ -221,11 +203,8 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .vocab-content.active {
-            display: block;
-        }
+        .vocab-content.active { display: block; }
 
-        /* Individual vocab card */
         .vocab-item {
             background: #f8fafc;
             border: 1px solid var(--border);
@@ -234,9 +213,7 @@
             margin-bottom: 10px;
         }
 
-        .vocab-item:last-child {
-            margin-bottom: 0;
-        }
+        .vocab-item:last-child { margin-bottom: 0; }
 
         .vocab-word {
             font-size: 0.95rem;
@@ -296,11 +273,9 @@
             flex-shrink: 0;
         }
 
-        .vocab-value {
-            color: var(--text);
-        }
+        .vocab-value { color: var(--text); }
 
-        /* Floating Refresh */
+        /* Floating button */
         .refresh-btn {
             position: fixed;
             bottom: 24px;
@@ -317,26 +292,13 @@
             justify-content: center;
             cursor: pointer;
             z-index: 900;
-            transition: transform 0.2s, background 0.2s;
         }
 
-        .refresh-btn:active {
-            transform: scale(0.94);
-        }
+        .refresh-btn:active { transform: scale(0.94); }
+        .refresh-btn.loading svg { animation: spin 0.8s linear infinite; }
+        .refresh-btn svg { width: 24px; height: 24px; fill: currentColor; }
 
-        .refresh-btn.loading svg {
-            animation: spin 0.8s linear infinite;
-        }
-
-        .refresh-btn svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Modal */
         .modal-overlay {
@@ -402,7 +364,6 @@
         .modal-header-title {
             font-weight: 600;
             font-size: 1rem;
-            color: var(--text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -424,21 +385,10 @@
             align-items: center;
             gap: 6px;
             cursor: pointer;
-            transition: background 0.2s;
         }
 
-        .copy-btn {
-            background: var(--success);
-            color: white;
-        }
-
-        .copy-btn:active {
-            background: #047857;
-        }
-
-        .copy-btn.copied {
-            background: #0f172a;
-        }
+        .copy-btn { background: var(--success); color: white; }
+        .copy-btn.copied { background: #0f172a; }
 
         .close-btn {
             background: var(--danger);
@@ -451,10 +401,6 @@
             font-size: 1.15rem;
         }
 
-        .close-btn:active {
-            background: #b91c1c;
-        }
-
         .modal-body {
             padding: 22px 18px 48px;
             overflow-y: auto;
@@ -464,26 +410,20 @@
         }
 
         @media (min-width: 640px) {
-            .modal-body {
-                padding: 28px 32px 50px;
-            }
+            .modal-body { padding: 28px 32px 50px; }
         }
 
         .reading-essay-title {
             font-size: 1.45rem;
             font-weight: 700;
-            color: var(--text);
             margin: 0 0 20px;
             line-height: 1.3;
-            letter-spacing: -0.02em;
             border-bottom: 2px solid var(--border);
             padding-bottom: 16px;
         }
 
         @media (min-width: 640px) {
-            .reading-essay-title {
-                font-size: 1.7rem;
-            }
+            .reading-essay-title { font-size: 1.7rem; }
         }
 
         .reading-outline-box {
@@ -529,6 +469,7 @@
         .error {
             color: var(--danger);
             font-weight: 600;
+            white-space: pre-line;
         }
     </style>
 </head>
@@ -545,20 +486,17 @@
         </div>
     </div>
 
-    <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()" title="Refresh" aria-label="Refresh essays">
+    <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()" title="Refresh">
         <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
     </button>
 
-    <div id="essayModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div id="essayModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-header-title">Reading Essay</div>
                 <div class="modal-header-actions">
-                    <button class="action-btn copy-btn" id="copyBtn" onclick="copyEssayText()">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        Copy
-                    </button>
-                    <button class="action-btn close-btn" onclick="closeModal()" aria-label="Close">✕</button>
+                    <button class="action-btn copy-btn" id="copyBtn" onclick="copyEssayText()">Copy</button>
+                    <button class="action-btn close-btn" onclick="closeModal()">✕</button>
                 </div>
             </div>
             <div class="modal-body" id="modalBody" onscroll="saveScrollPosition()"></div>
@@ -566,251 +504,207 @@
     </div>
 
     <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv';
 
         const container = document.getElementById('essays-container');
         const modal = document.getElementById('essayModal');
         const modalBody = document.getElementById('modalBody');
         const refreshBtn = document.getElementById('refreshBtn');
         const copyBtn = document.getElementById('copyBtn');
-        
-        let essaysData = []; 
-        let currentEssayIndex = null; 
+
+        let essaysData = [];
+        let currentEssayIndex = null;
         let scrollSaveTimeout;
 
         function loadEssays(forceRefresh = false) {
-            if (!forceRefresh && essaysData.length === 0) {
-                container.innerHTML = '<div class="loading">Loading essays...</div>';
-            }
+            container.innerHTML = '<div class="loading">Loading essays...</div>';
             refreshBtn.classList.add('loading');
 
-            const fetchUrl = forceRefresh ? csvUrl + '&t=' + new Date().getTime() : csvUrl;
+            const fetchUrl = forceRefresh ? csvUrl + '&t=' + Date.now() : csvUrl;
 
             Papa.parse(fetchUrl, {
                 download: true,
-                header: false, 
-                dynamicTyping: true,
+                header: true,               // ← now using header
+                skipEmptyLines: true,
                 complete: function(results) {
                     refreshBtn.classList.remove('loading');
-                    const rawRows = results.data.slice(1); 
-                    
-                    essaysData = rawRows
+
+                    if (results.errors && results.errors.length > 0) {
+                        console.error(results.errors);
+                    }
+
+                    const rows = results.data || [];
+
+                    if (rows.length === 0) {
+                        container.innerHTML = '<div class="error">No data found in the Google Sheet.</div>';
+                        return;
+                    }
+
+                    essaysData = rows
                         .map((row, index) => {
-                            const fullMarkdown = row[1] ? String(row[1]).trim() : '';
+                            // Support both column names
+                            const fullMarkdown = (row.essay_markdown || row['essay_markdown'] || row[1] || '').toString().trim();
                             if (!fullMarkdown) return null;
 
+                            // Title
                             let titleMatch = fullMarkdown.match(/^\s*#\s+(.+)$/m);
                             let title = titleMatch ? titleMatch[1].trim() : `Essay ${index + 1}`;
 
+                            // Meta
                             let srNoMatch = fullMarkdown.match(/\*\*SR No:\*\*\s*(.+)/);
                             let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/);
                             let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
                             let classMatch = fullMarkdown.match(/\*\*Primary Type:\*\*\s*(.+)/);
-                            
+
                             let meta = {
-                                srNo: srNoMatch ? srNoMatch[1].trim() : '',
+                                srNo: srNoMatch ? srNoMatch[1].trim() : (row.srno || ''),
                                 date: dateMatch ? dateMatch[1].trim() : '',
                                 wordCount: wordCountMatch ? wordCountMatch[1].trim() : '',
                                 classification: classMatch ? classMatch[1].trim() : ''
                             };
 
+                            // Outline
                             let outlineText = '';
                             let outlineMatch = fullMarkdown.match(/### Outline:\s*\n([\s\S]*?)(?=\n---|\n###|$)/i);
-                            if (outlineMatch) {
-                                outlineText = outlineMatch[1].trim();
-                            }
+                            if (outlineMatch) outlineText = outlineMatch[1].trim();
 
-                            // ===== Improved Vocabulary Parsing =====
+                            // Vocabulary (safer parsing)
                             let vocabHtml = '';
                             let vocabSplit = fullMarkdown.split(/### 📚 Vocabulary/i);
+
                             if (vocabSplit.length > 1) {
                                 let rawVocab = vocabSplit[1];
-                                
-                                // Parse each vocabulary entry more robustly
-                                let items = [];
-                                let regex = /\*\*(\d+)\s+(.+?)\*\*[\s\S]*?(?=\*\*\d+\s+|$)/g;
-                                let match;
-                                
-                                while ((match = regex.exec(rawVocab)) !== null) {
-                                    let number = match[1];
-                                    let word = match[2].trim();
-                                    let block = match[0];
-                                    
-                                    let urduMatch = block.match(/\*\*Urdu:\*\*\s*(.+)/);
-                                    let synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/);
-                                    let antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/);
-                                    
-                                    let urdu = urduMatch ? urduMatch[1].trim() : '';
-                                    let synonyms = synMatch ? synMatch[1].trim() : '';
-                                    let antonyms = antMatch ? antMatch[1].trim() : '';
-                                    
-                                    items.push(`
-                                        <div class="vocab-item">
-                                            <div class="vocab-word">
-                                                <span class="number">${number}</span>
-                                                ${word}
-                                            </div>
-                                            \( {urdu ? `<div class="urdu-text"> \){urdu}</div>` : ''}
-                                            <div class="vocab-meta">
-                                                ${synonyms ? `
-                                                    <div class="vocab-meta-row">
-                                                        <span class="vocab-label">Synonyms</span>
-                                                        <span class="vocab-value">${synonyms}</span>
-                                                    </div>` : ''}
-                                                ${antonyms ? `
-                                                    <div class="vocab-meta-row">
-                                                        <span class="vocab-label">Antonyms</span>
-                                                        <span class="vocab-value">${antonyms}</span>
-                                                    </div>` : ''}
-                                            </div>
-                                        </div>
-                                    `);
-                                }
-                                
-                                vocabHtml = items.join('');
+                                // Simple and reliable replace method
+                                let formatted = rawVocab
+                                    .replace(/\*\*(\d+)\s+(.+?)\*\*/g, 
+                                        '<div class="vocab-item"><div class="vocab-word"><span class="number">$1</span>$2</div>')
+                                    .replace(/\*?\s*\*\*Urdu:\*\*\s*(.+)/g, 
+                                        '<div class="urdu-text">$1</div>')
+                                    .replace(/\*?\s*\*\*Synonyms:\*\*\s*(.+)/g, 
+                                        '<div class="vocab-meta"><div class="vocab-meta-row"><span class="vocab-label">Synonyms</span><span class="vocab-value">$1</span></div>')
+                                    .replace(/\*?\s*\*\*Antonyms:\*\*\s*(.+)/g, 
+                                        '<div class="vocab-meta-row"><span class="vocab-label">Antonyms</span><span class="vocab-value">$1</span></div></div></div>');
+
+                                vocabHtml = formatted;
                             }
 
-                            let essayBody = vocabSplit[0]; 
-                            
+                            // Clean body
+                            let essayBody = vocabSplit[0] || fullMarkdown;
                             if (titleMatch) essayBody = essayBody.replace(titleMatch[0], '');
-                            essayBody = essayBody.replace(/\*\*\(PCS.*?\)\*\*/g, '');
-                            essayBody = essayBody.replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '');
-                            essayBody = essayBody.replace(/\*\*Date:\*\*.*?(?=\n\n|\n---|$)/is, '');
-                            essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
-                            essayBody = essayBody.replace(/### Outline:[\s\S]*?(?=\n---)/i, ''); 
-                            essayBody = essayBody.replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '');
-                            essayBody = essayBody.replace(/^[\s-]+/, '').trim();
+                            essayBody = essayBody
+                                .replace(/\*\*\(PCS.*?\)\*\*/g, '')
+                                .replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '')
+                                .replace(/\*\*Date:\*\*.*?(?=\n\n|\n---|$)/is, '')
+                                .replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '')
+                                .replace(/### Outline:[\s\S]*?(?=\n---)/i, '')
+                                .replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '')
+                                .replace(/^[\s-]+/, '')
+                                .trim();
 
                             return {
                                 id: index,
-                                title: title,
-                                meta: meta,
-                                outline: outlineText, 
+                                title,
+                                meta,
+                                outline: outlineText,
                                 bodyMarkdown: essayBody,
-                                vocabHtml: vocabHtml
+                                vocabHtml
                             };
                         })
-                        .filter(item => item !== null);
+                        .filter(Boolean);
 
                     if (essaysData.length === 0) {
-                        container.innerHTML = '<div class="error">No valid essay data found.</div>';
+                        container.innerHTML = '<div class="error">Could not parse any essays.\nCheck the Google Sheet format.</div>';
                         return;
                     }
 
                     renderCards();
                     restoreLastState();
                 },
-                error: function(error) {
+                error: function(err) {
                     refreshBtn.classList.remove('loading');
-                    container.innerHTML = `<div class="error">Error loading data: ${error.message}</div>`;
+                    console.error(err);
+                    container.innerHTML = `<div class="error">Failed to load data.\n\nPossible reasons:\n• Internet connection\n• Google Sheet is not published correctly\n• CORS / browser restriction\n\nError: ${err.message || err}</div>`;
                 }
             });
         }
 
         function renderCards() {
-            container.innerHTML = ''; 
+            container.innerHTML = '';
 
             essaysData.forEach((essay, index) => {
                 let metaParts = [];
                 if (essay.meta.wordCount) metaParts.push(`📝 ${essay.meta.wordCount}`);
                 if (essay.meta.date) metaParts.push(`📅 ${essay.meta.date}`);
-                let metaString = metaParts.map(p => `<span>${p}</span>`).join('');
 
-                let vocabSection = '';
-                if (essay.vocabHtml) {
-                    vocabSection = `
-                        <div class="vocab-section">
-                            <button class="vocab-toggle-btn" onclick="toggleVocab(event, ${index})">
-                                📚 Show Vocabulary
-                            </button>
-                            <div class="vocab-content" id="vocab-${index}">
-                                ${essay.vocabHtml}
-                            </div>
-                        </div>
-                    `;
-                }
+                let vocabSection = essay.vocabHtml ? `
+                    <div class="vocab-section">
+                        <button class="vocab-toggle-btn" onclick="toggleVocab(event, ${index})">📚 Show Vocabulary</button>
+                        <div class="vocab-content" id="vocab-\( {index}"> \){essay.vocabHtml}</div>
+                    </div>` : '';
 
-                let classificationSection = '';
-                if (essay.meta.classification) {
-                    classificationSection = `
-                        <div class="card-classification">
-                            <strong>Classification:</strong> ${essay.meta.classification}
-                        </div>
-                    `;
-                }
+                let classificationSection = essay.meta.classification ? `
+                    <div class="card-classification">
+                        <strong>Classification:</strong> ${essay.meta.classification}
+                    </div>` : '';
 
-                const cardHTML = `
-                    <div class="essay-card" id="card-${index}">
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="essay-card">
                         <div class="card-header">
                             <div class="card-title-group" onclick="openModal(${index})">
                                 <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
                                 <span class="card-title">${essay.title}</span>
                             </div>
-                            <button class="card-nav-icon" onclick="openModal(${index})" aria-label="Read essay">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <button class="card-nav-icon" onclick="openModal(${index})">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
                             </button>
                         </div>
-                        <div class="card-meta">${metaString}</div>
+                        <div class="card-meta">\( {metaParts.map(p => `<span> \){p}</span>`).join('')}</div>
                         ${classificationSection}
                         ${vocabSection}
                     </div>
-                `;
-                
-                container.insertAdjacentHTML('beforeend', cardHTML);
+                `);
             });
         }
 
         function toggleVocab(event, index) {
-            event.preventDefault(); 
-            event.stopPropagation(); 
-            
-            const vocabDiv = document.getElementById(`vocab-${index}`);
+            event.preventDefault();
+            event.stopPropagation();
+            const div = document.getElementById(`vocab-${index}`);
             const btn = event.currentTarget;
-            
-            if (vocabDiv.classList.contains('active')) {
-                vocabDiv.classList.remove('active');
+            if (div.classList.contains('active')) {
+                div.classList.remove('active');
                 btn.innerHTML = '📚 Show Vocabulary';
             } else {
-                vocabDiv.classList.add('active');
+                div.classList.add('active');
                 btn.innerHTML = '📚 Hide Vocabulary';
             }
         }
 
         function openModal(index) {
             if (!essaysData[index]) return;
-            
             currentEssayIndex = index;
             const essay = essaysData[index];
-            
-            let readingHtml = `<div class="reading-essay-title">${essay.title}</div>`;
-            
-            if (essay.outline) {
-                readingHtml += `
-                    <div class="reading-outline-box">
-                        <strong>📝 Part of Essay (Outline)</strong>
-                        ${essay.outline}
-                    </div>
-                `;
-            }
-            
-            readingHtml += marked.parse(essay.bodyMarkdown);
-            
-            modalBody.innerHTML = readingHtml;
-            
-            copyBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
-            copyBtn.classList.remove('copied');
-            
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; 
 
-            const savedScroll = localStorage.getItem(`essay_scroll_${index}`);
-            if (savedScroll) {
-                setTimeout(() => {
-                    modalBody.scrollTop = parseInt(savedScroll, 10);
-                }, 50);
-            } else {
-                modalBody.scrollTop = 0; 
+            let html = `<div class="reading-essay-title">${essay.title}</div>`;
+            if (essay.outline) {
+                html += `<div class="reading-outline-box"><strong>📝 Part of Essay (Outline)</strong>${essay.outline}</div>`;
             }
+            html += marked.parse(essay.bodyMarkdown || '');
+
+            modalBody.innerHTML = html;
+            copyBtn.innerHTML = 'Copy';
+            copyBtn.classList.remove('copied');
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            const saved = localStorage.getItem(`essay_scroll_${index}`);
+            setTimeout(() => {
+                modalBody.scrollTop = saved ? parseInt(saved) : 0;
+            }, 50);
 
             localStorage.setItem('last_open_essay', index);
         }
@@ -824,24 +718,18 @@
 
         function copyEssayText() {
             if (currentEssayIndex === null) return;
-            
             const essay = essaysData[currentEssayIndex];
-            let textToCopy = `${essay.title}\n\n`;
-            if (essay.outline) {
-                textToCopy += `Part of Essay (Outline):\n${essay.outline}\n\n`;
-            }
-            textToCopy += essay.bodyMarkdown;
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                copyBtn.innerHTML = `✅ Copied!`;
+            let text = essay.title + '\n\n';
+            if (essay.outline) text += 'Part of Essay (Outline):\n' + essay.outline + '\n\n';
+            text += essay.bodyMarkdown;
+
+            navigator.clipboard.writeText(text).then(() => {
+                copyBtn.innerHTML = '✅ Copied!';
                 copyBtn.classList.add('copied');
-                
                 setTimeout(() => {
-                    copyBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
+                    copyBtn.innerHTML = 'Copy';
                     copyBtn.classList.remove('copied');
                 }, 2000);
-            }).catch(() => {
-                alert('Failed to copy text. Please try again.');
             });
         }
 
@@ -855,9 +743,9 @@
         }
 
         function restoreLastState() {
-            const lastEssay = localStorage.getItem('last_open_essay');
-            if (lastEssay !== null && essaysData[lastEssay]) {
-                openModal(parseInt(lastEssay, 10));
+            const last = localStorage.getItem('last_open_essay');
+            if (last !== null && essaysData[last]) {
+                openModal(parseInt(last));
             }
         }
 
@@ -867,18 +755,12 @@
             loadEssays(true);
         }
 
-        window.onclick = function(event) {
-            if (event.target === modal) closeModal();
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && modal.style.display === 'flex') {
-                closeModal();
-            }
+        window.onclick = e => { if (e.target === modal) closeModal(); };
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
         });
 
         window.onload = () => loadEssays(false);
     </script>
-
 </body>
 </html>
