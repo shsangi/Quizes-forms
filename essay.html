@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essays Dashboard</title>
+    
+    <!-- Load Marked.js to convert Markdown to HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Load PapaParse to read CSV data easily -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .essay-card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-top: 5px solid #3498db;
+        }
+        .essay-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+        .essay-content {
+            font-size: 1.05em;
+        }
+        /* Styles for the Markdown content */
+        .essay-content h1, .essay-content h2, .essay-content h3 {
+            color: #2c3e50;
+        }
+        .essay-content blockquote {
+            border-left: 4px solid #3498db;
+            margin: 0;
+            padding-left: 15px;
+            color: #555;
+            font-style: italic;
+            background: #f9f9f9;
+            padding: 10px 15px;
+        }
+        .essay-content code {
+            background: #eee;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Essay Collection</h1>
+        <div id="essays-container">
+            <div class="loading">Loading essays... Please wait.</div>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS URL WITH YOUR CSV PUBLISHED URL (Option 2) or API URL (Option 1)
+        // Example: 'https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv'
+        const dataSourceUrl = 'YOUR_CSV_OR_API_URL_HERE'; 
+
+        const container = document.getElementById('essays-container');
+
+        // Function to fetch and display data
+        async function loadEssays() {
+            try {
+                // If using a CSV link:
+                Papa.parse(dataSourceUrl, {
+                    download: true,
+                    header: true,
+                    dynamicTyping: true,
+                    complete: function(results) {
+                        renderEssays(results.data);
+                    },
+                    error: function(error) {
+                        container.innerHTML = `<div class="error">Error loading data: ${error.message}</div>`;
+                    }
+                });
+                
+                /* 
+                // If using a JSON API (like SheetDB), use this instead:
+                const response = await fetch(dataSourceUrl);
+                const data = await response.json();
+                renderEssays(data);
+                */
+                
+            } catch (error) {
+                container.innerHTML = `<div class="error">Failed to fetch data. Check console for details.</div>`;
+                console.error(error);
+            }
+        }
+
+        // Function to render the essays to the HTML
+        function renderEssays(data) {
+            container.innerHTML = ''; // Clear loading message
+
+            // Filter out empty rows that PapaParse sometimes adds
+            const validData = data.filter(row => row.srno && row.essay_markdown);
+
+            if (validData.length === 0) {
+                container.innerHTML = '<div class="error">No valid essay data found.</div>';
+                return;
+            }
+
+            validData.forEach(row => {
+                // Convert Markdown to HTML using marked.js
+                const parsedMarkdown = marked.parse(row.essay_markdown);
+                
+                // Format the date if it exists
+                let dateStr = row.date ? new Date(row.date).toLocaleDateString() : 'No date';
+
+                // Create the card HTML
+                const cardHTML = `
+                    <div class="essay-card">
+                        <div class="essay-header">
+                            <span><strong>SR No:</strong> ${row.srno}</span>
+                            <span><strong>Date:</strong> ${dateStr}</span>
+                        </div>
+                        <div class="essay-content">
+                            ${parsedMarkdown}
+                        </div>
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        // Run the function on page load
+        window.onload = loadEssays;
+    </script>
+
+</body>
+</html>
