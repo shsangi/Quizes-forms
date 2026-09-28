@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="theme-color" content="#0f0e17">
-  <title>📖 Reading Pace · Voice & Punctuation Reader</title>
+  <title>📖 Reading Pace · Voice & Chunk Reader</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; padding: 0; }
     body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
       min-height: 100vh;
       background: linear-gradient(135deg, #0f0e17 0%, #1b1a2e 100%);
       display: flex;
@@ -18,45 +18,67 @@
       padding: 0.75rem;
     }
     .app-card {
-      max-width: 980px; width: 100%;
+      max-width: 980px;
+      width: 100%;
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-radius: 1.75rem;
       padding: 1.25rem 1.25rem 1.75rem;
-      box-shadow: 0 30px 45px -15px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06);
+      box-shadow: 0 30px 45px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     h1 {
-      font-size: 1.4rem; font-weight: 600;
-      color: #f0eef7; margin: 0 0 0.35rem 0;
-      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #f0eef7;
+      margin: 0 0 0.35rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
     h1 span {
-      background: #b7a9ff; color: #0b0b1a;
-      font-size: 0.72rem; font-weight: 600;
-      padding: 0.2rem 0.75rem; border-radius: 100px;
+      background: #b7a9ff;
+      color: #0b0b1a;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.75rem;
+      border-radius: 100px;
     }
     .subhead {
-      color: #a9a5c9; margin-bottom: 1.2rem;
-      font-size: 0.85rem; border-left: 3px solid #7f6bff;
-      padding-left: 0.75rem; line-height: 1.4;
+      color: #a9a5c9;
+      margin-bottom: 1.2rem;
+      font-size: 0.85rem;
+      border-left: 3px solid #7f6bff;
+      padding-left: 0.75rem;
+      line-height: 1.4;
     }
     textarea {
-      width: 100%; background: rgba(10, 10, 20, 0.7);
-      border: 1px solid #3e3b5a; border-radius: 1.25rem;
-      padding: 1rem 1.1rem; color: #f0edff;
-      font-size: 1rem; line-height: 1.5;
-      resize: vertical; min-height: 100px;
-      outline: none; font-family: inherit; margin-bottom: 1rem;
+      width: 100%;
+      background: rgba(10, 10, 20, 0.7);
+      border: 1px solid #3e3b5a;
+      border-radius: 1.25rem;
+      padding: 1rem 1.1rem;
+      color: #f0edff;
+      font-size: 1rem;
+      line-height: 1.5;
+      resize: vertical;
+      min-height: 110px;
+      outline: none;
+      font-family: inherit;
+      margin-bottom: 1.2rem;
     }
     textarea:focus {
       border-color: #8f7bff;
       box-shadow: 0 0 0 3px rgba(143, 123, 255, 0.2);
     }
     .controls-grid {
-      display: grid; grid-template-columns: 1fr;
-      gap: 1rem; margin-bottom: 1.2rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
     }
     @media (min-width: 720px) {
       .app-card { padding: 2rem 2rem 2.5rem; border-radius: 2.5rem; }
@@ -74,64 +96,66 @@
       .control-panel { border-radius: 1.75rem; padding: 1.4rem 1.5rem 1.6rem; }
     }
     .panel-title {
-      font-size: 0.72rem; text-transform: uppercase;
-      letter-spacing: 0.08em; color: #b7adf0;
-      margin-bottom: 0.8rem; font-weight: 600;
-      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #b7adf0;
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
     .chip-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
     .chip {
-      background: #26233a; border: 1px solid #423e62;
-      color: #d7d2f0; padding: 0.5rem 0.85rem;
-      border-radius: 3rem; font-size: 0.8rem;
-      font-weight: 500; cursor: pointer;
+      background: #26233a;
+      border: 1px solid #423e62;
+      color: #d7d2f0;
+      padding: 0.5rem 0.85rem;
+      border-radius: 3rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
       user-select: none;
-      display: inline-flex; align-items: center; justify-content: center;
-      transition: 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
-    .chip:hover { background: #353152; border-color: #7b6ed6; }
     .chip.active {
-      background: #7c6aff; border-color: #b3a6ff;
-      color: #0e0c1a; font-weight: 600;
+      background: #7c6aff;
+      border-color: #b3a6ff;
+      color: #0e0c1a;
+      font-weight: 600;
       box-shadow: 0 6px 14px rgba(124, 106, 255, 0.4);
     }
     .chip.small { font-size: 0.72rem; padding: 0.4rem 0.75rem; }
     .voice-selector {
       margin-top: 0.4rem;
-      display: flex; flex-direction: column; gap: 0.4rem;
-    }
-    .voice-selector .label-row {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
     }
     .voice-selector label {
-      font-size: 0.8rem; color: #beb8e0;
-      font-weight: 500; display: flex;
-      align-items: center; gap: 0.4rem;
+      font-size: 0.8rem;
+      color: #beb8e0;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
-    .load-voices-btn {
-      background: #4a3f7a;
-      border: 1px solid #7c6aff;
-      color: #e8e2ff;
-      padding: 0.3rem 0.7rem;
-      border-radius: 3rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.15s;
-      white-space: nowrap;
-    }
-    .load-voices-btn:hover { background: #5c4d94; }
-    .load-voices-btn:active { transform: scale(0.96); }
     select {
       background: #19172a;
       border: 1px solid #3f3b60;
       border-radius: 0.9rem;
       padding: 0.75rem 2.5rem 0.75rem 1rem;
-      color: #f0edff; font-size: 0.9rem;
-      outline: none; width: 100%; cursor: pointer;
+      color: #f0edff;
+      font-size: 0.9rem;
+      outline: none;
+      width: 100%;
+      cursor: pointer;
       font-weight: 500;
-      -webkit-appearance: none; appearance: none;
+      -webkit-appearance: none;
+      appearance: none;
       background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b7a9ff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
       background-repeat: no-repeat;
       background-position: right 1rem center;
@@ -139,237 +163,222 @@
     select:focus { border-color: #8f7bff; }
     select option { background: #1b192b; color: #f0edff; font-size: 0.9rem; }
     .gender-filter {
-      display: flex; gap: 0.4rem;
-      margin: 0.6rem 0; align-items: center; flex-wrap: wrap;
+      display: flex;
+      gap: 0.4rem;
+      margin: 0.6rem 0;
+      align-items: center;
+      flex-wrap: wrap;
     }
     .gender-filter .radio-label {
-      display: inline-flex; align-items: center; gap: 0.35rem;
-      background: #26233a; border: 1px solid #423e62;
-      padding: 0.4rem 0.75rem; border-radius: 3rem;
-      cursor: pointer; font-size: 0.78rem;
-      color: #d7d2f0; font-weight: 500; user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #26233a;
+      border: 1px solid #423e62;
+      padding: 0.4rem 0.75rem;
+      border-radius: 3rem;
+      cursor: pointer;
+      font-size: 0.78rem;
+      color: #d7d2f0;
+      font-weight: 500;
+      user-select: none;
     }
     .gender-filter input[type="radio"] {
-      appearance: none; -webkit-appearance: none;
-      width: 14px; height: 14px; border-radius: 50%;
-      border: 2px solid #7a749e; background: transparent;
-      margin: 0; position: relative; flex-shrink: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #7a749e;
+      background: transparent;
+      margin: 0;
+      position: relative;
+      flex-shrink: 0;
     }
     .gender-filter input[type="radio"]:checked {
-      border-color: #b7a9ff; background: #7c6aff;
+      border-color: #b7a9ff;
+      background: #7c6aff;
       box-shadow: inset 0 0 0 2px #1b1a2e;
     }
     .gender-filter .radio-label:has(input[type="radio"]:checked) {
-      background: #3d355f; border-color: #8f7bff; color: #fff;
+      background: #3d355f;
+      border-color: #8f7bff;
+      color: #fff;
     }
     .rate-control {
-      margin-top: 0.7rem; display: flex;
-      align-items: center; gap: 0.6rem; flex-wrap: wrap;
+      margin-top: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
     }
     .rate-control label { font-size: 0.8rem; color: #beb8e0; font-weight: 500; }
     input[type="range"] { flex: 1; min-width: 100px; accent-color: #8b78ff; height: 6px; }
     .rate-value { color: #d7d2f0; font-size: 0.8rem; font-weight: 600; min-width: 42px; text-align: right; }
     .custom-timing {
-      display: flex; align-items: center; gap: 0.5rem;
-      margin-top: 0.8rem; flex-wrap: wrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
     }
     .custom-timing label { color: #beb8e0; font-size: 0.8rem; font-weight: 500; }
     input[type="number"] {
-      background: #19172a; border: 1px solid #3f3b60;
-      border-radius: 2rem; padding: 0.5rem 0.8rem;
-      color: white; width: 75px; font-size: 0.85rem;
-      outline: none; font-weight: 500;
-    }
-    .punct-toggle {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 0.6rem; margin-top: 0.9rem;
-      padding: 0.7rem 0.9rem;
-      background: rgba(124, 106, 255, 0.08);
-      border: 1px solid rgba(124, 106, 255, 0.25);
-      border-radius: 1rem;
-    }
-    .punct-toggle .toggle-info {
-      display: flex; flex-direction: column; gap: 0.15rem;
-      flex: 1; min-width: 0;
-    }
-    .punct-toggle .toggle-title {
-      font-size: 0.8rem; font-weight: 600;
-      color: #d7d2f0; display: flex; align-items: center; gap: 0.35rem;
-    }
-    .punct-toggle .toggle-desc {
-      font-size: 0.68rem; color: #9b93c9; line-height: 1.3;
-    }
-    .switch {
-      position: relative; display: inline-block;
-      width: 44px; height: 24px; flex-shrink: 0;
-    }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider-switch {
-      position: absolute; cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #3a3554;
-      border: 1px solid #4d4772;
-      transition: .25s; border-radius: 24px;
-    }
-    .slider-switch:before {
-      position: absolute; content: "";
-      height: 18px; width: 18px;
-      left: 2px; bottom: 2px;
-      background-color: #b7a9ff;
-      transition: .25s; border-radius: 50%;
-    }
-    .switch input:checked + .slider-switch {
-      background-color: #7c6aff; border-color: #b3a6ff;
-    }
-    .switch input:checked + .slider-switch:before {
-      transform: translateX(20px); background-color: #fff;
+      background: #19172a;
+      border: 1px solid #3f3b60;
+      border-radius: 2rem;
+      padding: 0.5rem 0.8rem;
+      color: white;
+      width: 75px;
+      font-size: 0.85rem;
+      outline: none;
+      font-weight: 500;
     }
     .action-bar {
-      display: flex; flex-direction: column;
-      gap: 0.75rem; margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
     }
     @media (min-width: 560px) {
       .action-bar { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
     }
     .playback-controls { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
     .btn {
-      background: #2f2b46; border: none;
-      border-radius: 3rem; padding: 0.8rem 1.5rem;
-      font-weight: 600; font-size: 0.95rem;
-      color: #ece9ff; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center;
-      gap: 0.5rem; border: 1px solid #4b466e;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-      flex: 1; min-width: 110px; transition: 0.15s;
+      background: #2f2b46;
+      border: none;
+      border-radius: 3rem;
+      padding: 0.8rem 1.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #ece9ff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: 1px solid #4b466e;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      flex: 1;
+      min-width: 110px;
     }
     .btn-primary {
       background: linear-gradient(145deg, #8b78ff, #6a55f0);
-      border: 1px solid #b9adff; color: #0d0a1f;
+      border: 1px solid #b9adff;
+      color: #0d0a1f;
       font-weight: 700;
       box-shadow: 0 12px 18px -8px #4a37c0;
-    }
-    .btn-reset {
-      background: linear-gradient(145deg, #2eb872, #1e9e5c);
-      border: 1px solid #7ff0b0; color: #052a14;
-      font-weight: 700;
-      box-shadow: 0 10px 18px -8px #1e8a4f;
     }
     .btn:active { transform: scale(0.97); }
     .btn:disabled { opacity: 0.4; pointer-events: none; filter: grayscale(0.6); }
     .status-badge {
-      background: #1b1929; padding: 0.6rem 1.2rem;
-      border-radius: 3rem; font-size: 0.82rem;
-      font-weight: 500; border: 1px solid #39365a;
-      color: #cbc4f0; display: flex;
-      align-items: center; gap: 0.6rem;
-      white-space: nowrap; justify-content: center;
+      background: #1b1929;
+      padding: 0.6rem 1.2rem;
+      border-radius: 3rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border: 1px solid #39365a;
+      color: #cbc4f0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      white-space: nowrap;
+      justify-content: center;
     }
     .status-badge .dot {
-      width: 10px; height: 10px; border-radius: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
       background: #4cd964;
-      box-shadow: 0 0 8px #4cd964; flex-shrink: 0;
+      box-shadow: 0 0 8px #4cd964;
+      flex-shrink: 0;
     }
     .status-badge .dot.inactive { background: #5a5870; box-shadow: none; }
     .progress {
-      margin-top: 1.2rem; background: #1d1b2e;
-      height: 8px; border-radius: 100px;
-      overflow: hidden; border: 1px solid #2f2c46;
+      margin-top: 1.2rem;
+      background: #1d1b2e;
+      height: 8px;
+      border-radius: 100px;
+      overflow: hidden;
+      border: 1px solid #2f2c46;
     }
     .progress-fill {
-      height: 100%; width: 0%;
+      height: 100%;
+      width: 0%;
       background: linear-gradient(90deg, #9d8cff, #c6b9ff);
-      border-radius: 100px; transition: width 0.1s linear;
+      border-radius: 100px;
+      transition: width 0.1s linear;
     }
     .current-readout {
-      margin-top: 0.8rem; color: #cbc5f0;
-      font-size: 0.9rem; min-height: 3.5rem;
+      margin-top: 0.8rem;
+      color: #cbc5f0;
+      font-size: 0.9rem;
+      min-height: 3.5rem;
       background: rgba(255, 255, 255, 0.02);
-      border-radius: 0.9rem; padding: 0.9rem 1rem;
+      border-radius: 0.9rem;
+      padding: 0.9rem 1rem;
       border: 1px dashed #3d3960;
-      word-break: break-word; line-height: 1.5;
+      word-break: break-word;
+      line-height: 1.5;
     }
     .current-readout strong {
-      color: white; background: #3a3360;
-      padding: 0.2rem 0.55rem; border-radius: 1rem;
-      margin-right: 0.3rem; font-weight: 600; font-size: 0.85rem;
-    }
-    .current-readout .punct-highlight {
-      background: #6b4f1a; color: #ffd98a;
-      padding: 0.1rem 0.35rem; border-radius: 0.4rem;
-      font-weight: 600; font-size: 0.78rem; margin: 0 0.1rem;
+      color: white;
+      background: #3a3360;
+      padding: 0.2rem 0.55rem;
+      border-radius: 1rem;
+      margin-right: 0.3rem;
+      font-weight: 600;
+      font-size: 0.85rem;
     }
     .footer-note {
-      margin-top: 1.2rem; color: #716c99;
-      font-size: 0.72rem; text-align: center;
+      margin-top: 1.2rem;
+      color: #716c99;
+      font-size: 0.72rem;
+      text-align: center;
       border-top: 1px solid #2b2940;
-      padding-top: 1rem; line-height: 1.5;
+      padding-top: 1rem;
+      line-height: 1.5;
     }
+    /* Toast for errors */
     .toast {
-      position: fixed; bottom: 1.5rem; left: 50%;
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
       transform: translateX(-50%) translateY(150%);
-      background: #2c2547; color: #f0edff;
-      padding: 0.9rem 1.3rem; border-radius: 2rem;
+      background: #2c2547;
+      color: #f0edff;
+      padding: 0.9rem 1.3rem;
+      border-radius: 2rem;
       border: 1px solid #5a4a9c;
       box-shadow: 0 15px 25px rgba(0,0,0,0.6);
-      font-size: 0.85rem; z-index: 9999;
-      transition: transform 0.3s; max-width: 90vw;
+      font-size: 0.85rem;
+      z-index: 9999;
+      transition: transform 0.3s;
+      max-width: 90vw;
       text-align: center;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.success { background: #1e3a2a; border-color: #4cd964; color: #b8ffd0; }
-    .toast.warn { background: #3a2e1a; border-color: #ffb84d; color: #ffdc9e; }
-    .reset-hint {
-      font-size: 0.7rem; color: #7fd4a1;
-      margin-top: 0.35rem;
-      display: flex; align-items: center; gap: 0.3rem;
-      line-height: 1.4;
-    }
-    /* Diagnose panel */
-    .diag {
-      margin-top: 0.5rem;
-      background: rgba(0,0,0,0.3);
-      border: 1px dashed #4a4370;
-      border-radius: 0.8rem;
-      padding: 0.6rem 0.8rem;
-      font-size: 0.7rem;
-      color: #9b93c9;
-      line-height: 1.5;
-      display: none;
-    }
-    .diag.show { display: block; }
-    .diag strong { color: #c8bfff; }
   </style>
 </head>
 <body>
 <div class="app-card">
-  <h1>📖 Reading Pace <span>punctuation-aware</span></h1>
+  <h1>📖 Reading Pace <span>smooth & natural</span></h1>
   <div class="subhead">Paste text → choose chunk size, voice & speed → hit play.</div>
 
-  <textarea id="inputText" placeholder="Paste or type your text here...">Hello, world! "This is a test." Can you read it? Yes — I can. Use: colons; semicolons, and (parentheses). The price is $5.50 and 100% correct. Why? Because it's important!</textarea>
+  <textarea id="inputText" placeholder="Paste or type your text here...">The quick brown fox jumps over the lazy dog. This web app reads text smoothly with adjustable chunk sizes and a natural voice. You can select male or female voices, filter by gender, and control the speaking rate for a comfortable listening experience.</textarea>
 
   <div class="controls-grid">
     <div class="control-panel">
       <div class="panel-title"><i>📦</i> CHUNK SIZE</div>
       <div class="chip-group" id="chunkGroup">
-        <div class="chip" data-chunk="1">1 word</div>
+        <div class="chip active" data-chunk="1">1 word</div>
         <div class="chip" data-chunk="2">2 words</div>
         <div class="chip" data-chunk="3">3 words</div>
         <div class="chip" data-chunk="4">4 words</div>
         <div class="chip" data-chunk="5">5 words</div>
-        <div class="chip active" data-chunk="sentence">sentence</div>
+        <div class="chip" data-chunk="sentence">sentence</div>
         <div class="chip" data-chunk="paragraph">paragraph</div>
         <div class="chip" data-chunk="full">full text</div>
-      </div>
-
-      <div class="punct-toggle">
-        <div class="toggle-info">
-          <div class="toggle-title">🔊 Speak Punctuation</div>
-          <div class="toggle-desc">Say symbol names aloud: full stop, comma, quotation mark, etc.</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="punctToggle" checked>
-          <span class="slider-switch"></span>
-        </label>
       </div>
     </div>
 
@@ -383,28 +392,24 @@
       </div>
 
       <div class="voice-selector">
-        <div class="label-row">
-          <label for="voiceSelect">🗣️ Voice</label>
-          <button class="load-voices-btn" id="reloadVoicesBtn" type="button">🔄 Reload</button>
-        </div>
+        <label for="voiceSelect">🗣️ Voice</label>
         <select id="voiceSelect">
-          <option value="">Loading voices…</option>
+          <option value="">Tap here to load voices</option>
         </select>
-        <div class="diag" id="diagPanel"></div>
       </div>
 
       <div class="rate-control">
         <label for="rateSlider">⏩ Rate</label>
-        <input type="range" id="rateSlider" min="0.5" max="1.5" step="0.05" value="1">
-        <span class="rate-value" id="rateValue">1.00x</span>
+        <input type="range" id="rateSlider" min="0.5" max="1.5" step="0.05" value="0.95">
+        <span class="rate-value" id="rateValue">0.95x</span>
       </div>
 
       <div style="margin-top: 0.8rem;">
         <div class="panel-title" style="margin-bottom: 0.6rem;"><i>⏱️</i> DELAY AFTER EACH CHUNK</div>
         <div class="chip-group" id="timingGroup">
-          <div class="chip small active" data-delay="0">0s</div>
+          <div class="chip small" data-delay="0">0s</div>
           <div class="chip small" data-delay="0.5">0.5s</div>
-          <div class="chip small" data-delay="1">1s</div>
+          <div class="chip small active" data-delay="1">1s</div>
           <div class="chip small" data-delay="1.5">1.5s</div>
           <div class="chip small" data-delay="2">2s</div>
           <div class="chip small" data-delay="3">3s</div>
@@ -415,7 +420,7 @@
 
       <div class="custom-timing">
         <label>⏲️ Custom (sec):</label>
-        <input type="number" id="customDelayInput" min="0" max="60" step="0.5" value="0" inputmode="decimal">
+        <input type="number" id="customDelayInput" min="0" max="60" step="0.5" value="1.0" inputmode="decimal">
         <button class="chip small" id="applyCustomDelay" style="padding:0.5rem 0.9rem;">Apply</button>
       </div>
     </div>
@@ -425,7 +430,6 @@
     <div class="playback-controls">
       <button class="btn btn-primary" id="playBtn">▶ Read</button>
       <button class="btn" id="stopBtn" disabled>⏹ Stop</button>
-      <button class="btn btn-reset" id="resetBtn">🔄 Reset to Normal</button>
     </div>
     <div class="status-badge">
       <span class="dot inactive" id="statusDot"></span>
@@ -433,12 +437,10 @@
     </div>
   </div>
 
-  <div class="reset-hint">💡 <span>Normal = sentence chunks · 0s delay · 1.0x rate · natural voice</span></div>
-
   <div class="progress"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
   <div class="current-readout" id="currentChunkDisplay">⏳ <strong>Preview</strong> — chunk will appear here</div>
 
-  <div class="footer-note">⚡ If no voices appear, tap <b>🔄 Reload</b> or interact with the page first.<br>Works best in Chrome, Edge, or Safari.</div>
+  <div class="footer-note">⚡ Smooth natural speech with voice, gender & rate control.<br>Works best in Chrome, Edge, or Safari.</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -454,7 +456,6 @@
     const applyCustomBtn = document.getElementById('applyCustomDelay');
     const playBtn = document.getElementById('playBtn');
     const stopBtn = document.getElementById('stopBtn');
-    const resetBtn = document.getElementById('resetBtn');
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
     const progressFill = document.getElementById('progressFill');
@@ -463,108 +464,39 @@
     const rateSlider = document.getElementById('rateSlider');
     const rateValue = document.getElementById('rateValue');
     const genderRadios = document.querySelectorAll('input[name="gender"]');
-    const punctToggle = document.getElementById('punctToggle');
-    const reloadVoicesBtn = document.getElementById('reloadVoicesBtn');
-    const diagPanel = document.getElementById('diagPanel');
     const toast = document.getElementById('toast');
 
-    const NORMAL = { chunk: 'sentence', delaySec: 0, rate: 1.0, gender: 'all' };
-
-    let currentChunkMode = NORMAL.chunk;
-    let currentDelayMs = NORMAL.delaySec * 1000;
-    let speechRate = NORMAL.rate;
+    let currentChunkMode = '1';
+    let currentDelayMs = 1000;
+    let speechRate = 0.95;
     let selectedVoice = null;
     let allVoices = [];
     let filteredVoices = [];
-    let currentGenderFilter = NORMAL.gender;
-    let speakPunctuation = true;
+    let currentGenderFilter = 'all';
     let chunks = [];
     let currentIndex = 0;
     let isPlaying = false;
     let timeoutId = null;
     let utterance = null;
     let voicesReady = false;
-    let synthSupported = ('speechSynthesis' in window);
 
-    function showToast(msg, ms, type) {
+    function showToast(msg, ms) {
       toast.textContent = msg;
-      toast.classList.remove('success', 'warn');
-      if (type) toast.classList.add(type);
       toast.classList.add('show');
-      clearTimeout(toast._t);
-      toast._t = setTimeout(() => toast.classList.remove('show'), ms || 3000);
+      setTimeout(() => toast.classList.remove('show'), ms || 3000);
     }
 
-    // ===== PUNCTUATION =====
-    const PUNCTUATION_MAP = [
-      { symbol: '...', name: 'ellipsis' },
-      { symbol: '–', name: 'en dash' },
-      { symbol: '—', name: 'em dash' },
-      { symbol: '"', name: 'quotation mark' },
-      { symbol: '"', name: 'left double quotation mark' },
-      { symbol: '"', name: 'right double quotation mark' },
-      { symbol: ''', name: 'apostrophe' },
-      { symbol: ''', name: 'left single quotation mark' },
-      { symbol: ''', name: 'right single quotation mark' },
-      { symbol: '«', name: 'left guillemet' },
-      { symbol: '»', name: 'right guillemet' },
-      { symbol: '(', name: 'left parenthesis' },
-      { symbol: ')', name: 'right parenthesis' },
-      { symbol: '[', name: 'left square bracket' },
-      { symbol: ']', name: 'right square bracket' },
-      { symbol: '{', name: 'left curly bracket' },
-      { symbol: '}', name: 'right curly bracket' },
-      { symbol: '.', name: 'full stop' },
-      { symbol: ',', name: 'comma' },
-      { symbol: '?', name: 'question mark' },
-      { symbol: '!', name: 'exclamation mark' },
-      { symbol: ':', name: 'colon' },
-      { symbol: ';', name: 'semicolon' },
-      { symbol: '&', name: 'ampersand' },
-      { symbol: '*', name: 'asterisk' },
-      { symbol: '@', name: 'at sign' },
-      { symbol: '#', name: 'hash' },
-      { symbol: '$', name: 'dollar sign' },
-      { symbol: '%', name: 'percent sign' },
-      { symbol: '^', name: 'caret' },
-      { symbol: '~', name: 'tilde' },
-      { symbol: '`', name: 'backtick' },
-      { symbol: '|', name: 'vertical bar' },
-      { symbol: '\\', name: 'backslash' },
-      { symbol: '/', name: 'forward slash' },
-      { symbol: '=', name: 'equals sign' },
-      { symbol: '+', name: 'plus sign' },
-      { symbol: '-', name: 'hyphen' },
-      { symbol: '_', name: 'underscore' }
-    ];
-    PUNCTUATION_MAP.sort((a, b) => b.symbol.length - a.symbol.length);
+    const femaleKeywords = ['female', 'woman', 'girl', 'samantha', 'victoria', 'karen', 'moira', 'tessa',
+      'fiona', 'veena', 'susan', 'allison', 'ava', 'zira', 'catherine', 'joanna', 'salli',
+      'kimberly', 'ivy', 'ruth', 'tina', 'linda', 'heather', 'lisa', 'laura', 'emma',
+      'olivia', 'sophia', 'chloe', 'mia', 'ella', 'zuzana', 'paulina', 'yelda', 'mariska',
+      'kanya', 'lekha', 'helena', 'carmit', 'damayanti', 'monica', 'mónica', 'raveena',
+      'shruti', 'neerja', 'kalpana', 'sushma'];
 
-    function punctuateForSpeech(text) {
-      if (!speakPunctuation) return text;
-      let result = text;
-      for (const { symbol, name } of PUNCTUATION_MAP) {
-        if (!result.includes(symbol)) continue;
-        const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        result = result.replace(new RegExp(escaped, 'g'), ` ${name} `);
-      }
-      return result.replace(/\s+/g, ' ').trim();
-    }
-
-    function getPunctName(ch) {
-      const m = PUNCTUATION_MAP.find(p => p.symbol === ch);
-      return m ? m.name : null;
-    }
-
-    // ===== VOICE GENDER DETECTION =====
-    const femaleKeywords = ['female','woman','girl','samantha','victoria','karen','moira','tessa',
-      'fiona','veena','susan','allison','ava','zira','catherine','joanna','salli',
-      'kimberly','ivy','ruth','tina','linda','heather','lisa','laura','emma',
-      'olivia','sophia','chloe','mia','ella','zuzana','paulina','yelda','mariska',
-      'kanya','lekha','helena','carmit','damayanti','monica','mónica','raveena'];
-    const maleKeywords = ['male','man','boy','david','alex','daniel','fred','george',
-      'james','mark','richard','tom','oliver','thomas','diego','jorge',
-      'juan','carlos','liam','noah','ethan','lucas','maged','tarik',
-      'rishi','ravi','prabhat','hemant','matthew','justin','ryan'];
+    const maleKeywords = ['male', 'man', 'boy', 'david', 'alex', 'daniel', 'fred', 'george',
+      'james', 'mark', 'richard', 'tom', 'oliver', 'thomas', 'diego', 'jorge',
+      'juan', 'carlos', 'liam', 'noah', 'ethan', 'lucas', 'maged', 'tarik',
+      'rishi', 'ravi', 'prabhat', 'hemant', 'rishi', 'matthew', 'justin', 'ryan'];
 
     function detectGender(voice) {
       const name = (voice.name || '').toLowerCase();
@@ -573,41 +505,42 @@
       return 'unknown';
     }
 
-    // ===== VOICE LOADING =====
+    // ===== VOICE LOADING (mobile-safe) =====
     function loadVoices() {
-      if (!synthSupported) {
+      if (!('speechSynthesis' in window)) {
         voiceSelect.innerHTML = '<option value="">Speech not supported</option>';
         voiceSelect.disabled = true;
-        diagPanel.innerHTML = '❌ <strong>speechSynthesis is not available</strong> in this browser.';
-        diagPanel.classList.add('show');
-        return false;
+        showToast('Your browser does not support speech synthesis');
+        return;
       }
+
       const voices = window.speechSynthesis.getVoices();
-      if (!voices || voices.length === 0) {
-        // Not ready yet
-        return false;
-      }
+      if (!voices || voices.length === 0) return; // Not ready yet
+      if (voicesReady && voices.length === allVoices.length) return; // Already loaded same set
+
       allVoices = voices;
       voicesReady = true;
       buildVoiceDropdown();
-      diagPanel.innerHTML = `✅ Loaded <strong>${voices.length}</strong> voices. Filter: <strong>${currentGenderFilter}</strong>. Showing: <strong>${filteredVoices.length}</strong>.`;
-      diagPanel.classList.add('show');
-      return true;
     }
 
     function buildVoiceDropdown() {
-      filteredVoices = allVoices.filter(v => {
+      // Apply gender filter
+      filteredVoices = allVoices.filter(voice => {
         if (currentGenderFilter === 'all') return true;
-        return detectGender(v) === currentGenderFilter;
+        return detectGender(voice) === currentGenderFilter;
       });
+
+      // Sort English first
       filteredVoices.sort((a, b) => {
-        const aEn = a.lang.startsWith('en'), bEn = b.lang.startsWith('en');
+        const aEn = a.lang.startsWith('en');
+        const bEn = b.lang.startsWith('en');
         if (aEn && !bEn) return -1;
         if (!aEn && bEn) return 1;
         return a.name.localeCompare(b.name);
       });
 
       voiceSelect.innerHTML = '';
+
       if (filteredVoices.length === 0) {
         const opt = document.createElement('option');
         opt.value = '';
@@ -634,6 +567,7 @@
         voiceSelect.appendChild(opt);
       });
 
+      // Restore or auto-select
       if (selectedVoice) {
         const idx = filteredVoices.findIndex(v =>
           v.name === selectedVoice.name && v.lang === selectedVoice.lang);
@@ -655,88 +589,47 @@
       }
     }
 
-    // ===== AGGRESSIVE VOICE LOADING =====
-    let loadAttempts = 0;
-    const MAX_ATTEMPTS = 30;
-
+    // Try loading voices several ways
     function kickOffVoiceLoading() {
-      if (!synthSupported) return;
-      loadAttempts = 0;
-
+      if (!('speechSynthesis' in window)) return;
       // Immediate attempt
-      if (loadVoices()) return;
-
-      // Listen for voiceschanged event (main mechanism)
-      try {
-        window.speechSynthesis.onvoiceschanged = () => {
-          if (loadVoices()) {
-            showToast(`✅ Loaded ${allVoices.length} voices`, 2500, 'success');
-          }
-        };
-      } catch (e) { /* some browsers don't allow */ }
-
-      // Poll aggressively — many mobile browsers need this
+      loadVoices();
+      // Some browsers need a slight delay
+      setTimeout(loadVoices, 100);
+      setTimeout(loadVoices, 300);
+      setTimeout(loadVoices, 800);
+      setTimeout(loadVoices, 1500);
+      // The proper event
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+      // Also poll briefly
+      let polls = 0;
       const poll = setInterval(() => {
-        loadAttempts++;
-        if (loadVoices()) {
-          clearInterval(poll);
-          return;
-        }
-        if (loadAttempts >= MAX_ATTEMPTS) {
-          clearInterval(poll);
-          // Final fallback
-          if (!voicesReady) {
-            diagPanel.innerHTML = `⚠️ <strong>No voices loaded after ${MAX_ATTEMPTS} attempts.</strong><br>
-              • Try tapping the page anywhere<br>
-              • Or tap <b>🔄 Reload</b> to try again<br>
-              • Check if your device has TTS voices installed`;
-            diagPanel.classList.add('show');
-          }
-        }
-      }, 200);
+        loadVoices();
+        if (voicesReady || ++polls > 10) clearInterval(poll);
+      }, 400);
     }
 
-    // Load voices on ANY user interaction (crucial for mobile)
-    ['click', 'touchstart', 'keydown', 'pointerdown', 'touchend', 'mousedown'].forEach(evt => {
-      document.addEventListener(evt, function onFirstInteract() {
-        if (!voicesReady) {
-          loadVoices();
-        }
-        document.removeEventListener(evt, onFirstInteract);
-      }, { passive: true });
+    // Trigger voice loading on many possible first-interaction events
+    ['click', 'touchstart', 'keydown', 'pointerdown'].forEach(evt => {
+      document.addEventListener(evt, function once() {
+        kickOffVoiceLoading();
+        document.removeEventListener(evt, once);
+      }, { once: true, passive: true });
     });
 
-    // Start loading immediately
+    // Also try immediately
     kickOffVoiceLoading();
 
-    // Reload button
-    reloadVoicesBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      selectedVoice = null;
-      voicesReady = false;
-      loadAttempts = 0;
-      voiceSelect.innerHTML = '<option value="">Loading voices…</option>';
-      diagPanel.classList.remove('show');
-      if (synthSupported) {
-        try { window.speechSynthesis.cancel(); } catch (err) {}
-        // Force a refresh
-        window.speechSynthesis.getVoices();
-      }
-      if (loadVoices()) {
-        showToast(`✅ Loaded ${allVoices.length} voices`, 2500, 'success');
-      } else {
-        showToast('⏳ Still loading… try again in a moment', 2500, 'warn');
-        kickOffVoiceLoading();
-      }
+    // When user clicks select but voices not loaded, try again
+    voiceSelect.addEventListener('focus', () => {
+      if (!voicesReady) kickOffVoiceLoading();
     });
-
-    // Also focus/tap on select triggers load
-    ['focus', 'mousedown', 'touchstart'].forEach(evt => {
-      voiceSelect.addEventListener(evt, () => {
-        if (!voicesReady) loadVoices();
-      }, { passive: true });
+    voiceSelect.addEventListener('mousedown', () => {
+      if (!voicesReady) kickOffVoiceLoading();
     });
+    voiceSelect.addEventListener('touchstart', () => {
+      if (!voicesReady) kickOffVoiceLoading();
+    }, { passive: true });
 
     // ===== VOICE SELECT CHANGE =====
     voiceSelect.addEventListener('change', () => {
@@ -747,7 +640,7 @@
         if (!isNaN(idx) && filteredVoices[idx]) selectedVoice = filteredVoices[idx];
       }
       if (isPlaying && currentIndex < chunks.length) {
-        if (synthSupported) window.speechSynthesis.cancel();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
       }
     });
@@ -757,9 +650,9 @@
       r.addEventListener('change', e => {
         currentGenderFilter = e.target.value;
         selectedVoice = null;
-        if (voicesReady) buildVoiceDropdown();
+        buildVoiceDropdown();
         if (isPlaying && currentIndex < chunks.length) {
-          if (synthSupported) window.speechSynthesis.cancel();
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
           if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
         }
       });
@@ -768,15 +661,6 @@
     rateSlider.addEventListener('input', e => {
       speechRate = parseFloat(e.target.value);
       rateValue.textContent = speechRate.toFixed(2) + 'x';
-    });
-
-    punctToggle.addEventListener('change', () => {
-      speakPunctuation = punctToggle.checked;
-      if (isPlaying && currentIndex < chunks.length) {
-        if (synthSupported) window.speechSynthesis.cancel();
-        if (currentIndex < chunks.length) speakText(chunks[currentIndex].text);
-      }
-      showToast(speakPunctuation ? '🔊 Punctuation ON' : '🔇 Punctuation OFF', 1800);
     });
 
     // ===== CHUNKING =====
@@ -806,21 +690,6 @@
       updateProgressAndPreview();
     }
 
-    function renderChunkPreview(chunkText, showPunct) {
-      if (!showPunct) return esc(chunkText);
-      let out = '';
-      for (let i = 0; i < chunkText.length; i++) {
-        const ch = chunkText[i];
-        const name = getPunctName(ch);
-        if (name) {
-          out += `<span class="punct-highlight" title="${esc(name)}">${esc(ch)} → ${esc(name)}</span>`;
-        } else {
-          out += esc(ch);
-        }
-      }
-      return out;
-    }
-
     function updateProgressAndPreview() {
       if (!chunks.length) {
         progressFill.style.width = '0%';
@@ -831,8 +700,7 @@
       progressFill.style.width = `${(currentIndex / total) * 100}%`;
       if (currentIndex < total && currentIndex >= 0) {
         const c = chunks[currentIndex];
-        const previewHtml = renderChunkPreview(c.text, speakPunctuation);
-        currentChunkDisplay.innerHTML = `📌 <strong>Chunk ${currentIndex + 1}/${total}</strong> — “${previewHtml}”`;
+        currentChunkDisplay.innerHTML = `📌 <strong>Chunk ${currentIndex + 1}/${total}</strong> — “${esc(c.text)}”`;
       } else if (currentIndex >= total) {
         currentChunkDisplay.innerHTML = `✅ <strong>Finished</strong> — all ${total} chunks read.`;
       } else {
@@ -846,20 +714,17 @@
 
     // ===== SPEAK =====
     function speakText(text) {
-      if (!synthSupported) return;
+      if (!('speechSynthesis' in window)) {
+        showToast('Speech synthesis not supported');
+        return;
+      }
       try { window.speechSynthesis.cancel(); } catch (e) {}
-      const spokenText = punctuateForSpeech(text);
-      utterance = new SpeechSynthesisUtterance(spokenText);
+      utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = speechRate;
       utterance.pitch = 1;
       utterance.volume = 1;
       if (selectedVoice) utterance.voice = selectedVoice;
-      utterance.onerror = (e) => {
-        // Silently ignore "interrupted" / "canceled" errors — they're normal
-        if (e.error && !/interrupted|canceled/i.test(e.error)) {
-          console.warn('Speech error:', e.error);
-        }
-      };
+      // Slight delay helps on some mobile browsers
       setTimeout(() => {
         try { window.speechSynthesis.speak(utterance); } catch (e) {}
       }, 40);
@@ -869,7 +734,7 @@
     function stopReading(resetIndex) {
       if (resetIndex === undefined) resetIndex = true;
       if (timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
-      if (synthSupported) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+      if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
       isPlaying = false;
       playBtn.disabled = false;
       stopBtn.disabled = true;
@@ -891,7 +756,7 @@
         statusText.textContent = 'Finished';
         updateProgressAndPreview();
         currentChunkDisplay.innerHTML = `✅ <strong>Finished</strong> — all ${chunks.length} chunks read.`;
-        if (synthSupported) window.speechSynthesis.cancel();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         return;
       }
       const chunk = chunks[currentIndex];
@@ -906,21 +771,16 @@
     // ===== START =====
     function startReading() {
       if (isPlaying) return;
-      if (!synthSupported) {
-        showToast('❌ Your browser does not support speech synthesis', 3500, 'warn');
+      if (!('speechSynthesis' in window)) {
+        showToast('Your browser does not support speech synthesis');
         return;
       }
-      // Try to load voices one more time if not loaded
+      // Ensure voices loaded (needed on mobile)
       if (!voicesReady) {
         loadVoices();
-        if (!voicesReady) {
-          showToast('⏳ Voices still loading — try again in a moment', 3000, 'warn');
-          kickOffVoiceLoading();
-          return;
-        }
       }
       if (!chunks.length || currentIndex >= chunks.length) rebuildChunks();
-      if (!chunks.length) { showToast('Please enter some text first', 2500, 'warn'); return; }
+      if (!chunks.length) { showToast('Please enter some text first'); return; }
       if (currentIndex >= chunks.length) currentIndex = 0;
 
       isPlaying = true;
@@ -978,27 +838,6 @@
       }
     });
 
-    // ===== RESET =====
-    resetBtn.addEventListener('click', () => {
-      if (isPlaying) stopReading(true);
-      currentChunkMode = NORMAL.chunk;
-      chunkChips.forEach(c => c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk));
-      currentDelayMs = NORMAL.delaySec * 1000;
-      customDelayInput.value = NORMAL.delaySec;
-      timingChips.forEach(c => c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec));
-      speechRate = NORMAL.rate;
-      rateSlider.value = speechRate;
-      rateValue.textContent = speechRate.toFixed(2) + 'x';
-      currentGenderFilter = NORMAL.gender;
-      genderRadios.forEach(r => { r.checked = (r.value === NORMAL.gender); });
-      selectedVoice = null;
-      if (voicesReady) buildVoiceDropdown();
-      rebuildChunks();
-      statusText.textContent = 'Normal';
-      const punctNote = speakPunctuation ? ' · punctuation ON' : ' · punctuation OFF';
-      showToast('✅ Reset to normal' + punctNote, 2500, 'success');
-    });
-
     playBtn.addEventListener('click', startReading);
     stopBtn.addEventListener('click', () => stopReading(true));
 
@@ -1009,26 +848,16 @@
 
     // ===== INIT =====
     (function init() {
-      chunkChips.forEach(c => c.classList.toggle('active', c.dataset.chunk === NORMAL.chunk));
-      timingChips.forEach(c => c.classList.toggle('active', parseFloat(c.dataset.delay) === NORMAL.delaySec));
-      genderRadios.forEach(r => { r.checked = (r.value === NORMAL.gender); });
-      rateSlider.value = NORMAL.rate;
-      rateValue.textContent = NORMAL.rate.toFixed(2) + 'x';
-      customDelayInput.value = NORMAL.delaySec;
-      punctToggle.checked = true;
-      speakPunctuation = true;
+      rateSlider.value = speechRate;
+      rateValue.textContent = speechRate.toFixed(2) + 'x';
 
-      if (!synthSupported) {
+      if (!('speechSynthesis' in window)) {
         statusText.textContent = 'No speech support';
         voiceSelect.disabled = true;
         rateSlider.disabled = true;
-        diagPanel.innerHTML = '❌ <strong>speechSynthesis</strong> not available in this browser.';
-        diagPanel.classList.add('show');
-        showToast('Speech synthesis not supported', 5000, 'warn');
+        showToast('Speech synthesis not supported in this browser', 5000);
       } else {
-        // Show diagnostic panel with initial status
-        diagPanel.innerHTML = `⏳ Waiting for voices…<br>If nothing appears, tap <b>🔄 Reload</b> or interact with the page.`;
-        diagPanel.classList.add('show');
+        // Kick off loading immediately and after user gestures
         kickOffVoiceLoading();
       }
 
@@ -1038,7 +867,7 @@
 
     window.addEventListener('beforeunload', () => {
       if (timeoutId) clearTimeout(timeoutId);
-      if (synthSupported) window.speechSynthesis.cancel();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     });
 
   })();
