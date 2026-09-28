@@ -2,117 +2,197 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Essay Collection</title>
     
-    <!-- 1. Load Marked.js (converts Markdown to HTML) -->
+    <!-- Marked.js for Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
-    <!-- 2. Load PapaParse (reads CSV files) -->
+    <!-- PapaParse for CSV reading -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Google Fonts for English and Urdu -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #3498db;
+            --primary-hover: #2980b9;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-light: #7f8c8d;
+            --border: #e0e0e0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             line-height: 1.6;
             margin: 0;
             padding: 20px;
+            -webkit-tap-highlight-color: transparent;
         }
+
         .container {
-            max-width: 1200px; /* Wider to fit a grid */
+            max-width: 1200px;
             margin: 0 auto;
         }
-        h1 {
+
+        header {
             text-align: center;
-            color: #2c3e50;
             margin-bottom: 30px;
         }
-        
-        /* Grid Layout for Cards */
+
+        h1 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin: 0;
+        }
+
+        /* Grid Layout */
         .essay-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: 1fr;
             gap: 20px;
         }
 
+        @media (min-width: 768px) {
+            .essay-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .essay-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* Essay Cards */
         .essay-card {
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             padding: 20px;
-            border-top: 5px solid #3498db;
+            border-top: 4px solid var(--primary);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
             height: 100%;
             box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .essay-card:active {
+            transform: scale(0.98);
         }
 
         .essay-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
         }
 
-        .essay-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            font-size: 0.85em;
-            color: #7f8c8d;
-        }
-
-        .essay-preview {
+        .card-preview {
             font-size: 0.95em;
             color: #555;
             flex-grow: 1;
-            /* Limit to 4 lines */
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 5;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-bottom: 15px;
         }
 
-        .read-more-btn {
-            margin-top: 15px;
-            text-align: right;
-            color: #3498db;
+        .read-more {
+            color: var(--primary);
             font-weight: bold;
             font-size: 0.9em;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        /* Floating Refresh Button */
+        .refresh-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s, transform 0.2s;
+            z-index: 900;
+        }
+
+        .refresh-btn:hover {
+            background-color: var(--primary-hover);
+            transform: rotate(30deg);
+        }
+
+        .refresh-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .refresh-btn.loading svg {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
         }
 
         /* Modal Styles */
         .modal-overlay {
-            display: none; /* Hidden by default */
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.7);
             z-index: 1000;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
+            align-items: flex-end; /* Mobile slide up */
+        }
+
+        @media (min-width: 768px) {
+            .modal-overlay { align-items: center; } /* Desktop center */
         }
 
         .modal-content {
             background: #fff;
             width: 100%;
-            max-width: 800px;
-            max-height: 90vh;
-            border-radius: 10px;
+            height: 95vh;
+            max-width: 900px;
+            border-radius: 20px 20px 0 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: fadeIn 0.3s ease;
+            animation: slideUp 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                height: 90vh;
+                border-radius: 12px;
+                animation: fadeIn 0.3s ease;
+            }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
 
         @keyframes fadeIn {
@@ -121,27 +201,32 @@
         }
 
         .modal-header {
-            padding: 20px;
+            padding: 15px 20px;
             background: #f8f9fa;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .modal-header-info {
-            font-size: 0.9em;
-            color: #666;
+        .modal-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2c3e50;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
         }
 
         .close-btn {
             background: #e74c3c;
             color: white;
             border: none;
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -155,130 +240,188 @@
         }
 
         .modal-body {
-            padding: 30px;
+            padding: 20px;
             overflow-y: auto;
-            color: #333;
+            color: var(--text);
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Markdown Styles inside Modal */
+        /* Markdown Styles */
         .modal-body h1, .modal-body h2, .modal-body h3 {
             color: #2c3e50;
             margin-top: 1.5em;
             margin-bottom: 0.5em;
         }
+        
+        .modal-body p { margin-bottom: 1em; }
+        
         .modal-body blockquote {
-            border-left: 4px solid #3498db;
+            border-left: 4px solid var(--primary);
             margin: 0;
             padding-left: 15px;
             color: #555;
             font-style: italic;
             background: #f9f9f9;
             padding: 10px 15px;
+            border-radius: 0 5px 5px 0;
         }
-        .modal-body p {
-            margin-bottom: 1em;
+        
+        /* Table Styles for Vocabulary */
+        .modal-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+            display: block;
+            overflow-x: auto;
+        }
+        
+        .modal-body th, .modal-body td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .modal-body th {
+            background-color: #f2f2f2;
+            color: #2c3e50;
         }
 
-        .loading {
+        /* Urdu Text Styling */
+        .urdu-text, [lang="ur"] {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            direction: rtl;
+            text-align: right;
+            font-size: 1.15em;
+            line-height: 2.5;
+            color: #2c3e50;
+        }
+
+        .loading, .error {
             text-align: center;
-            font-size: 1.2em;
-            color: #7f8c8d;
+            padding: 40px 20px;
+            font-size: 1.1em;
             grid-column: 1 / -1;
         }
-        .error {
-            color: #e74c3c;
-            text-align: center;
-            font-weight: bold;
-            background: #fadbd8;
-            padding: 15px;
-            border-radius: 5px;
-            grid-column: 1 / -1;
-        }
+        .error { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Essay Collection</h1>
+        <header>
+            <h1>Essay Collection</h1>
+        </header>
         <div id="essays-container" class="essay-grid">
             <div class="loading">Loading essays... Please wait.</div>
         </div>
     </div>
 
-    <!-- Modal Structure -->
+    <!-- Floating Refresh Button -->
+    <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()" title="Refresh Data">
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+
+    <!-- Reading Modal -->
     <div id="essayModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-header-info" id="modalInfo"></div>
+                <div class="modal-title" id="modalTitle">Reading Essay...</div>
                 <button class="close-btn" onclick="closeModal()">✕</button>
             </div>
-            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-body" id="modalBody" onscroll="saveScrollPosition()"></div>
         </div>
     </div>
 
     <script>
+        // --- CONFIGURATION ---
         // Your published CSV link
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
 
+        // --- STATE MANAGEMENT ---
         const container = document.getElementById('essays-container');
         const modal = document.getElementById('essayModal');
         const modalBody = document.getElementById('modalBody');
-        const modalInfo = document.getElementById('modalInfo');
+        const modalTitle = document.getElementById('modalTitle');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        let essaysData = []; // Stores the fetched essays
+        let currentEssayIndex = null; // Tracks which essay is open
+        let scrollSaveTimeout;
 
-        // Function to fetch and display data
-        function loadEssays() {
-            Papa.parse(csvUrl, {
+        // --- DATA FETCHING ---
+        function loadEssays(forceRefresh = false) {
+            // Show loading state
+            if (!forceRefresh && essaysData.length === 0) {
+                container.innerHTML = '<div class="loading">Loading essays...</div>';
+            }
+            refreshBtn.classList.add('loading');
+
+            // Add a cache-busting parameter to the URL to ensure fresh data on refresh
+            const fetchUrl = forceRefresh ? csvUrl + '&t=' + new Date().getTime() : csvUrl;
+
+            Papa.parse(fetchUrl, {
                 download: true,
-                header: true,
+                header: false, // We will access columns by index
                 dynamicTyping: true,
                 complete: function(results) {
-                    renderEssays(results.data);
+                    refreshBtn.classList.remove('loading');
+                    // Extract only Column B (Index 1). Skip the header row (index 0).
+                    const rawRows = results.data.slice(1); 
+                    
+                    // Filter out empty rows and map to our object structure
+                    essaysData = rawRows
+                        .map((row, index) => ({
+                            id: index,
+                            markdown: row[1] ? String(row[1]).trim() : ''
+                        }))
+                        .filter(item => item.markdown !== '');
+
+                    if (essaysData.length === 0) {
+                        container.innerHTML = '<div class="error">No valid essay data found in Column B.</div>';
+                        return;
+                    }
+
+                    renderCards();
+                    
+                    // If a modal was previously open, try to restore it
+                    restoreLastState();
                 },
                 error: function(error) {
-                    container.innerHTML = `<div class="error">Error loading data: ${error.message}. Ensure the URL is correct and published to the web.</div>`;
+                    refreshBtn.classList.remove('loading');
+                    container.innerHTML = `<div class="error">Error loading data: ${error.message}.</div>`;
                 }
             });
         }
 
-        // Function to render the essay cards
-        function renderEssays(data) {
-            container.innerHTML = ''; // Clear loading message
+        // --- RENDERING ---
+        function renderCards() {
+            container.innerHTML = ''; 
 
-            const validData = data.filter(row => row.essay_markdown && row.essay_markdown.trim() !== '');
-
-            if (validData.length === 0) {
-                container.innerHTML = '<div class="error">No valid essay data found.</div>';
-                return;
-            }
-
-            validData.forEach((row, index) => {
-                const srNo = row.srno || 'N/A';
-                const rawMarkdown = row.essay_markdown || '';
-                const rawDate = row.date || 'No date';
+            essaysData.forEach((essay, index) => {
+                // Create a plain text preview by stripping Markdown
+                const plainText = essay.markdown
+                    .replace(/[#*`>_|]/g, '') // Remove markdown chars
+                    .replace(/\n/g, ' ')      // Replace newlines with spaces
+                    .substring(0, 200) + '...';
                 
-                // Convert full Markdown to HTML
-                const parsedMarkdown = marked.parse(rawMarkdown);
+                // Try to extract a title from the first line of the markdown
+                let titleMatch = essay.markdown.match(/^#\s+(.+)$/m);
+                let cardTitle = titleMatch ? titleMatch[1] : `Essay ${index + 1}`;
                 
-                // Create a plain text preview (strip markdown symbols for the card)
-                const plainTextPreview = rawMarkdown
-                                            .replace(/[#*`>_]/g, '') // Remove common markdown chars
-                                            .substring(0, 200) + '...';
-                
-                // Format the date
-                let dateStr = formatDate(rawDate);
+                // Truncate title for the card
+                if (cardTitle.length > 60) cardTitle = cardTitle.substring(0, 60) + '...';
 
-                // Create the card HTML
-                // We store the full HTML content in a data attribute (encoded to prevent breaking HTML)
                 const cardHTML = `
-                    <div class="essay-card" onclick="openModal('${encodeURIComponent(parsedMarkdown)}', '${srNo}', '${dateStr}')">
-                        <div class="essay-header">
-                            <span><strong>SR No:</strong> ${srNo}</span>
-                            <span><strong>Date:</strong> ${dateStr}</span>
+                    <div class="essay-card" onclick="openModal(${index})" id="card-${index}">
+                        <div class="card-preview">
+                            <strong style="color: #2c3e50; display: block; margin-bottom: 8px;">${cardTitle}</strong>
+                            ${plainText}
                         </div>
-                        <div class="essay-preview">
-                            ${plainTextPreview}
+                        <div class="read-more">
+                            Read Full Essay 
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
-                        <div class="read-more-btn">Read Full Essay &rarr;</div>
                     </div>
                 `;
                 
@@ -286,58 +429,95 @@
             });
         }
 
-        // Date formatting helper function
-        function formatDate(rawDate) {
-            if (!rawDate || rawDate === 'No date') return 'No date';
+        // --- MODAL LOGIC ---
+        function openModal(index) {
+            if (!essaysData[index]) return;
             
-            const dateObj = new Date(rawDate);
-            if (isNaN(dateObj.getTime())) return rawDate; // Return raw string if invalid date
-
-            if (rawDate.toString().includes(':')) {
-                return dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString();
-            } else {
-                return dateObj.toLocaleDateString();
-            }
-        }
-
-        // Modal Functions
-        function openModal(encodedHtml, srNo, dateStr) {
-            // Decode the HTML content back to normal
-            const decodedHtml = decodeURIComponent(encodedHtml);
+            currentEssayIndex = index;
+            const rawMarkdown = essaysData[index].markdown;
             
-            // Set the content in the modal
-            modalInfo.innerHTML = `<strong>SR No:</strong> ${srNo} &nbsp;|&nbsp; <strong>Date:</strong> ${dateStr}`;
-            modalBody.innerHTML = decodedHtml;
+            // Parse Markdown to HTML
+            modalBody.innerHTML = marked.parse(rawMarkdown);
             
-            // Show the modal
+            // Update Title
+            let titleMatch = rawMarkdown.match(/^#\s+(.+)$/m);
+            modalTitle.innerText = titleMatch ? titleMatch[1] : `Essay ${index + 1}`;
+            
+            // Show Modal
             modal.style.display = 'flex';
-            
-            // Prevent background scrolling
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+
+            // Restore scroll position if it exists for this specific essay
+            const savedScroll = localStorage.getItem(`essay_scroll_${index}`);
+            if (savedScroll) {
+                // Timeout ensures DOM is fully rendered before scrolling
+                setTimeout(() => {
+                    modalBody.scrollTop = parseInt(savedScroll, 10);
+                }, 50);
+            } else {
+                modalBody.scrollTop = 0; // Start at top for new essays
+            }
+
+            // Save state to localStorage
+            localStorage.setItem('last_open_essay', index);
         }
 
         function closeModal() {
             modal.style.display = 'none';
-            // Restore background scrolling
             document.body.style.overflow = 'auto';
+            
+            // Clear the "currently open" state, but keep the scroll position saved
+            localStorage.removeItem('last_open_essay');
+            currentEssayIndex = null;
         }
 
-        // Close modal if user clicks outside the content area
-        window.onclick = function(event) {
-            if (event.target === modal) {
-                closeModal();
+        // --- STATE PERSISTENCE ---
+        function saveScrollPosition() {
+            if (currentEssayIndex !== null) {
+                // Debounce the scroll saving to prevent performance issues
+                clearTimeout(scrollSaveTimeout);
+                scrollSaveTimeout = setTimeout(() => {
+                    localStorage.setItem(`essay_scroll_${currentEssayIndex}`, modalBody.scrollTop);
+                }, 100);
             }
         }
 
-        // Close modal if user presses "Escape" key
+        function restoreLastState() {
+            // Check if we were reading an essay before reload
+            const lastEssay = localStorage.getItem('last_open_essay');
+            if (lastEssay !== null && essaysData[lastEssay]) {
+                // Reopen the modal for that essay
+                openModal(parseInt(lastEssay, 10));
+            }
+        }
+
+        // --- REFRESH LOGIC ---
+        function forceRefresh() {
+            // 1. Clear all saved states to ensure truly fresh data
+            localStorage.clear();
+            
+            // 2. Close modal if open
+            closeModal();
+            
+            // 3. Fetch fresh data
+            loadEssays(true);
+        }
+
+        // --- EVENT LISTENERS ---
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target === modal) closeModal();
+        }
+
+        // Close modal on Escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape' && modal.style.display === 'flex') {
                 closeModal();
             }
         });
 
-        // Run the function on page load
-        window.onload = loadEssays;
+        // Initial Load
+        window.onload = () => loadEssays(false);
     </script>
 
 </body>
