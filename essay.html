@@ -23,7 +23,7 @@
             --danger: #dc2626;
             --radius: 14px;
             --radius-sm: 10px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
         }
 
@@ -39,43 +39,18 @@
             min-height: 100dvh;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 16px 110px;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 110px; }
 
-        header {
-            text-align: center;
-            margin-bottom: 28px;
-            padding-top: 8px;
-        }
+        header { text-align: center; margin-bottom: 28px; padding-top: 8px; }
+        h1 { font-size: 1.7rem; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.03em; }
+        .subtitle { margin: 0; font-size: 0.95rem; color: var(--text-secondary); }
 
-        h1 {
-            font-size: 1.7rem;
-            font-weight: 700;
-            margin: 0 0 4px;
-            letter-spacing: -0.03em;
-        }
-
-        .subtitle {
-            margin: 0;
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-        }
-
-        .essay-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
+        .essay-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
         @media (min-width: 640px) {
             .essay-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
             .container { padding: 28px 24px 110px; }
             h1 { font-size: 1.9rem; }
         }
-
         @media (min-width: 1024px) {
             .essay-grid { grid-template-columns: repeat(3, 1fr); gap: 22px; }
         }
@@ -93,19 +68,10 @@
         }
 
         @media (hover: hover) {
-            .essay-card:hover {
-                transform: translateY(-2px);
-                box-shadow: var(--shadow-md);
-            }
+            .essay-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
 
         .card-title-group {
             flex: 1;
@@ -115,333 +81,163 @@
             gap: 6px;
             cursor: pointer;
         }
-
         .card-title-group:active { opacity: 0.75; }
-
-        .card-srno {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .card-title {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--text);
-            line-height: 1.35;
-        }
+        .card-srno { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+        .card-title { font-size: 1.05rem; font-weight: 600; color: var(--text); line-height: 1.35; }
 
         .card-nav-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: var(--primary-soft);
-            border: none;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            cursor: pointer;
+            width: 42px; height: 42px; border-radius: 50%;
+            background: var(--primary-soft); border: none; color: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; cursor: pointer; transition: background 0.2s;
         }
-
         .card-nav-icon:active { background: #dbeafe; }
         .card-nav-icon svg { width: 20px; height: 20px; }
 
         .card-meta {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-bottom: 14px;
-            padding-bottom: 12px;
+            font-size: 0.8rem; color: var(--text-secondary);
+            display: flex; flex-wrap: wrap; gap: 14px;
+            margin-bottom: 14px; padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
         }
 
         .card-classification {
-            font-size: 0.8rem;
-            background: #fefce8;
-            color: #854d0e;
-            padding: 9px 12px;
-            border-radius: 8px;
-            border-left: 3px solid #eab308;
-            margin-bottom: 14px;
-            line-height: 1.4;
+            font-size: 0.8rem; background: #fefce8; color: #854d0e;
+            padding: 9px 12px; border-radius: 8px;
+            border-left: 3px solid #eab308; margin-bottom: 14px; line-height: 1.4;
         }
 
         /* Vocabulary */
-        .vocab-section {
-            margin-top: auto;
-            padding-top: 14px;
-            border-top: 1px solid var(--border);
-        }
+        .vocab-section { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border); }
 
         .vocab-toggle-btn {
-            width: 100%;
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            color: var(--primary);
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 13px 16px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            width: 100%; background: #f8fafc; border: 1px solid var(--border);
+            color: var(--primary); font-size: 0.9rem; font-weight: 600;
+            padding: 13px 16px; border-radius: var(--radius-sm); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s;
         }
-
         .vocab-toggle-btn:active { background: #f1f5f9; }
 
         .vocab-content {
-            display: none;
-            margin-top: 12px;
-            max-height: 340px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            display: none; margin-top: 12px; max-height: 340px;
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
         }
-
         .vocab-content.active { display: block; }
 
         .vocab-item {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
+            background: #f8fafc; border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
         }
-
         .vocab-item:last-child { margin-bottom: 0; }
 
         .vocab-word {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 0.95rem; font-weight: 600; color: var(--text);
+            margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
         }
 
         .vocab-word .number {
-            background: var(--primary);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 600;
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            background: var(--primary); color: white; font-size: 0.75rem;
+            font-weight: 600; width: 22px; height: 22px; border-radius: 6px;
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
 
         .urdu-text {
-            font-family: 'Noto Nastaliq Urdu', serif;
-            direction: rtl;
-            text-align: right;
-            font-size: 1.25rem;
-            line-height: 1.9;
-            color: #1e293b;
-            background: white;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            margin: 8px 0 10px;
+            font-family: 'Noto Nastaliq Urdu', serif; direction: rtl; text-align: right;
+            font-size: 1.25rem; line-height: 1.9; color: #1e293b;
+            background: white; padding: 10px 14px; border-radius: 8px;
+            border: 1px solid #e2e8f0; margin: 8px 0 10px;
         }
 
-        .vocab-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            font-size: 0.82rem;
-        }
-
-        .vocab-meta-row {
-            display: flex;
-            gap: 6px;
-            line-height: 1.45;
-        }
-
-        .vocab-label {
-            font-weight: 600;
-            color: var(--text-secondary);
-            min-width: 78px;
-            flex-shrink: 0;
-        }
-
+        .vocab-meta { display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem; }
+        .vocab-meta-row { display: flex; gap: 6px; line-height: 1.45; }
+        .vocab-label { font-weight: 600; color: var(--text-secondary); min-width: 78px; flex-shrink: 0; }
         .vocab-value { color: var(--text); }
 
-        /* Floating button */
+        /* Floating Refresh */
         .refresh-btn {
-            position: fixed;
-            bottom: 24px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
+            position: fixed; bottom: 24px; right: 20px; width: 56px; height: 56px;
+            background: var(--primary); color: white; border: none; border-radius: 50%;
             box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 900;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 900;
+            transition: transform 0.2s, background 0.2s;
         }
-
         .refresh-btn:active { transform: scale(0.94); }
         .refresh-btn.loading svg { animation: spin 0.8s linear infinite; }
         .refresh-btn svg { width: 24px; height: 24px; fill: currentColor; }
-
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Modal */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.55);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: flex-end;
+            display: none; position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(5px);
+            z-index: 1000; justify-content: center; align-items: flex-end;
         }
-
         @media (min-width: 768px) {
-            .modal-overlay {
-                align-items: center;
-                padding: 24px;
-            }
+            .modal-overlay { align-items: center; padding: 24px; }
         }
 
         .modal-content {
-            background: white;
-            width: 100%;
-            height: 94dvh;
-            max-width: 860px;
-            border-radius: 20px 20px 0 0;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            background: white; width: 100%; height: 94dvh; max-width: 860px;
+            border-radius: 20px 20px 0 0; display: flex; flex-direction: column;
+            overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
             animation: slideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
         @media (min-width: 768px) {
-            .modal-content {
-                height: 90vh;
-                border-radius: 16px;
-                animation: fadeIn 0.25s ease;
-            }
+            .modal-content { height: 90vh; border-radius: 16px; animation: fadeIn 0.25s ease; }
         }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.97); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
         .modal-header {
-            padding: 14px 16px;
-            background: #f8fafc;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
+            padding: 14px 16px; background: #f8fafc; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
             flex-shrink: 0;
         }
-
         .modal-header-title {
-            font-weight: 600;
-            font-size: 1rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: 600; font-size: 1rem; color: var(--text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
-        .modal-header-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
+        .modal-header-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
         .action-btn {
-            border: none;
-            border-radius: 9px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
+            border: none; border-radius: 9px; font-size: 0.875rem;
+            font-weight: 600; padding: 10px 14px;
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer; transition: background 0.2s;
         }
-
         .copy-btn { background: var(--success); color: white; }
+        .copy-btn:active { background: #047857; }
         .copy-btn.copied { background: #0f172a; }
 
         .close-btn {
-            background: var(--danger);
-            color: white;
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 1.15rem;
+            background: var(--danger); color: white; width: 40px; height: 40px;
+            padding: 0; justify-content: center; border-radius: 50%; font-size: 1.15rem;
         }
+        .close-btn:active { background: #b91c1c; }
 
         .modal-body {
-            padding: 22px 18px 48px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            flex: 1;
+            padding: 22px 18px 48px; overflow-y: auto;
+            -webkit-overflow-scrolling: touch; flex: 1;
             overscroll-behavior: contain;
         }
-
-        @media (min-width: 640px) {
-            .modal-body { padding: 28px 32px 50px; }
-        }
+        @media (min-width: 640px) { .modal-body { padding: 28px 32px 50px; } }
 
         .reading-essay-title {
-            font-size: 1.45rem;
-            font-weight: 700;
-            margin: 0 0 20px;
-            line-height: 1.3;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 16px;
+            font-size: 1.45rem; font-weight: 700; color: var(--text);
+            margin: 0 0 20px; line-height: 1.3; letter-spacing: -0.02em;
+            border-bottom: 2px solid var(--border); padding-bottom: 16px;
         }
-
-        @media (min-width: 640px) {
-            .reading-essay-title { font-size: 1.7rem; }
-        }
+        @media (min-width: 640px) { .reading-essay-title { font-size: 1.7rem; } }
 
         .reading-outline-box {
-            background: var(--primary-soft);
-            border-left: 4px solid var(--primary);
-            padding: 16px 18px;
-            margin-bottom: 28px;
-            border-radius: 0 10px 10px 0;
-            font-size: 0.95rem;
-            color: #1e3a5f;
-            line-height: 1.55;
+            background: var(--primary-soft); border-left: 4px solid var(--primary);
+            padding: 16px 18px; margin-bottom: 28px; border-radius: 0 10px 10px 0;
+            font-size: 0.95rem; color: #1e3a5f; line-height: 1.55;
         }
-
         .reading-outline-box strong {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--text);
-            font-size: 1rem;
+            display: block; margin-bottom: 6px; color: var(--text); font-size: 1rem;
         }
 
         .modal-body h1 { font-size: 1.35rem; margin: 1.5em 0 0.6em; }
@@ -449,28 +245,16 @@
         .modal-body p { margin-bottom: 1.1em; line-height: 1.7; }
 
         .modal-body blockquote {
-            border-left: 4px solid var(--primary);
-            margin: 1.2em 0;
-            padding: 12px 18px;
-            background: #f8fafc;
-            border-radius: 0 8px 8px 0;
-            color: #475569;
-            font-style: italic;
+            border-left: 4px solid var(--primary); margin: 1.2em 0;
+            padding: 12px 18px; background: #f8fafc; border-radius: 0 8px 8px 0;
+            color: #475569; font-style: italic;
         }
 
         .loading, .error {
-            text-align: center;
-            padding: 60px 20px;
-            grid-column: 1 / -1;
-            color: var(--text-secondary);
-            font-size: 1.05rem;
+            text-align: center; padding: 60px 20px; grid-column: 1 / -1;
+            color: var(--text-secondary); font-size: 1.05rem;
         }
-
-        .error {
-            color: var(--danger);
-            font-weight: 600;
-            white-space: pre-line;
-        }
+        .error { color: var(--danger); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -486,17 +270,20 @@
         </div>
     </div>
 
-    <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()" title="Refresh">
+    <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()" title="Refresh" aria-label="Refresh essays">
         <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
     </button>
 
-    <div id="essayModal" class="modal-overlay">
+    <div id="essayModal" class="modal-overlay" role="dialog" aria-modal="true">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-header-title">Reading Essay</div>
                 <div class="modal-header-actions">
-                    <button class="action-btn copy-btn" id="copyBtn" onclick="copyEssayText()">Copy</button>
-                    <button class="action-btn close-btn" onclick="closeModal()">✕</button>
+                    <button class="action-btn copy-btn" id="copyBtn" onclick="copyEssayText()">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy
+                    </button>
+                    <button class="action-btn close-btn" onclick="closeModal()" aria-label="Close">✕</button>
                 </div>
             </div>
             <div class="modal-body" id="modalBody" onscroll="saveScrollPosition()"></div>
@@ -504,207 +291,251 @@
     </div>
 
     <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv';
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
 
         const container = document.getElementById('essays-container');
         const modal = document.getElementById('essayModal');
         const modalBody = document.getElementById('modalBody');
         const refreshBtn = document.getElementById('refreshBtn');
         const copyBtn = document.getElementById('copyBtn');
-
-        let essaysData = [];
-        let currentEssayIndex = null;
+        
+        let essaysData = []; 
+        let currentEssayIndex = null; 
         let scrollSaveTimeout;
 
         function loadEssays(forceRefresh = false) {
-            container.innerHTML = '<div class="loading">Loading essays...</div>';
+            if (!forceRefresh && essaysData.length === 0) {
+                container.innerHTML = '<div class="loading">Loading essays...</div>';
+            }
             refreshBtn.classList.add('loading');
 
-            const fetchUrl = forceRefresh ? csvUrl + '&t=' + Date.now() : csvUrl;
+            const fetchUrl = forceRefresh ? csvUrl + '&t=' + new Date().getTime() : csvUrl;
 
             Papa.parse(fetchUrl, {
                 download: true,
-                header: true,               // ← now using header
-                skipEmptyLines: true,
+                header: false, 
+                dynamicTyping: true,
                 complete: function(results) {
                     refreshBtn.classList.remove('loading');
-
-                    if (results.errors && results.errors.length > 0) {
-                        console.error(results.errors);
-                    }
-
-                    const rows = results.data || [];
-
-                    if (rows.length === 0) {
-                        container.innerHTML = '<div class="error">No data found in the Google Sheet.</div>';
-                        return;
-                    }
-
-                    essaysData = rows
+                    const rawRows = results.data.slice(1); 
+                    
+                    essaysData = rawRows
                         .map((row, index) => {
-                            // Support both column names
-                            const fullMarkdown = (row.essay_markdown || row['essay_markdown'] || row[1] || '').toString().trim();
+                            const fullMarkdown = row[1] ? String(row[1]).trim() : '';
                             if (!fullMarkdown) return null;
 
-                            // Title
                             let titleMatch = fullMarkdown.match(/^\s*#\s+(.+)$/m);
                             let title = titleMatch ? titleMatch[1].trim() : `Essay ${index + 1}`;
 
-                            // Meta
                             let srNoMatch = fullMarkdown.match(/\*\*SR No:\*\*\s*(.+)/);
                             let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/);
                             let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
                             let classMatch = fullMarkdown.match(/\*\*Primary Type:\*\*\s*(.+)/);
-
+                            
                             let meta = {
-                                srNo: srNoMatch ? srNoMatch[1].trim() : (row.srno || ''),
+                                srNo: srNoMatch ? srNoMatch[1].trim() : '',
                                 date: dateMatch ? dateMatch[1].trim() : '',
                                 wordCount: wordCountMatch ? wordCountMatch[1].trim() : '',
                                 classification: classMatch ? classMatch[1].trim() : ''
                             };
 
-                            // Outline
                             let outlineText = '';
                             let outlineMatch = fullMarkdown.match(/### Outline:\s*\n([\s\S]*?)(?=\n---|\n###|$)/i);
-                            if (outlineMatch) outlineText = outlineMatch[1].trim();
-
-                            // Vocabulary (safer parsing)
-                            let vocabHtml = '';
-                            let vocabSplit = fullMarkdown.split(/### 📚 Vocabulary/i);
-
-                            if (vocabSplit.length > 1) {
-                                let rawVocab = vocabSplit[1];
-                                // Simple and reliable replace method
-                                let formatted = rawVocab
-                                    .replace(/\*\*(\d+)\s+(.+?)\*\*/g, 
-                                        '<div class="vocab-item"><div class="vocab-word"><span class="number">$1</span>$2</div>')
-                                    .replace(/\*?\s*\*\*Urdu:\*\*\s*(.+)/g, 
-                                        '<div class="urdu-text">$1</div>')
-                                    .replace(/\*?\s*\*\*Synonyms:\*\*\s*(.+)/g, 
-                                        '<div class="vocab-meta"><div class="vocab-meta-row"><span class="vocab-label">Synonyms</span><span class="vocab-value">$1</span></div>')
-                                    .replace(/\*?\s*\*\*Antonyms:\*\*\s*(.+)/g, 
-                                        '<div class="vocab-meta-row"><span class="vocab-label">Antonyms</span><span class="vocab-value">$1</span></div></div></div>');
-
-                                vocabHtml = formatted;
+                            if (outlineMatch) {
+                                outlineText = outlineMatch[1].trim();
                             }
 
-                            // Clean body
-                            let essayBody = vocabSplit[0] || fullMarkdown;
+                            // ===== Fixed Vocabulary Parsing =====
+                            let vocabHtml = '';
+                            let vocabSplit = fullMarkdown.split(/### 📚 Vocabulary/i);
+                            if (vocabSplit.length > 1) {
+                                let rawVocab = vocabSplit[1];
+                                
+                                let items = [];
+                                let regex = /\*\*(\d+)\s+(.+?)\*\*[\s\S]*?(?=\*\*\d+\s+|$)/g;
+                                let match;
+                                
+                                while ((match = regex.exec(rawVocab)) !== null) {
+                                    let number = match[1];
+                                    let word = match[2].trim();
+                                    let block = match[0];
+                                    
+                                    let urduMatch = block.match(/\*\*Urdu:\*\*\s*(.+)/);
+                                    let synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/);
+                                    let antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/);
+                                    
+                                    let urdu = urduMatch ? urduMatch[1].trim() : '';
+                                    let synonyms = synMatch ? synMatch[1].trim() : '';
+                                    let antonyms = antMatch ? antMatch[1].trim() : '';
+                                    
+                                    // FIXED: Removed the invalid \( and \) that was breaking the script
+                                    items.push(`
+                                        <div class="vocab-item">
+                                            <div class="vocab-word">
+                                                <span class="number">${number}</span>
+                                                ${word}
+                                            </div>
+                                            ${urdu ? `<div class="urdu-text">${urdu}</div>` : ''}
+                                            <div class="vocab-meta">
+                                                ${synonyms ? `
+                                                    <div class="vocab-meta-row">
+                                                        <span class="vocab-label">Synonyms</span>
+                                                        <span class="vocab-value">${synonyms}</span>
+                                                    </div>` : ''}
+                                                ${antonyms ? `
+                                                    <div class="vocab-meta-row">
+                                                        <span class="vocab-label">Antonyms</span>
+                                                        <span class="vocab-value">${antonyms}</span>
+                                                    </div>` : ''}
+                                            </div>
+                                        </div>
+                                    `);
+                                }
+                                
+                                vocabHtml = items.join('');
+                            }
+
+                            let essayBody = vocabSplit[0]; 
+                            
                             if (titleMatch) essayBody = essayBody.replace(titleMatch[0], '');
-                            essayBody = essayBody
-                                .replace(/\*\*\(PCS.*?\)\*\*/g, '')
-                                .replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '')
-                                .replace(/\*\*Date:\*\*.*?(?=\n\n|\n---|$)/is, '')
-                                .replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '')
-                                .replace(/### Outline:[\s\S]*?(?=\n---)/i, '')
-                                .replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '')
-                                .replace(/^[\s-]+/, '')
-                                .trim();
+                            essayBody = essayBody.replace(/\*\*\(PCS.*?\)\*\*/g, '');
+                            essayBody = essayBody.replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '');
+                            essayBody = essayBody.replace(/\*\*Date:\*\*.*?(?=\n\n|\n---|$)/is, '');
+                            essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
+                            essayBody = essayBody.replace(/### Outline:[\s\S]*?(?=\n---)/i, ''); 
+                            essayBody = essayBody.replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '');
+                            essayBody = essayBody.replace(/^[\s-]+/, '').trim();
 
                             return {
                                 id: index,
-                                title,
-                                meta,
-                                outline: outlineText,
+                                title: title,
+                                meta: meta,
+                                outline: outlineText, 
                                 bodyMarkdown: essayBody,
-                                vocabHtml
+                                vocabHtml: vocabHtml
                             };
                         })
-                        .filter(Boolean);
+                        .filter(item => item !== null);
 
                     if (essaysData.length === 0) {
-                        container.innerHTML = '<div class="error">Could not parse any essays.\nCheck the Google Sheet format.</div>';
+                        container.innerHTML = '<div class="error">No valid essay data found.</div>';
                         return;
                     }
 
                     renderCards();
                     restoreLastState();
                 },
-                error: function(err) {
+                error: function(error) {
                     refreshBtn.classList.remove('loading');
-                    console.error(err);
-                    container.innerHTML = `<div class="error">Failed to load data.\n\nPossible reasons:\n• Internet connection\n• Google Sheet is not published correctly\n• CORS / browser restriction\n\nError: ${err.message || err}</div>`;
+                    container.innerHTML = `<div class="error">Error loading data: ${error.message}</div>`;
                 }
             });
         }
 
         function renderCards() {
-            container.innerHTML = '';
+            container.innerHTML = ''; 
 
             essaysData.forEach((essay, index) => {
                 let metaParts = [];
                 if (essay.meta.wordCount) metaParts.push(`📝 ${essay.meta.wordCount}`);
                 if (essay.meta.date) metaParts.push(`📅 ${essay.meta.date}`);
+                let metaString = metaParts.map(p => `<span>${p}</span>`).join('');
 
-                let vocabSection = essay.vocabHtml ? `
-                    <div class="vocab-section">
-                        <button class="vocab-toggle-btn" onclick="toggleVocab(event, ${index})">📚 Show Vocabulary</button>
-                        <div class="vocab-content" id="vocab-\( {index}"> \){essay.vocabHtml}</div>
-                    </div>` : '';
+                let vocabSection = '';
+                if (essay.vocabHtml) {
+                    vocabSection = `
+                        <div class="vocab-section">
+                            <button class="vocab-toggle-btn" onclick="toggleVocab(event, ${index})">
+                                📚 Show Vocabulary
+                            </button>
+                            <div class="vocab-content" id="vocab-${index}">
+                                ${essay.vocabHtml}
+                            </div>
+                        </div>
+                    `;
+                }
 
-                let classificationSection = essay.meta.classification ? `
-                    <div class="card-classification">
-                        <strong>Classification:</strong> ${essay.meta.classification}
-                    </div>` : '';
+                let classificationSection = '';
+                if (essay.meta.classification) {
+                    classificationSection = `
+                        <div class="card-classification">
+                            <strong>Classification:</strong> ${essay.meta.classification}
+                        </div>
+                    `;
+                }
 
-                container.insertAdjacentHTML('beforeend', `
-                    <div class="essay-card">
+                const cardHTML = `
+                    <div class="essay-card" id="card-${index}">
                         <div class="card-header">
                             <div class="card-title-group" onclick="openModal(${index})">
                                 <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
                                 <span class="card-title">${essay.title}</span>
                             </div>
-                            <button class="card-nav-icon" onclick="openModal(${index})">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
+                            <button class="card-nav-icon" onclick="openModal(${index})" aria-label="Read essay">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                             </button>
                         </div>
-                        <div class="card-meta">\( {metaParts.map(p => `<span> \){p}</span>`).join('')}</div>
+                        <div class="card-meta">${metaString}</div>
                         ${classificationSection}
                         ${vocabSection}
                     </div>
-                `);
+                `;
+                
+                container.insertAdjacentHTML('beforeend', cardHTML);
             });
         }
 
         function toggleVocab(event, index) {
-            event.preventDefault();
-            event.stopPropagation();
-            const div = document.getElementById(`vocab-${index}`);
+            event.preventDefault(); 
+            event.stopPropagation(); 
+            
+            const vocabDiv = document.getElementById(`vocab-${index}`);
             const btn = event.currentTarget;
-            if (div.classList.contains('active')) {
-                div.classList.remove('active');
+            
+            if (vocabDiv.classList.contains('active')) {
+                vocabDiv.classList.remove('active');
                 btn.innerHTML = '📚 Show Vocabulary';
             } else {
-                div.classList.add('active');
+                vocabDiv.classList.add('active');
                 btn.innerHTML = '📚 Hide Vocabulary';
             }
         }
 
         function openModal(index) {
             if (!essaysData[index]) return;
+            
             currentEssayIndex = index;
             const essay = essaysData[index];
-
-            let html = `<div class="reading-essay-title">${essay.title}</div>`;
+            
+            let readingHtml = `<div class="reading-essay-title">${essay.title}</div>`;
+            
             if (essay.outline) {
-                html += `<div class="reading-outline-box"><strong>📝 Part of Essay (Outline)</strong>${essay.outline}</div>`;
+                readingHtml += `
+                    <div class="reading-outline-box">
+                        <strong>📝 Part of Essay (Outline)</strong>
+                        ${essay.outline}
+                    </div>
+                `;
             }
-            html += marked.parse(essay.bodyMarkdown || '');
-
-            modalBody.innerHTML = html;
-            copyBtn.innerHTML = 'Copy';
+            
+            readingHtml += marked.parse(essay.bodyMarkdown);
+            
+            modalBody.innerHTML = readingHtml;
+            
+            copyBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
             copyBtn.classList.remove('copied');
-
+            
             modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden'; 
 
-            const saved = localStorage.getItem(`essay_scroll_${index}`);
-            setTimeout(() => {
-                modalBody.scrollTop = saved ? parseInt(saved) : 0;
-            }, 50);
+            const savedScroll = localStorage.getItem(`essay_scroll_${index}`);
+            if (savedScroll) {
+                setTimeout(() => {
+                    modalBody.scrollTop = parseInt(savedScroll, 10);
+                }, 50);
+            } else {
+                modalBody.scrollTop = 0; 
+            }
 
             localStorage.setItem('last_open_essay', index);
         }
@@ -718,18 +549,24 @@
 
         function copyEssayText() {
             if (currentEssayIndex === null) return;
+            
             const essay = essaysData[currentEssayIndex];
-            let text = essay.title + '\n\n';
-            if (essay.outline) text += 'Part of Essay (Outline):\n' + essay.outline + '\n\n';
-            text += essay.bodyMarkdown;
-
-            navigator.clipboard.writeText(text).then(() => {
-                copyBtn.innerHTML = '✅ Copied!';
+            let textToCopy = `${essay.title}\n\n`;
+            if (essay.outline) {
+                textToCopy += `Part of Essay (Outline):\n${essay.outline}\n\n`;
+            }
+            textToCopy += essay.bodyMarkdown;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyBtn.innerHTML = `✅ Copied!`;
                 copyBtn.classList.add('copied');
+                
                 setTimeout(() => {
-                    copyBtn.innerHTML = 'Copy';
+                    copyBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
                     copyBtn.classList.remove('copied');
                 }, 2000);
+            }).catch(() => {
+                alert('Failed to copy text. Please try again.');
             });
         }
 
@@ -743,9 +580,9 @@
         }
 
         function restoreLastState() {
-            const last = localStorage.getItem('last_open_essay');
-            if (last !== null && essaysData[last]) {
-                openModal(parseInt(last));
+            const lastEssay = localStorage.getItem('last_open_essay');
+            if (lastEssay !== null && essaysData[lastEssay]) {
+                openModal(parseInt(lastEssay, 10));
             }
         }
 
@@ -755,12 +592,18 @@
             loadEssays(true);
         }
 
-        window.onclick = e => { if (e.target === modal) closeModal(); };
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+        window.onclick = function(event) {
+            if (event.target === modal) closeModal();
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && modal.style.display === 'flex') {
+                closeModal();
+            }
         });
 
         window.onload = () => loadEssays(false);
     </script>
+
 </body>
 </html>
