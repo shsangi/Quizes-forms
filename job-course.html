@@ -440,7 +440,7 @@
         }
         .read-btn i { font-size: 0.55rem; }
 
-        /* SOL FILE link (generic — any file type) */
+        /* SOL FILE link */
         .sol-link {
             display: inline-flex; align-items: center; gap: 0.25rem;
             background: #fff5eb; color: #b45309;
@@ -465,7 +465,7 @@
             max-width: 70px;
         }
 
-        /* FLOATING ACTION STACK (BOTTOM-LEFT) */
+        /* FLOATING ACTION STACK */
         .fab-stack {
             position: fixed;
             bottom: 1.2rem;
@@ -1020,7 +1020,16 @@
 
             let subjectCounts = {};
             let mainTopicCounts = {};
-            let subjectCoverage = {};
+
+            /* ============================================
+               SUBJECT COVERAGE — scoped to active job(s)
+               ============================================
+               Key format:
+                 - No job filter  → "subject"           (global)
+                 - Job filter(s)  → "subject||job1|job2|..." (scoped)
+               Value: { total, done }
+               ============================================ */
+            let subjectCoverageScoped = {};
 
             let toastTimer = null;
             let lastToastTime = 0;
@@ -1108,28 +1117,31 @@
             /* ============================================ */
             /* ========== HELPERS ========================= */
             /* ============================================ */
-            /* Extract a friendly filename from a URL.
-               Works for any file type. Falls back to "sol". */
             function extractFileName(url) {
                 if (!url || url === '#') return 'sol';
                 try {
-                    // Strip query + hash
                     let clean = url.split('#')[0].split('?')[0];
-                    // Get last path segment
                     const parts = clean.split('/');
                     let last = parts[parts.length - 1] || '';
-                    // Decode percent-encoding
                     try { last = decodeURIComponent(last); } catch (e) {}
-                    // If empty or looks like a bare domain, fallback
-                    if (!last || last.indexOf('.') === -1 && !/\w/.test(last)) return 'sol';
-                    // Trim very long names
-                    if (last.length > 24) {
-                        last = last.slice(0, 21) + '…';
-                    }
+                    if (!last || (last.indexOf('.') === -1 && !/\w/.test(last))) return 'sol';
+                    if (last.length > 24) last = last.slice(0, 21) + '…';
                     return last || 'sol';
-                } catch (e) {
-                    return 'sol';
-                }
+                } catch (e) { return 'sol'; }
+            }
+
+            /* Build the scope key from the currently selected jobs.
+               - Empty  → "ALL"  (global coverage)
+               - 1 job  → "JOB::<name>"
+               - N jobs → "JOB::<sorted names joined by |>" */
+            function buildJobScopeKey(jobsSet) {
+                if (!jobsSet || jobsSet.size === 0) return 'ALL';
+                const arr = Array.from(jobsSet).sort();
+                return 'JOB::' + arr.join('|');
+            }
+
+            function scopedCoverageKey(subject, jobScopeKey) {
+                return subject + '||' + jobScopeKey;
             }
 
             /* ============================================ */
@@ -1245,17 +1257,7 @@
                     const hasUrl = url && url !== '#' && url !== '—' && url.trim() !== '';
                     const hasSol = solUrl && solUrl !== '#' && solUrl !== '—' && solUrl.trim() !== '';
                     const hasMarkdown = looksLikeMarkdown(markdownNotes);
-
-                    /* ============================================
-                       STATUS LOGIC (UPDATED):
-                       A row is "covered" (Done) if it has ANY of:
-                         - a URL (chat link)
-                         - a Sol file link (any file type)
-                         - Markdown notes
-                       Only rows with NONE of the three are "pending".
-                       ============================================ */
                     const status = (hasUrl || hasSol || hasMarkdown) ? 'covered' : 'pending';
-
                     const displayTopic = subTopic || mainTopic;
 
                     result.push({
@@ -1281,33 +1283,92 @@
                 return result;
             }
 
+            /* ============================================
+               COMPUTE COUNTS — including per-job coverage
+               ============================================ */
             function computeCounts(data) {
                 subjectCounts = {};
                 mainTopicCounts = {};
-                subjectCoverage = {};
+                subjectCoverageScoped = {};
+
+                // Collect all unique jobs for pre-computing scoped coverage
+                const allJobs = new Set();
 
                 data.forEach(item => {
                     if (item.subject && item.subject !== '—') {
                         subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
-                        if (!subjectCoverage[item.subject]) {
-                            subjectCoverage[item.subject] = { total: 0, done: 0 };
-                        }
-                        subjectCoverage[item.subject].total += 1;
-                        if (item.status === 'covered') {
-                            subjectCoverage[item.subject].done += 1;
-                        }
                     }
                     const key = item.mainTopic;
                     if (key && key !== '—') {
                         mainTopicCounts[key] = (mainTopicCounts[key] || 0) + 1;
                     }
+                    if (item.job && item.job !== '—') allJobs.add(item.job);
+                });
+
+                // Pre-compute coverage for: (a) global (ALL) and (b) each single job
+                const scopes = ['ALL'];
+                allJobs.forEach(j => scopes.push('JOB::' + j));
+
+                scopes.forEach(scopeKey => {
+                    data.forEach(item => {
+                        if (!item.subject || item.subject === '—') return;
+
+                        if (scopeKey !== 'ALL') {
+                            const jobName = scopeKey.slice(5); // strip "JOB::"
+                            if (item.job !== jobName) return;
+                        }
+
+                        const key = scopedCoverageKey(item.subject, scopeKey);
+                        if (!subjectCoverageScoped[key]) {
+                            subjectCoverageScoped[key] = { total: 0, done: 0 };
+                        }
+                        subjectCoverageScoped[key].total += 1;
+                        if (item.status === 'covered') {
+                            subjectCoverageScoped[key].done += 1;
+                        }
+                    });
                 });
             }
 
-            function getSubjectCoveragePct(subject) {
-                const c = subjectCoverage[subject];
-                if (!c || c.total === 0) return 0;
-                return Math.round((c.done / c.total) * 100);
+            /* Get coverage % for a subject within the currently selected job scope.
+               - If no jobs selected → global coverage
+               - If 1 job selected   → that job's coverage for the subject
+               - If N jobs selected  → combined coverage across those N jobs
+                 (computed on the fly, not pre-cached) */
+            function getSubjectCoveragePctForScope(subject, jobsSet) {
+                if (!subject || subject === '—') return 0;
+
+                // Single scope (global or 1 job) → read from pre-computed
+                if (!jobsSet || jobsSet.size <= 1) {
+                    const scopeKey = buildJobScopeKey(jobsSet);
+                    const c = subjectCoverageScoped[scopedCoverageKey(subject, scopeKey)];
+                    if (!c || c.total === 0) return 0;
+                    return Math.round((c.done / c.total) * 100);
+                }
+
+                // Multi-job scope → compute on the fly from rawData
+                let total = 0, done = 0;
+                rawData.forEach(item => {
+                    if (item.subject !== subject) return;
+                    if (!jobsSet.has(item.job)) return;
+                    total += 1;
+                    if (item.status === 'covered') done += 1;
+                });
+                if (total === 0) return 0;
+                return Math.round((done / total) * 100);
+            }
+
+            /* Get the count of rows for a subject within the selected job scope */
+            function getSubjectCountForScope(subject, jobsSet) {
+                if (!subject || subject === '—') return 0;
+                if (!jobsSet || jobsSet.size === 0) {
+                    return subjectCounts[subject] || 0;
+                }
+                let count = 0;
+                rawData.forEach(item => {
+                    if (item.subject === subject && jobsSet.has(item.job)) count++;
+                });
+                return count;
             }
 
             function updateStats(data) {
@@ -1327,6 +1388,9 @@
                     const jobName = Array.from(selectedJobs)[0];
                     pageTitle.classList.add('job-active');
                     titleText.innerHTML = `Topic Tracker: <span class="job-title">${escapeHtml(jobName)}</span>`;
+                } else if (selectedJobs.size > 1) {
+                    pageTitle.classList.add('job-active');
+                    titleText.innerHTML = `Topic Tracker: <span class="job-title">${selectedJobs.size} jobs</span>`;
                 } else {
                     pageTitle.classList.remove('job-active');
                     titleText.textContent = 'Subject & Topic Tracker';
@@ -1508,7 +1572,6 @@
                                 }
                                 onUpdate();
                                 updateTriggerText();
-                                // Auto-close after selection
                                 closeDropdown();
                             });
                             dropdown.appendChild(div);
@@ -2048,11 +2111,16 @@ Correct answer as per choices`;
                     const leftSide = document.createElement('div');
                     leftSide.className = 'card-subject-left';
 
-                    const covPct = getSubjectCoveragePct(item.subject);
+                    /* ============================================
+                       COVERAGE % — scoped to currently-selected job(s)
+                       ============================================ */
+                    const covPct = getSubjectCoveragePctForScope(item.subject, selectedJobs);
                     const covClass = covPct === 100 ? 'full' : (covPct < 50 ? 'low' : '');
-                    const covPill = `<span class="card-coverage ${covClass}" title="Subject coverage: ${covPct}%">${covPct}%</span>`;
+                    const covPill = `<span class="card-coverage ${covClass}" title="Subject coverage${selectedJobs.size ? ' for selected job(s)' : ''}: ${covPct}%">${covPct}%</span>`;
 
-                    const subjCount = subjectCounts[item.subject] || 1;
+                    /* Subject count — also scoped to selected job(s) */
+                    const subjCount = getSubjectCountForScope(item.subject, selectedJobs);
+
                     leftSide.innerHTML = `
                         ${covPill}
                         <span class="card-subject">
@@ -2092,7 +2160,6 @@ Correct answer as per choices`;
                         `;
                         rightCluster.appendChild(coveredBadge);
                     } else {
-                        // No chat URL → still might be covered by sol / markdown
                         const isCovered = item.status === 'covered';
                         const pendingBadge = document.createElement('span');
                         pendingBadge.className = 'status-badge-inline ' + (isCovered ? 'covered' : 'pending');
