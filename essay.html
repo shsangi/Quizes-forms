@@ -53,7 +53,7 @@
             box-sizing: border-box;
         }
 
-        /* Card Header: SRNO, TITLE, and READ BUTTON */
+        /* Card Header Row 1: SRNO, TITLE, and READ ICON */
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -64,23 +64,49 @@
         
         .card-title-group {
             flex-grow: 1;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .card-srno {
-            font-size: 0.85em;
+            font-size: 0.9em;
             font-weight: bold;
             color: var(--primary);
-            margin-right: 5px;
         }
         .card-title {
-            font-size: 1.1em;
+            font-size: 1.05em;
             font-weight: bold;
             color: #2c3e50;
             line-height: 1.3;
-            display: inline;
         }
 
-        /* Card Meta: WORDS, DATE */
+        /* Navigation Icon (Arrow) */
+        .card-nav-icon {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s, transform 0.2s;
+            flex-shrink: 0;
+            margin-top: -3px;
+        }
+        .card-nav-icon:hover {
+            background: #eaf4fc;
+            transform: translateX(3px);
+        }
+        .card-nav-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        /* Card Meta Row 2: WORDS, DATE */
         .card-meta {
             font-size: 0.8em;
             color: #7f8c8d;
@@ -91,43 +117,18 @@
             padding-bottom: 10px;
         }
 
-        /* Card Preview Text */
-        .card-preview {
-            font-size: 0.9em;
-            color: #555;
-            flex-grow: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 15px;
-        }
-
-        /* Outline Section */
-        .card-outline {
-            font-size: 0.8em;
-            color: #555;
-            background: #f0f8ff;
-            padding: 8px 10px;
-            border-radius: 4px;
-            border-left: 3px solid var(--primary);
-            margin-bottom: 15px;
-        }
-        .card-outline strong { color: #2c3e50; }
-
-        /* Classification */
+        /* Classification Row 3 */
         .card-classification {
             font-size: 0.8em;
             color: #555;
             background: #fdfae6;
-            padding: 5px 10px;
+            padding: 8px 10px;
             border-radius: 4px;
             border-left: 3px solid #f1c40f;
             margin-bottom: 15px;
         }
 
-        /* Vocabulary Toggle Section (At the bottom) */
+        /* Vocabulary Toggle Section (Bottom) */
         .vocab-section {
             margin-top: auto; 
             border-top: 1px solid #eee;
@@ -188,26 +189,6 @@
             margin-bottom: 0;
             padding-bottom: 0;
         }
-
-        /* Card Actions (Read Essay Button top right) */
-        .read-essay-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.8em;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: background 0.2s;
-            white-space: nowrap;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-        .read-essay-btn:hover { background: var(--primary-hover); }
 
         /* Floating Refresh Button */
         .refresh-btn {
@@ -274,11 +255,38 @@
         }
 
         /* Reading View Markdown Styles */
-        .modal-body h1, .modal-body h2, .modal-body h3 { color: #2c3e50; margin-top: 1.5em; margin-bottom: 0.5em; }
+        .modal-body h1 { font-size: 1.5em; color: #2c3e50; margin-top: 0; margin-bottom: 15px; }
+        .modal-body h2, .modal-body h3 { color: #2c3e50; margin-top: 1.5em; margin-bottom: 0.5em; }
         .modal-body p { margin-bottom: 1em; }
         .modal-body blockquote {
             border-left: 4px solid var(--primary); margin: 0; padding-left: 15px;
             color: #555; font-style: italic; background: #f9f9f9; padding: 10px 15px; border-radius: 0 5px 5px 0;
+        }
+
+        /* Special Styles for Reading View Outline */
+        .reading-outline-box {
+            background: #f0f8ff;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.95em;
+            color: #444;
+        }
+        .reading-outline-box strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 1.05em;
+        }
+        .reading-essay-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            line-height: 1.3;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
         }
 
         .loading, .error { text-align: center; padding: 40px 20px; font-size: 1.1em; grid-column: 1 / -1; }
@@ -352,12 +360,10 @@
                     
                     essaysData = rawRows
                         .map((row, index) => {
-                            // FIX: Add .trim() here to remove hidden spaces or newlines
                             const fullMarkdown = row[1] ? String(row[1]).trim() : '';
                             if (!fullMarkdown) return null;
 
                             // 1. Extract Title
-                            // FIX: Regex now handles possible spaces before the #
                             let titleMatch = fullMarkdown.match(/^\s*#\s+(.+)$/m);
                             let title = titleMatch ? titleMatch[1].trim() : `Essay ${index + 1}`;
 
@@ -386,13 +392,11 @@
                             let vocabSplit = fullMarkdown.split(/### 📚 Vocabulary/i);
                             if (vocabSplit.length > 1) {
                                 let rawVocab = vocabSplit[1];
-                                
                                 let formattedVocab = rawVocab
                                     .replace(/\*\*(\d+)\s+(.+?)\*\*/g, '<div class="vocab-item"><strong>$1. $2</strong>') 
                                     .replace(/\*   \*\*Urdu:\*\*\s*(.+)/g, '<div class="urdu-text">$1</div>') 
                                     .replace(/\*   \*\*Synonyms:\*\*\s*(.+)/g, '<div><strong>Synonyms:</strong> $1</div>') 
                                     .replace(/\*   \*\*Antonyms:\*\*\s*(.+)/g, '<div><strong>Antonyms:</strong> $1</div></div>'); 
-                                
                                 vocabHtml = formattedVocab;
                             }
 
@@ -441,18 +445,18 @@
             });
         }
 
-        // --- RENDERING CARDS ---
+        // --- RENDERING CARDS (UPDATED LAYOUT) ---
         function renderCards() {
             container.innerHTML = ''; 
 
             essaysData.forEach((essay, index) => {
-                // Build the top meta line: "Count of words, Date"
+                // Row 2: Meta (Words | Date)
                 let metaParts = [];
                 if (essay.meta.wordCount) metaParts.push(essay.meta.wordCount);
                 if (essay.meta.date) metaParts.push(essay.meta.date);
                 let metaString = metaParts.join(' | ');
 
-                // Build the vocabulary toggle
+                // Row 4: Vocabulary Toggle
                 let vocabSection = '';
                 if (essay.vocabHtml) {
                     vocabSection = `
@@ -465,17 +469,7 @@
                     `;
                 }
 
-                // Build outline section
-                let outlineSection = '';
-                if (essay.outline) {
-                    outlineSection = `
-                        <div class="card-outline">
-                            <strong>Outline:</strong> ${essay.outline}
-                        </div>
-                    `;
-                }
-
-                // Build classification section
+                // Row 3: Classification
                 let classificationSection = '';
                 if (essay.meta.classification) {
                     classificationSection = `
@@ -492,17 +486,14 @@
                                 <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
                                 <span class="card-title">${essay.title}</span>
                             </div>
-                            <button class="read-essay-btn" onclick="openModal(${index})">
-                                Read 
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            <button class="card-nav-icon" onclick="openModal(${index})" title="Read Essay">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                             </button>
                         </div>
                         <div class="card-meta">
                             ${metaString}
                         </div>
-                        <div class="card-preview">${essay.previewText}</div>
                         
-                        ${outlineSection}
                         ${classificationSection}
                         ${vocabSection}
                     </div>
@@ -529,21 +520,44 @@
             }
         }
 
-        // --- MODAL LOGIC ---
+        // --- MODAL LOGIC (READING VIEW) ---
         function openModal(index) {
             if (!essaysData[index]) return;
             
             currentEssayIndex = index;
             const essay = essaysData[index];
             
-            modalBody.innerHTML = marked.parse(essay.bodyMarkdown);
+            // Build the Reading View Content
+            let readingHtml = '';
             
+            // 1. Title
+            readingHtml += `<div class="reading-essay-title">${essay.title}</div>`;
+            
+            // 2. Outline (Part of Essay)
+            if (essay.outline) {
+                readingHtml += `
+                    <div class="reading-outline-box">
+                        <strong>📝 Part of Essay (Outline):</strong>
+                        ${essay.outline}
+                    </div>
+                `;
+            }
+            
+            // 3. Complete Essay Body
+            readingHtml += marked.parse(essay.bodyMarkdown);
+            
+            // Insert into Modal
+            modalBody.innerHTML = readingHtml;
+            
+            // Reset copy button state
             copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
             copyBtn.classList.remove('copied');
             
+            // Show Modal
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; 
 
+            // Restore scroll position
             const savedScroll = localStorage.getItem(`essay_scroll_${index}`);
             if (savedScroll) {
                 setTimeout(() => {
@@ -569,7 +583,12 @@
             if (currentEssayIndex === null) return;
             
             const essay = essaysData[currentEssayIndex];
-            const textToCopy = `${essay.title}\n\n${essay.bodyMarkdown}`;
+            // Copy Title + Outline + Complete Essay
+            let textToCopy = `${essay.title}\n\n`;
+            if (essay.outline) {
+                textToCopy += `Part of Essay (Outline):\n${essay.outline}\n\n`;
+            }
+            textToCopy += essay.bodyMarkdown;
             
             navigator.clipboard.writeText(textToCopy).then(() => {
                 copyBtn.innerHTML = `✅ Copied!`;
