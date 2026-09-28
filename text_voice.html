@@ -85,9 +85,7 @@
       min-height: 1.8rem;
       align-items: center;
     }
-    .prefs-display:empty {
-      display: none;
-    }
+    .prefs-display:empty { display: none; }
     .pref-pill {
       display: inline-flex;
       align-items: center;
@@ -111,10 +109,7 @@
       font-size: 0.6rem;
       letter-spacing: 0.05em;
     }
-    .pref-pill .pref-value {
-      color: #ece9ff;
-      font-weight: 600;
-    }
+    .pref-pill .pref-value { color: #ece9ff; font-weight: 600; }
     @media (min-width: 720px) {
       .pref-pill { font-size: 0.78rem; padding: 0.3rem 0.85rem; }
       .pref-pill .pref-label { font-size: 0.65rem; }
@@ -139,32 +134,47 @@
       border-color: #8f7bff;
       box-shadow: 0 0 0 3px rgba(143, 123, 255, 0.2);
     }
+
     .reset-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
       margin-bottom: 1.2rem;
       justify-content: space-between;
+    }
+    .reset-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      flex: 0 0 auto;
     }
     .btn-reset {
       background: #2f2b46;
       border: 1px solid #5b527a;
       border-radius: 3rem;
-      padding: 0.6rem 1.5rem;
+      padding: 0.6rem 1.2rem;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #ece9ff;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
       transition: 0.1s;
       flex: 0 0 auto;
+      white-space: nowrap;
     }
     .btn-reset:active { transform: scale(0.97); background: #3e3860; }
+    .btn-reset.btn-reset-all {
+      background: #3a2f5a;
+      border-color: #7a5fd0;
+      color: #e0d8ff;
+    }
+    .btn-reset.btn-reset-all:active { background: #4a3d70; }
+
     .toggle-symbols {
       display: inline-flex;
       align-items: center;
@@ -508,7 +518,7 @@
 </head>
 <body>
 <div class="app-card">
-  <div class="version-badge" aria-label="App version">v2.3.0</div>
+  <div class="version-badge" aria-label="App version">v2.5.0</div>
 
   <h1>📖 Reading Pace <span>smooth & natural</span></h1>
   <div class="subhead">Paste text → choose chunk size, voice & speed → hit play.</div>
@@ -518,7 +528,10 @@
   <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
 
   <div class="reset-row">
-    <button class="btn-reset" id="resetBtn" title="Clear text (keeps your preferences)">🧹 Clear Text</button>
+    <div class="reset-actions">
+      <button class="btn-reset" id="clearTextBtn" title="Clear the text area (keeps your preferences)">🧹 Clear Text</button>
+      <button class="btn-reset btn-reset-all" id="resetAllBtn" title="Reset to natural reading mode and restore help text">↺ Reset All</button>
+    </div>
     <label class="toggle-symbols" for="symbolToggle">
       <input type="checkbox" id="symbolToggle">
       <span class="label-text">🔣 Read symbols as words <span style="font-size:0.7rem;opacity:0.7;">(full-stop, comma...)</span></span>
@@ -529,14 +542,14 @@
     <div class="control-panel">
       <div class="panel-title"><i>📦</i> CHUNK SIZE</div>
       <div class="chip-group" id="chunkGroup">
-        <div class="chip active" data-chunk="1">1 word</div>
+        <div class="chip" data-chunk="1">1 word</div>
         <div class="chip" data-chunk="2">2 words</div>
         <div class="chip" data-chunk="3">3 words</div>
         <div class="chip" data-chunk="4">4 words</div>
         <div class="chip" data-chunk="5">5 words</div>
         <div class="chip" data-chunk="sentence">sentence</div>
         <div class="chip" data-chunk="paragraph">paragraph</div>
-        <div class="chip" data-chunk="full">full text</div>
+        <div class="chip active" data-chunk="full">full text</div>
       </div>
     </div>
 
@@ -558,16 +571,16 @@
 
       <div class="rate-control">
         <label for="rateSlider">⏩ Rate</label>
-        <input type="range" id="rateSlider" min="0.5" max="1.5" step="0.05" value="0.95">
-        <span class="rate-value" id="rateValue">0.95x</span>
+        <input type="range" id="rateSlider" min="0.5" max="1.5" step="0.05" value="1.0">
+        <span class="rate-value" id="rateValue">1.00x</span>
       </div>
 
       <div style="margin-top: 0.8rem;">
         <div class="panel-title" style="margin-bottom: 0.6rem;"><i>⏱️</i> DELAY AFTER EACH CHUNK</div>
         <div class="chip-group" id="timingGroup">
-          <div class="chip small" data-delay="0">0s</div>
+          <div class="chip small active" data-delay="0">0s</div>
           <div class="chip small" data-delay="0.5">0.5s</div>
-          <div class="chip small active" data-delay="1">1s</div>
+          <div class="chip small" data-delay="1">1s</div>
           <div class="chip small" data-delay="1.5">1.5s</div>
           <div class="chip small" data-delay="2">2s</div>
           <div class="chip small" data-delay="3">3s</div>
@@ -578,7 +591,7 @@
 
       <div class="custom-timing">
         <label>⏲️ Custom (sec):</label>
-        <input type="number" id="customDelayInput" min="0" max="60" step="0.5" value="1.0" inputmode="decimal">
+        <input type="number" id="customDelayInput" min="0" max="60" step="0.5" value="0" inputmode="decimal">
         <button class="chip small" id="applyCustomDelay" style="padding:0.5rem 0.9rem;">Apply</button>
       </div>
     </div>
@@ -610,29 +623,39 @@
     const STORAGE_KEY = 'readingPacePrefs_v2';
     const DEFAULT_TEXT_KEY = 'readingPaceDefaultText_v1';
 
-    // ===== DEFAULT HELP TEXT =====
+    // ===== NATURAL DEFAULTS =====
+    const DEFAULTS = {
+      chunkMode: 'full',   // read the whole text naturally in one go
+      delayMs: 0,          // no pause between chunks
+      rate: 1.0,           // normal speaking speed
+      gender: 'all',
+      expandSymbols: false
+    };
+
     const DEFAULT_HELP_TEXT =
 `📖 Welcome to Reading Pace!
 
 This app reads your text aloud with a smooth, natural voice. Here is everything you can do:
 
-▶ READ — Press the "Read" button to start listening. The app splits your text into small chunks and reads them one by one.
+▶ READ — Press the "Read" button to start listening. By default it reads the full text naturally, like a human would.
 
 ⏹ STOP — Press "Stop" to pause or end the reading at any time.
 
-🧹 CLEAR TEXT — Use the "Clear Text" button below to empty the text box. Your settings will be remembered.
+🧹 CLEAR TEXT — Use the "Clear Text" button to empty the text box. Your settings will be remembered.
+
+↺ RESET ALL — Restore every setting back to natural reading defaults (full text, no delay, 1.0x rate) and reload this help text.
 
 🔣 SYMBOLS TOGGLE — Turn on "Read symbols as words" to hear punctuation like full-stop, comma, question mark, and exclamation mark spoken aloud.
 
-📦 CHUNK SIZE — Choose how many words to read at a time: 1, 2, 3, 4, 5 words, a whole sentence, a paragraph, or the full text.
+📦 CHUNK SIZE — Choose how many words to read at a time: 1, 2, 3, 4, 5 words, a whole sentence, a paragraph, or the full text (natural mode).
 
 🎙️ VOICE — Pick from available system voices. Use the gender filter (All / Female / Male) to narrow the list.
 
-⏩ RATE — Adjust the speaking speed from 0.5x (slower) to 1.5x (faster).
+⏩ RATE — Adjust the speaking speed from 0.5x (slower) to 1.5x (faster). Default is 1.0x (natural).
 
-⏱️ DELAY — Set a pause between each chunk (0s to 5s) or enter a custom value.
+⏱️ DELAY — Set a pause between each chunk. Default is 0s for natural flow.
 
-💾 AUTO-SAVE — Your preferences (chunk size, voice, rate, delay, gender, symbols) are saved automatically in your browser. They will be restored when you come back.
+💾 AUTO-SAVE — Your preferences are saved automatically in your browser. They will be restored when you come back.
 
 ✍️ TIP — Replace this text with your own and press "Read" to begin!`;
 
@@ -652,24 +675,25 @@ This app reads your text aloud with a smooth, natural voice. Here is everything 
     const rateValue = document.getElementById('rateValue');
     const genderRadios = document.querySelectorAll('input[name="gender"]');
     const toast = document.getElementById('toast');
-    const resetBtn = document.getElementById('resetBtn');
+    const clearTextBtn = document.getElementById('clearTextBtn');
+    const resetAllBtn = document.getElementById('resetAllBtn');
     const symbolToggle = document.getElementById('symbolToggle');
     const prefsDisplay = document.getElementById('prefsDisplay');
 
-    let currentChunkMode = '1';
-    let currentDelayMs = 1000;
-    let speechRate = 0.95;
+    let currentChunkMode = DEFAULTS.chunkMode;
+    let currentDelayMs = DEFAULTS.delayMs;
+    let speechRate = DEFAULTS.rate;
     let selectedVoice = null;
     let allVoices = [];
     let filteredVoices = [];
-    let currentGenderFilter = 'all';
+    let currentGenderFilter = DEFAULTS.gender;
     let chunks = [];
     let currentIndex = 0;
     let isPlaying = false;
     let timeoutId = null;
     let utterance = null;
     let voicesReady = false;
-    let expandSymbols = false;
+    let expandSymbols = DEFAULTS.expandSymbols;
     let savedVoiceName = null;
     let savedVoiceLang = null;
 
@@ -679,7 +703,6 @@ This app reads your text aloud with a smooth, natural voice. Here is everything 
       setTimeout(() => toast.classList.remove('show'), ms || 3000);
     }
 
-    // ===== DEFAULT TEXT HANDLING =====
     function getInitialText() {
       try {
         const custom = localStorage.getItem(DEFAULT_TEXT_KEY);
@@ -690,7 +713,6 @@ This app reads your text aloud with a smooth, natural voice. Here is everything 
 
     function saveUserText(text) {
       try {
-        // If the text matches the default help text, don't persist a custom one
         if (text === DEFAULT_HELP_TEXT) {
           localStorage.removeItem(DEFAULT_TEXT_KEY);
         } else {
@@ -699,13 +721,12 @@ This app reads your text aloud with a smooth, natural voice. Here is everything 
       } catch (e) {}
     }
 
-    // ===== PREFERENCES DISPLAY =====
     function updatePrefsDisplay() {
       const pills = [];
 
       const chunkLabels = {
         '1': '1 word', '2': '2 words', '3': '3 words', '4': '4 words', '5': '5 words',
-        'sentence': 'Sentence', 'paragraph': 'Paragraph', 'full': 'Full text'
+        'sentence': 'Sentence', 'paragraph': 'Paragraph', 'full': 'Full text (natural)'
       };
       pills.push({ label: 'Chunk', value: chunkLabels[currentChunkMode] || currentChunkMode });
 
@@ -778,11 +799,8 @@ This app reads your text aloud with a smooth, natural voice. Here is everything 
       const delaySec = currentDelayMs / 1000;
       timingChips.forEach(c => {
         const d = parseFloat(c.dataset.delay);
-        if (Math.abs(d - delaySec) < 0.01) {
-          c.classList.add('active');
-        } else {
-          c.classList.remove('active');
-        }
+        if (Math.abs(d - delaySec) < 0.01) c.classList.add('active');
+        else c.classList.remove('active');
       });
       customDelayInput.value = delaySec;
 
@@ -1170,7 +1188,6 @@ This app reads your text aloud with a smooth, natural voice. Here is everything 
     playBtn.addEventListener('click', startReading);
     stopBtn.addEventListener('click', () => stopReading(true));
 
-    // Auto-save text as user types
     textarea.addEventListener('input', () => {
       if (isPlaying) stopReading(true);
       rebuildChunks();
@@ -1185,9 +1202,8 @@ This app reads your text aloud with a smooth, natural voice. Here is everything 
       updatePrefsDisplay();
     });
 
-    // ===== CLEAR TEXT BUTTON =====
-    // Clears the textarea only. Keeps preferences intact.
-    resetBtn.addEventListener('click', () => {
+    // ===== CLEAR TEXT (keeps preferences) =====
+    clearTextBtn.addEventListener('click', () => {
       if (isPlaying) stopReading(true);
       textarea.value = '';
       saveUserText('');
@@ -1196,12 +1212,39 @@ This app reads your text aloud with a smooth, natural voice. Here is everything 
       showToast('🧹 Text cleared (preferences kept)', 2000);
     });
 
+    // ===== RESET ALL → NATURAL MODE =====
+    resetAllBtn.addEventListener('click', () => {
+      if (isPlaying) stopReading(true);
+
+      // Restore natural reading defaults
+      currentChunkMode = DEFAULTS.chunkMode;
+      currentDelayMs = DEFAULTS.delayMs;
+      speechRate = DEFAULTS.rate;
+      currentGenderFilter = DEFAULTS.gender;
+      expandSymbols = DEFAULTS.expandSymbols;
+      selectedVoice = null;
+      savedVoiceName = null;
+      savedVoiceLang = null;
+
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(DEFAULT_TEXT_KEY);
+      } catch (e) {}
+
+      applyPrefsToUI();
+      buildVoiceDropdown();
+
+      textarea.value = DEFAULT_HELP_TEXT;
+      rebuildChunks();
+
+      showToast('↺ Reset to natural reading mode', 2200);
+    });
+
     // ===== INIT =====
     (function init() {
       const hadPrefs = loadPreferences();
       applyPrefsToUI();
 
-      // Populate textarea with user's saved text, or the default help text
       textarea.value = getInitialText();
 
       if (!('speechSynthesis' in window)) {
