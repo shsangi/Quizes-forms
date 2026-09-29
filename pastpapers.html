@@ -634,17 +634,60 @@
             color: #b91c1c;
         }
 
-        /* Classification specific styling */
-        .classification-block {
-            background: #f0f7ff;
-            border-left: 4px solid var(--primary-500);
-            padding: 0.8rem 1rem;
-            border-radius: 0 8px 8px 0;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+        /* Accordion Toggle Styling for Drawer */
+        .drawer-toggle {
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            background: #fbfdff;
         }
-        .classification-block strong {
+
+        .drawer-toggle-header {
+            padding: 0.6rem 0.8rem;
+            background: #f0f6fe;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.8rem;
             color: var(--primary-800);
+            user-select: none;
+            transition: background 0.15s;
+        }
+
+        .drawer-toggle-header:hover { background: #e2eefc; }
+
+        .drawer-toggle-header .toggle-icon {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+        }
+
+        .drawer-toggle.open .drawer-toggle-header .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .drawer-toggle-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.2s ease;
+            padding: 0 0.8rem;
+            background: #ffffff;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .drawer-toggle.open .drawer-toggle-content {
+            max-height: 1000px;
+            padding: 0.8rem;
+        }
+
+        /* Main Content Body styling inside drawer */
+        .drawer-main-content {
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         /* scrollbar */
@@ -886,14 +929,11 @@
             }
         }
 
-        // Build essays using direct column indices
         function buildEssaysFromRows(rows) {
             if (rows.length < 2) return [];
             const headers = rows[0].map(h => h.trim().toLowerCase());
             const dataRows = rows.slice(1);
 
-            // Column J = Index 9 (Ref Link)
-            // Column K = Index 10 (Markdown File)
             const COL_J_REF = 9; 
             const COL_K_MD = 10;
 
@@ -942,65 +982,154 @@
             return essays;
         }
 
-        // Function to display markdown content in the drawer
+        // Function to display markdown content in the drawer with toggles
         function openMarkdownDrawer(content, title) {
             drawerTitle.textContent = title || "Reading Document";
             
-            // 1. Separate the Classification block if it exists
-            // We look for the "### 📝 Classification of Essay" heading
-            // and extract it so we can place it at the top.
-            let classificationHtml = '';
-            let mainContent = content;
-
-            const classRegex = /(### 📝 Classification of Essay[\s\S]*?)(?=(?:---|\n#|\n##|\n\*\*[A-Z]))/i;
-            const classMatch = content.match(classRegex);
+            // 1. Parse metadata using Regex
+            // Extract SR No, Date, Exam Year, Classification, Vocab/Info, and Main Body
             
+            let srNo = "—";
+            let date = "—";
+            let examYear = "—";
+            let classificationHtml = "";
+            let vocabHtml = "";
+            let mainBody = content;
+
+            // SR No
+            const srMatch = content.match(/\*\*SR No\*\*\s*(.*?)(?=\n\*\*|$)/i);
+            if (srMatch) srNo = srMatch[1].trim();
+
+            // Date
+            const dateMatch = content.match(/\*\*Date:\*\*\s*(.*?)(?=\n\*\*|$)/i);
+            if (dateMatch) date = dateMatch[1].trim();
+
+            // Exam Year
+            const yearMatch = content.match(/\*\*Exam year:\*\*\s*(.*?)(?=\n\*\*|$)/i);
+            if (yearMatch) examYear = yearMatch[1].trim();
+
+            // Classification
+            const classRegex = /(### 📝 Classification of Essay[\s\S]*?)(?=(?:---|\n#|\n##|\n\*\*[A-Z]|$))/i;
+            const classMatch = content.match(classRegex);
             if (classMatch) {
-                const classText = classMatch[1];
-                // Remove it from the main content
-                mainContent = content.replace(classRegex, '');
-                
-                // Format the classification text
-                let formattedClass = escapeHtml(classText);
-                formattedClass = formattedClass.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-                formattedClass = formattedClass.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-                formattedClass = formattedClass.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-                
-                classificationHtml = `<div class="classification-block">${formattedClass}</div>`;
+                classificationHtml = escapeHtml(classMatch[1]);
+                classificationHtml = classificationHtml.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+                classificationHtml = classificationHtml.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+                classificationHtml = classificationHtml.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+                mainBody = mainBody.replace(classRegex, '');
             }
 
-            // 2. Format the rest of the content
-            let htmlContent = escapeHtml(mainContent);
-            
-            // Headers
-            htmlContent = htmlContent.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-            htmlContent = htmlContent.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-            htmlContent = htmlContent.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-            
-            // Bold
-            htmlContent = htmlContent.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-            
-            // Italics
-            htmlContent = htmlContent.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-            
-            // Blockquotes
-            htmlContent = htmlContent.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
-            
-            // Lists (simple conversion)
-            htmlContent = htmlContent.replace(/^\- (.*$)/gim, '<li>$1</li>');
-            htmlContent = htmlContent.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
+            // Vocabulary / Info
+            const vocabRegex = /(### 📚 Vocabulary[\s\S]*?)(?=(?:---|\n#|\n##|$))/i;
+            const vocabMatch = content.match(vocabRegex);
+            if (vocabMatch) {
+                vocabHtml = escapeHtml(vocabMatch[1]);
+                vocabHtml = vocabHtml.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+                vocabHtml = vocabHtml.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+                vocabHtml = vocabHtml.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+                vocabHtml = vocabHtml.replace(/\n/g, '<br>'); // Preserve line breaks for vocab
+                mainBody = mainBody.replace(vocabRegex, '');
+            }
 
-            // 3. Combine: Classification first, then the rest of the essay
+            // Remove the first title line from main body if it's the essay title
+            // This is to avoid duplicate title since we show it separately
+            mainBody = mainBody.replace(/^# (.*$)/m, '');
+
+            // Format the main body
+            let formattedBody = escapeHtml(mainBody);
+            formattedBody = formattedBody.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            formattedBody = formattedBody.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            formattedBody = formattedBody.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            formattedBody = formattedBody.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+            formattedBody = formattedBody.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+            formattedBody = formattedBody.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+            formattedBody = formattedBody.replace(/^\- (.*$)/gim, '<li>$1</li>');
+            formattedBody = formattedBody.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
+
+            // 2. Build the final HTML structure with toggles
             const finalHtml = `
-                <div style="white-space: pre-wrap; word-wrap: break-word;">
-                    ${classificationHtml}
-                    ${htmlContent}
+                <div style="margin-bottom: 1rem;">
+                    
+                    <!-- SR No Toggle -->
+                    <div class="drawer-toggle">
+                        <div class="drawer-toggle-header">
+                            <span>📌 SR No</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="drawer-toggle-content">
+                            <p>${escapeHtml(srNo)}</p>
+                        </div>
+                    </div>
+
+                    <!-- Date Toggle -->
+                    <div class="drawer-toggle">
+                        <div class="drawer-toggle-header">
+                            <span>📅 Date</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="drawer-toggle-content">
+                            <p>${escapeHtml(date)}</p>
+                        </div>
+                    </div>
+
+                    <!-- Exam Year Toggle -->
+                    <div class="drawer-toggle">
+                        <div class="drawer-toggle-header">
+                            <span>📆 Exam Year</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="drawer-toggle-content">
+                            <p>${escapeHtml(examYear)}</p>
+                        </div>
+                    </div>
+
+                    <!-- Classification Toggle (Only if exists) -->
+                    ${classificationHtml ? `
+                    <div class="drawer-toggle">
+                        <div class="drawer-toggle-header">
+                            <span>📝 Classification of Essay</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="drawer-toggle-content">
+                            ${classificationHtml}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Vocabulary / Info Toggle (Only if exists) -->
+                    ${vocabHtml ? `
+                    <div class="drawer-toggle">
+                        <div class="drawer-toggle-header">
+                            <span>📚 Vocabulary / Info</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="drawer-toggle-content">
+                            ${vocabHtml}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                </div>
+
+                <!-- Main Content Body -->
+                <div class="drawer-main-content">
+                    ${formattedBody}
                 </div>
             `;
 
             drawerBody.innerHTML = finalHtml;
             
-            // Open the drawer
+            // 3. Add event listeners to the new drawer toggles
+            document.querySelectorAll('.drawer-toggle-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const parent = this.closest('.drawer-toggle');
+                    if (parent) {
+                        parent.classList.toggle('open');
+                    }
+                });
+            });
+
+            // Open the main drawer
             drawerOverlay.classList.add("open");
             mdDrawer.classList.add("open");
             document.body.style.overflow = "hidden"; 
@@ -1012,7 +1141,6 @@
             document.body.style.overflow = ""; 
         }
 
-        // Event Listeners for Drawer
         closeDrawerBtn.addEventListener("click", closeDrawer);
         drawerOverlay.addEventListener("click", closeDrawer);
         
@@ -1068,9 +1196,6 @@
                     subjectReqHtml += `</div>`;
                 }
 
-                // --- BUTTONS ---
-
-                // 1. Markdown Read Button
                 let mdButtonHtml;
                 if (essay.hasValidMarkdown) {
                     mdButtonHtml = `
@@ -1086,7 +1211,6 @@
                     `;
                 }
 
-                // 2. Solved Button
                 let answerButtonHtml;
                 if (essay.hasValidLink) {
                     answerButtonHtml = `
@@ -1102,7 +1226,6 @@
                     `;
                 }
 
-                // Detail panel logic
                 let solutionDetailHtml;
                 if (essay.hasValidLink) {
                     solutionDetailHtml = `<a href="${safeSolution}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-600); text-decoration: underline; word-break: break-all;">${safeSolution}</a>`;
@@ -1112,7 +1235,6 @@
                     solutionDetailHtml = `<span style="color: #94a3b8; font-style: italic;">Not available</span>`;
                 }
 
-                // Detail panel for Markdown
                 let mdDetailHtml;
                 if (essay.hasValidMarkdown) {
                     const snippet = safeMarkdown.length > 100 ? safeMarkdown.substring(0, 100) + '...' : safeMarkdown;
@@ -1187,7 +1309,6 @@
 
             cardsContainer.innerHTML = cardsHtml;
 
-            // Re-attach expand toggle listeners
             document.querySelectorAll('.expand-toggle').forEach(toggle => {
                 const handleToggle = function(e) {
                     e.preventDefault();
@@ -1217,7 +1338,6 @@
                 });
             });
 
-            // Attach listeners to the new "Read MD" buttons
             document.querySelectorAll('.md-read-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
