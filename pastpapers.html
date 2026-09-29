@@ -335,6 +335,7 @@
             border: 1px solid var(--primary-700);
             box-shadow: 0 3px 8px -3px rgba(28, 60, 100, 0.25);
             min-height: 40px;
+            cursor: pointer;
         }
 
         .answer-link:active:not(.disabled) {
@@ -353,32 +354,33 @@
             opacity: 0.75;
         }
 
-        /* Markdown button style */
-        .md-link {
+        /* Markdown Read button style */
+        .md-read-btn {
             flex: 0 0 auto;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.25rem;
-            background: #f0f6fe;
-            color: var(--primary-700);
+            background: #e0f2fe;
+            color: #0369a1;
             font-weight: 600;
             font-size: 0.72rem;
             padding: 0.55rem 0.8rem;
             border-radius: 30px;
             text-decoration: none;
-            border: 1px solid #c9dcf0;
+            border: 1px solid #bae6fd;
             transition: all 0.15s ease;
             min-height: 40px;
             white-space: nowrap;
+            cursor: pointer;
         }
 
-        .md-link:active:not(.disabled) {
-            background: #e2eefc;
+        .md-read-btn:active:not(.disabled) {
+            background: #bae6fd;
             transform: scale(0.985);
         }
 
-        .md-link.disabled {
+        .md-read-btn.disabled {
             background: #f1f5f9;
             color: #94a3b8;
             border-color: #e2e8f0;
@@ -500,12 +502,163 @@
             line-height: 1.5;
         }
 
+        /* ---------- Full Screen Drawer ---------- */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .drawer-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            background: #ffffff;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+            transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fbff;
+        }
+
+        .drawer-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-900);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 60%;
+        }
+
+        .drawer-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .drawer-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-700);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: var(--font-sans);
+        }
+
+        .drawer-btn:active {
+            background: #e2eefc;
+            transform: scale(0.97);
+        }
+
+        .drawer-btn.close-btn {
+            color: #dc2626;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 1.2rem 3rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: var(--font-sans);
+        }
+
+        /* Markdown specific styling for the drawer */
+        .drawer-body h1, .drawer-body h2, .drawer-body h3 {
+            color: var(--primary-800);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        .drawer-body h1 { font-size: 1.5rem; border-bottom: 2px solid var(--border-light); padding-bottom: 0.3rem; }
+        .drawer-body h2 { font-size: 1.25rem; }
+        .drawer-body h3 { font-size: 1.1rem; }
+        .drawer-body p { margin-bottom: 0.8rem; }
+        .drawer-body ul, .drawer-body ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .drawer-body li { margin-bottom: 0.3rem; }
+        .drawer-body strong { color: var(--primary-900); }
+        .drawer-body blockquote {
+            border-left: 4px solid var(--primary-500);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-soft);
+            font-style: italic;
+            background: #f8fbff;
+            padding: 0.8rem 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+        .drawer-body code {
+            background: #eef2f6;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #b91c1c;
+        }
+
+        /* Skeleton for drawer loading */
+        .drawer-loading {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+        .drawer-loading-line {
+            height: 1rem;
+            background: #e9f0fa;
+            border-radius: 4px;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        .drawer-loading-line.short { width: 60%; }
+        .drawer-loading-line.medium { width: 80%; }
+        .drawer-loading-line.long { width: 100%; }
+
         /* scrollbar */
         .extra-details::-webkit-scrollbar,
-        .instruction-preview::-webkit-scrollbar { width: 3px; }
+        .instruction-preview::-webkit-scrollbar,
+        .drawer-body::-webkit-scrollbar { width: 5px; }
 
         .extra-details::-webkit-scrollbar-thumb,
-        .instruction-preview::-webkit-scrollbar-thumb {
+        .instruction-preview::-webkit-scrollbar-thumb,
+        .drawer-body::-webkit-scrollbar-thumb {
             background: #b8cde4;
             border-radius: 10px;
         }
@@ -560,6 +713,7 @@
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
                 gap: 1rem;
             }
+            .drawer { max-width: 900px; }
         }
 
         @media (min-width: 1300px) {
@@ -574,7 +728,9 @@
             .page-header h1 { font-size: 1.25rem; }
             .essay-title { font-size: 0.88rem; }
             .urdu-meaning { font-size: 0.82rem; }
-            .answer-link, .expand-toggle, .md-link { font-size: 0.7rem; padding: 0.5rem 0.5rem; }
+            .answer-link, .expand-toggle, .md-read-btn { font-size: 0.7rem; padding: 0.5rem 0.5rem; }
+            .drawer-title { font-size: 0.85rem; }
+            .drawer-btn { font-size: 0.68rem; padding: 0.3rem 0.5rem; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -638,6 +794,25 @@
     </div>
 </div>
 
+<!-- Full Screen Drawer for Markdown Reader -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="mdDrawer">
+    <div class="drawer-header">
+        <div class="drawer-title" id="drawerTitle">Reading Markdown...</div>
+        <div class="drawer-actions">
+            <button class="drawer-btn" id="copyDrawerContent" title="Copy to clipboard">
+                📋 Copy
+            </button>
+            <button class="drawer-btn close-btn" id="closeDrawer" title="Close">
+                ✕ Close
+            </button>
+        </div>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+        <!-- Content will be injected here -->
+    </div>
+</div>
+
 <script>
     (function() {
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv";
@@ -649,6 +824,14 @@
         const statsCount = document.getElementById("statsCount");
         const headerTotalRecords = document.getElementById("headerTotalRecords");
         const headerTotalYears = document.getElementById("headerTotalYears");
+
+        // Drawer Elements
+        const drawerOverlay = document.getElementById("drawerOverlay");
+        const mdDrawer = document.getElementById("mdDrawer");
+        const drawerTitle = document.getElementById("drawerTitle");
+        const drawerBody = document.getElementById("drawerBody");
+        const closeDrawerBtn = document.getElementById("closeDrawer");
+        const copyDrawerBtn = document.getElementById("copyDrawerContent");
 
         let allEssays = [];
         let filteredEssays = [];
@@ -705,11 +888,17 @@
             return /^https?:\/\//i.test(trimmed);
         }
 
-        // Build essays – includes markdown file column
+        // Build essays using direct column indices
         function buildEssaysFromRows(rows) {
             if (rows.length < 2) return [];
             const headers = rows[0].map(h => h.trim().toLowerCase());
             const dataRows = rows.slice(1);
+
+            // Use index-based mapping to guarantee K and J are read correctly
+            // Column J = Index 9 (Ref Link)
+            // Column K = Index 10 (Markdown File)
+            const COL_J_REF = 9; 
+            const COL_K_MD = 10;
 
             const srnoIdx = headers.findIndex(h => /srno|sr no/i.test(h));
             const titleIdx = headers.findIndex(h => /title of exam/i.test(h));
@@ -720,13 +909,7 @@
             const urduIdx = headers.findIndex(h => /urdu_meaning|urdu meaning/i.test(h));
             const subjectIdx = headers.findIndex(h => /paper_subject|paper subject/i.test(h));
             const requirementIdx = headers.findIndex(h => /requirement/i.test(h));
-
-            const solutionIdx = headers.findIndex(h =>
-                /solution/i.test(h) || /ref/i.test(h) || /link/i.test(h)
-            );
-
-            // NEW: Markdown file column
-            const markdownIdx = headers.findIndex(h => /markdown/i.test(h) || /md_file/i.test(h));
+            const solutionIdx = headers.findIndex(h => /solution/i.test(h) || /ref/i.test(h) || /link/i.test(h));
 
             const getCol = (row, idx, fallback = '') => {
                 if (idx === -1 || idx >= row.length || row[idx] === undefined) return fallback;
@@ -737,8 +920,9 @@
             dataRows.forEach((row, i) => {
                 if (!row.some(cell => cell.trim() !== '')) return;
 
-                const rawSolution = getCol(row, solutionIdx, '');
-                const rawMarkdown = getCol(row, markdownIdx, '');
+                // Read from specific J and K columns
+                const rawSolution = getCol(row, COL_J_REF, ''); 
+                const rawMarkdown = getCol(row, COL_K_MD, '');
 
                 const essay = {
                     srno: getCol(row, srnoIdx, String(i + 1)),
@@ -751,10 +935,9 @@
                     subject: getCol(row, subjectIdx, 'General'),
                     requirement: getCol(row, requirementIdx, ''),
                     solutionRaw: rawSolution,
-                    answerLink: rawSolution,
                     hasValidLink: isValidLink(rawSolution),
                     markdownRaw: rawMarkdown,
-                    hasValidMarkdown: isValidLink(rawMarkdown) // Reusing the same validation logic
+                    hasValidMarkdown: isValidLink(rawMarkdown)
                 };
                 if (essay.topic && essay.topic !== 'Untitled essay') {
                     essays.push(essay);
@@ -762,6 +945,85 @@
             });
             return essays;
         }
+
+        // Function to fetch and render MD content in the drawer
+        async function openMarkdownDrawer(url, title) {
+            drawerTitle.textContent = title || "Reading Document";
+            drawerBody.innerHTML = `
+                <div class="drawer-loading">
+                    <div class="drawer-loading-line long"></div>
+                    <div class="drawer-loading-line medium"></div>
+                    <div class="drawer-loading-line long"></div>
+                    <div class="drawer-loading-line short"></div>
+                    <div class="drawer-loading-line long"></div>
+                    <div class="drawer-loading-line medium"></div>
+                </div>
+            `;
+            drawerOverlay.classList.add("open");
+            mdDrawer.classList.add("open");
+            document.body.style.overflow = "hidden"; // Prevent background scrolling
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const text = await response.text();
+                
+                // Very basic markdown to HTML conversion for better readability
+                let htmlContent = escapeHtml(text);
+                
+                // Convert headers
+                htmlContent = htmlContent.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+                htmlContent = htmlContent.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+                htmlContent = htmlContent.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+                
+                // Convert bold
+                htmlContent = htmlContent.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+                
+                // Convert blockquotes
+                htmlContent = htmlContent.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+                
+                // Convert line breaks to paragraphs/br (preserving pre-wrap logic)
+                // We'll rely on the CSS white-space: pre-wrap to handle regular newlines,
+                // but for headers and blockquotes, the HTML tags will override.
+                
+                drawerBody.innerHTML = htmlContent;
+            } catch (error) {
+                console.error("Error fetching MD file:", error);
+                drawerBody.innerHTML = `
+                    <div style="color: #dc2626; text-align: center; padding: 2rem;">
+                        <h3>⚠️ Failed to load file</h3>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Could not fetch the Markdown file. This usually happens if the link is not a direct raw text link (e.g., a Google Drive preview link instead of a direct download link).</p>
+                        <p style="font-size: 0.8rem; margin-top: 1rem; color: #64748b;">Error: ${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function closeDrawer() {
+            drawerOverlay.classList.remove("open");
+            mdDrawer.classList.remove("open");
+            document.body.style.overflow = ""; // Restore background scrolling
+        }
+
+        // Event Listeners for Drawer
+        closeDrawerBtn.addEventListener("click", closeDrawer);
+        drawerOverlay.addEventListener("click", closeDrawer);
+        
+        copyDrawerBtn.addEventListener("click", () => {
+            const textToCopy = drawerBody.innerText || drawerBody.textContent;
+            if (!textToCopy || textToCopy.includes("Failed to load")) return;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = copyDrawerBtn.innerHTML;
+                copyDrawerBtn.innerHTML = "✅ Copied!";
+                setTimeout(() => {
+                    copyDrawerBtn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error("Copy failed:", err);
+                alert("Failed to copy text. Please select and copy manually.");
+            });
+        });
 
         function renderCards(essays) {
             if (!essays || essays.length === 0) {
@@ -801,18 +1063,19 @@
 
                 // --- BUTTONS ---
 
-                // 1. Markdown File Button (Placed first)
+                // 1. Markdown Read Button
                 let mdButtonHtml;
                 if (essay.hasValidMarkdown) {
+                    // Using a button element to trigger the JS drawer instead of a direct link
                     mdButtonHtml = `
-                        <a class="md-link" href="${safeMarkdown}" target="_blank" rel="noopener noreferrer" title="Open Markdown File">
-                            <span>📝</span> MD
-                        </a>
+                        <button class="md-read-btn" data-md-url="${safeMarkdown}" data-md-title="${safeTopic}">
+                            <span>📖</span> Read MD
+                        </button>
                     `;
                 } else {
                     mdButtonHtml = `
-                        <span class="md-link disabled" title="No Markdown file available" aria-disabled="true">
-                            <span>📝</span> MD
+                        <span class="md-read-btn disabled" title="No Markdown file available" aria-disabled="true">
+                            <span>📖</span> Read MD
                         </span>
                     `;
                 }
@@ -919,6 +1182,7 @@
 
             cardsContainer.innerHTML = cardsHtml;
 
+            // Re-attach expand toggle listeners
             document.querySelectorAll('.expand-toggle').forEach(toggle => {
                 const handleToggle = function(e) {
                     e.preventDefault();
@@ -944,6 +1208,18 @@
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         handleToggle.call(this, e);
+                    }
+                });
+            });
+
+            // Attach listeners to the new "Read MD" buttons
+            document.querySelectorAll('.md-read-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.dataset.mdUrl;
+                    const title = this.dataset.mdTitle;
+                    if (url) {
+                        openMarkdownDrawer(url, title);
                     }
                 });
             });
