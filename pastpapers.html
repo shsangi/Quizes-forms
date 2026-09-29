@@ -634,23 +634,6 @@
             color: #b91c1c;
         }
 
-        /* Skeleton for drawer loading */
-        .drawer-loading {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1rem 0;
-        }
-        .drawer-loading-line {
-            height: 1rem;
-            background: #e9f0fa;
-            border-radius: 4px;
-            animation: pulse 1.5s infinite ease-in-out;
-        }
-        .drawer-loading-line.short { width: 60%; }
-        .drawer-loading-line.medium { width: 80%; }
-        .drawer-loading-line.long { width: 100%; }
-
         /* scrollbar */
         .extra-details::-webkit-scrollbar,
         .instruction-preview::-webkit-scrollbar,
@@ -881,11 +864,14 @@
                 .replace(/'/g, '&#039;');
         }
 
-        function isValidLink(link) {
-            if (!link) return false;
-            const trimmed = link.trim();
-            if (trimmed === '' || trimmed === '#') return false;
-            return /^https?:\/\//i.test(trimmed);
+        // Check if a string is a valid URL
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
         }
 
         // Build essays using direct column indices
@@ -894,7 +880,6 @@
             const headers = rows[0].map(h => h.trim().toLowerCase());
             const dataRows = rows.slice(1);
 
-            // Use index-based mapping to guarantee K and J are read correctly
             // Column J = Index 9 (Ref Link)
             // Column K = Index 10 (Markdown File)
             const COL_J_REF = 9; 
@@ -935,9 +920,10 @@
                     subject: getCol(row, subjectIdx, 'General'),
                     requirement: getCol(row, requirementIdx, ''),
                     solutionRaw: rawSolution,
-                    hasValidLink: isValidLink(rawSolution),
+                    hasValidLink: isValidUrl(rawSolution),
                     markdownRaw: rawMarkdown,
-                    hasValidMarkdown: isValidLink(rawMarkdown)
+                    // Important: treat as valid if it's a URL OR if it just has text
+                    hasValidMarkdown: rawMarkdown !== '' 
                 };
                 if (essay.topic && essay.topic !== 'Untitled essay') {
                     essays.push(essay);
@@ -946,63 +932,44 @@
             return essays;
         }
 
-        // Function to fetch and render MD content in the drawer
-        async function openMarkdownDrawer(url, title) {
+        // Function to display markdown content in the drawer
+        function openMarkdownDrawer(content, title) {
             drawerTitle.textContent = title || "Reading Document";
-            drawerBody.innerHTML = `
-                <div class="drawer-loading">
-                    <div class="drawer-loading-line long"></div>
-                    <div class="drawer-loading-line medium"></div>
-                    <div class="drawer-loading-line long"></div>
-                    <div class="drawer-loading-line short"></div>
-                    <div class="drawer-loading-line long"></div>
-                    <div class="drawer-loading-line medium"></div>
-                </div>
-            `;
+            
+            // Basic Markdown to HTML formatting
+            let htmlContent = escapeHtml(content);
+            
+            // Headers
+            htmlContent = htmlContent.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            htmlContent = htmlContent.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            htmlContent = htmlContent.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            
+            // Bold
+            htmlContent = htmlContent.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+            
+            // Italics
+            htmlContent = htmlContent.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+            
+            // Blockquotes
+            htmlContent = htmlContent.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+            
+            // Lists (simple conversion)
+            htmlContent = htmlContent.replace(/^\- (.*$)/gim, '<li>$1</li>');
+            htmlContent = htmlContent.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
+
+            // Apply pre-wrap styling to preserve line breaks from the text
+            drawerBody.innerHTML = `<div style="white-space: pre-wrap; word-wrap: break-word;">${htmlContent}</div>`;
+            
+            // Open the drawer
             drawerOverlay.classList.add("open");
             mdDrawer.classList.add("open");
-            document.body.style.overflow = "hidden"; // Prevent background scrolling
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const text = await response.text();
-                
-                // Very basic markdown to HTML conversion for better readability
-                let htmlContent = escapeHtml(text);
-                
-                // Convert headers
-                htmlContent = htmlContent.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-                htmlContent = htmlContent.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-                htmlContent = htmlContent.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-                
-                // Convert bold
-                htmlContent = htmlContent.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-                
-                // Convert blockquotes
-                htmlContent = htmlContent.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
-                
-                // Convert line breaks to paragraphs/br (preserving pre-wrap logic)
-                // We'll rely on the CSS white-space: pre-wrap to handle regular newlines,
-                // but for headers and blockquotes, the HTML tags will override.
-                
-                drawerBody.innerHTML = htmlContent;
-            } catch (error) {
-                console.error("Error fetching MD file:", error);
-                drawerBody.innerHTML = `
-                    <div style="color: #dc2626; text-align: center; padding: 2rem;">
-                        <h3>⚠️ Failed to load file</h3>
-                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Could not fetch the Markdown file. This usually happens if the link is not a direct raw text link (e.g., a Google Drive preview link instead of a direct download link).</p>
-                        <p style="font-size: 0.8rem; margin-top: 1rem; color: #64748b;">Error: ${escapeHtml(error.message)}</p>
-                    </div>
-                `;
-            }
+            document.body.style.overflow = "hidden"; 
         }
 
         function closeDrawer() {
             drawerOverlay.classList.remove("open");
             mdDrawer.classList.remove("open");
-            document.body.style.overflow = ""; // Restore background scrolling
+            document.body.style.overflow = ""; 
         }
 
         // Event Listeners for Drawer
@@ -1010,8 +977,9 @@
         drawerOverlay.addEventListener("click", closeDrawer);
         
         copyDrawerBtn.addEventListener("click", () => {
+            // Get the raw text content (without HTML formatting) for copying
             const textToCopy = drawerBody.innerText || drawerBody.textContent;
-            if (!textToCopy || textToCopy.includes("Failed to load")) return;
+            if (!textToCopy) return;
             
             navigator.clipboard.writeText(textToCopy).then(() => {
                 const originalText = copyDrawerBtn.innerHTML;
@@ -1066,15 +1034,14 @@
                 // 1. Markdown Read Button
                 let mdButtonHtml;
                 if (essay.hasValidMarkdown) {
-                    // Using a button element to trigger the JS drawer instead of a direct link
                     mdButtonHtml = `
-                        <button class="md-read-btn" data-md-url="${safeMarkdown}" data-md-title="${safeTopic}">
+                        <button class="md-read-btn" data-md-content="${encodeURIComponent(essay.markdownRaw)}" data-md-title="${safeTopic}">
                             <span>📖</span> Read MD
                         </button>
                     `;
                 } else {
                     mdButtonHtml = `
-                        <span class="md-read-btn disabled" title="No Markdown file available" aria-disabled="true">
+                        <span class="md-read-btn disabled" title="No Markdown content available" aria-disabled="true">
                             <span>📖</span> Read MD
                         </span>
                     `;
@@ -1109,9 +1076,9 @@
                 // Detail panel for Markdown
                 let mdDetailHtml;
                 if (essay.hasValidMarkdown) {
-                    mdDetailHtml = `<a href="${safeMarkdown}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-600); text-decoration: underline; word-break: break-all;">${safeMarkdown}</a>`;
-                } else if (safeMarkdown) {
-                    mdDetailHtml = `<span style="color: #1f344b;">${safeMarkdown}</span>`;
+                    // Show a snippet since the content is long
+                    const snippet = safeMarkdown.length > 100 ? safeMarkdown.substring(0, 100) + '...' : safeMarkdown;
+                    mdDetailHtml = `<span style="color: #1f344b; font-size: 0.7rem;">${snippet}</span>`;
                 } else {
                     mdDetailHtml = `<span style="color: #94a3b8; font-style: italic;">Not available</span>`;
                 }
@@ -1169,7 +1136,7 @@
                                     </span>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="detail-label">Markdown File</span>
+                                    <span class="detail-label">Markdown Content</span>
                                     <span class="detail-value" style="font-size: 0.72rem;">
                                         ${mdDetailHtml}
                                     </span>
@@ -1216,10 +1183,13 @@
             document.querySelectorAll('.md-read-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const url = this.dataset.mdUrl;
+                    // We stored the content URL-encoded in the data attribute to prevent HTML issues
+                    const encodedContent = this.dataset.mdContent;
                     const title = this.dataset.mdTitle;
-                    if (url) {
-                        openMarkdownDrawer(url, title);
+                    
+                    if (encodedContent) {
+                        const decodedContent = decodeURIComponent(encodedContent);
+                        openMarkdownDrawer(decodedContent, title);
                     }
                 });
             });
