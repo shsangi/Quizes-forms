@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
+    <!-- Light theme color (matches page background) -->
+    <meta name="theme-color" content="#f1f5f9" media="(prefers-color-scheme: light)">
+    <!-- Dark theme color (for users in dark mode) -->
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="color-scheme" content="light dark">
     <meta name="description" content="FPSC AI Solved Papers — searchable past papers with solutions and markdown content">
     <title>FPSC AI Solved Papers</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -910,7 +914,7 @@
                 <span class="stat-pill" id="headerTotalYears">
                     📅 Years: <span class="num">0</span>
                 </span>
-                <span class="version-badge">v1.1</span>
+                <span class="version-badge">v1.2</span>
             </div>
         </div>
     </header>
@@ -1025,7 +1029,6 @@
     const copyDrawerBtn = document.getElementById("copyDrawerContent");
     const infoToggleBtn = document.getElementById("infoToggleBtn");
 
-    // Info Modal Elements
     const infoModalOverlay = document.getElementById("infoModalOverlay");
     const infoModalClose = document.getElementById("infoModalClose");
     const infoModalBody = document.getElementById("infoModalBody");
@@ -1243,7 +1246,6 @@
         bodySource = bodySource.replace(/\n{3,}/g, '\n\n').trim();
         essayBody = bodySource;
 
-        // Populate Info Modal Body
         let modalHtml = `
             <div class="info-section">
                 <span class="info-label">📌 SR No</span>
@@ -1274,7 +1276,6 @@
         `;
         infoModalBody.innerHTML = modalHtml;
 
-        // Main content: Title + Outline + Essay
         let mainHtml = `<h1 class="essay-drawer-title">${escapeHtml(essayTitle)}</h1>`;
 
         if (outlineText) {
@@ -1301,7 +1302,6 @@
         document.body.style.overflow = "hidden";
     }
 
-    // Info Modal Open/Close
     infoToggleBtn.addEventListener("click", function () {
         infoModalOverlay.classList.add("open");
         infoModalOverlay.setAttribute('aria-hidden', 'false');
@@ -1319,7 +1319,6 @@
         if (e.target === infoModalOverlay) closeInfoModal();
     });
 
-    // Close drawer / modal on Escape
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
             if (infoModalOverlay.classList.contains("open")) {
@@ -1396,12 +1395,10 @@
                 tagsHtml += `</div>`;
             }
 
-            // Read File button (only if MD exists)
             const mdBtn = essay.hasValidMarkdown
                 ? `<button class="btn btn-secondary md-read-btn" type="button" data-md-content="${encodeURIComponent(essay.markdownRaw)}" data-md-title="${safeTopic}">📄 Read File</button>`
                 : "";
 
-            // Solved button (only if valid URL exists, otherwise HIDDEN)
             const answerBtn = essay.hasValidLink
                 ? `<a class="btn btn-primary" href="${safeSolution}" target="_blank" rel="noopener noreferrer">📄 Solved</a>`
                 : "";
