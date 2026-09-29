@@ -634,6 +634,19 @@
             color: #b91c1c;
         }
 
+        /* Classification specific styling */
+        .classification-block {
+            background: #f0f7ff;
+            border-left: 4px solid var(--primary-500);
+            padding: 0.8rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .classification-block strong {
+            color: var(--primary-800);
+        }
+
         /* scrollbar */
         .extra-details::-webkit-scrollbar,
         .instruction-preview::-webkit-scrollbar,
@@ -864,7 +877,6 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // Check if a string is a valid URL
         function isValidUrl(string) {
             try {
                 new URL(string);
@@ -905,7 +917,6 @@
             dataRows.forEach((row, i) => {
                 if (!row.some(cell => cell.trim() !== '')) return;
 
-                // Read from specific J and K columns
                 const rawSolution = getCol(row, COL_J_REF, ''); 
                 const rawMarkdown = getCol(row, COL_K_MD, '');
 
@@ -922,7 +933,6 @@
                     solutionRaw: rawSolution,
                     hasValidLink: isValidUrl(rawSolution),
                     markdownRaw: rawMarkdown,
-                    // Important: treat as valid if it's a URL OR if it just has text
                     hasValidMarkdown: rawMarkdown !== '' 
                 };
                 if (essay.topic && essay.topic !== 'Untitled essay') {
@@ -936,8 +946,31 @@
         function openMarkdownDrawer(content, title) {
             drawerTitle.textContent = title || "Reading Document";
             
-            // Basic Markdown to HTML formatting
-            let htmlContent = escapeHtml(content);
+            // 1. Separate the Classification block if it exists
+            // We look for the "### 📝 Classification of Essay" heading
+            // and extract it so we can place it at the top.
+            let classificationHtml = '';
+            let mainContent = content;
+
+            const classRegex = /(### 📝 Classification of Essay[\s\S]*?)(?=(?:---|\n#|\n##|\n\*\*[A-Z]))/i;
+            const classMatch = content.match(classRegex);
+            
+            if (classMatch) {
+                const classText = classMatch[1];
+                // Remove it from the main content
+                mainContent = content.replace(classRegex, '');
+                
+                // Format the classification text
+                let formattedClass = escapeHtml(classText);
+                formattedClass = formattedClass.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+                formattedClass = formattedClass.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+                formattedClass = formattedClass.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+                
+                classificationHtml = `<div class="classification-block">${formattedClass}</div>`;
+            }
+
+            // 2. Format the rest of the content
+            let htmlContent = escapeHtml(mainContent);
             
             // Headers
             htmlContent = htmlContent.replace(/^# (.*$)/gim, '<h1>$1</h1>');
@@ -957,8 +990,15 @@
             htmlContent = htmlContent.replace(/^\- (.*$)/gim, '<li>$1</li>');
             htmlContent = htmlContent.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
 
-            // Apply pre-wrap styling to preserve line breaks from the text
-            drawerBody.innerHTML = `<div style="white-space: pre-wrap; word-wrap: break-word;">${htmlContent}</div>`;
+            // 3. Combine: Classification first, then the rest of the essay
+            const finalHtml = `
+                <div style="white-space: pre-wrap; word-wrap: break-word;">
+                    ${classificationHtml}
+                    ${htmlContent}
+                </div>
+            `;
+
+            drawerBody.innerHTML = finalHtml;
             
             // Open the drawer
             drawerOverlay.classList.add("open");
@@ -977,7 +1017,6 @@
         drawerOverlay.addEventListener("click", closeDrawer);
         
         copyDrawerBtn.addEventListener("click", () => {
-            // Get the raw text content (without HTML formatting) for copying
             const textToCopy = drawerBody.innerText || drawerBody.textContent;
             if (!textToCopy) return;
             
@@ -1076,7 +1115,6 @@
                 // Detail panel for Markdown
                 let mdDetailHtml;
                 if (essay.hasValidMarkdown) {
-                    // Show a snippet since the content is long
                     const snippet = safeMarkdown.length > 100 ? safeMarkdown.substring(0, 100) + '...' : safeMarkdown;
                     mdDetailHtml = `<span style="color: #1f344b; font-size: 0.7rem;">${snippet}</span>`;
                 } else {
@@ -1183,7 +1221,6 @@
             document.querySelectorAll('.md-read-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    // We stored the content URL-encoded in the data attribute to prevent HTML issues
                     const encodedContent = this.dataset.mdContent;
                     const title = this.dataset.mdTitle;
                     
