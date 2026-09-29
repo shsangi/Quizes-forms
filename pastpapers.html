@@ -353,6 +353,40 @@
             opacity: 0.75;
         }
 
+        /* Markdown button style */
+        .md-link {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            background: #f0f6fe;
+            color: var(--primary-700);
+            font-weight: 600;
+            font-size: 0.72rem;
+            padding: 0.55rem 0.8rem;
+            border-radius: 30px;
+            text-decoration: none;
+            border: 1px solid #c9dcf0;
+            transition: all 0.15s ease;
+            min-height: 40px;
+            white-space: nowrap;
+        }
+
+        .md-link:active:not(.disabled) {
+            background: #e2eefc;
+            transform: scale(0.985);
+        }
+
+        .md-link.disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
         .expand-toggle {
             display: inline-flex;
             align-items: center;
@@ -540,7 +574,7 @@
             .page-header h1 { font-size: 1.25rem; }
             .essay-title { font-size: 0.88rem; }
             .urdu-meaning { font-size: 0.82rem; }
-            .answer-link, .expand-toggle { font-size: 0.72rem; padding: 0.5rem 0.5rem; }
+            .answer-link, .expand-toggle, .md-link { font-size: 0.7rem; padding: 0.5rem 0.5rem; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -671,7 +705,7 @@
             return /^https?:\/\//i.test(trimmed);
         }
 
-        // Build essays – solution/ref/link column added
+        // Build essays – includes markdown file column
         function buildEssaysFromRows(rows) {
             if (rows.length < 2) return [];
             const headers = rows[0].map(h => h.trim().toLowerCase());
@@ -687,10 +721,12 @@
             const subjectIdx = headers.findIndex(h => /paper_subject|paper subject/i.test(h));
             const requirementIdx = headers.findIndex(h => /requirement/i.test(h));
 
-            // NEW: solution / ref / link column
             const solutionIdx = headers.findIndex(h =>
                 /solution/i.test(h) || /ref/i.test(h) || /link/i.test(h)
             );
+
+            // NEW: Markdown file column
+            const markdownIdx = headers.findIndex(h => /markdown/i.test(h) || /md_file/i.test(h));
 
             const getCol = (row, idx, fallback = '') => {
                 if (idx === -1 || idx >= row.length || row[idx] === undefined) return fallback;
@@ -702,6 +738,7 @@
                 if (!row.some(cell => cell.trim() !== '')) return;
 
                 const rawSolution = getCol(row, solutionIdx, '');
+                const rawMarkdown = getCol(row, markdownIdx, '');
 
                 const essay = {
                     srno: getCol(row, srnoIdx, String(i + 1)),
@@ -716,6 +753,8 @@
                     solutionRaw: rawSolution,
                     answerLink: rawSolution,
                     hasValidLink: isValidLink(rawSolution),
+                    markdownRaw: rawMarkdown,
+                    hasValidMarkdown: isValidLink(rawMarkdown) // Reusing the same validation logic
                 };
                 if (essay.topic && essay.topic !== 'Untitled essay') {
                     essays.push(essay);
@@ -744,6 +783,7 @@
                 const safeSubject = escapeHtml(essay.subject);
                 const safeRequirement = escapeHtml(essay.requirement);
                 const safeSolution = escapeHtml(essay.solutionRaw);
+                const safeMarkdown = escapeHtml(essay.markdownRaw);
 
                 const expandId = `extra-${idx}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
@@ -759,7 +799,25 @@
                     subjectReqHtml += `</div>`;
                 }
 
-                // Answer button: only active if a valid http(s) link exists
+                // --- BUTTONS ---
+
+                // 1. Markdown File Button (Placed first)
+                let mdButtonHtml;
+                if (essay.hasValidMarkdown) {
+                    mdButtonHtml = `
+                        <a class="md-link" href="${safeMarkdown}" target="_blank" rel="noopener noreferrer" title="Open Markdown File">
+                            <span>📝</span> MD
+                        </a>
+                    `;
+                } else {
+                    mdButtonHtml = `
+                        <span class="md-link disabled" title="No Markdown file available" aria-disabled="true">
+                            <span>📝</span> MD
+                        </span>
+                    `;
+                }
+
+                // 2. Solved Button
                 let answerButtonHtml;
                 if (essay.hasValidLink) {
                     answerButtonHtml = `
@@ -775,15 +833,24 @@
                     `;
                 }
 
-                // Answer URL in details panel
+                // Detail panel logic
                 let solutionDetailHtml;
                 if (essay.hasValidLink) {
                     solutionDetailHtml = `<a href="${safeSolution}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-600); text-decoration: underline; word-break: break-all;">${safeSolution}</a>`;
                 } else if (safeSolution) {
-                    // Non-URL reference text (e.g. "AI generated", "see notes")
                     solutionDetailHtml = `<span style="color: #1f344b;">${safeSolution}</span>`;
                 } else {
                     solutionDetailHtml = `<span style="color: #94a3b8; font-style: italic;">Not available</span>`;
+                }
+
+                // Detail panel for Markdown
+                let mdDetailHtml;
+                if (essay.hasValidMarkdown) {
+                    mdDetailHtml = `<a href="${safeMarkdown}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-600); text-decoration: underline; word-break: break-all;">${safeMarkdown}</a>`;
+                } else if (safeMarkdown) {
+                    mdDetailHtml = `<span style="color: #1f344b;">${safeMarkdown}</span>`;
+                } else {
+                    mdDetailHtml = `<span style="color: #94a3b8; font-style: italic;">Not available</span>`;
                 }
 
                 cardsHtml += `
@@ -800,6 +867,7 @@
                         </div>
                         <div class="card-body">
                             <div class="action-row">
+                                ${mdButtonHtml}
                                 ${answerButtonHtml}
                                 <div class="expand-toggle" data-target="${expandId}" role="button" tabindex="0" aria-expanded="false">
                                     <span>Details</span>
@@ -835,6 +903,12 @@
                                     <span class="detail-label">Solution / Ref / Link</span>
                                     <span class="detail-value" style="font-size: 0.72rem;">
                                         ${solutionDetailHtml}
+                                    </span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Markdown File</span>
+                                    <span class="detail-value" style="font-size: 0.72rem;">
+                                        ${mdDetailHtml}
                                     </span>
                                 </div>
                             </div>
@@ -897,7 +971,8 @@
                         essay.year,
                         essay.srno,
                         essay.examTitle || '',
-                        essay.solutionRaw || ''
+                        essay.solutionRaw || '',
+                        essay.markdownRaw || ''
                     ].join(' ').toLowerCase();
                     if (!haystack.includes(searchTerm)) return false;
                 }
