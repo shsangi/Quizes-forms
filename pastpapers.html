@@ -955,7 +955,6 @@
         const headers = rows[0].map(h => h.trim().toLowerCase());
         const dataRows = rows.slice(1);
 
-        // Find column indices by header name, not hardcoded position
         const srnoIdx = headers.findIndex(h => /sr\s*no|srno/i.test(h));
         const titleIdx = headers.findIndex(h => /title of exam|exam title/i.test(h));
         const instructionIdx = headers.findIndex(h => /instruction/i.test(h));
@@ -965,10 +964,7 @@
         const urduIdx = headers.findIndex(h => /urdu_meaning|urdu meaning/i.test(h));
         const subjectIdx = headers.findIndex(h => /paper_subject|paper subject|subject/i.test(h));
         const requirementIdx = headers.findIndex(h => /requirement/i.test(h));
-        
-        // Look for "Solution", "Ref", or "Link" headers for Column J equivalent
         const solutionIdx = headers.findIndex(h => /solution|ref|link|solved/i.test(h));
-        // Look for "Markdown" or "MD" headers for Column K equivalent
         const markdownIdx = headers.findIndex(h => /markdown|md_file|md file/i.test(h));
 
         const getCol = (row, idx, fallback = '') => {
@@ -1005,7 +1001,7 @@
         return essays;
     }
 
-    // --- 3. Robust Drawer Logic with Error Handling ---
+    // --- 3. Robust Drawer Logic: Shows only Title, Outline, Essay by default ---
     function openMarkdownDrawer(content, title) {
         drawerTitle.textContent = title || "Reading Document";
 
@@ -1026,7 +1022,7 @@
         const yearMatch = content.match(/\*\*Exam year:\*\*\s*(.*?)(?=\n\*\*|$)/i);
         if (yearMatch) examYear = yearMatch[1].trim();
 
-        // Extract Classification (Fuzzy match for "Classification")
+        // Extract Classification (Hidden by default)
         const classRegex = /(###\s*.*Classification.*[\s\S]*?)(?=(?:---|\n#|\n##|\n\*\*[A-Z]|$))/i;
         const classMatch = content.match(classRegex);
         if (classMatch) {
@@ -1037,7 +1033,7 @@
             mainBody = mainBody.replace(classRegex, '');
         }
 
-        // Extract Vocabulary (Fuzzy match for "Vocabulary" or "Info")
+        // Extract Vocabulary (Hidden by default)
         const vocabRegex = /(###\s*.*(?:Vocabulary|Info).*[\s\S]*?)(?=(?:---|\n#|\n##|$))/i;
         const vocabMatch = content.match(vocabRegex);
         if (vocabMatch) {
@@ -1050,6 +1046,7 @@
         }
 
         // Remove the first title line from main body if it's the essay title
+        // so we don't duplicate the title
         mainBody = mainBody.replace(/^# (.*$)/m, '');
 
         // Format the main body
@@ -1063,7 +1060,7 @@
         formattedBody = formattedBody.replace(/^\- (.*$)/gim, '<li>$1</li>');
         formattedBody = formattedBody.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
 
-        // Build the Info Panel
+        // Build the Info Panel (contains SR No, Date, Exam Year, Classification, Vocab)
         const infoPanelHtml = `
             <div class="info-panel" id="infoPanel">
                 <div class="info-section">
@@ -1093,12 +1090,13 @@
             </div>
         `;
 
+        // Final HTML: Info Panel (hidden) + Main Body (Title, Outline, Essay)
         drawerBody.innerHTML = `
             ${infoPanelHtml}
             <div class="drawer-main-content">${formattedBody}</div>
         `;
 
-        // Reset Toggle State
+        // Reset Toggle State (Info panel starts closed)
         infoToggleBtn.classList.remove('open');
         infoToggleBtn.setAttribute('aria-expanded', 'false');
         const infoPanel = document.getElementById('infoPanel');
@@ -1287,7 +1285,7 @@
             toggle.addEventListener("click", handle);
         });
 
-        // Attach Read MD Button (with Try-Catch for decode)
+        // Attach Read MD Button
         document.querySelectorAll(".md-read-btn").forEach(btn => {
             btn.addEventListener("click", function (e) {
                 e.preventDefault();
