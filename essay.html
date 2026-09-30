@@ -124,6 +124,7 @@
             .essay-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
         }
 
+        /* Card is fully clickable */
         .essay-card {
             background: var(--card-bg); border-radius: var(--radius);
             box-shadow: var(--shadow); border: 1px solid var(--border);
@@ -131,6 +132,7 @@
             height: 100%;
             transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
             position: relative; overflow: hidden;
+            cursor: pointer;
         }
         .essay-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0;
@@ -145,6 +147,9 @@
                 border-color: var(--primary-muted);
             }
         }
+        .essay-card:active {
+            transform: scale(0.995);
+        }
 
         .card-header {
             display: flex; justify-content: space-between;
@@ -158,19 +163,22 @@
             font-size: 0.75rem; font-weight: 700; color: var(--primary);
             background: var(--primary-soft); padding: 2px 7px;
             border-radius: 5px; letter-spacing: 0.01em;
+            pointer-events: none;
         }
         .card-title {
             font-size: 1rem; font-weight: 600; color: var(--text);
-            line-height: 1.35; cursor: pointer; text-decoration: none;
+            line-height: 1.35; text-decoration: none;
             word-break: break-word; transition: color var(--transition);
+            pointer-events: none;
         }
-        .card-title:hover { color: var(--primary); }
+        .essay-card:hover .card-title { color: var(--primary); }
 
         .card-meta {
             font-size: 0.72rem; color: var(--text-muted);
             display: flex; flex-wrap: wrap; gap: 8px;
             margin-bottom: 12px; padding-bottom: 12px;
             border-bottom: 1px solid var(--border-subtle);
+            pointer-events: none;
         }
         .card-meta span {
             display: inline-flex; align-items: center; gap: 4px;
@@ -184,6 +192,7 @@
             padding: 10px 12px; border-radius: var(--radius-xs);
             border-left: 3px solid var(--warning);
             margin-bottom: 12px; line-height: 1.45;
+            pointer-events: none;
         }
         .card-classification strong {
             font-weight: 600; color: #78350f;
@@ -194,6 +203,7 @@
             font-size: 0.65rem; font-weight: 700;
             letter-spacing: 0.04em; text-transform: uppercase;
             padding: 3px 8px; border-radius: 5px; flex-shrink: 0;
+            pointer-events: none;
         }
         .type-badge.essay {
             background: #ede9fe; color: #6d28d9;
@@ -219,6 +229,8 @@
             gap: 8px;
             transition: background var(--transition), border-color var(--transition), transform var(--transition);
             font-family: inherit;
+            position: relative;
+            z-index: 2;
         }
         .vocab-toggle-btn:hover {
             background: var(--primary-soft);
@@ -785,7 +797,7 @@
     </div>
 
     <script>
-        const APP_VERSION = '2.5.0';
+        const APP_VERSION = '2.6.0';
         document.getElementById('versionBadge').textContent = 'v' + APP_VERSION;
 
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
@@ -1102,7 +1114,7 @@
                 if (essay.vocabItems && essay.vocabItems.length > 0) {
                     vocabButton = `
                         <div class="vocab-section">
-                            <button class="vocab-toggle-btn" onclick="openVocabPopup(${index})">
+                            <button class="vocab-toggle-btn" onclick="event.stopPropagation(); openVocabPopup(${index});">
                                 ${ICONS.book}
                                 Show Vocabulary (${essay.vocabItems.length})
                             </button>
@@ -1124,11 +1136,11 @@
                     : '<span class="type-badge reading">Reading</span>';
 
                 const cardHTML = `
-                    <div class="essay-card" id="card-${index}">
+                    <div class="essay-card" id="card-${index}" onclick="openModal(${index})">
                         <div class="card-header">
                             <div class="card-title-group">
                                 <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
-                                <span class="card-title" onclick="openModal(${index})">${escapeHtml(essay.title)}</span>
+                                <span class="card-title">${escapeHtml(essay.title)}</span>
                             </div>
                         </div>
                         <div style="margin-bottom:10px;">${typeBadge}</div>
