@@ -33,6 +33,7 @@
             --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
             --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
             --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12), 0 4px 8px rgba(15, 23, 42, 0.06);
+            --shadow-xl: 0 24px 48px rgba(15, 23, 42, 0.18), 0 8px 16px rgba(15, 23, 42, 0.08);
             --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -50,7 +51,7 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* ── Top bar / version ── */
+        /* ── Top bar ── */
         .top-bar {
             position: sticky;
             top: 0;
@@ -69,79 +70,48 @@
             justify-content: space-between;
             gap: 12px;
         }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .brand { display: flex; align-items: center; gap: 10px; }
         .brand-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
+            width: 32px; height: 32px; border-radius: 9px;
             background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: white; flex-shrink: 0;
         }
         .brand-icon svg { width: 16px; height: 16px; }
         .brand-text {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text);
+            font-size: 0.95rem; font-weight: 600; color: var(--text);
             letter-spacing: -0.02em;
         }
         .version-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: var(--primary-soft);
-            color: var(--primary);
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.02em;
-            border: 1px solid var(--primary-muted);
+            display: inline-flex; align-items: center; gap: 5px;
+            background: var(--primary-soft); color: var(--primary);
+            font-size: 0.7rem; font-weight: 600;
+            padding: 4px 10px; border-radius: 20px;
+            letter-spacing: 0.02em; border: 1px solid var(--primary-muted);
         }
         .version-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
+            content: ''; width: 6px; height: 6px; border-radius: 50%;
             background: var(--success);
             box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1200px; margin: 0 auto;
             padding: 28px 16px 120px;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
+        header { text-align: center; margin-bottom: 32px; }
         h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin: 0 0 6px;
-            letter-spacing: -0.04em;
-            color: var(--text);
+            font-size: 1.75rem; font-weight: 700;
+            margin: 0 0 6px; letter-spacing: -0.04em; color: var(--text);
         }
         .subtitle {
-            margin: 0;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            font-weight: 400;
+            margin: 0; font-size: 0.9rem;
+            color: var(--text-secondary); font-weight: 400;
         }
 
         .essay-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
+            display: grid; grid-template-columns: 1fr; gap: 16px;
         }
         @media (min-width: 640px) {
             .essay-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
@@ -155,29 +125,19 @@
 
         /* ── Cards ── */
         .essay-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
+            background: var(--card-bg); border-radius: var(--radius);
+            box-shadow: var(--shadow); border: 1px solid var(--border);
+            padding: 18px; display: flex; flex-direction: column;
             height: 100%;
             transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
         .essay-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
             height: 3px;
             background: linear-gradient(90deg, var(--primary), #7c3aed);
             opacity: 0.9;
         }
-
         @media (hover: hover) {
             .essay-card:hover {
                 transform: translateY(-3px);
@@ -187,250 +147,111 @@
         }
 
         .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 10px;
+            display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 12px; margin-bottom: 10px;
         }
-
         .card-title-group {
-            flex: 1;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            gap: 6px;
-            min-width: 0;
+            flex: 1; display: flex; flex-wrap: wrap;
+            align-items: baseline; gap: 6px; min-width: 0;
         }
         .card-srno {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--primary);
-            background: var(--primary-soft);
-            padding: 2px 7px;
-            border-radius: 5px;
-            letter-spacing: 0.01em;
+            font-size: 0.75rem; font-weight: 700; color: var(--primary);
+            background: var(--primary-soft); padding: 2px 7px;
+            border-radius: 5px; letter-spacing: 0.01em;
         }
-        
         .card-title {
-            font-size: 0.98rem;
-            font-weight: 600;
-            color: var(--text);
-            line-height: 1.35;
-            cursor: pointer;
-            text-decoration: none;
-            word-break: break-word;
-            transition: color var(--transition);
+            font-size: 0.98rem; font-weight: 600; color: var(--text);
+            line-height: 1.35; cursor: pointer; text-decoration: none;
+            word-break: break-word; transition: color var(--transition);
         }
         .card-title:hover { color: var(--primary); }
 
         .card-nav-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 11px;
-            background: var(--primary-soft);
-            border: 1px solid transparent;
+            width: 38px; height: 38px; border-radius: 11px;
+            background: var(--primary-soft); border: 1px solid transparent;
             color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; cursor: pointer;
             transition: background var(--transition), border-color var(--transition), transform var(--transition), color var(--transition);
         }
         .card-nav-icon:hover {
-            background: var(--primary);
-            color: white;
+            background: var(--primary); color: white;
             border-color: var(--primary);
         }
         .card-nav-icon:active { transform: scale(0.94); }
         .card-nav-icon svg { width: 17px; height: 17px; }
 
         .card-meta {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
+            font-size: 0.72rem; color: var(--text-muted);
+            display: flex; flex-wrap: wrap; gap: 8px;
+            margin-bottom: 12px; padding-bottom: 12px;
             border-bottom: 1px solid var(--border-subtle);
         }
         .card-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--bg);
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-weight: 500;
+            display: inline-flex; align-items: center; gap: 4px;
+            background: var(--bg); padding: 3px 8px;
+            border-radius: 5px; font-weight: 500;
         }
 
         .card-classification {
-            font-size: 0.78rem;
-            background: #fffbeb;
-            color: #92400e;
-            padding: 10px 12px;
-            border-radius: var(--radius-xs);
+            font-size: 0.78rem; background: #fffbeb; color: #92400e;
+            padding: 10px 12px; border-radius: var(--radius-xs);
             border-left: 3px solid var(--warning);
-            margin-bottom: 12px;
-            line-height: 1.45;
+            margin-bottom: 12px; line-height: 1.45;
         }
         .card-classification strong {
-            font-weight: 600;
-            color: #78350f;
+            font-weight: 600; color: #78350f;
         }
 
         /* ── Type Badge ── */
         .type-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            padding: 3px 8px;
-            border-radius: 5px;
-            flex-shrink: 0;
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.65rem; font-weight: 700;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            padding: 3px 8px; border-radius: 5px; flex-shrink: 0;
         }
         .type-badge.essay {
-            background: #ede9fe;
-            color: #6d28d9;
+            background: #ede9fe; color: #6d28d9;
             border: 1px solid #ddd6fe;
         }
         .type-badge.reading {
-            background: #ecfeff;
-            color: #0e7490;
+            background: #ecfeff; color: #0e7490;
             border: 1px solid #cffafe;
         }
 
-        /* ── Vocabulary ── */
+        /* ── Vocabulary button ── */
         .vocab-section {
-            margin-top: auto;
-            padding-top: 12px;
+            margin-top: auto; padding-top: 12px;
             border-top: 1px solid var(--border-subtle);
         }
-
         .vocab-toggle-btn {
-            width: 100%;
-            background: var(--bg);
+            width: 100%; background: var(--bg);
             border: 1px solid var(--border);
             color: var(--primary);
-            font-size: 0.82rem;
-            font-weight: 600;
-            padding: 11px 14px;
-            border-radius: var(--radius-sm);
+            font-size: 0.82rem; font-weight: 600;
+            padding: 11px 14px; border-radius: var(--radius-sm);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             gap: 6px;
-            transition: background var(--transition), border-color var(--transition);
+            transition: background var(--transition), border-color var(--transition), transform var(--transition);
             font-family: inherit;
         }
         .vocab-toggle-btn:hover {
             background: var(--primary-soft);
             border-color: var(--primary-muted);
         }
-        .vocab-toggle-btn:active { background: #e0e7ff; }
-
-        .vocab-content {
-            display: none;
-            margin-top: 12px;
-            max-height: 340px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-        .vocab-content.active { display: block; }
-
-        .vocab-item {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 14px;
-            margin-bottom: 10px;
-        }
-        .vocab-item:last-child { margin-bottom: 0; }
-
-        .vocab-word {
-            font-size: 0.92rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .vocab-word .number {
-            background: var(--primary);
-            color: white;
-            font-size: 0.68rem;
-            font-weight: 700;
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .vocab-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color var(--transition);
-        }
-        .vocab-link:hover {
-            text-decoration: underline;
-            color: var(--primary-hover);
-        }
-
-        .urdu-text {
-            font-family: 'Noto Nastaliq Urdu', serif;
-            direction: rtl;
-            text-align: right;
-            font-size: 1.12rem;
-            line-height: 1.85;
-            color: #1e293b;
-            background: white;
-            padding: 10px 14px;
-            border-radius: var(--radius-xs);
-            border: 1px solid var(--border);
-            margin: 8px 0 10px;
-        }
-
-        .vocab-meta { display: flex; flex-direction: column; gap: 5px; font-size: 0.78rem; }
-        .vocab-meta-row { display: flex; gap: 8px; line-height: 1.45; }
-        .vocab-label {
-            font-weight: 600;
-            color: var(--text-muted);
-            min-width: 72px;
-            flex-shrink: 0;
-        }
-        .vocab-value { color: var(--text); }
+        .vocab-toggle-btn:active { transform: scale(0.98); }
+        .vocab-toggle-btn svg { width: 15px; height: 15px; }
 
         /* ── Refresh FAB ── */
         .refresh-btn {
-            position: fixed;
-            bottom: 24px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
+            position: fixed; bottom: 24px; right: 20px;
+            width: 56px; height: 56px;
             background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-            color: white;
-            border: none;
-            border-radius: 16px;
+            color: white; border: none; border-radius: 16px;
             box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 900;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 900;
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow var(--transition);
         }
         .refresh-btn:hover {
@@ -438,55 +259,44 @@
             box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
         }
         .refresh-btn:active { transform: scale(0.92); }
-        
         .refresh-btn.loading {
             animation: morphLoad 1.2s ease-in-out infinite;
             pointer-events: none;
         }
         .refresh-btn.loading svg { animation: spin 0.8s linear infinite; }
-        
         @keyframes morphLoad {
             0%   { transform: scale(1) rotate(0deg); border-radius: 16px; }
             50%  { transform: scale(0.88) rotate(180deg); border-radius: 50%; }
             100% { transform: scale(1) rotate(360deg); border-radius: 16px; }
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         .refresh-btn svg { width: 22px; height: 22px; fill: currentColor; }
 
-        /* ── Modal ── */
+        /* ── Generic modal overlay ── */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
+            display: none; position: fixed; inset: 0;
             background: rgba(15, 23, 42, 0.5);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             z-index: 1000;
-            justify-content: center;
-            align-items: flex-end;
+            justify-content: center; align-items: flex-end;
         }
         @media (min-width: 768px) {
             .modal-overlay { align-items: center; padding: 24px; }
         }
+        .modal-overlay.active { display: flex; }
 
         .modal-content {
-            background: white;
-            width: 100%;
-            height: 94dvh;
-            max-width: 860px;
-            border-radius: 20px 20px 0 0;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
+            background: white; width: 100%; height: 94dvh;
+            max-width: 860px; border-radius: 20px 20px 0 0;
+            display: flex; flex-direction: column;
+            overflow: hidden; box-shadow: var(--shadow-lg);
             animation: slideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
         }
         @media (min-width: 768px) {
             .modal-content {
-                height: 90vh;
-                border-radius: 16px;
+                height: 90vh; border-radius: 16px;
                 animation: fadeIn 0.25s ease;
             }
         }
@@ -500,54 +310,35 @@
         }
 
         .modal-header {
-            padding: 14px 18px;
-            background: var(--bg);
+            padding: 14px 18px; background: var(--bg);
             border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 12px; flex-shrink: 0;
         }
         .modal-header-title {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: 600; font-size: 0.95rem; color: var(--text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .modal-header-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
         .action-btn {
-            border: none;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            border: none; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 600;
             padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            display: flex; align-items: center; gap: 6px;
             cursor: pointer;
             transition: background var(--transition), transform var(--transition);
             font-family: inherit;
         }
-        .copy-btn {
-            background: var(--success);
-            color: white;
-        }
+        .copy-btn { background: var(--success); color: white; }
         .copy-btn:hover { background: #059669; }
         .copy-btn:active { transform: scale(0.96); }
         .copy-btn.copied { background: var(--text); }
 
         .close-btn {
-            background: var(--danger);
-            color: white;
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            justify-content: center;
-            border-radius: 50%;
+            background: var(--danger); color: white;
+            width: 40px; height: 40px; padding: 0;
+            justify-content: center; border-radius: 50%;
             font-size: 1.1rem;
         }
         .close-btn:hover { background: #dc2626; }
@@ -555,10 +346,8 @@
 
         .modal-body {
             padding: 24px 18px 48px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            flex: 1;
-            overscroll-behavior: contain;
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            flex: 1; overscroll-behavior: contain;
             position: relative;
         }
         @media (min-width: 640px) {
@@ -566,11 +355,8 @@
         }
 
         .reading-essay-title {
-            font-size: 1.45rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0 0 22px;
-            line-height: 1.3;
+            font-size: 1.45rem; font-weight: 700; color: var(--text);
+            margin: 0 0 22px; line-height: 1.3;
             letter-spacing: -0.03em;
             border-bottom: 2px solid var(--border);
             padding-bottom: 16px;
@@ -582,90 +368,333 @@
         .reading-outline-box {
             background: var(--primary-soft);
             border-left: 4px solid var(--primary);
-            padding: 16px 18px;
-            margin-bottom: 28px;
+            padding: 16px 18px; margin-bottom: 28px;
             border-radius: 0 12px 12px 0;
-            font-size: 0.94rem;
-            color: #312e81;
-            line-height: 1.55;
+            font-size: 0.94rem; color: #312e81; line-height: 1.55;
         }
         .reading-outline-box strong {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--text);
-            font-size: 0.98rem;
+            display: block; margin-bottom: 6px;
+            color: var(--text); font-size: 0.98rem;
         }
 
         .modal-body h1 { font-size: 1.3rem; margin: 1.5em 0 0.55em; font-weight: 700; }
         .modal-body h2, .modal-body h3 {
-            margin: 1.35em 0 0.5em;
-            font-weight: 600;
-            color: var(--text);
+            margin: 1.35em 0 0.5em; font-weight: 600; color: var(--text);
         }
         .modal-body p { margin-bottom: 1.1em; line-height: 1.72; color: #1e293b; }
-
         .modal-body blockquote {
             border-left: 4px solid var(--primary);
-            margin: 1.2em 0;
-            padding: 14px 18px;
-            background: var(--bg);
-            border-radius: 0 10px 10px 0;
-            color: #475569;
-            font-style: italic;
+            margin: 1.2em 0; padding: 14px 18px;
+            background: var(--bg); border-radius: 0 10px 10px 0;
+            color: #475569; font-style: italic;
         }
-
         .modal-body ul, .modal-body ol {
-            margin-bottom: 1.1em;
-            padding-left: 1.4em;
+            margin-bottom: 1.1em; padding-left: 1.4em;
         }
         .modal-body li { margin-bottom: 0.35em; line-height: 1.65; }
 
         /* ── Back to top (inside modal) ── */
         .back-to-top {
-            position: absolute;
-            bottom: 24px;
-            right: 24px;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--text);
-            color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: var(--shadow-md);
-            opacity: 0;
-            visibility: hidden;
+            position: absolute; bottom: 24px; right: 24px;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--text); color: white; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: var(--shadow-md);
+            opacity: 0; visibility: hidden;
             transform: translateY(10px);
             transition: opacity var(--transition), visibility var(--transition), transform var(--transition), background var(--transition);
             z-index: 10;
         }
         .back-to-top.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+            opacity: 1; visibility: visible; transform: translateY(0);
         }
         .back-to-top:hover { background: var(--primary); }
         .back-to-top:active { transform: scale(0.92); }
         .back-to-top svg { width: 18px; height: 18px; }
 
+        /* ══════════════════════════════════════════════
+           VOCABULARY POPUP (BEAUTIFUL)
+           ══════════════════════════════════════════════ */
+        .vocab-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1100;
+            justify-content: center; align-items: flex-end;
+        }
+        @media (min-width: 768px) {
+            .vocab-overlay { align-items: center; padding: 24px; }
+        }
+        .vocab-overlay.active { display: flex; }
+
+        .vocab-modal {
+            background: linear-gradient(180deg, #fefefe 0%, #f8fafc 100%);
+            width: 100%; height: 92dvh;
+            max-width: 720px;
+            border-radius: 24px 24px 0 0;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            animation: vocabSlideUp 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        @media (min-width: 768px) {
+            .vocab-modal {
+                height: 88vh; border-radius: 20px;
+                animation: vocabFadeIn 0.28s ease;
+            }
+        }
+        @keyframes vocabSlideUp {
+            from { transform: translateY(100%); opacity: 0.6; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes vocabFadeIn {
+            from { opacity: 0; transform: scale(0.96) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Header with gradient accent */
+        .vocab-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            padding: 20px 22px 18px;
+            color: white;
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 12px;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .vocab-header::after {
+            content: '';
+            position: absolute; top: -50%; right: -20%;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .vocab-header-left {
+            display: flex; align-items: center; gap: 12px;
+            min-width: 0; flex: 1;
+            position: relative; z-index: 1;
+        }
+        .vocab-header-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .vocab-header-icon svg { width: 22px; height: 22px; }
+        .vocab-header-text { min-width: 0; flex: 1; }
+        .vocab-header-title {
+            font-size: 1.05rem; font-weight: 700;
+            letter-spacing: -0.02em;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+        .vocab-header-subtitle {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        .vocab-close-btn {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 1rem;
+            transition: background var(--transition), transform var(--transition);
+            position: relative; z-index: 1;
+            font-family: inherit;
+        }
+        .vocab-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .vocab-close-btn:active { transform: scale(0.92); }
+
+        /* Body */
+        .vocab-body {
+            flex: 1; overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px 18px 32px;
+            overscroll-behavior: contain;
+        }
+        @media (min-width: 640px) {
+            .vocab-body { padding: 24px 26px 40px; }
+        }
+
+        /* Individual vocabulary card */
+        .vocab-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 18px 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .vocab-card:last-child { margin-bottom: 0; }
+        .vocab-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary), #7c3aed);
+            opacity: 0.85;
+        }
+        @media (hover: hover) {
+            .vocab-card:hover {
+                box-shadow: var(--shadow-md);
+                border-color: var(--primary-muted);
+                transform: translateY(-1px);
+            }
+        }
+
+        .vocab-card-header {
+            display: flex; align-items: center;
+            gap: 12px; margin-bottom: 14px;
+            padding-left: 6px;
+        }
+        .vocab-number-badge {
+            width: 32px; height: 32px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
+        }
+        .vocab-word-title {
+            font-size: 1.15rem; font-weight: 700;
+            color: var(--text); letter-spacing: -0.02em;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        /* Urdu block — full width, elegant */
+        .vocab-urdu-block {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            direction: rtl; text-align: right;
+            font-size: 1.25rem; line-height: 2;
+            color: #1e293b;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #bbf7d0;
+            border-right: 4px solid var(--success);
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        /* Definition row */
+        .vocab-definition-row {
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 12px;
+            padding-left: 6px;
+        }
+        .vocab-definition-label {
+            font-size: 0.68rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .vocab-definition-label svg {
+            width: 12px; height: 12px;
+        }
+        .vocab-definition-text {
+            font-size: 0.9rem; color: var(--text);
+            line-height: 1.55;
+        }
+
+        /* Synonym / Antonym chips */
+        .vocab-chips-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 6px;
+            padding-left: 6px;
+        }
+        @media (min-width: 480px) {
+            .vocab-chips-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .vocab-chip-group {
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .vocab-chip-label {
+            font-size: 0.68rem; font-weight: 700;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .vocab-chip-label.syn { color: #059669; }
+        .vocab-chip-label.ant { color: #dc2626; }
+        .vocab-chip-label svg { width: 11px; height: 11px; }
+
+        .vocab-chips {
+            display: flex; flex-wrap: wrap; gap: 5px;
+        }
+        .vocab-chip {
+            display: inline-flex; align-items: center;
+            font-size: 0.78rem; font-weight: 600;
+            padding: 5px 11px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: transform var(--transition), box-shadow var(--transition);
+            white-space: nowrap;
+        }
+        .vocab-chip.syn {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+        .vocab-chip.syn:hover {
+            background: #d1fae5;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.15);
+        }
+        .vocab-chip.ant {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .vocab-chip.ant:hover {
+            background: #fee2e2;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.15);
+        }
+
+        /* Empty state */
+        .vocab-empty {
+            text-align: center; padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .vocab-empty svg {
+            width: 48px; height: 48px;
+            margin-bottom: 12px; opacity: 0.4;
+        }
+
+        /* Loading / Error */
         .loading, .error {
-            text-align: center;
-            padding: 64px 20px;
+            text-align: center; padding: 64px 20px;
             grid-column: 1 / -1;
-            color: var(--text-secondary);
-            font-size: 1rem;
+            color: var(--text-secondary); font-size: 1rem;
         }
         .error { color: var(--danger); font-weight: 600; }
-
         .loading::after {
-            content: '';
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
+            content: ''; display: inline-block;
+            width: 18px; height: 18px; margin-left: 10px;
             border: 2px solid var(--border);
             border-top-color: var(--primary);
             border-radius: 50%;
@@ -706,6 +735,7 @@
         <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
     </button>
 
+    <!-- ═══ Reading Modal ═══ -->
     <div id="essayModal" class="modal-overlay" role="dialog" aria-modal="true">
         <div class="modal-content">
             <div class="modal-header">
@@ -729,9 +759,33 @@
         </div>
     </div>
 
+    <!-- ═══ Vocabulary Popup ═══ -->
+    <div id="vocabOverlay" class="vocab-overlay" role="dialog" aria-modal="true" aria-labelledby="vocabTitle">
+        <div class="vocab-modal">
+            <div class="vocab-header">
+                <div class="vocab-header-left">
+                    <div class="vocab-header-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                    </div>
+                    <div class="vocab-header-text">
+                        <div class="vocab-header-title" id="vocabTitle">Vocabulary</div>
+                        <div class="vocab-header-subtitle" id="vocabSubtitle">0 words</div>
+                    </div>
+                </div>
+                <button class="vocab-close-btn" onclick="closeVocabPopup()" aria-label="Close vocabulary">✕</button>
+            </div>
+            <div class="vocab-body" id="vocabBody">
+                <!-- filled dynamically -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // ── Single source of truth for version ──
-        const APP_VERSION = '2.1.0';
+        const APP_VERSION = '2.2.0';
         document.getElementById('versionBadge').textContent = 'v' + APP_VERSION;
 
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
@@ -742,59 +796,44 @@
         const refreshBtn = document.getElementById('refreshBtn');
         const copyBtn = document.getElementById('copyBtn');
         const backToTopBtn = document.getElementById('backToTopBtn');
+
+        const vocabOverlay = document.getElementById('vocabOverlay');
+        const vocabBody = document.getElementById('vocabBody');
+        const vocabTitle = document.getElementById('vocabTitle');
+        const vocabSubtitle = document.getElementById('vocabSubtitle');
         
         let essaysData = []; 
         let currentEssayIndex = null; 
         let scrollSaveTimeout;
 
         // ---------- HELPERS ----------
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function createSearchLink(query) {
             if (!query || query.trim() === '') return '';
             const cleaned = query.replace(/["']/g, '').replace(/\s+/g, ' ').trim();
             const encoded = encodeURIComponent(cleaned);
-            return `<a href="https://www.google.com/search?q=${encoded}" target="_blank" rel="noopener noreferrer" class="vocab-link">${query}</a>`;
+            return `https://www.google.com/search?q=${encoded}`;
         }
 
-        function linkifyList(list) {
-            if (!list) return '';
-            return list.split(',').map(item => {
-                const trimmed = item.trim();
-                if (!trimmed) return '';
-                return createSearchLink(trimmed);
-            }).filter(Boolean).join(', ');
-        }
-
-        function buildVocabItem(number, word, urdu, engDef, synonyms, antonyms) {
-            const wordLink = createSearchLink(word);
-            const synLinks = linkifyList(synonyms);
-            const antLinks = linkifyList(antonyms);
-
-            return `
-                <div class="vocab-item">
-                    <div class="vocab-word">
-                        <span class="number">${number}</span>
-                        ${wordLink}
-                    </div>
-                    ${urdu ? `<div class="urdu-text">${urdu}</div>` : ''}
-                    ${engDef ? `<div class="vocab-meta-row" style="margin-bottom:6px;"><span class="vocab-label">Definition</span><span class="vocab-value">${engDef}</span></div>` : ''}
-                    <div class="vocab-meta">
-                        ${synLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Synonyms</span><span class="vocab-value">${synLinks}</span></div>` : ''}
-                        ${antLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Antonyms</span><span class="vocab-value">${antLinks}</span></div>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-        // Extract vocabulary — supports both formats
-        function extractVocab(markdown) {
-            let vocabHtml = '';
+        // ── Extract vocabulary into structured array (for the popup) ──
+        // Returns { body: string, vocabItems: [{number, word, urdu, engDef, synonyms, antonyms}] }
+        function extractVocabStructured(markdown) {
             let vocabSplit = markdown.split(/###\s*📚\s*Vocabulary|##\s*Vocabulary in Detail/i);
-            if (vocabSplit.length < 2) return { body: markdown, vocabHtml: '' };
+            if (vocabSplit.length < 2) return { body: markdown, vocabItems: [] };
 
-            let rawVocab = vocabSplit[1];
-            let items = [];
+            const rawVocab = vocabSplit[1];
+            const items = [];
 
-            // Pattern A: **1 Word** (structured essay format)
+            // Pattern A: **1 Word** (structured essay)
             let regexA = /\*\*(\d+)\s+(.+?)\*\*[\s\S]*?(?=\*\*\d+\s+|$)/g;
             // Pattern B: ### 1. Word (reading format)
             let regexB = /###\s*(\d+)\.\s*(.+?)\n([\s\S]*?)(?=\n###\s*\d+\.|$)/g;
@@ -813,13 +852,14 @@
                 const synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/i);
                 const antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/i);
 
-                items.push(buildVocabItem(
-                    number, word,
-                    urduMatch ? urduMatch[1].trim() : '',
-                    defMatch ? defMatch[1].trim() : '',
-                    synMatch ? synMatch[1].trim() : '',
-                    antMatch ? antMatch[1].trim() : ''
-                ));
+                items.push({
+                    number,
+                    word,
+                    urdu: urduMatch ? urduMatch[1].trim() : '',
+                    engDef: defMatch ? defMatch[1].trim() : '',
+                    synonyms: synMatch ? synMatch[1].trim() : '',
+                    antonyms: antMatch ? antMatch[1].trim() : ''
+                });
             }
 
             if (!foundA) {
@@ -833,57 +873,178 @@
                     const synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/i);
                     const antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/i);
 
-                    items.push(buildVocabItem(
-                        number, word,
-                        urduMatch ? urduMatch[1].trim() : '',
-                        defMatch ? defMatch[1].trim() : '',
-                        synMatch ? synMatch[1].trim() : '',
-                        antMatch ? antMatch[1].trim() : ''
-                    ));
+                    items.push({
+                        number,
+                        word,
+                        urdu: urduMatch ? urduMatch[1].trim() : '',
+                        engDef: defMatch ? defMatch[1].trim() : '',
+                        synonyms: synMatch ? synMatch[1].trim() : '',
+                        antonyms: antMatch ? antMatch[1].trim() : ''
+                    });
                 }
             }
 
-            vocabHtml = items.join('');
-            return { body: vocabSplit[0], vocabHtml };
+            return { body: vocabSplit[0], vocabItems: items };
+        }
+
+        // Split a comma-separated list into a clean array
+        function splitList(list) {
+            if (!list) return [];
+            return list.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        // ── Build a single vocabulary card for the popup ──
+        function buildVocabCard(item) {
+            const wordEsc = escapeHtml(item.word);
+            const wordSearchUrl = createSearchLink(item.word);
+
+            // Urdu block (only if present)
+            const urduBlock = item.urdu
+                ? `<div class="vocab-urdu-block">${escapeHtml(item.urdu)}</div>`
+                : '';
+
+            // Definition row (only if present)
+            const defRow = item.engDef
+                ? `<div class="vocab-definition-row">
+                       <div class="vocab-definition-label">
+                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                               <circle cx="12" cy="12" r="10"></circle>
+                               <line x1="12" y1="16" x2="12" y2="12"></line>
+                               <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                           </svg>
+                           Definition
+                       </div>
+                       <div class="vocab-definition-text">${escapeHtml(item.engDef)}</div>
+                   </div>`
+                : '';
+
+            // Synonym chips
+            const synArr = splitList(item.synonyms);
+            const synBlock = synArr.length
+                ? `<div class="vocab-chip-group">
+                       <div class="vocab-chip-label syn">
+                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                               <polyline points="20 6 9 17 4 12"></polyline>
+                           </svg>
+                           Synonyms
+                       </div>
+                       <div class="vocab-chips">
+                           ${synArr.map(s => `<a class="vocab-chip syn" href="${createSearchLink(s)}" target="_blank" rel="noopener noreferrer">${escapeHtml(s)}</a>`).join('')}
+                       </div>
+                   </div>`
+                : '';
+
+            // Antonym chips
+            const antArr = splitList(item.antonyms);
+            const antBlock = antArr.length
+                ? `<div class="vocab-chip-group">
+                       <div class="vocab-chip-label ant">
+                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                               <line x1="18" y1="6" x2="6" y2="18"></line>
+                               <line x1="6" y1="6" x2="18" y2="18"></line>
+                           </svg>
+                           Antonyms
+                       </div>
+                       <div class="vocab-chips">
+                           ${antArr.map(a => `<a class="vocab-chip ant" href="${createSearchLink(a)}" target="_blank" rel="noopener noreferrer">${escapeHtml(a)}</a>`).join('')}
+                       </div>
+                   </div>`
+                : '';
+
+            const chipsRow = (synBlock || antBlock)
+                ? `<div class="vocab-chips-row">${synBlock}${antBlock}</div>`
+                : '';
+
+            return `
+                <div class="vocab-card">
+                    <div class="vocab-card-header">
+                        <div class="vocab-number-badge">${escapeHtml(item.number)}</div>
+                        <a class="vocab-word-title" href="${wordSearchUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                            ${wordEsc}
+                        </a>
+                    </div>
+                    ${urduBlock}
+                    ${defRow}
+                    ${chipsRow}
+                </div>
+            `;
+        }
+
+        // ── Open the vocabulary popup ──
+        function openVocabPopup(index) {
+            const essay = essaysData[index];
+            if (!essay) return;
+
+            // Try cached items first
+            let items = essay.vocabItems;
+            if (!items || items.length === 0) {
+                // Fallback: re-parse from markdown
+                const parsed = extractVocabStructured(essay.rawMarkdown || essay.bodyMarkdown);
+                items = parsed.vocabItems;
+            }
+
+            if (!items || items.length === 0) {
+                vocabTitle.textContent = 'Vocabulary';
+                vocabSubtitle.textContent = 'No vocabulary available';
+                vocabBody.innerHTML = `
+                    <div class="vocab-empty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        <div>No vocabulary found for this entry.</div>
+                    </div>
+                `;
+            } else {
+                vocabTitle.textContent = essay.title;
+                vocabSubtitle.textContent = `${items.length} word${items.length === 1 ? '' : 's'}`;
+                vocabBody.innerHTML = items.map(buildVocabCard).join('');
+            }
+
+            vocabOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            vocabBody.scrollTop = 0;
+        }
+
+        function closeVocabPopup() {
+            vocabOverlay.classList.remove('active');
+            // Only restore body scroll if reading modal is also closed
+            if (modal.style.display !== 'flex') {
+                document.body.style.overflow = 'auto';
+            }
         }
 
         // ---------- UNIFIED PARSER (ONLY reads column B) ----------
         function parseRow(row, index) {
-            // ONLY read column B (index 1). Ignore everything else.
             const fullMarkdown = row[1] ? String(row[1]).trim() : '';
             if (!fullMarkdown) return null;
 
-            // Title: first # heading
             let titleMatch = fullMarkdown.match(/^\s*#\s+(.+)$/m);
             let title = titleMatch ? titleMatch[1].trim() : `Reading ${index + 1}`;
 
-            // Detect format type
             const isEssay = fullMarkdown.includes('**SR No:**') || 
                             fullMarkdown.includes('Total Essay Word Count');
 
-            // Metadata (only present in structured essays — parsed from column B itself)
             let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/) || 
                             fullMarkdown.match(/\*\*Dated:\*\*\s*(.+)/i);
             let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
             let classMatch = fullMarkdown.match(/\*\*Primary Type:\*\*\s*(.+)/);
 
             let meta = {
-                srNo: '', // assigned later
+                srNo: '',
                 date: dateMatch ? dateMatch[1].trim() : '',
                 wordCount: wordCountMatch ? wordCountMatch[1].trim() : '',
                 classification: classMatch ? classMatch[1].trim() : '',
                 type: isEssay ? 'essay' : 'reading'
             };
 
-            // Outline (only for structured essays)
             let outlineText = '';
             let outlineMatch = fullMarkdown.match(/### Outline:\s*\n([\s\S]*?)(?=\n---|\n###|$)/i);
             if (outlineMatch) outlineText = outlineMatch[1].trim();
 
-            // Extract vocabulary
-            const { body: bodyWithoutVocab, vocabHtml } = extractVocab(fullMarkdown);
+            // Extract vocab as structured items (for the popup)
+            const { body: bodyWithoutVocab, vocabItems } = extractVocabStructured(fullMarkdown);
 
-            // Clean body
             let essayBody = bodyWithoutVocab;
             if (titleMatch) essayBody = essayBody.replace(titleMatch[0], '');
             essayBody = essayBody.replace(/\*\*\(PCS.*?\)\*\*/g, '');
@@ -893,11 +1054,9 @@
             essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
             essayBody = essayBody.replace(/### Outline:[\s\S]*?(?=\n---)/i, '');
             essayBody = essayBody.replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '');
-            // Only strip the FIRST horizontal rule (separator after metadata)
             essayBody = essayBody.replace(/^\s*---\s*\n/, '');
             essayBody = essayBody.replace(/^[\s-]+/, '').trim();
 
-            // Auto-compute word count if missing
             if (!meta.wordCount && essayBody) {
                 const count = essayBody.split(/\s+/).filter(Boolean).length;
                 if (count > 0) meta.wordCount = count.toLocaleString() + ' words';
@@ -909,7 +1068,8 @@
                 meta: meta,
                 outline: outlineText,
                 bodyMarkdown: essayBody,
-                vocabHtml: vocabHtml
+                rawMarkdown: fullMarkdown,
+                vocabItems: vocabItems
             };
         }
 
@@ -939,15 +1099,12 @@
                         return;
                     }
 
-                    // Assign serial numbers: last record gets 1, first gets total
                     const total = parsed.length;
                     parsed.forEach((item, idx) => {
                         item.meta.srNo = (total - idx).toString();
                     });
 
-                    // Reverse for bottom-to-top display (newest first)
                     parsed.reverse();
-
                     essaysData = parsed;
 
                     renderCards();
@@ -965,23 +1122,23 @@
             container.innerHTML = ''; 
 
             essaysData.forEach((essay, index) => {
-                // Build meta section (only if there's content)
                 let metaParts = [];
                 if (essay.meta.wordCount) metaParts.push(`📝 ${essay.meta.wordCount}`);
                 if (essay.meta.date) metaParts.push(`📅 ${essay.meta.date}`);
                 let metaString = metaParts.map(p => `<span>${p}</span>`).join('');
                 const metaSection = metaString ? `<div class="card-meta">${metaString}</div>` : '';
 
-                let vocabSection = '';
-                if (essay.vocabHtml) {
-                    vocabSection = `
+                let vocabButton = '';
+                if (essay.vocabItems && essay.vocabItems.length > 0) {
+                    vocabButton = `
                         <div class="vocab-section">
-                            <button class="vocab-toggle-btn" onclick="toggleVocab(event, ${index})">
-                                📚 Show Vocabulary
+                            <button class="vocab-toggle-btn" onclick="openVocabPopup(${index})">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                                </svg>
+                                Show Vocabulary (${essay.vocabItems.length})
                             </button>
-                            <div class="vocab-content" id="vocab-${index}">
-                                ${essay.vocabHtml}
-                            </div>
                         </div>
                     `;
                 }
@@ -990,12 +1147,11 @@
                 if (essay.meta.classification) {
                     classificationSection = `
                         <div class="card-classification">
-                            <strong>Classification:</strong> ${essay.meta.classification}
+                            <strong>Classification:</strong> ${escapeHtml(essay.meta.classification)}
                         </div>
                     `;
                 }
 
-                // Type badge
                 const typeBadge = essay.meta.type === 'essay'
                     ? '<span class="type-badge essay">Essay</span>'
                     : '<span class="type-badge reading">Reading</span>';
@@ -1005,7 +1161,7 @@
                         <div class="card-header">
                             <div class="card-title-group">
                                 <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
-                                <span class="card-title" onclick="openModal(${index})">${essay.title}</span>
+                                <span class="card-title" onclick="openModal(${index})">${escapeHtml(essay.title)}</span>
                             </div>
                             <button class="card-nav-icon" onclick="openModal(${index})" aria-label="Read">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -1014,7 +1170,7 @@
                         <div style="margin-bottom:10px;">${typeBadge}</div>
                         ${metaSection}
                         ${classificationSection}
-                        ${vocabSection}
+                        ${vocabButton}
                     </div>
                 `;
                 
@@ -1022,43 +1178,26 @@
             });
         }
 
-        // ---------- INTERACTIONS ----------
-        function toggleVocab(event, index) {
-            event.preventDefault(); 
-            event.stopPropagation(); 
-            
-            const vocabDiv = document.getElementById(`vocab-${index}`);
-            const btn = event.currentTarget;
-            
-            if (vocabDiv.classList.contains('active')) {
-                vocabDiv.classList.remove('active');
-                btn.innerHTML = '📚 Show Vocabulary';
-            } else {
-                vocabDiv.classList.add('active');
-                btn.innerHTML = '📚 Hide Vocabulary';
-            }
-        }
-
+        // ---------- READING MODAL ----------
         function openModal(index) {
             if (!essaysData[index]) return;
             
             currentEssayIndex = index;
             const essay = essaysData[index];
             
-            let readingHtml = `<div class="reading-essay-title">${essay.title}</div>`;
+            let readingHtml = `<div class="reading-essay-title">${escapeHtml(essay.title)}</div>`;
             
             if (essay.outline) {
                 readingHtml += `
                     <div class="reading-outline-box">
                         <strong>📝 Part of Essay (Outline)</strong>
-                        ${essay.outline}
+                        ${marked.parse(essay.outline)}
                     </div>
                 `;
             }
             
             readingHtml += marked.parse(essay.bodyMarkdown);
             
-            // Keep the back-to-top button element in the DOM
             modalBody.innerHTML = readingHtml;
             modalBody.appendChild(backToTopBtn);
             
@@ -1084,7 +1223,10 @@
 
         function closeModal() {
             modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
+            // Only restore scroll if vocab popup is also closed
+            if (!vocabOverlay.classList.contains('active')) {
+                document.body.style.overflow = 'auto';
+            }
             localStorage.removeItem('last_open_essay_id');
             currentEssayIndex = null;
         }
@@ -1148,16 +1290,23 @@
         function forceRefresh() {
             localStorage.clear();
             closeModal();
+            closeVocabPopup();
             loadEssays(true);
         }
 
+        // ---------- GLOBAL EVENTS ----------
         window.onclick = function(event) {
             if (event.target === modal) closeModal();
+            if (event.target === vocabOverlay) closeVocabPopup();
         }
 
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && modal.style.display === 'flex') {
-                closeModal();
+            if (event.key === 'Escape') {
+                if (vocabOverlay.classList.contains('active')) {
+                    closeVocabPopup();
+                } else if (modal.style.display === 'flex') {
+                    closeModal();
+                }
             }
         });
 
