@@ -11,19 +11,29 @@
 
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --primary-soft: #eff6ff;
-            --bg: #f1f5f9;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-soft: #eef2ff;
+            --primary-muted: #c7d2fe;
+            --bg: #f8fafc;
+            --bg-elevated: #ffffff;
             --card-bg: #ffffff;
             --text: #0f172a;
             --text-secondary: #64748b;
+            --text-muted: #94a3b8;
             --border: #e2e8f0;
-            --danger: #dc2626;
-            --radius: 12px;
-            --radius-sm: 8px;
-            --shadow: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 10px rgba(0,0,0,0.06);
+            --border-subtle: #f1f5f9;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+            --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12), 0 4px 8px rgba(15, 23, 42, 0.06);
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -36,42 +46,153 @@
             padding: 0;
             line-height: 1.5;
             min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 110px; }
+        /* ── Top bar / version ── */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
+        }
+        .top-bar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        .brand-icon svg { width: 16px; height: 16px; }
+        .brand-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.02em;
+            border: 1px solid var(--primary-muted);
+        }
+        .version-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+        }
 
-        header { text-align: center; margin-bottom: 24px; padding-top: 8px; }
-        h1 { font-size: 1.6rem; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.03em; }
-        .subtitle { margin: 0; font-size: 0.9rem; color: var(--text-secondary); }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 16px 120px;
+        }
 
-        .essay-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 6px;
+            letter-spacing: -0.04em;
+            color: var(--text);
+        }
+        .subtitle {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .essay-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
         @media (min-width: 640px) {
             .essay-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
-            .container { padding: 24px 20px 110px; }
-            h1 { font-size: 1.8rem; }
+            .container { padding: 32px 20px 120px; }
+            h1 { font-size: 2rem; }
+            .top-bar { padding: 12px 20px; }
         }
         @media (min-width: 1024px) {
             .essay-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
         }
 
+        /* ── Cards ── */
         .essay-card {
             background: var(--card-bg);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
-            border-top: 4px solid var(--primary);
-            padding: 16px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
             height: 100%;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .essay-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), #7c3aed);
+            opacity: 0.9;
         }
 
         @media (hover: hover) {
-            .essay-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+            .essay-card:hover {
+                transform: translateY(-3px);
+                box-shadow: var(--shadow-md);
+                border-color: var(--primary-muted);
+            }
         }
 
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
 
         .card-title-group {
             flex: 1;
@@ -79,217 +200,505 @@
             flex-wrap: wrap;
             align-items: baseline;
             gap: 6px;
+            min-width: 0;
         }
-        .card-srno { font-size: 0.8rem; font-weight: 600; color: var(--primary); }
+        .card-srno {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-soft);
+            padding: 2px 7px;
+            border-radius: 5px;
+            letter-spacing: 0.01em;
+        }
         
         .card-title {
-            font-size: 1rem; font-weight: 600; color: var(--text); 
-            line-height: 1.3; cursor: pointer; text-decoration: none;
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.35;
+            cursor: pointer;
+            text-decoration: none;
+            word-break: break-word;
+            transition: color var(--transition);
         }
-        .card-title:hover { text-decoration: underline; color: var(--primary); }
+        .card-title:hover { color: var(--primary); }
 
         .card-nav-icon {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: var(--primary-soft); border: none; color: var(--primary);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; cursor: pointer; transition: background 0.2s;
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: var(--primary-soft);
+            border: 1px solid transparent;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: background var(--transition), border-color var(--transition), transform var(--transition), color var(--transition);
         }
-        .card-nav-icon:active { background: #dbeafe; }
-        .card-nav-icon svg { width: 18px; height: 18px; }
+        .card-nav-icon:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .card-nav-icon:active { transform: scale(0.94); }
+        .card-nav-icon svg { width: 17px; height: 17px; }
 
         .card-meta {
-            font-size: 0.75rem; color: var(--text-secondary);
-            display: flex; flex-wrap: wrap; gap: 10px;
-            margin-bottom: 12px; padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .card-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: 500;
         }
 
         .card-classification {
-            font-size: 0.75rem; background: #fefce8; color: #854d0e;
-            padding: 8px 10px; border-radius: 6px;
-            border-left: 3px solid #eab308; margin-bottom: 12px; line-height: 1.4;
+            font-size: 0.78rem;
+            background: #fffbeb;
+            color: #92400e;
+            padding: 10px 12px;
+            border-radius: var(--radius-xs);
+            border-left: 3px solid var(--warning);
+            margin-bottom: 12px;
+            line-height: 1.45;
+        }
+        .card-classification strong {
+            font-weight: 600;
+            color: #78350f;
         }
 
-        .vocab-section { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+        /* ── Type Badge ── */
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 5px;
+            flex-shrink: 0;
+        }
+        .type-badge.essay {
+            background: #ede9fe;
+            color: #6d28d9;
+            border: 1px solid #ddd6fe;
+        }
+        .type-badge.reading {
+            background: #ecfeff;
+            color: #0e7490;
+            border: 1px solid #cffafe;
+        }
+
+        /* ── Vocabulary ── */
+        .vocab-section {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+        }
 
         .vocab-toggle-btn {
-            width: 100%; background: #f8fafc; border: 1px solid var(--border);
-            color: var(--primary); font-size: 0.85rem; font-weight: 600;
-            padding: 10px 14px; border-radius: var(--radius-sm); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            transition: all 0.2s;
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 11px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background var(--transition), border-color var(--transition);
+            font-family: inherit;
         }
-        .vocab-toggle-btn:active { background: #f1f5f9; }
+        .vocab-toggle-btn:hover {
+            background: var(--primary-soft);
+            border-color: var(--primary-muted);
+        }
+        .vocab-toggle-btn:active { background: #e0e7ff; }
 
         .vocab-content {
-            display: none; margin-top: 10px; max-height: 320px;
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            display: none;
+            margin-top: 12px;
+            max-height: 340px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
         }
         .vocab-content.active { display: block; }
 
         .vocab-item {
-            background: #f8fafc; border: 1px solid var(--border);
-            border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            margin-bottom: 10px;
         }
         .vocab-item:last-child { margin-bottom: 0; }
 
         .vocab-word {
-            font-size: 0.9rem; font-weight: 600; color: var(--text);
-            margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .vocab-word .number {
-            background: var(--primary); color: white; font-size: 0.7rem;
-            font-weight: 600; width: 20px; height: 20px; border-radius: 5px;
-            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+            background: var(--primary);
+            color: white;
+            font-size: 0.68rem;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         .vocab-link {
             color: var(--primary);
             text-decoration: none;
             font-weight: 600;
-            transition: color 0.2s;
+            transition: color var(--transition);
         }
-        .vocab-link:hover { text-decoration: underline; color: var(--primary-hover); }
+        .vocab-link:hover {
+            text-decoration: underline;
+            color: var(--primary-hover);
+        }
 
         .urdu-text {
-            font-family: 'Noto Nastaliq Urdu', serif; direction: rtl; text-align: right;
-            font-size: 1.15rem; line-height: 1.8; color: #1e293b;
-            background: white; padding: 8px 12px; border-radius: 6px;
-            border: 1px solid #e2e8f0; margin: 6px 0 8px;
+            font-family: 'Noto Nastaliq Urdu', serif;
+            direction: rtl;
+            text-align: right;
+            font-size: 1.12rem;
+            line-height: 1.85;
+            color: #1e293b;
+            background: white;
+            padding: 10px 14px;
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--border);
+            margin: 8px 0 10px;
         }
 
-        .vocab-meta { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; }
-        .vocab-meta-row { display: flex; gap: 6px; line-height: 1.4; }
-        .vocab-label { font-weight: 600; color: var(--text-secondary); min-width: 72px; flex-shrink: 0; }
+        .vocab-meta { display: flex; flex-direction: column; gap: 5px; font-size: 0.78rem; }
+        .vocab-meta-row { display: flex; gap: 8px; line-height: 1.45; }
+        .vocab-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            min-width: 72px;
+            flex-shrink: 0;
+        }
         .vocab-value { color: var(--text); }
 
+        /* ── Refresh FAB ── */
         .refresh-btn {
-            position: fixed; bottom: 24px; right: 20px; width: 56px; height: 56px;
-            background: var(--primary); color: white; border: none; border-radius: 50%;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 900;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 900;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow var(--transition);
         }
-        
-        .refresh-btn:active { transform: scale(0.85); }
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
+        }
+        .refresh-btn:active { transform: scale(0.92); }
         
         .refresh-btn.loading {
             animation: morphLoad 1.2s ease-in-out infinite;
-            background: var(--primary-hover);
+            pointer-events: none;
         }
-        
         .refresh-btn.loading svg { animation: spin 0.8s linear infinite; }
         
         @keyframes morphLoad {
-            0%   { transform: scale(1) rotate(0deg); border-radius: 50%; }
-            50%  { transform: scale(0.85) rotate(180deg); border-radius: 35%; }
-            100% { transform: scale(1) rotate(360deg); border-radius: 50%; }
+            0%   { transform: scale(1) rotate(0deg); border-radius: 16px; }
+            50%  { transform: scale(0.88) rotate(180deg); border-radius: 50%; }
+            100% { transform: scale(1) rotate(360deg); border-radius: 16px; }
         }
-        
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        .refresh-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        .refresh-btn svg { width: 22px; height: 22px; fill: currentColor; }
 
+        /* ── Modal ── */
         .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(5px);
-            z-index: 1000; justify-content: center; align-items: flex-end;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
         }
         @media (min-width: 768px) {
             .modal-overlay { align-items: center; padding: 24px; }
         }
 
         .modal-content {
-            background: white; width: 100%; height: 94dvh; max-width: 860px;
-            border-radius: 20px 20px 0 0; display: flex; flex-direction: column;
-            overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            background: white;
+            width: 100%;
+            height: 94dvh;
+            max-width: 860px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
             animation: slideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
         @media (min-width: 768px) {
-            .modal-content { height: 90vh; border-radius: 16px; animation: fadeIn 0.25s ease; }
+            .modal-content {
+                height: 90vh;
+                border-radius: 16px;
+                animation: fadeIn 0.25s ease;
+            }
         }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
 
         .modal-header {
-            padding: 14px 16px; background: #f8fafc; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+            padding: 14px 18px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
             flex-shrink: 0;
         }
         .modal-header-title {
-            font-weight: 600; font-size: 1rem; color: var(--text);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .modal-header-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
         .action-btn {
-            border: none; border-radius: 9px; font-size: 0.875rem;
-            font-weight: 600; padding: 10px 14px;
-            display: flex; align-items: center; gap: 6px;
-            cursor: pointer; transition: background 0.2s;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background var(--transition), transform var(--transition);
+            font-family: inherit;
         }
-        .copy-btn { background: #059669; color: white; }
-        .copy-btn:active { background: #047857; }
-        .copy-btn.copied { background: #0f172a; }
+        .copy-btn {
+            background: var(--success);
+            color: white;
+        }
+        .copy-btn:hover { background: #059669; }
+        .copy-btn:active { transform: scale(0.96); }
+        .copy-btn.copied { background: var(--text); }
 
         .close-btn {
-            background: var(--danger); color: white; width: 40px; height: 40px;
-            padding: 0; justify-content: center; border-radius: 50%; font-size: 1.15rem;
+            background: var(--danger);
+            color: white;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1.1rem;
         }
-        .close-btn:active { background: #b91c1c; }
+        .close-btn:hover { background: #dc2626; }
+        .close-btn:active { transform: scale(0.94); }
 
         .modal-body {
-            padding: 22px 18px 48px; overflow-y: auto;
-            -webkit-overflow-scrolling: touch; flex: 1;
+            padding: 24px 18px 48px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            flex: 1;
             overscroll-behavior: contain;
+            position: relative;
         }
-        @media (min-width: 640px) { .modal-body { padding: 28px 32px 50px; } }
+        @media (min-width: 640px) {
+            .modal-body { padding: 32px 36px 56px; }
+        }
 
         .reading-essay-title {
-            font-size: 1.4rem; font-weight: 700; color: var(--text);
-            margin: 0 0 20px; line-height: 1.3; letter-spacing: -0.02em;
-            border-bottom: 2px solid var(--border); padding-bottom: 16px;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 22px;
+            line-height: 1.3;
+            letter-spacing: -0.03em;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 16px;
         }
-        @media (min-width: 640px) { .reading-essay-title { font-size: 1.6rem; } }
+        @media (min-width: 640px) {
+            .reading-essay-title { font-size: 1.7rem; }
+        }
 
         .reading-outline-box {
-            background: var(--primary-soft); border-left: 4px solid var(--primary);
-            padding: 16px 18px; margin-bottom: 28px; border-radius: 0 10px 10px 0;
-            font-size: 0.95rem; color: #1e3a5f; line-height: 1.55;
+            background: var(--primary-soft);
+            border-left: 4px solid var(--primary);
+            padding: 16px 18px;
+            margin-bottom: 28px;
+            border-radius: 0 12px 12px 0;
+            font-size: 0.94rem;
+            color: #312e81;
+            line-height: 1.55;
         }
         .reading-outline-box strong {
-            display: block; margin-bottom: 6px; color: var(--text); font-size: 1rem;
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text);
+            font-size: 0.98rem;
         }
 
-        .modal-body h1 { font-size: 1.35rem; margin: 1.5em 0 0.6em; }
-        .modal-body h2, .modal-body h3 { margin: 1.4em 0 0.5em; font-weight: 600; }
-        .modal-body p { margin-bottom: 1.1em; line-height: 1.7; }
+        .modal-body h1 { font-size: 1.3rem; margin: 1.5em 0 0.55em; font-weight: 700; }
+        .modal-body h2, .modal-body h3 {
+            margin: 1.35em 0 0.5em;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .modal-body p { margin-bottom: 1.1em; line-height: 1.72; color: #1e293b; }
 
         .modal-body blockquote {
-            border-left: 4px solid var(--primary); margin: 1.2em 0;
-            padding: 12px 18px; background: #f8fafc; border-radius: 0 8px 8px 0;
-            color: #475569; font-style: italic;
+            border-left: 4px solid var(--primary);
+            margin: 1.2em 0;
+            padding: 14px 18px;
+            background: var(--bg);
+            border-radius: 0 10px 10px 0;
+            color: #475569;
+            font-style: italic;
         }
 
+        .modal-body ul, .modal-body ol {
+            margin-bottom: 1.1em;
+            padding-left: 1.4em;
+        }
+        .modal-body li { margin-bottom: 0.35em; line-height: 1.65; }
+
+        /* ── Back to top (inside modal) ── */
+        .back-to-top {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--text);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity var(--transition), visibility var(--transition), transform var(--transition), background var(--transition);
+            z-index: 10;
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .back-to-top:hover { background: var(--primary); }
+        .back-to-top:active { transform: scale(0.92); }
+        .back-to-top svg { width: 18px; height: 18px; }
+
         .loading, .error {
-            text-align: center; padding: 60px 20px; grid-column: 1 / -1;
-            color: var(--text-secondary); font-size: 1.05rem;
+            text-align: center;
+            padding: 64px 20px;
+            grid-column: 1 / -1;
+            color: var(--text-secondary);
+            font-size: 1rem;
         }
         .error { color: var(--danger); font-weight: 600; }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
 
+    <div class="top-bar">
+        <div class="top-bar-inner">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                </div>
+                <span class="brand-text">Reading Collection</span>
+            </div>
+            <span class="version-badge" id="versionBadge">v0.0.0</span>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>Reading Collection</h1>
-            <p class="subtitle">Essays, news, books & random reads</p>
+            <p class="subtitle">Essays, news, books &amp; random reads</p>
         </header>
 
         <div id="essays-container" class="essay-grid">
-            <div class="loading">Loading...</div>
+            <div class="loading">Loading</div>
         </div>
     </div>
 
@@ -309,11 +718,22 @@
                     <button class="action-btn close-btn" onclick="closeModal()" aria-label="Close">✕</button>
                 </div>
             </div>
-            <div class="modal-body" id="modalBody" onscroll="saveScrollPosition()"></div>
+            <div class="modal-body" id="modalBody" onscroll="saveScrollPosition()">
+                <button class="back-to-top" id="backToTopBtn" onclick="scrollModalToTop()" aria-label="Back to top">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
+        // ── Single source of truth for version ──
+        const APP_VERSION = '2.1.0';
+        document.getElementById('versionBadge').textContent = 'v' + APP_VERSION;
+
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
 
         const container = document.getElementById('essays-container');
@@ -321,6 +741,7 @@
         const modalBody = document.getElementById('modalBody');
         const refreshBtn = document.getElementById('refreshBtn');
         const copyBtn = document.getElementById('copyBtn');
+        const backToTopBtn = document.getElementById('backToTopBtn');
         
         let essaysData = []; 
         let currentEssayIndex = null; 
@@ -373,9 +794,9 @@
             let rawVocab = vocabSplit[1];
             let items = [];
 
-            // Pattern A: **1 Word** (first format)
+            // Pattern A: **1 Word** (structured essay format)
             let regexA = /\*\*(\d+)\s+(.+?)\*\*[\s\S]*?(?=\*\*\d+\s+|$)/g;
-            // Pattern B: ### 1. Word (second format)
+            // Pattern B: ### 1. Word (reading format)
             let regexB = /###\s*(\d+)\.\s*(.+?)\n([\s\S]*?)(?=\n###\s*\d+\.|$)/g;
 
             let match;
@@ -436,8 +857,13 @@
             let titleMatch = fullMarkdown.match(/^\s*#\s+(.+)$/m);
             let title = titleMatch ? titleMatch[1].trim() : `Reading ${index + 1}`;
 
+            // Detect format type
+            const isEssay = fullMarkdown.includes('**SR No:**') || 
+                            fullMarkdown.includes('Total Essay Word Count');
+
             // Metadata (only present in structured essays — parsed from column B itself)
-            let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/) || fullMarkdown.match(/\*\*Dated:\*\*\s*(.+)/i);
+            let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/) || 
+                            fullMarkdown.match(/\*\*Dated:\*\*\s*(.+)/i);
             let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
             let classMatch = fullMarkdown.match(/\*\*Primary Type:\*\*\s*(.+)/);
 
@@ -445,7 +871,8 @@
                 srNo: '', // assigned later
                 date: dateMatch ? dateMatch[1].trim() : '',
                 wordCount: wordCountMatch ? wordCountMatch[1].trim() : '',
-                classification: classMatch ? classMatch[1].trim() : ''
+                classification: classMatch ? classMatch[1].trim() : '',
+                type: isEssay ? 'essay' : 'reading'
             };
 
             // Outline (only for structured essays)
@@ -466,8 +893,15 @@
             essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
             essayBody = essayBody.replace(/### Outline:[\s\S]*?(?=\n---)/i, '');
             essayBody = essayBody.replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '');
+            // Only strip the FIRST horizontal rule (separator after metadata)
             essayBody = essayBody.replace(/^\s*---\s*\n/, '');
             essayBody = essayBody.replace(/^[\s-]+/, '').trim();
+
+            // Auto-compute word count if missing
+            if (!meta.wordCount && essayBody) {
+                const count = essayBody.split(/\s+/).filter(Boolean).length;
+                if (count > 0) meta.wordCount = count.toLocaleString() + ' words';
+            }
 
             return {
                 id: index,
@@ -482,7 +916,7 @@
         // ---------- LOAD ----------
         function loadEssays(forceRefresh = false) {
             if (!forceRefresh && essaysData.length === 0) {
-                container.innerHTML = '<div class="loading">Loading...</div>';
+                container.innerHTML = '<div class="loading">Loading</div>';
             }
             refreshBtn.classList.add('loading');
 
@@ -531,10 +965,12 @@
             container.innerHTML = ''; 
 
             essaysData.forEach((essay, index) => {
+                // Build meta section (only if there's content)
                 let metaParts = [];
                 if (essay.meta.wordCount) metaParts.push(`📝 ${essay.meta.wordCount}`);
                 if (essay.meta.date) metaParts.push(`📅 ${essay.meta.date}`);
                 let metaString = metaParts.map(p => `<span>${p}</span>`).join('');
+                const metaSection = metaString ? `<div class="card-meta">${metaString}</div>` : '';
 
                 let vocabSection = '';
                 if (essay.vocabHtml) {
@@ -559,20 +995,24 @@
                     `;
                 }
 
-                const titleSearchLink = createSearchLink(essay.title);
+                // Type badge
+                const typeBadge = essay.meta.type === 'essay'
+                    ? '<span class="type-badge essay">Essay</span>'
+                    : '<span class="type-badge reading">Reading</span>';
 
                 const cardHTML = `
                     <div class="essay-card" id="card-${index}">
                         <div class="card-header">
                             <div class="card-title-group">
                                 <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
-                                <span class="card-title">${titleSearchLink}</span>
+                                <span class="card-title" onclick="openModal(${index})">${essay.title}</span>
                             </div>
                             <button class="card-nav-icon" onclick="openModal(${index})" aria-label="Read">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                             </button>
                         </div>
-                        <div class="card-meta">${metaString}</div>
+                        <div style="margin-bottom:10px;">${typeBadge}</div>
+                        ${metaSection}
                         ${classificationSection}
                         ${vocabSection}
                     </div>
@@ -618,7 +1058,9 @@
             
             readingHtml += marked.parse(essay.bodyMarkdown);
             
+            // Keep the back-to-top button element in the DOM
             modalBody.innerHTML = readingHtml;
+            modalBody.appendChild(backToTopBtn);
             
             copyBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
             copyBtn.classList.remove('copied');
@@ -630,9 +1072,11 @@
             if (savedScroll) {
                 setTimeout(() => {
                     modalBody.scrollTop = parseInt(savedScroll, 10);
+                    updateBackToTopVisibility();
                 }, 50);
             } else {
                 modalBody.scrollTop = 0; 
+                backToTopBtn.classList.remove('visible');
             }
 
             localStorage.setItem('last_open_essay_id', essay.id);
@@ -669,6 +1113,7 @@
         }
 
         function saveScrollPosition() {
+            updateBackToTopVisibility();
             if (currentEssayIndex !== null) {
                 clearTimeout(scrollSaveTimeout);
                 scrollSaveTimeout = setTimeout(() => {
@@ -678,6 +1123,18 @@
                     }
                 }, 100);
             }
+        }
+
+        function updateBackToTopVisibility() {
+            if (modalBody.scrollTop > 400) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }
+
+        function scrollModalToTop() {
+            modalBody.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function restoreLastState() {
