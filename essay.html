@@ -24,7 +24,9 @@
             --border: #e2e8f0;
             --border-subtle: #f1f5f9;
             --danger: #ef4444;
+            --danger-hover: #dc2626;
             --success: #10b981;
+            --success-hover: #059669;
             --warning: #f59e0b;
             --radius: 14px;
             --radius-sm: 10px;
@@ -192,6 +194,7 @@
             background: var(--bg); padding: 3px 8px;
             border-radius: 5px; font-weight: 500;
         }
+        .card-meta svg { width: 11px; height: 11px; opacity: 0.7; }
 
         .card-classification {
             font-size: 0.78rem; background: #fffbeb; color: #92400e;
@@ -232,7 +235,7 @@
             padding: 11px 14px; border-radius: var(--radius-sm);
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            gap: 6px;
+            gap: 8px;
             transition: background var(--transition), border-color var(--transition), transform var(--transition);
             font-family: inherit;
         }
@@ -331,18 +334,32 @@
             font-family: inherit;
         }
         .copy-btn { background: var(--success); color: white; }
-        .copy-btn:hover { background: #059669; }
+        .copy-btn:hover { background: var(--success-hover); }
         .copy-btn:active { transform: scale(0.96); }
         .copy-btn.copied { background: var(--text); }
 
-        .close-btn {
-            background: var(--danger); color: white;
-            width: 40px; height: 40px; padding: 0;
-            justify-content: center; border-radius: 50%;
-            font-size: 1.1rem;
+        /* ── Icon-only round buttons (close) ── */
+        .icon-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: background var(--transition), transform var(--transition), color var(--transition);
+            flex-shrink: 0;
+            font-family: inherit;
         }
-        .close-btn:hover { background: #dc2626; }
-        .close-btn:active { transform: scale(0.94); }
+        .icon-btn:active { transform: scale(0.92); }
+        .icon-btn svg { width: 16px; height: 16px; }
+
+        .close-btn {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+        .close-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
 
         .modal-body {
             padding: 24px 18px 48px;
@@ -413,7 +430,7 @@
         .back-to-top svg { width: 18px; height: 18px; }
 
         /* ══════════════════════════════════════════════
-           VOCABULARY POPUP (BEAUTIFUL)
+           VOCABULARY POPUP
            ══════════════════════════════════════════════ */
         .vocab-overlay {
             display: none; position: fixed; inset: 0;
@@ -454,7 +471,6 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* Header with gradient accent */
         .vocab-header {
             background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
             padding: 20px 22px 18px;
@@ -507,7 +523,7 @@
             border: 1px solid rgba(255, 255, 255, 0.25);
             color: white; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; font-size: 1rem;
+            flex-shrink: 0;
             transition: background var(--transition), transform var(--transition);
             position: relative; z-index: 1;
             font-family: inherit;
@@ -516,8 +532,8 @@
             background: rgba(255, 255, 255, 0.3);
         }
         .vocab-close-btn:active { transform: scale(0.92); }
+        .vocab-close-btn svg { width: 16px; height: 16px; }
 
-        /* Body */
         .vocab-body {
             flex: 1; overflow-y: auto;
             -webkit-overflow-scrolling: touch;
@@ -528,7 +544,6 @@
             .vocab-body { padding: 24px 26px 40px; }
         }
 
-        /* Individual vocabulary card */
         .vocab-card {
             background: white;
             border: 1px solid var(--border);
@@ -576,9 +591,11 @@
             color: var(--text); letter-spacing: -0.02em;
             line-height: 1.25;
             word-break: break-word;
+            text-decoration: none;
+            transition: color var(--transition);
         }
+        .vocab-word-title:hover { color: var(--primary); }
 
-        /* Urdu block — full width, elegant */
         .vocab-urdu-block {
             font-family: 'Noto Nastaliq Urdu', serif;
             direction: rtl; text-align: right;
@@ -593,7 +610,6 @@
             font-weight: 500;
         }
 
-        /* Definition row */
         .vocab-definition-row {
             padding: 12px 14px;
             background: #f8fafc;
@@ -617,7 +633,6 @@
             line-height: 1.55;
         }
 
-        /* Synonym / Antonym chips */
         .vocab-chips-row {
             display: grid;
             grid-template-columns: 1fr;
@@ -638,8 +653,8 @@
             letter-spacing: 0.06em; text-transform: uppercase;
             display: flex; align-items: center; gap: 5px;
         }
-        .vocab-chip-label.syn { color: #059669; }
-        .vocab-chip-label.ant { color: #dc2626; }
+        .vocab-chip-label.syn { color: var(--success-hover); }
+        .vocab-chip-label.ant { color: var(--danger); }
         .vocab-chip-label svg { width: 11px; height: 11px; }
 
         .vocab-chips {
@@ -745,7 +760,12 @@
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                         Copy
                     </button>
-                    <button class="action-btn close-btn" onclick="closeModal()" aria-label="Close">✕</button>
+                    <button class="icon-btn close-btn" onclick="closeModal()" aria-label="Close">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
             </div>
             <div class="modal-body" id="modalBody" onscroll="saveScrollPosition()">
@@ -775,7 +795,12 @@
                         <div class="vocab-header-subtitle" id="vocabSubtitle">0 words</div>
                     </div>
                 </div>
-                <button class="vocab-close-btn" onclick="closeVocabPopup()" aria-label="Close vocabulary">✕</button>
+                <button class="vocab-close-btn" onclick="closeVocabPopup()" aria-label="Close vocabulary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <div class="vocab-body" id="vocabBody">
                 <!-- filled dynamically -->
@@ -784,8 +809,7 @@
     </div>
 
     <script>
-        // ── Single source of truth for version ──
-        const APP_VERSION = '2.2.0';
+        const APP_VERSION = '2.3.0';
         document.getElementById('versionBadge').textContent = 'v' + APP_VERSION;
 
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQT6SIpNx8XznQsOgvBHjsz_-HgNO_cmBvxZaIhDcnwgGwJpx932G6nHPv9aVo-p8GF1srqAHzn35u2/pub?output=csv'; 
@@ -806,6 +830,20 @@
         let currentEssayIndex = null; 
         let scrollSaveTimeout;
 
+        // SVG icons (used in templates)
+        const ICONS = {
+            copy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
+            check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+            book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
+            calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+            fileText: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+            info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
+            checkCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+            xCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+            empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
+            arrowRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`
+        };
+
         // ---------- HELPERS ----------
         function escapeHtml(str) {
             if (str === null || str === undefined) return '';
@@ -820,12 +858,10 @@
         function createSearchLink(query) {
             if (!query || query.trim() === '') return '';
             const cleaned = query.replace(/["']/g, '').replace(/\s+/g, ' ').trim();
-            const encoded = encodeURIComponent(cleaned);
-            return `https://www.google.com/search?q=${encoded}`;
+            return `https://www.google.com/search?q=${encodeURIComponent(cleaned)}`;
         }
 
-        // ── Extract vocabulary into structured array (for the popup) ──
-        // Returns { body: string, vocabItems: [{number, word, urdu, engDef, synonyms, antonyms}] }
+        // ── Extract vocabulary into structured array ──
         function extractVocabStructured(markdown) {
             let vocabSplit = markdown.split(/###\s*📚\s*Vocabulary|##\s*Vocabulary in Detail/i);
             if (vocabSplit.length < 2) return { body: markdown, vocabItems: [] };
@@ -833,9 +869,7 @@
             const rawVocab = vocabSplit[1];
             const items = [];
 
-            // Pattern A: **1 Word** (structured essay)
             let regexA = /\*\*(\d+)\s+(.+?)\*\*[\s\S]*?(?=\*\*\d+\s+|$)/g;
-            // Pattern B: ### 1. Word (reading format)
             let regexB = /###\s*(\d+)\.\s*(.+?)\n([\s\S]*?)(?=\n###\s*\d+\.|$)/g;
 
             let match;
@@ -846,15 +880,13 @@
                 const number = match[1];
                 const word = match[2].trim();
                 const block = match[0];
-
                 const urduMatch = block.match(/\*\*Urdu:\*\*\s*(.+)/i) || block.match(/\*\*Urdu Meaning:\*\*\s*(.+)/i);
                 const defMatch = block.match(/\*\*English Definition:\*\*\s*(.+)/i);
                 const synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/i);
                 const antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/i);
 
                 items.push({
-                    number,
-                    word,
+                    number, word,
                     urdu: urduMatch ? urduMatch[1].trim() : '',
                     engDef: defMatch ? defMatch[1].trim() : '',
                     synonyms: synMatch ? synMatch[1].trim() : '',
@@ -867,15 +899,13 @@
                     const number = match[1];
                     const word = match[2].trim();
                     const block = match[3];
-
                     const urduMatch = block.match(/\*\*Urdu Meaning:\*\*\s*(.+)/i) || block.match(/\*\*Urdu:\*\*\s*(.+)/i);
                     const defMatch = block.match(/\*\*English Definition:\*\*\s*(.+)/i);
                     const synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/i);
                     const antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/i);
 
                     items.push({
-                        number,
-                        word,
+                        number, word,
                         urdu: urduMatch ? urduMatch[1].trim() : '',
                         engDef: defMatch ? defMatch[1].trim() : '',
                         synonyms: synMatch ? synMatch[1].trim() : '',
@@ -887,64 +917,40 @@
             return { body: vocabSplit[0], vocabItems: items };
         }
 
-        // Split a comma-separated list into a clean array
         function splitList(list) {
             if (!list) return [];
             return list.split(',').map(s => s.trim()).filter(Boolean);
         }
 
-        // ── Build a single vocabulary card for the popup ──
         function buildVocabCard(item) {
             const wordEsc = escapeHtml(item.word);
             const wordSearchUrl = createSearchLink(item.word);
 
-            // Urdu block (only if present)
             const urduBlock = item.urdu
                 ? `<div class="vocab-urdu-block">${escapeHtml(item.urdu)}</div>`
                 : '';
 
-            // Definition row (only if present)
             const defRow = item.engDef
                 ? `<div class="vocab-definition-row">
-                       <div class="vocab-definition-label">
-                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                               <circle cx="12" cy="12" r="10"></circle>
-                               <line x1="12" y1="16" x2="12" y2="12"></line>
-                               <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                           </svg>
-                           Definition
-                       </div>
+                       <div class="vocab-definition-label">${ICONS.info} Definition</div>
                        <div class="vocab-definition-text">${escapeHtml(item.engDef)}</div>
                    </div>`
                 : '';
 
-            // Synonym chips
             const synArr = splitList(item.synonyms);
             const synBlock = synArr.length
                 ? `<div class="vocab-chip-group">
-                       <div class="vocab-chip-label syn">
-                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                               <polyline points="20 6 9 17 4 12"></polyline>
-                           </svg>
-                           Synonyms
-                       </div>
+                       <div class="vocab-chip-label syn">${ICONS.checkCircle} Synonyms</div>
                        <div class="vocab-chips">
                            ${synArr.map(s => `<a class="vocab-chip syn" href="${createSearchLink(s)}" target="_blank" rel="noopener noreferrer">${escapeHtml(s)}</a>`).join('')}
                        </div>
                    </div>`
                 : '';
 
-            // Antonym chips
             const antArr = splitList(item.antonyms);
             const antBlock = antArr.length
                 ? `<div class="vocab-chip-group">
-                       <div class="vocab-chip-label ant">
-                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                               <line x1="18" y1="6" x2="6" y2="18"></line>
-                               <line x1="6" y1="6" x2="18" y2="18"></line>
-                           </svg>
-                           Antonyms
-                       </div>
+                       <div class="vocab-chip-label ant">${ICONS.xCircle} Antonyms</div>
                        <div class="vocab-chips">
                            ${antArr.map(a => `<a class="vocab-chip ant" href="${createSearchLink(a)}" target="_blank" rel="noopener noreferrer">${escapeHtml(a)}</a>`).join('')}
                        </div>
@@ -959,7 +965,7 @@
                 <div class="vocab-card">
                     <div class="vocab-card-header">
                         <div class="vocab-number-badge">${escapeHtml(item.number)}</div>
-                        <a class="vocab-word-title" href="${wordSearchUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
+                        <a class="vocab-word-title" href="${wordSearchUrl}" target="_blank" rel="noopener noreferrer">
                             ${wordEsc}
                         </a>
                     </div>
@@ -970,15 +976,12 @@
             `;
         }
 
-        // ── Open the vocabulary popup ──
         function openVocabPopup(index) {
             const essay = essaysData[index];
             if (!essay) return;
 
-            // Try cached items first
             let items = essay.vocabItems;
             if (!items || items.length === 0) {
-                // Fallback: re-parse from markdown
                 const parsed = extractVocabStructured(essay.rawMarkdown || essay.bodyMarkdown);
                 items = parsed.vocabItems;
             }
@@ -988,10 +991,7 @@
                 vocabSubtitle.textContent = 'No vocabulary available';
                 vocabBody.innerHTML = `
                     <div class="vocab-empty">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                        </svg>
+                        ${ICONS.empty}
                         <div>No vocabulary found for this entry.</div>
                     </div>
                 `;
@@ -1008,13 +1008,12 @@
 
         function closeVocabPopup() {
             vocabOverlay.classList.remove('active');
-            // Only restore body scroll if reading modal is also closed
             if (modal.style.display !== 'flex') {
                 document.body.style.overflow = 'auto';
             }
         }
 
-        // ---------- UNIFIED PARSER (ONLY reads column B) ----------
+        // ---------- PARSER ----------
         function parseRow(row, index) {
             const fullMarkdown = row[1] ? String(row[1]).trim() : '';
             if (!fullMarkdown) return null;
@@ -1042,7 +1041,6 @@
             let outlineMatch = fullMarkdown.match(/### Outline:\s*\n([\s\S]*?)(?=\n---|\n###|$)/i);
             if (outlineMatch) outlineText = outlineMatch[1].trim();
 
-            // Extract vocab as structured items (for the popup)
             const { body: bodyWithoutVocab, vocabItems } = extractVocabStructured(fullMarkdown);
 
             let essayBody = bodyWithoutVocab;
@@ -1123,9 +1121,9 @@
 
             essaysData.forEach((essay, index) => {
                 let metaParts = [];
-                if (essay.meta.wordCount) metaParts.push(`📝 ${essay.meta.wordCount}`);
-                if (essay.meta.date) metaParts.push(`📅 ${essay.meta.date}`);
-                let metaString = metaParts.map(p => `<span>${p}</span>`).join('');
+                if (essay.meta.wordCount) metaParts.push(`<span>${ICONS.fileText}${escapeHtml(essay.meta.wordCount)}</span>`);
+                if (essay.meta.date) metaParts.push(`<span>${ICONS.calendar}${escapeHtml(essay.meta.date)}</span>`);
+                let metaString = metaParts.join('');
                 const metaSection = metaString ? `<div class="card-meta">${metaString}</div>` : '';
 
                 let vocabButton = '';
@@ -1133,10 +1131,7 @@
                     vocabButton = `
                         <div class="vocab-section">
                             <button class="vocab-toggle-btn" onclick="openVocabPopup(${index})">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                                </svg>
+                                ${ICONS.book}
                                 Show Vocabulary (${essay.vocabItems.length})
                             </button>
                         </div>
@@ -1164,7 +1159,7 @@
                                 <span class="card-title" onclick="openModal(${index})">${escapeHtml(essay.title)}</span>
                             </div>
                             <button class="card-nav-icon" onclick="openModal(${index})" aria-label="Read">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                ${ICONS.arrowRight}
                             </button>
                         </div>
                         <div style="margin-bottom:10px;">${typeBadge}</div>
@@ -1190,7 +1185,7 @@
             if (essay.outline) {
                 readingHtml += `
                     <div class="reading-outline-box">
-                        <strong>📝 Part of Essay (Outline)</strong>
+                        <strong>Part of Essay (Outline)</strong>
                         ${marked.parse(essay.outline)}
                     </div>
                 `;
@@ -1201,7 +1196,8 @@
             modalBody.innerHTML = readingHtml;
             modalBody.appendChild(backToTopBtn);
             
-            copyBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
+            // Reset copy button to default state with clean SVG
+            copyBtn.innerHTML = `${ICONS.copy} Copy`;
             copyBtn.classList.remove('copied');
             
             modal.style.display = 'flex';
@@ -1223,7 +1219,6 @@
 
         function closeModal() {
             modal.style.display = 'none';
-            // Only restore scroll if vocab popup is also closed
             if (!vocabOverlay.classList.contains('active')) {
                 document.body.style.overflow = 'auto';
             }
@@ -1242,11 +1237,11 @@
             textToCopy += essay.bodyMarkdown;
             
             navigator.clipboard.writeText(textToCopy).then(() => {
-                copyBtn.innerHTML = `✅ Copied!`;
+                copyBtn.innerHTML = `${ICONS.check} Copied`;
                 copyBtn.classList.add('copied');
                 
                 setTimeout(() => {
-                    copyBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
+                    copyBtn.innerHTML = `${ICONS.copy} Copy`;
                     copyBtn.classList.remove('copied');
                 }, 2000);
             }).catch(() => {
@@ -1294,7 +1289,6 @@
             loadEssays(true);
         }
 
-        // ---------- GLOBAL EVENTS ----------
         window.onclick = function(event) {
             if (event.target === modal) closeModal();
             if (event.target === vocabOverlay) closeVocabPopup();
@@ -1310,7 +1304,7 @@
             }
         });
 
-        window.onload = () => loadEssays(false);
+        window.onload = () => loadEssays(true);
     </script>
 
 </body>
