@@ -19,9 +19,6 @@
             --text: #0f172a;
             --text-secondary: #64748b;
             --border: #e2e8f0;
-            --success: #059669;
-            --success-soft: #ecfdf5;
-            --success-border: #10b981;
             --danger: #dc2626;
             --radius: 12px;
             --radius-sm: 8px;
@@ -67,13 +64,7 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-        }
-
-        .essay-card.read {
-            border-top-color: var(--success-border);
-            background-color: var(--success-soft);
-            border-color: #d1fae5;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         @media (hover: hover) {
@@ -89,7 +80,6 @@
             align-items: baseline;
             gap: 6px;
         }
-        .card-title-group:active { opacity: 0.75; }
         .card-srno { font-size: 0.8rem; font-weight: 600; color: var(--primary); }
         
         .card-title {
@@ -240,7 +230,7 @@
             display: flex; align-items: center; gap: 6px;
             cursor: pointer; transition: background 0.2s;
         }
-        .copy-btn { background: var(--success); color: white; }
+        .copy-btn { background: #059669; color: white; }
         .copy-btn:active { background: #047857; }
         .copy-btn.copied { background: #0f172a; }
 
@@ -288,12 +278,6 @@
             color: var(--text-secondary); font-size: 1.05rem;
         }
         .error { color: var(--danger); font-weight: 600; }
-
-        /* Bottom-to-top: reverse the visual order */
-        .essay-grid.reverse {
-            display: flex;
-            flex-direction: column-reverse;
-        }
     </style>
 </head>
 <body>
@@ -359,10 +343,30 @@
             }).filter(Boolean).join(', ');
         }
 
-        // Extract vocabulary from "## Vocabulary in Detail" (works for both formats)
+        function buildVocabItem(number, word, urdu, engDef, synonyms, antonyms) {
+            const wordLink = createSearchLink(word);
+            const synLinks = linkifyList(synonyms);
+            const antLinks = linkifyList(antonyms);
+
+            return `
+                <div class="vocab-item">
+                    <div class="vocab-word">
+                        <span class="number">${number}</span>
+                        ${wordLink}
+                    </div>
+                    ${urdu ? `<div class="urdu-text">${urdu}</div>` : ''}
+                    ${engDef ? `<div class="vocab-meta-row" style="margin-bottom:6px;"><span class="vocab-label">Definition</span><span class="vocab-value">${engDef}</span></div>` : ''}
+                    <div class="vocab-meta">
+                        ${synLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Synonyms</span><span class="vocab-value">${synLinks}</span></div>` : ''}
+                        ${antLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Antonyms</span><span class="vocab-value">${antLinks}</span></div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Extract vocabulary — supports both formats
         function extractVocab(markdown) {
             let vocabHtml = '';
-            // Match either "### 📚 Vocabulary" OR "## Vocabulary in Detail"
             let vocabSplit = markdown.split(/###\s*📚\s*Vocabulary|##\s*Vocabulary in Detail/i);
             if (vocabSplit.length < 2) return { body: markdown, vocabHtml: '' };
 
@@ -388,15 +392,15 @@
                 const synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/i);
                 const antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/i);
 
-                const urdu = urduMatch ? urduMatch[1].trim() : '';
-                const engDef = defMatch ? defMatch[1].trim() : '';
-                const synonyms = synMatch ? synMatch[1].trim() : '';
-                const antonyms = antMatch ? antMatch[1].trim() : '';
-
-                items.push(buildVocabItem(number, word, urdu, engDef, synonyms, antonyms));
+                items.push(buildVocabItem(
+                    number, word,
+                    urduMatch ? urduMatch[1].trim() : '',
+                    defMatch ? defMatch[1].trim() : '',
+                    synMatch ? synMatch[1].trim() : '',
+                    antMatch ? antMatch[1].trim() : ''
+                ));
             }
 
-            // If Pattern A found nothing, try Pattern B
             if (!foundA) {
                 while ((match = regexB.exec(rawVocab)) !== null) {
                     const number = match[1];
@@ -408,12 +412,13 @@
                     const synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/i);
                     const antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/i);
 
-                    const urdu = urduMatch ? urduMatch[1].trim() : '';
-                    const engDef = defMatch ? defMatch[1].trim() : '';
-                    const synonyms = synMatch ? synMatch[1].trim() : '';
-                    const antonyms = antMatch ? antMatch[1].trim() : '';
-
-                    items.push(buildVocabItem(number, word, urdu, engDef, synonyms, antonyms));
+                    items.push(buildVocabItem(
+                        number, word,
+                        urduMatch ? urduMatch[1].trim() : '',
+                        defMatch ? defMatch[1].trim() : '',
+                        synMatch ? synMatch[1].trim() : '',
+                        antMatch ? antMatch[1].trim() : ''
+                    ));
                 }
             }
 
@@ -421,48 +426,23 @@
             return { body: vocabSplit[0], vocabHtml };
         }
 
-        function buildVocabItem(number, word, urdu, engDef, synonyms, antonyms) {
-            const wordLink = createSearchLink(word);
-            const synLinks = linkifyList(synonyms);
-            const antLinks = linkifyList(antonyms);
-
-            return `
-                <div class="vocab-item">
-                    <div class="vocab-word">
-                        <span class="number">${number}</span>
-                        ${wordLink}
-                    </div>
-                    ${urdu ? `<div class="urdu-text">${urdu}</div>` : ''}
-                    ${engDef ? `<div class="vocab-meta-row" style="margin-bottom:6px;"><span class="vocab-label">Definition</span><span class="vocab-value">${engDef}</span></div>` : ''}
-                    <div class="vocab-meta">
-                        ${synLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Synonyms</span><span class="vocab-value">${synLinks}</span></div>` : ''}
-                        ${antLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Antonyms</span><span class="vocab-value">${antLinks}</span></div>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-        // ---------- UNIFIED PARSER ----------
-        // Handles both structured essays AND random reading (news, books)
+        // ---------- UNIFIED PARSER (ONLY reads column B) ----------
         function parseRow(row, index) {
+            // ONLY read column B (index 1). Ignore everything else.
             const fullMarkdown = row[1] ? String(row[1]).trim() : '';
             if (!fullMarkdown) return null;
-
-            const rawStatus = row[2];
-            const isReadFromSheet = rawStatus !== null && rawStatus !== undefined && String(rawStatus).trim() !== '';
 
             // Title: first # heading
             let titleMatch = fullMarkdown.match(/^\s*#\s+(.+)$/m);
             let title = titleMatch ? titleMatch[1].trim() : `Reading ${index + 1}`;
 
-            // Metadata (only present in structured essays)
-            let srNoMatch = fullMarkdown.match(/\*\*SR No:\*\*\s*(.+)/);
+            // Metadata (only present in structured essays — parsed from column B itself)
             let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/) || fullMarkdown.match(/\*\*Dated:\*\*\s*(.+)/i);
             let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
             let classMatch = fullMarkdown.match(/\*\*Primary Type:\*\*\s*(.+)/);
 
             let meta = {
-                srNo: srNoMatch ? srNoMatch[1].trim() : '',
+                srNo: '', // assigned later
                 date: dateMatch ? dateMatch[1].trim() : '',
                 wordCount: wordCountMatch ? wordCountMatch[1].trim() : '',
                 classification: classMatch ? classMatch[1].trim() : ''
@@ -486,18 +466,16 @@
             essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
             essayBody = essayBody.replace(/### Outline:[\s\S]*?(?=\n---)/i, '');
             essayBody = essayBody.replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '');
-            // Remove the leading horizontal rule if present
             essayBody = essayBody.replace(/^\s*---\s*\n/, '');
             essayBody = essayBody.replace(/^[\s-]+/, '').trim();
 
             return {
-                id: index,                     // original index (for localStorage)
+                id: index,
                 title: title,
                 meta: meta,
                 outline: outlineText,
                 bodyMarkdown: essayBody,
-                vocabHtml: vocabHtml,
-                isReadFromSheet: isReadFromSheet
+                vocabHtml: vocabHtml
             };
         }
 
@@ -523,7 +501,7 @@
                         .filter(item => item !== null);
 
                     if (parsed.length === 0) {
-                        container.innerHTML = '<div class="error">No valid reading data found.</div>';
+                        container.innerHTML = '<div class="error">No valid reading data found in column B.</div>';
                         return;
                     }
 
@@ -581,14 +559,10 @@
                     `;
                 }
 
-                const isReadLocally = localStorage.getItem(`essay_read_${essay.id}`) === 'true';
-                const isRead = essay.isReadFromSheet || isReadLocally;
-                const readClass = isRead ? 'read' : '';
-
                 const titleSearchLink = createSearchLink(essay.title);
 
                 const cardHTML = `
-                    <div class="essay-card ${readClass}" id="card-${index}">
+                    <div class="essay-card" id="card-${index}">
                         <div class="card-header">
                             <div class="card-title-group">
                                 <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
@@ -630,10 +604,6 @@
             
             currentEssayIndex = index;
             const essay = essaysData[index];
-            
-            localStorage.setItem(`essay_read_${essay.id}`, 'true');
-            const cardElement = document.getElementById(`card-${index}`);
-            if (cardElement) cardElement.classList.add('read');
             
             let readingHtml = `<div class="reading-essay-title">${essay.title}</div>`;
             
