@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Essay Collection</title>
+    <title>Reading Collection</title>
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -92,7 +92,6 @@
         .card-title-group:active { opacity: 0.75; }
         .card-srno { font-size: 0.8rem; font-weight: 600; color: var(--primary); }
         
-        /* Clickable Title */
         .card-title {
             font-size: 1rem; font-weight: 600; color: var(--text); 
             line-height: 1.3; cursor: pointer; text-decoration: none;
@@ -121,7 +120,6 @@
             border-left: 3px solid #eab308; margin-bottom: 12px; line-height: 1.4;
         }
 
-        /* Vocabulary */
         .vocab-section { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
 
         .vocab-toggle-btn {
@@ -156,7 +154,6 @@
             display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
 
-        /* Clickable Vocabulary Word */
         .vocab-link {
             color: var(--primary);
             text-decoration: none;
@@ -177,7 +174,6 @@
         .vocab-label { font-weight: 600; color: var(--text-secondary); min-width: 72px; flex-shrink: 0; }
         .vocab-value { color: var(--text); }
 
-        /* Floating Refresh */
         .refresh-btn {
             position: fixed; bottom: 24px; right: 20px; width: 56px; height: 56px;
             background: var(--primary); color: white; border: none; border-radius: 50%;
@@ -206,7 +202,6 @@
         
         .refresh-btn svg { width: 24px; height: 24px; fill: currentColor; }
 
-        /* Modal */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(5px);
@@ -293,29 +288,35 @@
             color: var(--text-secondary); font-size: 1.05rem;
         }
         .error { color: var(--danger); font-weight: 600; }
+
+        /* Bottom-to-top: reverse the visual order */
+        .essay-grid.reverse {
+            display: flex;
+            flex-direction: column-reverse;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Essay Collection</h1>
-            <p class="subtitle">Browse, read & explore essays</p>
+            <h1>Reading Collection</h1>
+            <p class="subtitle">Essays, news, books & random reads</p>
         </header>
 
         <div id="essays-container" class="essay-grid">
-            <div class="loading">Loading essays...</div>
+            <div class="loading">Loading...</div>
         </div>
     </div>
 
-    <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()" title="Refresh" aria-label="Refresh essays">
+    <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()" title="Refresh" aria-label="Refresh">
         <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
     </button>
 
     <div id="essayModal" class="modal-overlay" role="dialog" aria-modal="true">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-header-title">Reading Essay</div>
+                <div class="modal-header-title">Reading</div>
                 <div class="modal-header-actions">
                     <button class="action-btn copy-btn" id="copyBtn" onclick="copyEssayText()">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -341,19 +342,16 @@
         let currentEssayIndex = null; 
         let scrollSaveTimeout;
 
-        // Helper function to create Google search links
+        // ---------- HELPERS ----------
         function createSearchLink(query) {
             if (!query || query.trim() === '') return '';
-            // Clean query: remove extra spaces, trim quotes
             const cleaned = query.replace(/["']/g, '').replace(/\s+/g, ' ').trim();
             const encoded = encodeURIComponent(cleaned);
             return `<a href="https://www.google.com/search?q=${encoded}" target="_blank" rel="noopener noreferrer" class="vocab-link">${query}</a>`;
         }
 
-        // Helper function to linkify a comma-separated list of words
         function linkifyList(list) {
             if (!list) return '';
-            // Split by comma, then linkify each item
             return list.split(',').map(item => {
                 const trimmed = item.trim();
                 if (!trimmed) return '';
@@ -361,9 +359,152 @@
             }).filter(Boolean).join(', ');
         }
 
+        // Extract vocabulary from "## Vocabulary in Detail" (works for both formats)
+        function extractVocab(markdown) {
+            let vocabHtml = '';
+            // Match either "### 📚 Vocabulary" OR "## Vocabulary in Detail"
+            let vocabSplit = markdown.split(/###\s*📚\s*Vocabulary|##\s*Vocabulary in Detail/i);
+            if (vocabSplit.length < 2) return { body: markdown, vocabHtml: '' };
+
+            let rawVocab = vocabSplit[1];
+            let items = [];
+
+            // Pattern A: **1 Word** (first format)
+            let regexA = /\*\*(\d+)\s+(.+?)\*\*[\s\S]*?(?=\*\*\d+\s+|$)/g;
+            // Pattern B: ### 1. Word (second format)
+            let regexB = /###\s*(\d+)\.\s*(.+?)\n([\s\S]*?)(?=\n###\s*\d+\.|$)/g;
+
+            let match;
+            let foundA = false;
+
+            while ((match = regexA.exec(rawVocab)) !== null) {
+                foundA = true;
+                const number = match[1];
+                const word = match[2].trim();
+                const block = match[0];
+
+                const urduMatch = block.match(/\*\*Urdu:\*\*\s*(.+)/i) || block.match(/\*\*Urdu Meaning:\*\*\s*(.+)/i);
+                const defMatch = block.match(/\*\*English Definition:\*\*\s*(.+)/i);
+                const synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/i);
+                const antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/i);
+
+                const urdu = urduMatch ? urduMatch[1].trim() : '';
+                const engDef = defMatch ? defMatch[1].trim() : '';
+                const synonyms = synMatch ? synMatch[1].trim() : '';
+                const antonyms = antMatch ? antMatch[1].trim() : '';
+
+                items.push(buildVocabItem(number, word, urdu, engDef, synonyms, antonyms));
+            }
+
+            // If Pattern A found nothing, try Pattern B
+            if (!foundA) {
+                while ((match = regexB.exec(rawVocab)) !== null) {
+                    const number = match[1];
+                    const word = match[2].trim();
+                    const block = match[3];
+
+                    const urduMatch = block.match(/\*\*Urdu Meaning:\*\*\s*(.+)/i) || block.match(/\*\*Urdu:\*\*\s*(.+)/i);
+                    const defMatch = block.match(/\*\*English Definition:\*\*\s*(.+)/i);
+                    const synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/i);
+                    const antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/i);
+
+                    const urdu = urduMatch ? urduMatch[1].trim() : '';
+                    const engDef = defMatch ? defMatch[1].trim() : '';
+                    const synonyms = synMatch ? synMatch[1].trim() : '';
+                    const antonyms = antMatch ? antMatch[1].trim() : '';
+
+                    items.push(buildVocabItem(number, word, urdu, engDef, synonyms, antonyms));
+                }
+            }
+
+            vocabHtml = items.join('');
+            return { body: vocabSplit[0], vocabHtml };
+        }
+
+        function buildVocabItem(number, word, urdu, engDef, synonyms, antonyms) {
+            const wordLink = createSearchLink(word);
+            const synLinks = linkifyList(synonyms);
+            const antLinks = linkifyList(antonyms);
+
+            return `
+                <div class="vocab-item">
+                    <div class="vocab-word">
+                        <span class="number">${number}</span>
+                        ${wordLink}
+                    </div>
+                    ${urdu ? `<div class="urdu-text">${urdu}</div>` : ''}
+                    ${engDef ? `<div class="vocab-meta-row" style="margin-bottom:6px;"><span class="vocab-label">Definition</span><span class="vocab-value">${engDef}</span></div>` : ''}
+                    <div class="vocab-meta">
+                        ${synLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Synonyms</span><span class="vocab-value">${synLinks}</span></div>` : ''}
+                        ${antLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Antonyms</span><span class="vocab-value">${antLinks}</span></div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ---------- UNIFIED PARSER ----------
+        // Handles both structured essays AND random reading (news, books)
+        function parseRow(row, index) {
+            const fullMarkdown = row[1] ? String(row[1]).trim() : '';
+            if (!fullMarkdown) return null;
+
+            const rawStatus = row[2];
+            const isReadFromSheet = rawStatus !== null && rawStatus !== undefined && String(rawStatus).trim() !== '';
+
+            // Title: first # heading
+            let titleMatch = fullMarkdown.match(/^\s*#\s+(.+)$/m);
+            let title = titleMatch ? titleMatch[1].trim() : `Reading ${index + 1}`;
+
+            // Metadata (only present in structured essays)
+            let srNoMatch = fullMarkdown.match(/\*\*SR No:\*\*\s*(.+)/);
+            let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/) || fullMarkdown.match(/\*\*Dated:\*\*\s*(.+)/i);
+            let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
+            let classMatch = fullMarkdown.match(/\*\*Primary Type:\*\*\s*(.+)/);
+
+            let meta = {
+                srNo: srNoMatch ? srNoMatch[1].trim() : '',
+                date: dateMatch ? dateMatch[1].trim() : '',
+                wordCount: wordCountMatch ? wordCountMatch[1].trim() : '',
+                classification: classMatch ? classMatch[1].trim() : ''
+            };
+
+            // Outline (only for structured essays)
+            let outlineText = '';
+            let outlineMatch = fullMarkdown.match(/### Outline:\s*\n([\s\S]*?)(?=\n---|\n###|$)/i);
+            if (outlineMatch) outlineText = outlineMatch[1].trim();
+
+            // Extract vocabulary
+            const { body: bodyWithoutVocab, vocabHtml } = extractVocab(fullMarkdown);
+
+            // Clean body
+            let essayBody = bodyWithoutVocab;
+            if (titleMatch) essayBody = essayBody.replace(titleMatch[0], '');
+            essayBody = essayBody.replace(/\*\*\(PCS.*?\)\*\*/g, '');
+            essayBody = essayBody.replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '');
+            essayBody = essayBody.replace(/\*\*Date:\*\*.*?(?=\n\n|\n---|$)/is, '');
+            essayBody = essayBody.replace(/\*\*Dated:\*\*.*?(?=\n\n|\n---|$)/is, '');
+            essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
+            essayBody = essayBody.replace(/### Outline:[\s\S]*?(?=\n---)/i, '');
+            essayBody = essayBody.replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '');
+            // Remove the leading horizontal rule if present
+            essayBody = essayBody.replace(/^\s*---\s*\n/, '');
+            essayBody = essayBody.replace(/^[\s-]+/, '').trim();
+
+            return {
+                id: index,                     // original index (for localStorage)
+                title: title,
+                meta: meta,
+                outline: outlineText,
+                bodyMarkdown: essayBody,
+                vocabHtml: vocabHtml,
+                isReadFromSheet: isReadFromSheet
+            };
+        }
+
+        // ---------- LOAD ----------
         function loadEssays(forceRefresh = false) {
             if (!forceRefresh && essaysData.length === 0) {
-                container.innerHTML = '<div class="loading">Loading essays...</div>';
+                container.innerHTML = '<div class="loading">Loading...</div>';
             }
             refreshBtn.classList.add('loading');
 
@@ -377,106 +518,25 @@
                     setTimeout(() => refreshBtn.classList.remove('loading'), 500);
                     const rawRows = results.data.slice(1); 
                     
-                    essaysData = rawRows
-                        .map((row, index) => {
-                            const fullMarkdown = row[1] ? String(row[1]).trim() : '';
-                            if (!fullMarkdown) return null;
-
-                            const rawStatus = row[2]; 
-                            const isReadFromSheet = rawStatus !== null && rawStatus !== undefined && String(rawStatus).trim() !== '';
-
-                            let titleMatch = fullMarkdown.match(/^\s*#\s+(.+)$/m);
-                            let title = titleMatch ? titleMatch[1].trim() : `Essay ${index + 1}`;
-
-                            let srNoMatch = fullMarkdown.match(/\*\*SR No:\*\*\s*(.+)/);
-                            let dateMatch = fullMarkdown.match(/\*\*Date:\*\*\s*(.+)/);
-                            let wordCountMatch = fullMarkdown.match(/\*\*Total Essay Word Count:\*\*\s*(.+)/);
-                            let classMatch = fullMarkdown.match(/\*\*Primary Type:\*\*\s*(.+)/);
-                            
-                            let meta = {
-                                srNo: srNoMatch ? srNoMatch[1].trim() : '',
-                                date: dateMatch ? dateMatch[1].trim() : '',
-                                wordCount: wordCountMatch ? wordCountMatch[1].trim() : '',
-                                classification: classMatch ? classMatch[1].trim() : ''
-                            };
-
-                            let outlineText = '';
-                            let outlineMatch = fullMarkdown.match(/### Outline:\s*\n([\s\S]*?)(?=\n---|\n###|$)/i);
-                            if (outlineMatch) {
-                                outlineText = outlineMatch[1].trim();
-                            }
-
-                            // ===== Vocabulary Parsing with Clickable Links =====
-                            let vocabHtml = '';
-                            let vocabSplit = fullMarkdown.split(/### 📚 Vocabulary/i);
-                            if (vocabSplit.length > 1) {
-                                let rawVocab = vocabSplit[1];
-                                let items = [];
-                                let regex = /\*\*(\d+)\s+(.+?)\*\*[\s\S]*?(?=\*\*\d+\s+|$)/g;
-                                let match;
-                                
-                                while ((match = regex.exec(rawVocab)) !== null) {
-                                    let number = match[1];
-                                    let word = match[2].trim();
-                                    let block = match[0];
-                                    
-                                    let urduMatch = block.match(/\*\*Urdu:\*\*\s*(.+)/);
-                                    let synMatch = block.match(/\*\*Synonyms:\*\*\s*(.+)/);
-                                    let antMatch = block.match(/\*\*Antonyms:\*\*\s*(.+)/);
-                                    
-                                    let urdu = urduMatch ? urduMatch[1].trim() : '';
-                                    let synonyms = synMatch ? synMatch[1].trim() : '';
-                                    let antonyms = antMatch ? antMatch[1].trim() : '';
-                                    
-                                    // Create clickable versions
-                                    const wordLink = createSearchLink(word);
-                                    const synLinks = linkifyList(synonyms);
-                                    const antLinks = linkifyList(antonyms);
-                                    
-                                    items.push(`
-                                        <div class="vocab-item">
-                                            <div class="vocab-word">
-                                                <span class="number">${number}</span>
-                                                ${wordLink}
-                                            </div>
-                                            ${urdu ? `<div class="urdu-text">${urdu}</div>` : ''}
-                                            <div class="vocab-meta">
-                                                ${synLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Synonyms</span><span class="vocab-value">${synLinks}</span></div>` : ''}
-                                                ${antLinks ? `<div class="vocab-meta-row"><span class="vocab-label">Antonyms</span><span class="vocab-value">${antLinks}</span></div>` : ''}
-                                            </div>
-                                        </div>
-                                    `);
-                                }
-                                vocabHtml = items.join('');
-                            }
-
-                            let essayBody = vocabSplit[0]; 
-                            
-                            if (titleMatch) essayBody = essayBody.replace(titleMatch[0], '');
-                            essayBody = essayBody.replace(/\*\*\(PCS.*?\)\*\*/g, '');
-                            essayBody = essayBody.replace(/\*\*SR No:\*\*.*?(?=\n\n|\n---|$)/is, '');
-                            essayBody = essayBody.replace(/\*\*Date:\*\*.*?(?=\n\n|\n---|$)/is, '');
-                            essayBody = essayBody.replace(/\*\*Total Essay Word Count:\*\*.*?(?=\n\n|\n---|$)/is, '');
-                            essayBody = essayBody.replace(/### Outline:[\s\S]*?(?=\n---)/i, ''); 
-                            essayBody = essayBody.replace(/### 📝 Classification of Essay[\s\S]*?(?=\n---)/i, '');
-                            essayBody = essayBody.replace(/^[\s-]+/, '').trim();
-
-                            return {
-                                id: index,
-                                title: title,
-                                meta: meta,
-                                outline: outlineText, 
-                                bodyMarkdown: essayBody,
-                                vocabHtml: vocabHtml,
-                                isReadFromSheet: isReadFromSheet
-                            };
-                        })
+                    let parsed = rawRows
+                        .map((row, index) => parseRow(row, index))
                         .filter(item => item !== null);
 
-                    if (essaysData.length === 0) {
-                        container.innerHTML = '<div class="error">No valid essay data found.</div>';
+                    if (parsed.length === 0) {
+                        container.innerHTML = '<div class="error">No valid reading data found.</div>';
                         return;
                     }
+
+                    // Assign serial numbers: last record gets 1, first gets total
+                    const total = parsed.length;
+                    parsed.forEach((item, idx) => {
+                        item.meta.srNo = (total - idx).toString();
+                    });
+
+                    // Reverse for bottom-to-top display (newest first)
+                    parsed.reverse();
+
+                    essaysData = parsed;
 
                     renderCards();
                     restoreLastState();
@@ -488,6 +548,7 @@
             });
         }
 
+        // ---------- RENDER ----------
         function renderCards() {
             container.innerHTML = ''; 
 
@@ -520,11 +581,10 @@
                     `;
                 }
 
-                const isReadLocally = localStorage.getItem(`essay_read_${index}`) === 'true';
+                const isReadLocally = localStorage.getItem(`essay_read_${essay.id}`) === 'true';
                 const isRead = essay.isReadFromSheet || isReadLocally;
                 const readClass = isRead ? 'read' : '';
 
-                // Create the Google Search Link for the Title
                 const titleSearchLink = createSearchLink(essay.title);
 
                 const cardHTML = `
@@ -534,7 +594,7 @@
                                 <span class="card-srno">${essay.meta.srNo ? essay.meta.srNo + '.' : ''}</span>
                                 <span class="card-title">${titleSearchLink}</span>
                             </div>
-                            <button class="card-nav-icon" onclick="openModal(${index})" aria-label="Read essay">
+                            <button class="card-nav-icon" onclick="openModal(${index})" aria-label="Read">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                             </button>
                         </div>
@@ -548,6 +608,7 @@
             });
         }
 
+        // ---------- INTERACTIONS ----------
         function toggleVocab(event, index) {
             event.preventDefault(); 
             event.stopPropagation(); 
@@ -570,11 +631,9 @@
             currentEssayIndex = index;
             const essay = essaysData[index];
             
-            localStorage.setItem(`essay_read_${index}`, 'true');
+            localStorage.setItem(`essay_read_${essay.id}`, 'true');
             const cardElement = document.getElementById(`card-${index}`);
-            if (cardElement) {
-                cardElement.classList.add('read');
-            }
+            if (cardElement) cardElement.classList.add('read');
             
             let readingHtml = `<div class="reading-essay-title">${essay.title}</div>`;
             
@@ -597,7 +656,7 @@
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; 
 
-            const savedScroll = localStorage.getItem(`essay_scroll_${index}`);
+            const savedScroll = localStorage.getItem(`essay_scroll_${essay.id}`);
             if (savedScroll) {
                 setTimeout(() => {
                     modalBody.scrollTop = parseInt(savedScroll, 10);
@@ -606,13 +665,13 @@
                 modalBody.scrollTop = 0; 
             }
 
-            localStorage.setItem('last_open_essay', index);
+            localStorage.setItem('last_open_essay_id', essay.id);
         }
 
         function closeModal() {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
-            localStorage.removeItem('last_open_essay');
+            localStorage.removeItem('last_open_essay_id');
             currentEssayIndex = null;
         }
 
@@ -643,15 +702,19 @@
             if (currentEssayIndex !== null) {
                 clearTimeout(scrollSaveTimeout);
                 scrollSaveTimeout = setTimeout(() => {
-                    localStorage.setItem(`essay_scroll_${currentEssayIndex}`, modalBody.scrollTop);
+                    const essay = essaysData[currentEssayIndex];
+                    if (essay) {
+                        localStorage.setItem(`essay_scroll_${essay.id}`, modalBody.scrollTop);
+                    }
                 }, 100);
             }
         }
 
         function restoreLastState() {
-            const lastEssay = localStorage.getItem('last_open_essay');
-            if (lastEssay !== null && essaysData[lastEssay]) {
-                openModal(parseInt(lastEssay, 10));
+            const lastEssayId = localStorage.getItem('last_open_essay_id');
+            if (lastEssayId !== null) {
+                const idx = essaysData.findIndex(e => e.id == lastEssayId);
+                if (idx !== -1) openModal(idx);
             }
         }
 
