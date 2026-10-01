@@ -1,48 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Read CSV Google Sheet</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f4f4f4; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sheet Cards</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #ffffff;
+    --muted: #64748b;
+    --text: #0f172a;
+    --accent: #4f46e5;
+    --accent-2: #06b6d4;
+    --border: #e2e8f0;
+    --shadow: 0 10px 25px -10px rgba(2, 6, 23, 0.25);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #1e293b 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 10%, #312e81 0%, transparent 55%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+
+  header {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+  }
+
+  header h1 {
+    color: #fff;
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+
+  header p {
+    color: #94a3b8;
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .toolbar {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .search {
+    flex: 1;
+    min-width: 220px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border 0.2s, background 0.2s;
+  }
+
+  .search::placeholder { color: #94a3b8; }
+  .search:focus {
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.08);
+  }
+
+  .grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    opacity: 0.9;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.45);
+  }
+
+  .card h3 {
+    margin: 0 0 14px;
+    font-size: 1.1rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .card dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .card dt {
+    color: var(--muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .card dd {
+    margin: 0;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .status {
+    max-width: 1200px;
+    margin: 0 auto;
+    color: #cbd5e1;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255,255,255,0.15);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #eef2ff, #cffafe);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+</style>
 </head>
 <body>
 
-    <h2>Google Sheet CSV Viewer</h2>
-    <div id="table-container">Loading...</div>
+<header>
+  <h1>Sheet Data <span class="badge">Live</span></h1>
+  <p>Fetched directly from Google Sheets — displayed as cards.</p>
+</header>
 
-    <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQfcgGgESJ_GlCR7EnCJAl34LBhJbCFAv3S7qcxujKNb44bukCymdC5vqc4WVEmJULVPF7U3fqQOigL/pub?output=csv';
+<div class="toolbar">
+  <input id="search" class="search" type="search" placeholder="🔍 Search cards…" />
+</div>
 
-        fetch(csvUrl)
-            .then(response => response.text())
-            .then(data => {
-                const rows = data.split('\n').map(row => row.split(','));
-                let html = '<table>';
-                
-                rows.forEach((row, rowIndex) => {
-                    html += '<tr>';
-                    row.forEach(cell => {
-                        // Clean up quotes if present
-                        const cleanCell = cell.replace(/^"|"$/g, '').trim();
-                        const tag = rowIndex === 0 ? 'th' : 'td';
-                        html += `<${tag}>${cleanCell}</${tag}>`;
-                    });
-                    html += '</tr>';
-                });
-                
-                html += '</table>';
-                document.getElementById('table-container').innerHTML = html;
-            })
-            .catch(error => {
-                document.getElementById('table-container').innerHTML = 'Error loading CSV data. Note: Cross-Origin Resource Sharing (CORS) restrictions might apply if opened locally; try running it via a local web server.';
-                console.error('Error:', error);
-            });
-    </script>
+<div id="status" class="status">
+  <div class="spinner"></div>
+  Loading data…
+</div>
+
+<div id="grid" class="grid"></div>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfcgGgESJ_GlCR7EnCJAl34LBhJbCFAv3S7qcxujKNb44bukCymdC5vqc4WVEmJULVPF7U3fqQOigL/pub?output=csv";
+
+const statusEl = document.getElementById("status");
+const gridEl   = document.getElementById("grid");
+const searchEl = document.getElementById("search");
+
+let allRows = [];
+let headers = [];
+
+/* ---------- CSV parser (handles quotes, commas, newlines) ---------- */
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+
+    if (inQuotes) {
+      if (ch === '"' && next === '"') { field += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { field += ch; }
+    } else {
+      if (ch === '"') inQuotes = true;
+      else if (ch === ',') { row.push(field); field = ""; }
+      else if (ch === '\n') { row.push(field); rows.push(row); row = []; field = ""; }
+      else if (ch === '\r') { /* skip */ }
+      else field += ch;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(c => c.trim() !== ""));
+}
+
+/* ---------- Render ---------- */
+function renderCards(rows) {
+  gridEl.innerHTML = "";
+  if (!rows.length) {
+    statusEl.style.display = "block";
+    statusEl.textContent = "No matching records.";
+    return;
+  }
+  statusEl.style.display = "none";
+
+  rows.forEach((r, idx) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.animationDelay = `${Math.min(idx * 40, 400)}ms`;
+
+    const title = document.createElement("h3");
+    title.textContent = r[headers[0]] || `Row ${idx + 1}`;
+    card.appendChild(title);
+
+    const dl = document.createElement("dl");
+    headers.slice(1).forEach((h, i) => {
+      const val = r[h];
+      if (val === undefined || val === "") return;
+      const dt = document.createElement("dt");
+      dt.textContent = h;
+      const dd = document.createElement("dd");
+      dd.textContent = val;
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    });
+    card.appendChild(dl);
+
+    card.addEventListener("click", () => {
+      alert(headers.map(h => `${h}: ${r[h] ?? ""}`).join("\n"));
+    });
+
+    gridEl.appendChild(card);
+  });
+}
+
+/* ---------- Load ---------- */
+fetch(CSV_URL)
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.text();
+  })
+  .then(text => {
+    const rows = parseCSV(text);
+    if (rows.length < 2) throw new Error("Sheet appears empty.");
+
+    headers = rows[0].map((h, i) => h.trim() || `Column ${i + 1}`);
+
+    allRows = rows.slice(1).map(r => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
+      return obj;
+    });
+
+    renderCards(allRows);
+
+    searchEl.addEventListener("input", () => {
+      const q = searchEl.value.toLowerCase().trim();
+      if (!q) return renderCards(allRows);
+      const filtered = allRows.filter(row =>
+        Object.values(row).some(v => v.toLowerCase().includes(q))
+      );
+      renderCards(filtered);
+    });
+  })
+  .catch(err => {
+    console.error(err);
+    statusEl.innerHTML = `
+      ⚠️ Could not load the sheet.<br>
+      <small style="color:#94a3b8">${err.message}</small><br><br>
+      <small>Open the page via a local web server or check the sheet is public.</small>
+    `;
+  });
+</script>
 
 </body>
 </html>
