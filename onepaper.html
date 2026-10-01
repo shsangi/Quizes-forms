@@ -1,415 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Question Bank — Professional Study Portal</title>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<style>
-  :root{
-    --bg:#0f172a; --surface:#1e293b; --surface2:#334155; --border:#334155;
-    --text:#e2e8f0; --muted:#94a3b8; --accent:#3b82f6; --accent2:#8b5cf6;
-    --correct:#10b981; --incorrect:#ef4444; --pending:#f59e0b;
-    --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.35);
-  }
-  [data-theme="light"]{
-    --bg:#f1f5f9; --surface:#ffffff; --surface2:#f8fafc; --border:#e2e8f0;
-    --text:#0f172a; --muted:#64748b; --shadow:0 8px 24px rgba(15,23,42,.08);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
-    background:var(--bg); color:var(--text); line-height:1.6;
-    transition:background .3s,color .3s;
-  }
-  header{
-    position:sticky; top:0; z-index:100;
-    background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(30,41,59,.95));
-    backdrop-filter:blur(12px); border-bottom:1px solid var(--border);
-    padding:18px 24px;
-  }
-  [data-theme="light"] header{background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(248,250,252,.95))}
-  .header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-  .logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
-  .logo-mark{
-    width:38px;height:38px;border-radius:10px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:grid;place-items:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(59,130,246,.4)
-  }
-  .header-stats{margin-left:auto;display:flex;gap:16px;font-size:.8rem;color:var(--muted)}
-  .header-stats b{color:var(--text);font-size:1rem;display:block}
-  .theme-btn{
-    background:var(--surface2);border:1px solid var(--border);color:var(--text);
-    width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:1.1rem;transition:.2s;
-  }
-  .theme-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .controls{
-    max-width:1400px;margin:24px auto 0;padding:0 24px;
-    display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;
-  }
-  .controls input,.controls select{
-    width:100%;padding:12px 16px;border-radius:10px;
-    background:var(--surface);border:1px solid var(--border);
-    color:var(--text);font-size:.92rem;font-family:inherit;transition:.2s;
-  }
-  .controls input:focus,.controls select:focus{
-    outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.15)
-  }
-  .search-wrap{position:relative}
-  .search-wrap::before{
-    content:"🔍";position:absolute;left:16px;top:50%;transform:translateY(-50%);
-    opacity:.5;font-size:.9rem;pointer-events:none
-  }
-  .search-wrap input{padding-left:44px}
-  .pills{
-    max-width:1400px;margin:16px auto 0;padding:0 24px;
-    display:flex;gap:8px;flex-wrap:wrap;
-  }
-  .pill{
-    padding:6px 14px;border-radius:999px;background:var(--surface);
-    border:1px solid var(--border);color:var(--muted);
-    font-size:.78rem;font-weight:600;cursor:pointer;transition:.2s;
-  }
-  .pill:hover,.pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-  main{max-width:1400px;margin:24px auto;padding:0 24px 80px}
-  .results-info{color:var(--muted);font-size:.85rem;margin-bottom:16px}
-  .card{
-    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-    margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);
-    transition:transform .2s,border-color .2s;
-  }
-  .card:hover{border-color:var(--accent)}
-  .card-head{
-    padding:18px 20px;cursor:pointer;display:flex;gap:16px;align-items:flex-start;
-  }
-  .q-num{
-    flex-shrink:0;width:44px;height:44px;border-radius:10px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    color:#fff;display:grid;place-items:center;font-weight:800;font-size:.9rem;
-  }
-  .q-body{flex:1;min-width:0}
-  .q-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:.72rem}
-  .tag{
-    padding:3px 9px;border-radius:6px;background:var(--surface2);
-    color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;
-  }
-  .tag.subject{background:rgba(59,130,246,.15);color:#60a5fa}
-  .q-text{font-size:1rem;font-weight:600;line-height:1.5}
-  .q-badges{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
-  .badge{
-    padding:4px 12px;border-radius:999px;font-size:.7rem;font-weight:700;
-    text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;
-  }
-  .badge.correct{background:rgba(16,185,129,.15);color:var(--correct);border:1px solid rgba(16,185,129,.3)}
-  .badge.incorrect{background:rgba(239,68,68,.15);color:var(--incorrect);border:1px solid rgba(239,68,68,.3)}
-  .badge.pending{background:rgba(245,158,11,.15);color:var(--pending);border:1px solid rgba(245,158,11,.3)}
-  .card-body{
-    max-height:0;overflow:hidden;transition:max-height .4s ease;
-    border-top:1px solid transparent;
-  }
-  .card.open .card-body{max-height:4000px;border-top-color:var(--border)}
-  .card-body-inner{padding:20px}
-  .options{display:grid;gap:10px;margin-bottom:20px}
-  .option{
-    padding:12px 16px;border-radius:10px;background:var(--surface2);
-    border:1px solid var(--border);font-size:.92rem;
-    display:flex;gap:12px;align-items:flex-start;
-  }
-  .option .key{
-    flex-shrink:0;width:26px;height:26px;border-radius:6px;
-    background:var(--surface);border:1px solid var(--border);
-    display:grid;place-items:center;font-weight:700;font-size:.78rem;
-  }
-  .option.correct-opt{
-    background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.4)
-  }
-  .option.correct-opt .key{background:var(--correct);color:#fff;border-color:var(--correct)}
-  .section-title{
-    font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
-    color:var(--muted);margin:20px 0 10px;display:flex;align-items:center;gap:8px;
-  }
-  .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
-  .md-content{
-    background:var(--surface2);border-radius:10px;padding:16px;
-    font-size:.9rem;line-height:1.7;border:1px solid var(--border);
-  }
-  .md-content h1,.md-content h2,.md-content h3{margin:12px 0 8px;font-size:1.05rem;font-weight:700}
-  .md-content p{margin-bottom:10px}
-  .md-content ul,.md-content ol{margin:8px 0 12px 22px}
-  .md-content li{margin-bottom:5px}
-  .md-content strong{color:var(--accent);font-weight:700}
-  .empty-state{text-align:center;padding:80px 20px;color:var(--muted)}
-  .empty-state div{font-size:3rem;margin-bottom:12px;opacity:.4}
-  .loading{text-align:center;padding:60px;color:var(--muted)}
-  .spinner{
-    width:36px;height:36px;border:3px solid var(--border);
-    border-top-color:var(--accent);border-radius:50%;
-    animation:spin .8s linear infinite;margin:0 auto 16px;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @media(max-width:900px){.controls{grid-template-columns:1fr 1fr}}
-  @media(max-width:600px){
-    .controls{grid-template-columns:1fr}
-    .card-head{flex-wrap:wrap}
-    .q-badges{flex-direction:row;width:100%}
-    .header-stats{display:none}
-    main{padding:0 12px 60px}
-    .controls,.pills{padding:0 12px}
-  }
-</style>
+    <meta charset="UTF-8">
+    <title>Read CSV Google Sheet</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
 </head>
 <body>
-<header>
-  <div class="header-inner">
-    <div class="logo">
-      <div class="logo-mark">📚</div>
-      <span>Question Bank</span>
-    </div>
-    <div class="header-stats">
-      <div>Questions <b id="stat-total">0</b></div>
-      <div>Subjects <b id="stat-subjects">0</b></div>
-      <div>Showing <b id="stat-shown">0</b></div>
-    </div>
-    <button class="theme-btn" id="themeToggle" title="Toggle theme">🌙</button>
-  </div>
-</header>
 
-<div class="controls">
-  <div class="search-wrap">
-    <input type="text" id="search" placeholder="Search questions, options, explanations...">
-  </div>
-  <select id="filterSubject"><option value="">All Subjects</option></select>
-  <select id="filterModule"><option value="">All Modules</option></select>
-  <select id="filterResult">
-    <option value="">All Results</option>
-    <option value="Correct">Correct</option>
-    <option value="Incorrect">Incorrect</option>
-    <option value="Pending">Pending</option>
-  </select>
-</div>
+    <h2>Google Sheet CSV Viewer</h2>
+    <div id="table-container">Loading...</div>
 
-<div class="pills" id="topicPills"></div>
+    <script>
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQfcgGgESJ_GlCR7EnCJAl34LBhJbCFAv3S7qcxujKNb44bukCymdC5vqc4WVEmJULVPF7U3fqQOigL/pub?output=csv';
 
-<main>
-  <div class="results-info" id="resultsInfo"></div>
-  <div id="content">
-    <div class="loading"><div class="spinner"></div>Loading question bank from Google Sheets...</div>
-  </div>
-</main>
+        fetch(csvUrl)
+            .then(response => response.text())
+            .then(data => {
+                const rows = data.split('\n').map(row => row.split(','));
+                let html = '<table>';
+                
+                rows.forEach((row, rowIndex) => {
+                    html += '<tr>';
+                    row.forEach(cell => {
+                        // Clean up quotes if present
+                        const cleanCell = cell.replace(/^"|"$/g, '').trim();
+                        const tag = rowIndex === 0 ? 'th' : 'td';
+                        html += `<${tag}>${cleanCell}</${tag}>`;
+                    });
+                    html += '</tr>';
+                });
+                
+                html += '</table>';
+                document.getElementById('table-container').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('table-container').innerHTML = 'Error loading CSV data. Note: Cross-Origin Resource Sharing (CORS) restrictions might apply if opened locally; try running it via a local web server.';
+                console.error('Error:', error);
+            });
+    </script>
 
-<script>
-/* ============================================================
-   CONFIG — GOOGLE SHEET CSV ENDPOINT
-   ============================================================ */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfcgGgESJ_GlCR7EnCJAl34LBhJbCFAv3S7qcxujKNb44bukCymdC5vqc4WVEmJULVPF7U3fqQOigL/gviz/tq?tqx=out:csv";
-
-function parseCSV(text){
-  const rows=[]; let row=[], field="", inQuotes=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i], next=text[i+1];
-    if(inQuotes){
-      if(c==='"' && next==='"'){ field+='"'; i++; }
-      else if(c==='"'){ inQuotes=false; }
-      else field+=c;
-    } else {
-      if(c==='"') inQuotes=true;
-      else if(c===','){ row.push(field); field=""; }
-      else if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=""; }
-      else if(c==='\r'){}
-      else field+=c;
-    }
-  }
-  if(field||row.length){ row.push(field); rows.push(row); }
-  return rows;
-}
-
-function toObjects(rows){
-  if(!rows.length) return [];
-  const header=rows[0].map(h=>h.trim());
-  return rows.slice(1)
-    .filter(r=>r.some(c=>c && c.trim()!==""))
-    .map(r=>{
-      const o={};
-      header.forEach((h,i)=>o[h]=(r[i]||"").trim());
-      return o;
-    })
-    .filter(o=>o["Question"] && o["Sr No"]);
-}
-
-function md(text){
-  if(!text) return "";
-  try{ return marked.parse(text); }
-  catch(e){ return escapeHtml(text); }
-}
-
-let ALL=[], VIEW=[];
-let filters={search:"",subject:"",module:"",result:"",topic:""};
-
-function render(){
-  const container=document.getElementById("content");
-  const info=document.getElementById("resultsInfo");
-  if(!VIEW.length){
-    container.innerHTML=`<div class="empty-state"><div>🔍</div><h3>No questions match your filters</h3><p>Try clearing your search terms or filter configurations.</p></div>`;
-    info.textContent="0 questions";
-    document.getElementById("stat-shown").textContent="0";
-    return;
-  }
-  info.textContent=`Showing ${VIEW.length} of ${ALL.length} questions`;
-  document.getElementById("stat-shown").textContent=VIEW.length;
-
-  container.innerHTML=VIEW.map((q,i)=>{
-    const res=(q["Your Result"]||"Pending").trim();
-    const resClass=res.toLowerCase().includes("correct")&&!res.toLowerCase().includes("incorrect")?"correct":
-                   res.toLowerCase().includes("incorrect")?"incorrect":"pending";
-    const correct=(q["Exact Correct Answer"]||"").trim();
-    const opts=[
-      ["A","Option A"],["B","Option B"],["C","Option C"],["D","Option D"]
-    ].filter(([k,f])=>q[f]);
-    return `
-    <div class="card" data-idx="${i}">
-      <div class="card-head">
-        <div class="q-num">${escapeHtml(q["Sr No"]||i+1)}</div>
-        <div class="q-body">
-          <div class="q-meta">
-            <span class="tag subject">${escapeHtml(q["Subject"]||"General")}</span>
-            <span class="tag">${escapeHtml(q["Module"]||"Core")}</span>
-            <span class="tag">${escapeHtml(q["Title"]||"")}</span>
-          </div>
-          <div class="q-text">${escapeHtml(q["Question"]||"")}</div>
-        </div>
-        <div class="q-badges">
-          <span class="badge ${resClass}">${escapeHtml(res)}</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="card-body-inner">
-          <div class="options">
-            ${opts.map(([k,f])=>{
-              const val=q[f];
-              const isCorrect=val && correct && (val===correct || correct.endsWith(val) || val===correct.replace(/^[A-D]\)\s*/,""));
-              return `<div class="option ${isCorrect?'correct-opt':''}">
-                <span class="key">${k}</span>
-                <span>${escapeHtml(val)}</span>
-              </div>`;
-            }).join("")}
-          </div>
-
-          <div class="section-title">✅ Correct Answer</div>
-          <div class="md-content"><strong>${escapeHtml(correct)}</strong></div>
-
-          <div class="section-title">💡 Explanation</div>
-          <div class="md-content">${escapeHtml(q["Explanation"]||"—")}</div>
-
-          ${q["Module Overview (Markdown)"]?`
-          <div class="section-title">📘 Module Overview</div>
-          <div class="md-content">${md(q["Module Overview (Markdown)"])}</div>`:""}
-
-          ${q["Mardown 2 for Current question detail explaintion by ai "]?`
-          <div class="section-title">🧠 Detailed Explanation</div>
-          <div class="md-content">${md(q["Mardown 2 for Current question detail explaintion by ai "])}</div>`:""}
-        </div>
-      </div>
-    </div>`;
-  }).join("");
-
-  container.querySelectorAll(".card-head").forEach(h=>{
-    h.addEventListener("click",()=>h.parentElement.classList.toggle("open"));
-  });
-}
-
-function escapeHtml(s){
-  return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-
-function applyFilters(){
-  const s=filters.search.toLowerCase();
-  VIEW=ALL.filter(q=>{
-    if(filters.subject && q["Subject"]!==filters.subject) return false;
-    if(filters.module && q["Module"]!==filters.module) return false;
-    if(filters.result && (q["Your Result"]||"Pending")!==filters.result) return false;
-    if(filters.topic && q["Title"]!==filters.topic) return false;
-    if(s){
-      const hay=[q["Question"],q["Option A"],q["Option B"],q["Option C"],q["Option D"],
-                 q["Explanation"],q["Exact Correct Answer"],q["Title"],q["Module"],q["Subject"]]
-                 .join(" ").toLowerCase();
-      if(!hay.includes(s)) return false;
-    }
-    return true;
-  });
-  render();
-}
-
-function populateControls(){
-  const subjects=[...new Set(ALL.map(q=>q["Subject"]).filter(Boolean))].sort();
-  const modules=[...new Set(ALL.map(q=>q["Module"]).filter(Boolean))].sort();
-  const topics=[...new Set(ALL.map(q=>q["Title"]).filter(Boolean))].sort();
-
-  const fs=document.getElementById("filterSubject");
-  subjects.forEach(s=>fs.insertAdjacentHTML("beforeend",`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`));
-  const fm=document.getElementById("filterModule");
-  modules.forEach(m=>fm.insertAdjacentHTML("beforeend",`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`));
-
-  const pills=document.getElementById("topicPills");
-  pills.innerHTML=`<span class="pill active" data-topic="">All Topics</span>`+
-    topics.map(t=>`<span class="pill" data-topic="${escapeHtml(t)}">${escapeHtml(t)}</span>`).join("");
-  pills.querySelectorAll(".pill").forEach(p=>{
-    p.addEventListener("click",()=>{
-      pills.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
-      p.classList.add("active");
-      filters.topic=p.dataset.topic;
-      applyFilters();
-    });
-  });
-
-  document.getElementById("stat-total").textContent=ALL.length;
-  document.getElementById("stat-subjects").textContent=subjects.length;
-}
-
-document.getElementById("search").addEventListener("input",e=>{filters.search=e.target.value;applyFilters();});
-document.getElementById("filterSubject").addEventListener("change",e=>{filters.subject=e.target.value;applyFilters();});
-document.getElementById("filterModule").addEventListener("change",e=>{filters.module=e.target.value;applyFilters();});
-document.getElementById("filterResult").addEventListener("change",e=>{filters.result=e.target.value;applyFilters();});
-
-const themeBtn=document.getElementById("themeToggle");
-const savedTheme=localStorage.getItem("qb-theme")||"dark";
-document.documentElement.setAttribute("data-theme",savedTheme);
-themeBtn.textContent=savedTheme==="dark"?"🌙":"☀️";
-themeBtn.addEventListener("click",()=>{
-  const cur=document.documentElement.getAttribute("data-theme");
-  const nxt=cur==="dark"?"light":"dark";
-  document.documentElement.setAttribute("data-theme",nxt);
-  themeBtn.textContent=nxt==="dark"?"🌙":"☀️";
-  localStorage.setItem("qb-theme",nxt);
-});
-
-async function boot(){
-  try{
-    const res=await fetch(CSV_URL);
-    if(!res.ok) throw new Error(`Network response failed with status: ${res.status}`);
-    const csv=await res.text();
-    if(csv.trim().startsWith("<!DOCTYPE html>")) {
-      throw new Error("Received an HTML login/error page instead of CSV. Check Google Sheet sharing permissions.");
-    }
-    const rows=parseCSV(csv);
-    ALL=toObjects(rows);
-    if(!ALL.length) throw new Error("Parsed 0 valid questions. Check if column headers match script requirements.");
-    populateControls();
-    applyFilters();
-  }catch(err){
-    document.getElementById("content").innerHTML=`
-      <div class="empty-state">
-        <div>⚠️</div>
-        <h3>Initialization Failed</h3>
-        <p style="margin-top:8px;max-width:540px;margin-inline:auto;color:var(--muted)">
-          ${escapeHtml(err.message)}<br><br>
-          <strong>Troubleshooting Tips:</strong><br>
-          1. Ensure you are running this file via a local server (like VS Code Live Server) and not directly via <code>file:///</code>.<br>
-          2. Verify your Google Sheet is published to the web as a CSV.
-        </p>
-      </div>`;
-  }
-}
-boot();
-</script>
 </body>
 </html>
