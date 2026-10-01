@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Question Bank — Interactive Study Portal</title>
+<title>Question Bank — Professional Study Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
   :root{
@@ -22,7 +22,6 @@
     background:var(--bg); color:var(--text); line-height:1.6;
     transition:background .3s,color .3s;
   }
-  /* ===== Header ===== */
   header{
     position:sticky; top:0; z-index:100;
     background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(30,41,59,.95));
@@ -41,11 +40,9 @@
   .header-stats b{color:var(--text);font-size:1rem;display:block}
   .theme-btn{
     background:var(--surface2);border:1px solid var(--border);color:var(--text);
-    width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:1.1rem;
-    transition:.2s;
+    width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:1.1rem;transition:.2s;
   }
   .theme-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-  /* ===== Controls ===== */
   .controls{
     max-width:1400px;margin:24px auto 0;padding:0 24px;
     display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;
@@ -53,8 +50,7 @@
   .controls input,.controls select{
     width:100%;padding:12px 16px;border-radius:10px;
     background:var(--surface);border:1px solid var(--border);
-    color:var(--text);font-size:.92rem;font-family:inherit;
-    transition:.2s;
+    color:var(--text);font-size:.92rem;font-family:inherit;transition:.2s;
   }
   .controls input:focus,.controls select:focus{
     outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.15)
@@ -65,7 +61,6 @@
     opacity:.5;font-size:.9rem;pointer-events:none
   }
   .search-wrap input{padding-left:44px}
-  /* ===== Filter Pills ===== */
   .pills{
     max-width:1400px;margin:16px auto 0;padding:0 24px;
     display:flex;gap:8px;flex-wrap:wrap;
@@ -76,10 +71,8 @@
     font-size:.78rem;font-weight:600;cursor:pointer;transition:.2s;
   }
   .pill:hover,.pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-  /* ===== Main ===== */
   main{max-width:1400px;margin:24px auto;padding:0 24px 80px}
   .results-info{color:var(--muted);font-size:.85rem;margin-bottom:16px}
-  /* ===== Question Card ===== */
   .card{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
     margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);
@@ -95,9 +88,7 @@
     color:#fff;display:grid;place-items:center;font-weight:800;font-size:.9rem;
   }
   .q-body{flex:1;min-width:0}
-  .q-meta{
-    display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:.72rem;
-  }
+  .q-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:.72rem}
   .tag{
     padding:3px 9px;border-radius:6px;background:var(--surface2);
     color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;
@@ -112,7 +103,6 @@
   .badge.correct{background:rgba(16,185,129,.15);color:var(--correct);border:1px solid rgba(16,185,129,.3)}
   .badge.incorrect{background:rgba(239,68,68,.15);color:var(--incorrect);border:1px solid rgba(239,68,68,.3)}
   .badge.pending{background:rgba(245,158,11,.15);color:var(--pending);border:1px solid rgba(245,158,11,.3)}
-  /* ===== Expanded Body ===== */
   .card-body{
     max-height:0;overflow:hidden;transition:max-height .4s ease;
     border-top:1px solid transparent;
@@ -144,20 +134,12 @@
     font-size:.9rem;line-height:1.7;border:1px solid var(--border);
   }
   .md-content h1,.md-content h2,.md-content h3{margin:12px 0 8px;font-size:1.05rem;font-weight:700}
-  .md-content h1:first-child,.md-content h2:first-child,.md-content h3:first-child{margin-top:0}
   .md-content p{margin-bottom:10px}
   .md-content ul,.md-content ol{margin:8px 0 12px 22px}
   .md-content li{margin-bottom:5px}
   .md-content strong{color:var(--accent);font-weight:700}
-  .md-content code{
-    background:var(--bg);padding:2px 6px;border-radius:4px;font-size:.85em;
-  }
-  .md-content blockquote{
-    border-left:3px solid var(--accent);padding-left:12px;color:var(--muted);margin:10px 0;
-  }
   .empty-state{text-align:center;padding:80px 20px;color:var(--muted)}
   .empty-state div{font-size:3rem;margin-bottom:12px;opacity:.4}
-  /* ===== Loading ===== */
   .loading{text-align:center;padding:60px;color:var(--muted)}
   .spinner{
     width:36px;height:36px;border:3px solid var(--border);
@@ -165,10 +147,7 @@
     animation:spin .8s linear infinite;margin:0 auto 16px;
   }
   @keyframes spin{to{transform:rotate(360deg)}}
-  /* ===== Responsive ===== */
-  @media(max-width:900px){
-    .controls{grid-template-columns:1fr 1fr}
-  }
+  @media(max-width:900px){.controls{grid-template-columns:1fr 1fr}}
   @media(max-width:600px){
     .controls{grid-template-columns:1fr}
     .card-head{flex-wrap:wrap}
@@ -214,19 +193,16 @@
 <main>
   <div class="results-info" id="resultsInfo"></div>
   <div id="content">
-    <div class="loading"><div class="spinner"></div>Loading question bank...</div>
+    <div class="loading"><div class="spinner"></div>Loading question bank from Google Sheets...</div>
   </div>
 </main>
 
 <script>
 /* ============================================================
-   CONFIG — REPLACE THIS WITH YOUR WORKING CSV URL
-   Or paste CSV text directly: const INLINE_CSV = `...`;
+   CONFIG — GOOGLE SHEET CSV ENDPOINT
    ============================================================ */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfcgGgESJ_GlCR7EnCJAl34LBhJbCFAv3S7qcxujKNb44bukCymdC5vqc4WVEmJULVPF7U3fqQOigL/gviz/tq?tqx=out:csv";
-const INLINE_CSV = ""; // optional fallback
 
-/* ---------- Robust CSV parser (handles quotes, commas, newlines) ---------- */
 function parseCSV(text){
   const rows=[]; let row=[], field="", inQuotes=false;
   for(let i=0;i<text.length;i++){
@@ -247,7 +223,6 @@ function parseCSV(text){
   return rows;
 }
 
-/* ---------- Normalize rows to objects ---------- */
 function toObjects(rows){
   if(!rows.length) return [];
   const header=rows[0].map(h=>h.trim());
@@ -261,23 +236,20 @@ function toObjects(rows){
     .filter(o=>o["Question"] && o["Sr No"]);
 }
 
-/* ---------- Safe markdown render ---------- */
 function md(text){
   if(!text) return "";
   try{ return marked.parse(text); }
-  catch(e){ return text.replace(/</g,"&lt;"); }
+  catch(e){ return escapeHtml(text); }
 }
 
-/* ---------- State ---------- */
 let ALL=[], VIEW=[];
 let filters={search:"",subject:"",module:"",result:"",topic:""};
 
-/* ---------- Render ---------- */
 function render(){
   const container=document.getElementById("content");
   const info=document.getElementById("resultsInfo");
   if(!VIEW.length){
-    container.innerHTML=`<div class="empty-state"><div>🔍</div><h3>No questions match your filters</h3><p>Try clearing the search or filters.</p></div>`;
+    container.innerHTML=`<div class="empty-state"><div>🔍</div><h3>No questions match your filters</h3><p>Try clearing your search terms or filter configurations.</p></div>`;
     info.textContent="0 questions";
     document.getElementById("stat-shown").textContent="0";
     return;
@@ -296,17 +268,17 @@ function render(){
     return `
     <div class="card" data-idx="${i}">
       <div class="card-head">
-        <div class="q-num">${q["Sr No"]||i+1}</div>
+        <div class="q-num">${escapeHtml(q["Sr No"]||i+1)}</div>
         <div class="q-body">
           <div class="q-meta">
-            <span class="tag subject">${q["Subject"]||""}</span>
-            <span class="tag">${q["Module"]||""}</span>
-            <span class="tag">${q["Title"]||""}</span>
+            <span class="tag subject">${escapeHtml(q["Subject"]||"General")}</span>
+            <span class="tag">${escapeHtml(q["Module"]||"Core")}</span>
+            <span class="tag">${escapeHtml(q["Title"]||"")}</span>
           </div>
           <div class="q-text">${escapeHtml(q["Question"]||"")}</div>
         </div>
         <div class="q-badges">
-          <span class="badge ${resClass}">${res}</span>
+          <span class="badge ${resClass}">${escapeHtml(res)}</span>
         </div>
       </div>
       <div class="card-body">
@@ -340,7 +312,6 @@ function render(){
     </div>`;
   }).join("");
 
-  // Expand/collapse
   container.querySelectorAll(".card-head").forEach(h=>{
     h.addEventListener("click",()=>h.parentElement.classList.toggle("open"));
   });
@@ -350,7 +321,6 @@ function escapeHtml(s){
   return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
-/* ---------- Filtering ---------- */
 function applyFilters(){
   const s=filters.search.toLowerCase();
   VIEW=ALL.filter(q=>{
@@ -369,7 +339,6 @@ function applyFilters(){
   render();
 }
 
-/* ---------- Populate dropdowns ---------- */
 function populateControls(){
   const subjects=[...new Set(ALL.map(q=>q["Subject"]).filter(Boolean))].sort();
   const modules=[...new Set(ALL.map(q=>q["Module"]).filter(Boolean))].sort();
@@ -396,13 +365,11 @@ function populateControls(){
   document.getElementById("stat-subjects").textContent=subjects.length;
 }
 
-/* ---------- Wire events ---------- */
 document.getElementById("search").addEventListener("input",e=>{filters.search=e.target.value;applyFilters();});
 document.getElementById("filterSubject").addEventListener("change",e=>{filters.subject=e.target.value;applyFilters();});
 document.getElementById("filterModule").addEventListener("change",e=>{filters.module=e.target.value;applyFilters();});
 document.getElementById("filterResult").addEventListener("change",e=>{filters.result=e.target.value;applyFilters();});
 
-/* ---------- Theme ---------- */
 const themeBtn=document.getElementById("themeToggle");
 const savedTheme=localStorage.getItem("qb-theme")||"dark";
 document.documentElement.setAttribute("data-theme",savedTheme);
@@ -415,29 +382,29 @@ themeBtn.addEventListener("click",()=>{
   localStorage.setItem("qb-theme",nxt);
 });
 
-/* ---------- Boot ---------- */
 async function boot(){
   try{
-    let csv=INLINE_CSV;
-    if(!csv){
-      const res=await fetch(CSV_URL);
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      csv=await res.text();
+    const res=await fetch(CSV_URL);
+    if(!res.ok) throw new Error(`Network response failed with status: ${res.status}`);
+    const csv=await res.text();
+    if(csv.trim().startsWith("<!DOCTYPE html>")) {
+      throw new Error("Received an HTML login/error page instead of CSV. Check Google Sheet sharing permissions.");
     }
     const rows=parseCSV(csv);
     ALL=toObjects(rows);
-    if(!ALL.length) throw new Error("No rows parsed");
+    if(!ALL.length) throw new Error("Parsed 0 valid questions. Check if column headers match script requirements.");
     populateControls();
     applyFilters();
   }catch(err){
     document.getElementById("content").innerHTML=`
       <div class="empty-state">
         <div>⚠️</div>
-        <h3>Could not load data</h3>
-        <p style="margin-top:8px;max-width:520px;margin-inline:auto">
+        <h3>Initialization Failed</h3>
+        <p style="margin-top:8px;max-width:540px;margin-inline:auto;color:var(--muted)">
           ${escapeHtml(err.message)}<br><br>
-          Make sure the sheet is published to the web, or paste your CSV into the
-          <code>INLINE_CSV</code> variable at the top of the script.
+          <strong>Troubleshooting Tips:</strong><br>
+          1. Ensure you are running this file via a local server (like VS Code Live Server) and not directly via <code>file:///</code>.<br>
+          2. Verify your Google Sheet is published to the web as a CSV.
         </p>
       </div>`;
   }
