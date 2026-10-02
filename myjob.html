@@ -157,6 +157,34 @@ body{
 .brand-txt span{font-size:.68rem;font-weight:500;color:var(--text-3);letter-spacing:.01em}
 .topbar-spacer{flex:1}
 
+/* clock chip */
+.clock{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 11px;border-radius:8px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-2);
+  font-size:.72rem;font-weight:600;
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.02em;
+  white-space:nowrap;
+  transition:all .2s ease;
+}
+.clock:hover{border-color:var(--border-2);color:var(--text)}
+.clock-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--ok);
+  box-shadow:0 0 6px var(--ok);
+  animation:pulse 2s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes pulse{50%{opacity:.4}}
+.clock .tz{
+  color:var(--text-3);
+  font-size:.62rem;
+  font-weight:500;
+  margin-left:1px;
+}
+
 .version{
   display:inline-flex;align-items:center;gap:6px;
   padding:5px 10px;border-radius:8px;
@@ -194,32 +222,24 @@ body{
 [data-theme="light"] .theme-btn .icon-sun{opacity:0;transform:rotate(90deg) scale(.6)}
 [data-theme="light"] .theme-btn .icon-moon{opacity:1;transform:rotate(0) scale(1)}
 
-/* PAGE TOP */
 .page-top{padding:32px 0 8px}
 
 /* STATS */
 .stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
   margin-bottom:28px;
 }
 .stat{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:14px 16px;
-  transition:all .2s ease;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;transition:all .2s ease;
 }
 .stat:hover{border-color:var(--border-2)}
 .stat-l{
   font-size:.66rem;font-weight:600;color:var(--text-3);
-  text-transform:uppercase;letter-spacing:.08em;
-  margin-bottom:5px;
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;
 }
 .stat-v{
-  font-size:1.45rem;font-weight:700;
-  letter-spacing:-.03em;
+  font-size:1.45rem;font-weight:700;letter-spacing:-.03em;
   font-variant-numeric:tabular-nums;
   font-family:'JetBrains Mono',monospace;
 }
@@ -230,38 +250,25 @@ body{
 
 /* SECTION HEADER */
 .section-h{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin:28px 0 12px;
-  padding:0 2px;
+  display:flex;align-items:center;gap:10px;
+  margin:28px 0 12px;padding:0 2px;
 }
 .section-h h2{
-  font-size:.72rem;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.1em;
+  font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
   color:var(--text-3);
-  display:flex;
-  align-items:center;
-  gap:9px;
+  display:flex;align-items:center;gap:9px;
 }
 .section-h h2 svg{width:13px;height:13px}
-.section-h::after{
-  content:"";flex:1;height:1px;background:var(--border);
-}
+.section-h::after{content:"";flex:1;height:1px;background:var(--border)}
 .section-h .count{
   font-family:'JetBrains Mono',monospace;
-  font-size:.7rem;
-  font-weight:600;
-  padding:2px 7px;
-  border-radius:5px;
-  background:var(--surface);
-  border:1px solid var(--border);
+  font-size:.7rem;font-weight:600;
+  padding:2px 7px;border-radius:5px;
+  background:var(--surface);border:1px solid var(--border);
   color:var(--text-3);
 }
 
-/* LIST */
 .list{display:flex;flex-direction:column;gap:8px}
 
 /* JOB CARD */
@@ -284,12 +291,9 @@ body{
   background:var(--surface-2);
   box-shadow:var(--shadow-sm);
 }
-/* urgency stripe */
 .job::before{
   content:"";
-  position:absolute;
-  left:0;top:0;bottom:0;
-  width:3px;
+  position:absolute;left:0;top:0;bottom:0;width:3px;
   background:var(--stripe,var(--muted-br));
   transition:background .2s ease;
 }
@@ -298,38 +302,23 @@ body{
 .job.urgent-far::before{background:var(--ok)}
 .job.urgent-past::before{background:var(--border-2)}
 
-/* date block on the left */
 .job-date{
-  flex-shrink:0;
-  width:74px;
-  text-align:center;
-  padding:10px 6px;
-  border-radius:10px;
-  background:var(--bg-elev);
-  border:1px solid var(--border);
+  flex-shrink:0;width:74px;text-align:center;
+  padding:10px 6px;border-radius:10px;
+  background:var(--bg-elev);border:1px solid var(--border);
   transition:all .2s ease;
 }
 .job-date .d-day{
-  font-size:1.45rem;
-  font-weight:800;
-  letter-spacing:-.04em;
-  line-height:1;
-  font-variant-numeric:tabular-nums;
-  margin-bottom:3px;
+  font-size:1.45rem;font-weight:800;letter-spacing:-.04em;
+  line-height:1;font-variant-numeric:tabular-nums;margin-bottom:3px;
 }
 .job-date .d-mon{
-  font-size:.68rem;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  color:var(--text-2);
+  font-size:.68rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--text-2);
 }
 .job-date .d-year{
-  font-size:.6rem;
-  font-weight:500;
-  color:var(--text-3);
-  margin-top:1px;
-  font-family:'JetBrains Mono',monospace;
+  font-size:.6rem;font-weight:500;color:var(--text-3);
+  margin-top:1px;font-family:'JetBrains Mono',monospace;
 }
 .job.urgent-near .job-date{border-color:var(--err-br);background:var(--err-bg)}
 .job.urgent-near .job-date .d-day{color:var(--err)}
@@ -338,60 +327,45 @@ body{
 .job.urgent-far .job-date .d-day{color:var(--ok)}
 .job.urgent-past .job-date{opacity:.65}
 
-/* body */
 .job-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
 .job-title{
-  font-size:1rem;
-  font-weight:600;
-  letter-spacing:-.015em;
-  line-height:1.35;
+  font-size:1rem;font-weight:600;
+  letter-spacing:-.015em;line-height:1.35;
   color:var(--text);
 }
 .job-meta{
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
-  font-size:.78rem;
-  color:var(--text-3);
+  display:flex;gap:14px;flex-wrap:wrap;
+  font-size:.78rem;color:var(--text-3);
 }
 .job-meta .m{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
+  display:inline-flex;align-items:center;gap:6px;
+  min-width:0;
 }
-.job-meta .m svg{width:12px;height:12px;opacity:.75}
+.job-meta .m svg{width:12px;height:12px;opacity:.75;flex-shrink:0}
 .job-meta .m b{
-  color:var(--text-2);
-  font-weight:600;
+  color:var(--text-2);font-weight:600;
   font-variant-numeric:tabular-nums;
+  overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;max-width:100%;
 }
-.job-meta .m.empty b{color:var(--text-3);font-style:italic;font-weight:500}
+.job-meta .m.empty b{
+  color:var(--text-3);font-style:italic;font-weight:500;
+}
 
-/* badges */
 .job-badges{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  align-items:flex-end;
-  flex-shrink:0;
+  display:flex;flex-direction:column;gap:6px;
+  align-items:flex-end;flex-shrink:0;
 }
 .badge{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:.63rem;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.06em;
+  padding:4px 10px;border-radius:999px;
+  font-size:.63rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;
   border:1px solid;
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  white-space:nowrap;
-  line-height:1.5;
+  display:inline-flex;align-items:center;gap:5px;
+  white-space:nowrap;line-height:1.5;
 }
 .badge::before{
-  content:"";
-  width:5px;height:5px;border-radius:50%;
+  content:"";width:5px;height:5px;border-radius:50%;
   background:currentColor;flex-shrink:0;
 }
 .badge.ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-br)}
@@ -401,10 +375,8 @@ body{
 .badge.muted{color:var(--text-3);background:var(--muted-bg);border-color:var(--muted-br)}
 
 .badge-sub{
-  font-size:.62rem;
-  font-weight:500;
-  color:var(--text-3);
-  font-variant-numeric:tabular-nums;
+  font-size:.62rem;font-weight:500;
+  color:var(--text-3);font-variant-numeric:tabular-nums;
 }
 
 /* STATES */
@@ -424,7 +396,6 @@ body{
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* FOOTER */
 footer{
   margin-top:44px;padding:22px 0;
   border-top:1px solid var(--border);
@@ -436,48 +407,37 @@ footer{
   .shell{padding:0 14px}
   .topbar-in{padding:11px 14px;gap:8px}
   .brand-txt span{display:none}
+  .clock{padding:4px 9px;font-size:.68rem}
+  .clock .tz{display:none}
   .version{padding:4px 8px;font-size:.68rem}
   .theme-btn{width:34px;height:34px}
   .page-top{padding:20px 0 6px}
 
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
-    margin-bottom:22px;
-  }
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:22px}
   .stat{padding:11px 13px}
   .stat-v{font-size:1.25rem}
 
   .section-h{margin:22px 0 10px}
 
-  .job{
-    padding:14px 15px 14px 17px;
-    gap:13px;
-    flex-wrap:wrap;
-  }
-  .job-date{
-    width:64px;
-    padding:8px 5px;
-  }
+  .job{padding:14px 15px 14px 17px;gap:13px;flex-wrap:wrap}
+  .job-date{width:64px;padding:8px 5px}
   .job-date .d-day{font-size:1.25rem}
   .job-date .d-mon{font-size:.62rem}
   .job-date .d-year{font-size:.55rem}
 
   .job-badges{
-    flex-direction:row;
-    align-items:center;
-    width:100%;
-    justify-content:flex-start;
-    order:3;
-    margin-top:2px;
+    flex-direction:row;align-items:center;
+    width:100%;justify-content:flex-start;
+    order:3;margin-top:2px;
   }
   .job-title{font-size:.95rem}
   .job-meta{font-size:.74rem;gap:12px}
+  .job-meta .m b{max-width:160px}
 }
-
 @media (max-width:400px){
   .job-meta{gap:9px}
   .job-meta .m svg{width:11px;height:11px}
+  .version .v-num{display:none}
 }
 
 ::selection{background:var(--brand-soft);color:var(--text)}
@@ -506,10 +466,19 @@ footer{
       </div>
     </div>
     <div class="topbar-spacer"></div>
+
+    <!-- Live PKT clock -->
+    <div class="clock" title="Pakistan Standard Time (UTC+5)">
+      <span class="clock-dot"></span>
+      <span id="pktClock">--:--:--</span>
+      <span class="tz">PKT</span>
+    </div>
+
     <div class="version" title="App version">
       <span class="version-dot"></span>
-      <span>v1.0.0</span>
+      <span class="v-num">v1.0.0</span>
     </div>
+
     <button class="theme-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="4"/>
@@ -554,20 +523,37 @@ footer{
     </div>
   </div>
 
-  <footer>Data · Google Sheets · Built with vanilla JS</footer>
+  <footer>Data · Google Sheets · Times shown in Pakistan Standard Time (UTC+5)</footer>
 </div>
 
 <script>
 /* ============================================================
-   CONFIG — swap CSV_URL or paste INLINE_CSV
+   LIVE DATA — no hardcoding. Reads the published CSV.
    ============================================================ */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUBCdhjwLbdOb968RwtVQYOy_0xLl1x9OQDoctPsD-wfO_c6ob5zUElpUpUxPeyhrwKOt321WiXTSa/pub?output=csv";
-const INLINE_CSV = `Sr No,Applied Job,Test Date,Applied On
-1,CSS,10/10/2026,23/8/2026
-2,FIA Superintendent,26/8/2026,12/10/2026
-3,SPSC,22/9/2026,
-4,EC Senior and Junior Assistant,,
-`;
+
+/* ---------- Pakistan Standard Time (UTC+5, no DST) ---------- */
+const PKT_OFFSET_MIN = 5 * 60; // +05:00
+
+function nowInPKT(){
+  // Build a Date shifted so that its local getters return PKT values
+  const now = new Date();
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  return new Date(utcMs + PKT_OFFSET_MIN * 60000);
+}
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+
+function tickClock(){
+  const pkt = nowInPKT();
+  const h = pad2(pkt.getHours());
+  const m = pad2(pkt.getMinutes());
+  const s = pad2(pkt.getSeconds());
+  const el = document.getElementById("pktClock");
+  if(el) el.textContent = `${h}:${m}:${s}`;
+}
+tickClock();
+setInterval(tickClock, 1000);
 
 /* ---------- theme ---------- */
 const themeBtn=document.getElementById("themeBtn");
@@ -607,21 +593,54 @@ function parseCSV(t){
 }
 const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-/* ---------- date parsing (DD/MM/YYYY) ---------- */
+/* ---------- header normalization ----------
+   Handles variations: "Sr No", "srno", "SrNo", "aplied job",
+   "applied job", "test date", "aplied on", "applied on", "venue".
+   Also handles cases where two columns got merged in the paste:
+   "test dateaplied on" — we detect that and split it.
+------------------------------------------------------------ */
+function normalizeHeader(h){
+  let s = String(h||"").trim().toLowerCase();
+  s = s.replace(/\s+/g," ");
+  // fix common typos
+  s = s.replace(/aplied/g,"applied");
+  s = s.replace(/sr no/g,"sr no");
+  // collapsed header: "test dateaplied on" → flag it
+  if(/test ?date.*applied ?on/.test(s)) return "TEST_DATE_APPLIED_ON_COLLAPSED";
+  if(s==="sr no"||s==="srno"||s==="sr_no"||s==="sno"||s==="no") return "sr_no";
+  if(s==="applied job"||s==="job"||s==="applied jobs") return "applied_job";
+  if(s==="test date"||s==="testdate"||s==="test_date") return "test_date";
+  if(s==="applied on"||s==="appliedon"||s==="applied_on"||s==="apply date") return "applied_on";
+  if(s==="venue"||s==="test venue"||s==="center"||s==="centre") return "venue";
+  return s;
+}
+
+/* ---------- date parsing (DD/MM/YYYY primary, fallbacks) ---------- */
 function parseDate(str){
   if(!str) return null;
   const s=String(str).trim();
   if(!s) return null;
   // DD/MM/YYYY or D/M/YYYY
-  let m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  let m=s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
   if(m){
     let d=+m[1], mo=+m[2], y=+m[3];
     if(y<100) y+=2000;
+    // If the "day" is >12 and "month" <=12, it's DD/MM
+    // If the "month" >12 and "day" <=12, swap (so MM/DD input still works)
+    if(mo>12 && d<=12){ const t=d; d=mo; mo=t; }
     const dt=new Date(y,mo-1,d);
     if(isNaN(dt.getTime())) return null;
+    // sanity check
+    if(dt.getDate()!==d || dt.getMonth()!==mo-1) return null;
     return dt;
   }
-  // fallback: let JS try
+  // ISO YYYY-MM-DD
+  m=s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if(m){
+    const dt=new Date(+m[1],+m[2]-1,+m[3]);
+    return isNaN(dt.getTime())?null:dt;
+  }
+  // last resort
   const dt=new Date(s);
   return isNaN(dt.getTime())?null:dt;
 }
@@ -642,13 +661,16 @@ function daysBetween(a,b){
   return Math.round((b0-a0)/ms);
 }
 
-const TODAY=new Date();
-TODAY.setHours(0,0,0,0);
+/* Today in PKT (date only) */
+function todayPKT(){
+  const p=nowInPKT();
+  return new Date(p.getFullYear(),p.getMonth(),p.getDate());
+}
 
 /* ---------- urgency ---------- */
-function urgencyFor(testDate){
-  if(!testDate) return {kind:"past",cls:"urgent-past",badge:"muted",label:"No date",sub:""};
-  const diff=daysBetween(TODAY,testDate);
+function urgencyFor(testDate, today){
+  if(!testDate) return {kind:"none",cls:"urgent-past",badge:"muted",label:"No date",sub:""};
+  const diff=daysBetween(today,testDate);
   if(diff<0) return {kind:"past",cls:"urgent-past",badge:"muted",label:"Past",sub:`${Math.abs(diff)} day${Math.abs(diff)===1?"":"s"} ago`};
   if(diff===0) return {kind:"today",cls:"urgent-near",badge:"err",label:"Today",sub:"Test is today"};
   if(diff===1) return {kind:"tomorrow",cls:"urgent-near",badge:"err",label:"Tomorrow",sub:"1 day left"};
@@ -657,14 +679,17 @@ function urgencyFor(testDate){
   return {kind:"far",cls:"urgent-far",badge:"ok",label:"Upcoming",sub:`in ${diff} days`};
 }
 
-/* ---------- render ---------- */
+/* ---------- icons ---------- */
 const SVG_CAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
 const SVG_SEND='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+const SVG_PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
 const SVG_UP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
 const SVG_PAST='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
 
+/* ---------- render ---------- */
 function render(rows){
   const out=document.getElementById("out");
+  const today=todayPKT();
 
   if(!rows.length){
     out.innerHTML=`<div class="state">
@@ -681,13 +706,12 @@ function render(rows){
   }
 
   const withDates = rows.map(r=>{
-    const testDate=parseDate(r["Test Date"]);
-    const appliedOn=parseDate(r["Applied On"]);
-    const urg=urgencyFor(testDate);
+    const testDate=parseDate(r.test_date);
+    const appliedOn=parseDate(r.applied_on);
+    const urg=urgencyFor(testDate, today);
     return {...r, _testDate:testDate, _appliedOn:appliedOn, _urg:urg};
   });
 
-  // Split: upcoming (test date >= today) vs past
   const upcoming = withDates
     .filter(r=>r._testDate && r._urg.kind!=="past")
     .sort((a,b)=>a._testDate-b._testDate);
@@ -696,10 +720,8 @@ function render(rows){
     .sort((a,b)=>b._testDate-a._testDate);
   const noDate = withDates.filter(r=>!r._testDate);
 
-  // Stats
-  const total=rows.length;
-  const week=withDates.filter(r=>r._urg.kind==="today"||r._urg.kind==="tomorrow"||r._urg.kind==="week").length;
-  document.getElementById("sTotal").textContent=total;
+  const week=withDates.filter(r=>["today","tomorrow","week"].includes(r._urg.kind)).length;
+  document.getElementById("sTotal").textContent=withDates.length;
   document.getElementById("sUpcoming").textContent=upcoming.length;
   document.getElementById("sWeek").textContent=week;
   document.getElementById("sPast").textContent=past.length;
@@ -708,6 +730,7 @@ function render(rows){
     const u=r._urg;
     const fDate=r._testDate?fmtDate(r._testDate):{day:"—",mon:"TBD",year:""};
     const applied=r._appliedOn?fmtDate(r._appliedOn).full:null;
+    const venue=r.venue||null;
 
     return `<article class="job ${u.cls}" style="animation-delay:${Math.min(i*30,240)}ms">
       <div class="job-date">
@@ -716,7 +739,7 @@ function render(rows){
         ${fDate.year?`<div class="d-year">${fDate.year}</div>`:""}
       </div>
       <div class="job-body">
-        <div class="job-title">${esc(r["Applied Job"]||"Untitled")}</div>
+        <div class="job-title">${esc(r.applied_job||"Untitled")}</div>
         <div class="job-meta">
           <span class="m">
             ${SVG_CAL}
@@ -728,6 +751,11 @@ function render(rows){
             <span>Applied:</span>
             <b>${applied||"Not set"}</b>
           </span>
+          ${venue?`<span class="m">
+            ${SVG_PIN}
+            <span>Venue:</span>
+            <b>${esc(venue)}</b>
+          </span>`:""}
         </div>
       </div>
       <div class="job-badges">
@@ -740,53 +768,82 @@ function render(rows){
   let html="";
   if(upcoming.length){
     html+=`<div class="section-h"><h2>${SVG_UP} Upcoming Tests</h2><span class="count">${upcoming.length}</span></div>`;
-    html+=`<div class="list">${upcoming.map((r,i)=>cardHTML(r,i)).join("")}</div>`;
+    html+=`<div class="list">${upcoming.map(cardHTML).join("")}</div>`;
   }
   if(noDate.length){
     html+=`<div class="section-h"><h2>${SVG_CAL} Date Not Set</h2><span class="count">${noDate.length}</span></div>`;
-    html+=`<div class="list">${noDate.map((r,i)=>cardHTML(r,i)).join("")}</div>`;
+    html+=`<div class="list">${noDate.map(cardHTML).join("")}</div>`;
   }
   if(past.length){
     html+=`<div class="section-h"><h2>${SVG_PAST} Past Tests</h2><span class="count">${past.length}</span></div>`;
-    html+=`<div class="list">${past.map((r,i)=>cardHTML(r,i)).join("")}</div>`;
+    html+=`<div class="list">${past.map(cardHTML).join("")}</div>`;
   }
 
   out.innerHTML=html;
 }
 
-/* ---------- boot ---------- */
-(async function boot(){
-  let txt="";
-  // Prefer inline if set — avoids network entirely
-  if(INLINE_CSV.trim()){
-    txt=INLINE_CSV;
-  } else {
-    try{
-      const res=await fetch(CSV_URL);
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      txt=await res.text();
-    } catch(err){
-      // fall back to inline
-      if(INLINE_CSV.trim()){
-        txt=INLINE_CSV;
+/* ---------- map row to object using normalized headers ---------- */
+function rowToObject(rawHeaders, rawRow){
+  const obj={
+    sr_no:"", applied_job:"", test_date:"", applied_on:"", venue:""
+  };
+  let sawCollapsed=false;
+
+  rawHeaders.forEach((h,i)=>{
+    const key=normalizeHeader(h);
+    const val=(rawRow[i]||"").trim();
+
+    if(key==="TEST_DATE_APPLIED_ON_COLLAPSED"){
+      sawCollapsed=true;
+      // Best-effort: try to split by detecting two dates inside the string.
+      // Example: "10/10/202623/8/2026" → split after first DD/MM/YYYY.
+      const combined=val.replace(/\s+/g,"");
+      const m=combined.match(/^(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})$/);
+      if(m){
+        obj.test_date=m[1];
+        obj.applied_on=m[2];
       } else {
-        document.getElementById("out").innerHTML=`<div class="state">
-          <div class="state-ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/>
-            </svg>
-          </div>
-          <h3>Could not load data</h3>
-          <p>${esc(err.message)}<br><br>Serve this page over a local HTTP server, or paste your CSV into the INLINE_CSV variable.</p>
-        </div>`;
-        return;
+        // fallback: just store as test_date, leave applied_on blank
+        obj.test_date=val;
       }
+      return;
     }
+
+    if(key in obj) obj[key]=val;
+  });
+
+  // If header was collapsed but next header is "venue", we've done our best.
+  // If test_date contains a second date glitch, attempt cleanup:
+  if(!obj.applied_on && obj.test_date && !sawCollapsed){
+    // no-op
+  }
+  return obj;
+}
+
+/* ---------- boot ---------- */
+async function boot(){
+  const out=document.getElementById("out");
+  let txt="";
+  try{
+    const res=await fetch(CSV_URL,{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    txt=await res.text();
+  } catch(err){
+    out.innerHTML=`<div class="state">
+      <div class="state-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/>
+        </svg>
+      </div>
+      <h3>Could not load data</h3>
+      <p>${esc(err.message)}<br><br>Serve this page over a local HTTP server, or verify the sheet is published to the web as CSV.</p>
+    </div>`;
+    return;
   }
 
   const rows=parseCSV(txt);
   if(rows.length<2){
-    document.getElementById("out").innerHTML=`<div class="state">
+    out.innerHTML=`<div class="state">
       <div class="state-ico">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/>
@@ -798,13 +855,14 @@ function render(rows){
     return;
   }
 
-  const H=rows[0].map((h,i)=>h.trim()||("Col"+i));
+  const rawHeaders=rows[0];
   const objs=rows.slice(1)
-    .map(r=>{const o={};H.forEach((h,i)=>o[h]=(r[i]||"").trim());return o;})
-    .filter(o=>o["Applied Job"]||o["Test Date"]);
+    .map(r=>rowToObject(rawHeaders,r))
+    .filter(o=>o.applied_job || o.test_date);
 
   render(objs);
-})();
+}
+boot();
 </script>
 </body>
 </html>
