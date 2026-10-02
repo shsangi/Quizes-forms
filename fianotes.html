@@ -18,31 +18,20 @@
 <style>
 :root,
 [data-theme="dark"]{
-  --bg:#0a0b0f;
-  --bg-elev:#111319;
-  --surface:#16181f;
-  --surface-2:#1c1f28;
-  --border:#252832;
-  --border-2:#333847;
-  --text:#eceef3;
-  --text-2:#9498a5;
-  --text-3:#6a6f7e;
-  --brand:#6366f1;
-  --brand-2:#8b5cf6;
+  --bg:#0a0b0f;--bg-elev:#111319;--surface:#16181f;--surface-2:#1c1f28;
+  --border:#252832;--border-2:#333847;
+  --text:#eceef3;--text-2:#9498a5;--text-3:#6a6f7e;
+  --brand:#6366f1;--brand-2:#8b5cf6;
   --brand-soft:rgba(99,102,241,.14);
   --brand-border:rgba(99,102,241,.32);
-  --brand-text:#a5b1ff;
-  --brand-shadow:rgba(99,102,241,.55);
+  --brand-text:#a5b1ff;--brand-shadow:rgba(99,102,241,.55);
   --ok:#22c55e;--ok-bg:rgba(34,197,94,.11);--ok-br:rgba(34,197,94,.32);
   --err:#ef4444;--err-bg:rgba(239,68,68,.11);--err-br:rgba(239,68,68,.32);
   --warn:#f59e0b;--warn-bg:rgba(245,158,11,.11);--warn-br:rgba(245,158,11,.32);
   --info:#38bdf8;--info-bg:rgba(56,189,248,.11);--info-br:rgba(56,189,248,.32);
   --muted-bg:rgba(148,152,165,.09);--muted-br:rgba(148,152,165,.22);
   --shadow-sm:0 1px 2px rgba(0,0,0,.35);
-  --shadow-md:0 6px 20px -8px rgba(0,0,0,.5);
-  --amb-a:rgba(99,102,241,.14);
-  --amb-b:rgba(139,92,246,.11);
-  --scrim:rgba(5,6,10,.6);
+  --amb-a:rgba(99,102,241,.14);--amb-b:rgba(139,92,246,.11);
 }
 [data-theme="light"]{
   --bg:#f6f7fb;--bg-elev:#ffffff;--surface:#ffffff;--surface-2:#f2f3f8;
@@ -51,18 +40,14 @@
   --brand:#4f46e5;--brand-2:#7c3aed;
   --brand-soft:rgba(79,70,229,.09);
   --brand-border:rgba(79,70,229,.24);
-  --brand-text:#4f46e5;
-  --brand-shadow:rgba(79,70,229,.35);
+  --brand-text:#4f46e5;--brand-shadow:rgba(79,70,229,.35);
   --ok:#16a34a;--ok-bg:rgba(22,163,74,.09);--ok-br:rgba(22,163,74,.28);
   --err:#dc2626;--err-bg:rgba(220,38,38,.09);--err-br:rgba(220,38,38,.28);
   --warn:#d97706;--warn-bg:rgba(217,119,6,.09);--warn-br:rgba(217,119,6,.28);
   --info:#0284c7;--info-bg:rgba(2,132,199,.09);--info-br:rgba(2,132,199,.28);
   --muted-bg:rgba(90,95,110,.08);--muted-br:rgba(90,95,110,.2);
   --shadow-sm:0 1px 2px rgba(15,23,42,.06);
-  --shadow-md:0 6px 20px -8px rgba(15,23,42,.15);
-  --amb-a:rgba(79,70,229,.09);
-  --amb-b:rgba(124,58,237,.07);
-  --scrim:rgba(15,23,42,.35);
+  --amb-a:rgba(79,70,229,.09);--amb-b:rgba(124,58,237,.07);
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -92,7 +77,6 @@ body{
 
 .shell{max-width:1100px;margin:0 auto;padding:0 20px}
 
-/* TOPBAR */
 .topbar{
   position:sticky;top:0;z-index:40;
   backdrop-filter:blur(22px) saturate(1.4);
@@ -164,7 +148,6 @@ body{
 
 .sheet-btn{background:var(--brand-soft);border-color:var(--brand-border);color:var(--brand-text)}
 .sheet-btn:hover{background:var(--brand);border-color:var(--brand);color:#fff}
-
 .progress-btn{background:var(--ok-bg);border-color:var(--ok-br);color:var(--ok)}
 .progress-btn:hover{background:var(--ok);border-color:var(--ok);color:#fff}
 .load-btn{background:var(--warn-bg);border-color:var(--warn-br);color:var(--warn)}
@@ -182,56 +165,15 @@ body{
 
 .page-top{padding:22px 0 6px}
 
-/* PROGRESS BAR */
-.progress-wrap{
-  display:flex;align-items:center;gap:14px;
-  padding:12px 16px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;
-  margin-bottom:14px;
-  transition:all .2s ease;
-}
-.progress-wrap:hover{border-color:var(--border-2)}
-.progress-labels{display:flex;flex-direction:column;gap:2px;min-width:110px}
-.progress-labels .p-title{
-  font-size:.66rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;
-  color:var(--text-3);
-}
-.progress-labels .p-count{
-  font-family:'JetBrains Mono',monospace;
-  font-size:.85rem;font-weight:600;
-  color:var(--text);font-variant-numeric:tabular-nums;
-}
-.progress-labels .p-count b{color:var(--ok)}
-.progress-bar{
-  flex:1;height:8px;border-radius:99px;
-  background:var(--bg-elev);overflow:hidden;
-}
-.progress-fill{
-  height:100%;
-  background:linear-gradient(90deg,var(--brand),var(--brand-2));
-  border-radius:99px;
-  transition:width .4s cubic-bezier(.32,.72,0,1);
-  box-shadow:0 0 10px -2px var(--brand-shadow);
-}
-.progress-pct{
-  font-family:'JetBrains Mono',monospace;
-  font-size:.78rem;font-weight:700;
-  color:var(--brand-text);
-  min-width:42px;text-align:right;
-  font-variant-numeric:tabular-nums;
-}
-
 /* ============================================================
-   FILTER PANEL — redesigned
+   FILTER PANEL
    ============================================================ */
 .filters{
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:14px;
   padding:14px;
-  margin-bottom:16px;
+  margin-bottom:12px;
   display:flex;flex-direction:column;gap:12px;
   transition:all .2s ease;
 }
@@ -274,10 +216,8 @@ input:focus,.select:focus{
 
 .field-arrow{position:relative}
 .field-arrow::after{
-  content:"";
-  position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  width:10px;height:10px;
-  background-color:var(--text-3);
+  content:"";position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:10px;height:10px;background-color:var(--text-3);
   -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   -webkit-mask-size:contain;mask-size:contain;
@@ -286,7 +226,6 @@ input:focus,.select:focus{
   pointer-events:none;
 }
 
-/* filter groups */
 .filter-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
 .filter-label{
   font-size:.62rem;font-weight:700;
@@ -303,7 +242,7 @@ input:focus,.select:focus{
   color:var(--text-2);
   font-size:.72rem;font-weight:600;
   cursor:pointer;transition:all .15s ease;
-  letter-spacing:-.003em;white-space:nowrap;font-family:inherit;
+  white-space:nowrap;font-family:inherit;
   display:inline-flex;align-items:center;gap:6px;
 }
 .chip:hover{border-color:var(--border-2);color:var(--text);background:var(--surface-2)}
@@ -318,15 +257,12 @@ input:focus,.select:focus{
 .chip.note.on{background:var(--info);border-color:var(--info);color:#fff}
 .chip .n{
   font-family:'JetBrains Mono',monospace;
-  font-size:.66rem;
-  padding:1px 6px;
-  border-radius:99px;
+  font-size:.66rem;padding:1px 6px;border-radius:99px;
   background:rgba(255,255,255,.12);
   font-variant-numeric:tabular-nums;
 }
 .chip:not(.on) .n{background:var(--muted-bg);color:var(--text-3)}
 
-/* active filters summary */
 .active-filters{
   display:flex;align-items:center;gap:8px;flex-wrap:wrap;
   padding-top:10px;
@@ -372,12 +308,50 @@ input:focus,.select:focus{
 .af-reset:hover{background:var(--err);border-color:var(--err);color:#fff}
 .af-reset svg{width:11px;height:11px}
 
+/* ============================================================
+   INFOBAR — small, with inline progress on the right
+   ============================================================ */
 .infobar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 2px 12px;
-  color:var(--text-3);font-size:.78rem;font-weight:500;
+  gap:10px;
+  padding:0 4px 10px;
+  color:var(--text-3);
+  font-size:.72rem;
+  font-weight:500;
+  letter-spacing:-.002em;
 }
-.infobar b{color:var(--text-2);font-weight:600;font-variant-numeric:tabular-nums}
+.infobar .ib-left,
+.infobar .ib-right{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'JetBrains Mono',monospace;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.infobar b{color:var(--text-2);font-weight:600}
+.infobar .ib-right{
+  color:var(--text-3);
+}
+.infobar .ib-right b.read{color:var(--ok);font-weight:700}
+.infobar .ib-right b.total{color:var(--text-2);font-weight:600}
+.infobar .ib-right .pct{
+  padding:1px 6px;
+  border-radius:99px;
+  background:var(--brand-soft);
+  border:1px solid var(--brand-border);
+  color:var(--brand-text);
+  font-weight:700;
+  font-size:.66rem;
+  letter-spacing:.01em;
+}
+.infobar .ib-right .pct.zero{
+  background:var(--muted-bg);
+  border-color:var(--muted-br);
+  color:var(--text-3);
+}
+.infobar .sep{
+  color:var(--text-3);
+  opacity:.5;
+}
 
 .list{display:flex;flex-direction:column;gap:8px}
 
@@ -403,18 +377,14 @@ input:focus,.select:focus{
 .card:active{transform:scale(.998)}
 .card:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
-.card.is-read{
-  background:var(--ok-bg);
-  border-color:var(--ok-br);
-}
+.card.is-read{background:var(--ok-bg);border-color:var(--ok-br)}
 .card.is-read:hover{
   background:color-mix(in srgb,var(--ok-bg) 80%,var(--surface-2));
   border-color:var(--ok);
 }
 
 .card::before{
-  content:"";
-  position:absolute;left:0;top:0;bottom:0;width:3px;
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
   background:var(--muted-br);
   transition:background .2s ease;
 }
@@ -450,8 +420,7 @@ input:focus,.select:focus{
   flex-shrink:0;
   padding:3px 9px;border-radius:999px;
   font-size:.6rem;font-weight:700;
-  letter-spacing:.05em;
-  border:1px solid;
+  letter-spacing:.05em;border:1px solid;
   display:inline-flex;align-items:center;gap:4px;
   white-space:nowrap;line-height:1.5;
   text-transform:uppercase;
@@ -465,21 +434,27 @@ input:focus,.select:focus{
 .badge.note{color:var(--info);background:var(--info-bg);border-color:var(--info-br)}
 .badge.other{color:var(--text-3);background:var(--muted-bg);border-color:var(--muted-br)}
 
+/* ============================================================
+   MEMORY — 20 lines on mobile, 20 lines on desktop (per request)
+   Actually: 20 lines everywhere as the max; expands fully when card opened
+   ============================================================ */
 .card-memory{
   display:-webkit-box;
-  -webkit-line-clamp:5;
+  -webkit-line-clamp:20;
   -webkit-box-orient:vertical;
   overflow:hidden;
   font-size:.92rem;font-weight:500;line-height:1.5;
   color:var(--text);
   letter-spacing:-.008em;
-  padding:8px 10px;
-  margin:-3px -4px;
+  padding:8px 10px;margin:-3px -4px;
   border-radius:8px;
   transition:background .15s ease,color .15s ease;
   position:relative;cursor:pointer;text-decoration:none;
 }
-@media (min-width:641px){.card-memory{-webkit-line-clamp:2}}
+.card.open .card-memory{
+  -webkit-line-clamp:unset;
+  display:block;
+}
 .card-memory:hover{background:var(--brand-soft)}
 .card-memory:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .card-memory::after{
@@ -498,8 +473,7 @@ input:focus,.select:focus{
 
 .card-row-bot{
   display:flex;align-items:center;justify-content:space-between;
-  gap:10px;
-  padding-top:4px;margin-top:1px;
+  gap:10px;padding-top:4px;margin-top:1px;
   border-top:1px dashed var(--border);
   min-height:20px;
 }
@@ -514,8 +488,7 @@ input:focus,.select:focus{
 .read-count{
   display:inline-flex;align-items:center;gap:5px;
   padding:2px 8px;border-radius:99px;
-  background:var(--muted-bg);
-  color:var(--text-3);
+  background:var(--muted-bg);color:var(--text-3);
   font-family:'JetBrains Mono',monospace;
   font-size:.62rem;font-weight:700;
   letter-spacing:.02em;
@@ -532,16 +505,12 @@ input:focus,.select:focus{
   cursor:pointer;padding:2px 6px;border-radius:5px;
 }
 .card-foot-right:hover{background:var(--surface-2);color:var(--text)}
-.card-foot-right svg{
-  width:12px;height:12px;
-  transition:transform .22s ease;
-}
+.card-foot-right svg{width:12px;height:12px;transition:transform .22s ease}
 .card.open .card-foot-right svg{transform:rotate(90deg)}
 .card.open .card-foot-right{color:var(--brand)}
 
 .card-detail{
-  display:none;
-  padding-top:10px;margin-top:2px;
+  display:none;padding-top:10px;margin-top:2px;
   border-top:1px solid var(--border);
   animation:fade .25s ease both;
 }
@@ -593,12 +562,6 @@ footer{
   .icon-btn svg{width:15px;height:15px}
   .version{padding:4px 8px;font-size:.68rem}
   .page-top{padding:14px 0 4px}
-  .progress-wrap{padding:10px 13px;gap:10px;margin-bottom:12px}
-  .progress-labels{min-width:86px}
-  .progress-labels .p-title{font-size:.6rem}
-  .progress-labels .p-count{font-size:.76rem}
-  .progress-pct{font-size:.72rem;min-width:38px}
-  .progress-bar{height:6px}
   .filters{padding:12px;gap:10px}
   .chip{font-size:.68rem;padding:4px 9px}
   .chip .n{font-size:.6rem;padding:0 5px}
@@ -610,6 +573,8 @@ footer{
   .field-icon{left:11px}
   .field-icon svg{width:14px;height:14px}
   .field-arrow::after{right:12px;width:9px;height:9px}
+  .infobar{font-size:.66rem;padding:0 2px 8px;gap:6px}
+  .infobar .ib-right .pct{font-size:.6rem;padding:1px 5px}
   .card{padding:12px 13px 10px;gap:8px}
   .card-memory{font-size:.87rem;padding:6px 8px;margin:-2px -3px}
   .detail-row{grid-template-columns:80px 1fr;gap:10px;font-size:.78rem}
@@ -627,10 +592,8 @@ footer{
 .toast{
   position:fixed;bottom:24px;left:50%;
   transform:translateX(-50%) translateY(20px);
-  background:var(--bg-elev);
-  border:1px solid var(--border-2);
-  color:var(--text);
-  padding:11px 18px;border-radius:10px;
+  background:var(--bg-elev);border:1px solid var(--border-2);
+  color:var(--text);padding:11px 18px;border-radius:10px;
   font-size:.82rem;font-weight:500;
   box-shadow:0 20px 40px -10px rgba(0,0,0,.4);
   opacity:0;pointer-events:none;
@@ -658,7 +621,6 @@ footer{
   <div class="topbar-in">
     <div class="brand">
       <div class="brand-mark">
-        <!-- Pen icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 19l7-7 3 3-7 7-3-3z"/>
           <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
@@ -728,18 +690,6 @@ footer{
 <div class="shell">
   <div class="page-top"></div>
 
-  <div class="progress-wrap">
-    <div class="progress-labels">
-      <span class="p-title">Progress</span>
-      <span class="p-count"><b id="pRead">0</b> / <span id="pTotal">0</span></span>
-    </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="pFill" style="width:0%"></div>
-    </div>
-    <div class="progress-pct" id="pPct">0%</div>
-  </div>
-
-  <!-- REDESIGNED FILTER PANEL -->
   <div class="filters">
     <div class="filters-row">
       <div class="field field-full">
@@ -785,7 +735,8 @@ footer{
   </div>
 
   <div class="infobar">
-    <div id="info">Loading…</div>
+    <div class="ib-left" id="ibLeft">Loading…</div>
+    <div class="ib-right" id="ibRight">—/— <span class="pct zero">0%Read</span></div>
   </div>
 
   <div class="list" id="out">
@@ -827,7 +778,6 @@ function tickClock(){
 tickClock();
 setInterval(tickClock, 15000);
 
-/* PKT calendar date string for "one read per day" */
 function todayPKTKey(){
   const p=nowInPKT();
   return `${p.getFullYear()}-${pad2(p.getMonth()+1)}-${pad2(p.getDate())}`;
@@ -851,7 +801,7 @@ themeBtn.addEventListener("click",()=>{
   applyThemeColor();
 });
 
-/* toast helper */
+/* toast */
 let toastTimer=null;
 function toast(msg, kind=""){
   const el=document.getElementById("toast");
@@ -866,10 +816,7 @@ function toast(msg, kind=""){
   toastTimer=setTimeout(()=>el.classList.remove("show"),2400);
 }
 
-/* ============================================================
-   READ STORE — one increment per calendar day (PKT)
-   Structure: { key: {count,last,lastDay} }
-   ============================================================ */
+/* read store — one increment per calendar day (PKT) */
 function loadReadStore(){
   try{
     const raw=localStorage.getItem(LS_KEY);
@@ -886,13 +833,11 @@ function rowKey(r){
 }
 let READ = loadReadStore();
 
-/* increment only if this calendar day hasn't been counted for this row */
 function markRead(r){
   const key=rowKey(r);
   const day=todayPKTKey();
   const rec=READ[key]||{count:0,last:0,lastDay:""};
   if(rec.lastDay===day){
-    // already counted today — don't increment
     rec.last=Date.now();
     READ[key]=rec;
     return false;
@@ -904,7 +849,7 @@ function markRead(r){
   return true;
 }
 
-/* CSV parser */
+/* CSV */
 function parseCSV(t){
   const rows=[];let row=[],f="",q=false;
   for(let i=0;i<t.length;i++){
@@ -955,24 +900,25 @@ let ALL=[];
 let VIEW=[];
 let F={q:"", status:"", category:"", read:"", sort:"default"};
 
-function renderProgress(){
+/* compact info + progress renderer */
+function renderInfoBar(){
   const total=ALL.length;
   const readCount=ALL.filter(r=>READ[rowKey(r)]).length;
   const pct=total?Math.round(readCount*100/total):0;
-  document.getElementById("pRead").textContent=readCount;
-  document.getElementById("pTotal").textContent=total;
-  document.getElementById("pFill").style.width=pct+"%";
-  document.getElementById("pPct").textContent=pct+"%";
 
-  const chipRead=document.querySelector('.chip.read[data-read="read"] .n');
-  const chipUn=document.querySelector('.chip.unread[data-read="unread"] .n');
-  if(chipRead) chipRead.textContent=readCount;
-  if(chipUn) chipUn.textContent=(total-readCount);
+  // left: "334/334 Total"
+  document.getElementById("ibLeft").innerHTML =
+    `<b>${VIEW.length}</b><span class="sep">/</span><b>${total}</b>&nbsp;Total`;
+
+  // right: "6/200 (3%Read)"
+  const right = document.getElementById("ibRight");
+  right.innerHTML =
+    `<b class="read">${readCount}</b><span class="sep">/</span><b class="total">${total}</b>` +
+    `<span class="pct ${pct===0?'zero':''}">${pct}%Read</span>`;
 }
 
 function render(){
   const out=document.getElementById("out");
-  const info=document.getElementById("info");
 
   if(!VIEW.length){
     out.innerHTML=`<div class="state">
@@ -984,11 +930,9 @@ function render(){
       <h3>No cards found</h3>
       <p>Try a different search or clear the filters.</p>
     </div>`;
-    info.innerHTML=`Showing <b>0</b> of <b>${ALL.length}</b>`;
-    renderProgress();
+    renderInfoBar();
     return;
   }
-  info.innerHTML=`Showing <b>${VIEW.length}</b> of <b>${ALL.length}</b> cards`;
 
   out.innerHTML=VIEW.map((r,i)=>{
     const sm=statusMeta(r.status);
@@ -1038,23 +982,20 @@ function render(){
     </article>`;
   }).join("");
 
-  /* memory link click: mark read (once per day) + stop propagation so card doesn't toggle */
   out.querySelectorAll(".card-memory").forEach(a=>{
     a.addEventListener("click",e=>{
       e.stopPropagation();
       const key=a.dataset.key;
-      // find row by key
       const r=ALL.find(x=>rowKey(x)===key);
       if(!r) return;
       const changed=markRead(r);
       if(changed) saveReadStore(READ);
       updateCardUI(a.closest(".card"), key);
-      renderProgress();
+      renderInfoBar();
     });
     a.addEventListener("keydown",e=>e.stopPropagation());
   });
 
-  /* card click: mark read + toggle */
   out.querySelectorAll(".card").forEach(el=>{
     el.addEventListener("click",e=>{
       if(e.target.closest(".card-memory")) return;
@@ -1066,20 +1007,20 @@ function render(){
       }
       el.classList.toggle("open");
       updateCardUI(el, key);
-      renderProgress();
+      renderInfoBar();
     });
   });
 
-  /* chevron */
   out.querySelectorAll(".card-foot-right").forEach(x=>{
     x.addEventListener("click",e=>{
       e.stopPropagation();
       x.closest(".card").click();
     });
   });
+
+  renderInfoBar();
 }
 
-/* update the in-place card UI after a read event */
 function updateCardUI(el, key){
   if(!el) return;
   const rec=READ[key];
@@ -1115,7 +1056,6 @@ function apply(){
     return true;
   });
 
-  /* sort */
   if(F.sort==="priority"){
     VIEW.sort((a,b)=>statusMeta(a.status).rank - statusMeta(b.status).rank);
   } else if(F.sort==="unread"){
@@ -1179,7 +1119,6 @@ function resetAllFilters(){
 }
 
 function buildChips(){
-  /* priority chips */
   const counts={};
   ALL.forEach(r=>{
     const k=String(r.status||"Other").trim()||"Other";
@@ -1211,7 +1150,6 @@ function buildChips(){
     });
   });
 
-  /* read chips */
   const readCount=ALL.filter(r=>READ[rowKey(r)]).length;
   const unreadCount=ALL.length-readCount;
   const readEl=document.getElementById("chips-read");
@@ -1244,7 +1182,6 @@ document.getElementById("q").addEventListener("input",e=>{F.q=e.target.value;app
 document.getElementById("fCat").addEventListener("change",e=>{F.category=e.target.value;apply();});
 document.getElementById("fSort").addEventListener("change",e=>{F.sort=e.target.value;apply();});
 
-/* export / import */
 document.getElementById("exportBtn").addEventListener("click",()=>{
   const rows=[["row","reference","category","count","last","lastDay"]];
   ALL.forEach(r=>{
@@ -1252,33 +1189,24 @@ document.getElementById("exportBtn").addEventListener("click",()=>{
     const rec=READ[k];
     if(rec && rec.count>0){
       rows.push([
-        r.row||"",
-        r.reference||"",
-        r.category||"",
+        r.row||"", r.reference||"", r.category||"",
         rec.count,
         rec.last?new Date(rec.last).toISOString():"",
         rec.lastDay||""
       ]);
     }
   });
-  if(rows.length<2){
-    toast("Nothing read yet — open a card first.", "err");
-    return;
-  }
+  if(rows.length<2){ toast("Nothing read yet — open a card first.", "err"); return; }
   const csv=rows.map(row=>row.map(field=>{
     const s=String(field==null?"":field);
     return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
   }).join(",")).join("\n");
-
   const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
   const stamp=new Date().toISOString().slice(0,10);
-  a.href=url;
-  a.download=`my-notes-progress-${stamp}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  a.href=url; a.download=`my-notes-progress-${stamp}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
   toast(`Downloaded ${rows.length-1} read record${rows.length-1===1?"":"s"}.`, "ok");
 });
@@ -1302,7 +1230,6 @@ document.getElementById("fileInput").addEventListener("change",(e)=>{
       const idxLast=H.indexOf("last");
       const idxDay=H.indexOf("lastday");
       if(idxRef<0 && idxCat<0) throw new Error("Missing reference/category columns");
-
       const merged = Object.assign({}, READ);
       let added=0;
       rows.slice(1).forEach(r=>{
