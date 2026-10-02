@@ -219,7 +219,6 @@ body{
   color:#fff;
 }
 
-/* Version badge — no dot */
 .version{
   display:inline-flex;align-items:center;
   padding:5px 10px;border-radius:8px;
@@ -232,26 +231,69 @@ body{
 
 .page-top{padding:28px 0 8px}
 
+/* STATS — clickable filter cards */
 .stats{
   display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-  margin-bottom:26px;
+  margin-bottom:22px;
 }
 .stat{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:10px;padding:13px 15px;transition:all .2s ease;
+  border-radius:10px;padding:13px 15px;
+  transition:all .2s cubic-bezier(.32,.72,0,1);
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;
+  overflow:hidden;
+  text-align:left;
+  font-family:inherit;
+  color:inherit;
+  display:block;
+  width:100%;
 }
-.stat:hover{border-color:var(--border-2)}
+.stat:hover{
+  border-color:var(--border-2);
+  background:var(--surface-2);
+  transform:translateY(-1px);
+}
+.stat:active{transform:translateY(0)}
+.stat:focus-visible{
+  outline:2px solid var(--brand);
+  outline-offset:2px;
+}
+.stat.on{
+  border-color:var(--brand-border);
+  background:var(--brand-soft);
+  box-shadow:0 0 0 1px var(--brand-border);
+}
 .stat-l{
   font-size:.64rem;font-weight:600;color:var(--text-3);
   text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;
+  transition:color .2s ease;
 }
+.stat.on .stat-l{color:var(--brand-text)}
 .stat-v{
   font-size:1.35rem;font-weight:700;letter-spacing:-.03em;
   font-variant-numeric:tabular-nums;
   font-family:'JetBrains Mono',monospace;
+  transition:color .2s ease;
 }
 .stat-v.muted{color:var(--text-3)}
 .stat-v.ok{color:var(--ok)}
+.stat.on .stat-v{color:var(--brand-text)}
+
+/* active indicator bar */
+.stat::after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:2px;
+  background:var(--brand);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform .25s cubic-bezier(.32,.72,0,1);
+}
+.stat.on::after{transform:scaleX(1)}
 
 .section-h{
   display:flex;align-items:center;gap:10px;
@@ -415,7 +457,7 @@ footer{
   .version{padding:4px 8px;font-size:.68rem}
   .page-top{padding:18px 0 6px}
 
-  .stats{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:20px}
+  .stats{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:18px}
   .stat{padding:9px 11px}
   .stat-l{font-size:.58rem;margin-bottom:3px}
   .stat-v{font-size:1.05rem}
@@ -432,7 +474,7 @@ footer{
   .job-meta{font-size:.68rem;gap:10px}
 }
 @media (max-width:400px){
-  .version .v-num{display:none}
+  .version{display:none}
   .job-meta .m:nth-child(3){display:none}
 }
 
@@ -471,7 +513,7 @@ footer{
       <span class="ampm" id="pktAmPm">--</span>
     </div>
 
-    <a class="icon-btn sheet-btn" id="sheetBtn" href="https://docs.google.com/spreadsheets/d/1SJRPdkff35aF60k--P-_Mf7s7m0TM1BFlLSPhdkUuK4/edit" target="_blank" rel="noopener" aria-label="Open Google Sheet" title="Open sheet">
+    <a class="icon-btn sheet-btn" href="https://docs.google.com/spreadsheets/d/1SJRPdkff35aF60k--P-_Mf7s7m0TM1BFlLSPhdkUuK4/edit" target="_blank" rel="noopener" aria-label="Open Google Sheet" title="Open sheet">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
         <polyline points="14 2 14 8 20 8"/>
@@ -503,18 +545,18 @@ footer{
   <div class="page-top"></div>
 
   <section class="stats" id="stats">
-    <div class="stat">
+    <button class="stat on" data-filter="all" aria-pressed="true">
       <div class="stat-l">Total</div>
       <div class="stat-v" id="sTotal">—</div>
-    </div>
-    <div class="stat">
+    </button>
+    <button class="stat" data-filter="upcoming" aria-pressed="false">
       <div class="stat-l">Upcoming</div>
       <div class="stat-v ok" id="sUpcoming">—</div>
-    </div>
-    <div class="stat">
+    </button>
+    <button class="stat" data-filter="past" aria-pressed="false">
       <div class="stat-l">Past</div>
       <div class="stat-v muted" id="sPast">—</div>
-    </div>
+    </button>
   </section>
 
   <div id="out">
@@ -528,10 +570,10 @@ footer{
 </div>
 
 <script>
-/* ============================================================
-   LIVE DATA from your jobs sheet
-   ============================================================ */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUBCdhjwLbdOb968RwtVQYOy_0xLl1x9OQDoctPsD-wfO_c6ob5zUElpUpUxPeyhrwKOt321WiXTSa/pub?output=csv";
+
+/* filter state — default: "all" */
+let FILTER = "all";
 
 /* Pakistan Standard Time */
 const PKT_OFFSET_MIN = 5 * 60;
@@ -569,6 +611,21 @@ themeBtn.addEventListener("click",()=>{
   document.documentElement.setAttribute("data-theme",next);
   localStorage.setItem("jt-theme",next);
   applyThemeColor();
+});
+
+/* stat card clicks */
+document.getElementById("stats").addEventListener("click",e=>{
+  const btn=e.target.closest(".stat");
+  if(!btn) return;
+  const nextFilter=btn.dataset.filter;
+  if(nextFilter===FILTER) return;
+  FILTER=nextFilter;
+  document.querySelectorAll(".stat").forEach(s=>{
+    const on = s.dataset.filter===FILTER;
+    s.classList.toggle("on",on);
+    s.setAttribute("aria-pressed",String(on));
+  });
+  render();
 });
 
 /* CSV parser */
@@ -665,11 +722,20 @@ const SVG_PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const SVG_UP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
 const SVG_PAST='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
 
-function render(rows){
+/* cached parsed data */
+let ROWS=[];
+let STATS={total:0,upcoming:0,past:0};
+
+function render(){
   const out=document.getElementById("out");
   const today=todayPKT();
 
-  if(!rows.length){
+  // refresh stats display
+  document.getElementById("sTotal").textContent=STATS.total;
+  document.getElementById("sUpcoming").textContent=STATS.upcoming;
+  document.getElementById("sPast").textContent=STATS.past;
+
+  if(!ROWS.length){
     out.innerHTML=`<div class="state">
       <div class="state-ico">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -682,24 +748,24 @@ function render(rows){
     return;
   }
 
-  const withDates = rows.map(r=>{
+  const withDates = ROWS.map(r=>{
     const testDate=parseDate(r.test_date);
     const appliedOn=parseDate(r.applied_on);
     const urg=urgencyFor(testDate, today);
     return {...r, _testDate:testDate, _appliedOn:appliedOn, _urg:urg};
   });
 
-  const upcoming = withDates
-    .filter(r=>r._testDate && r._urg.kind!=="past")
-    .sort((a,b)=>a._testDate-b._testDate);
-  const past = withDates
-    .filter(r=>r._testDate && r._urg.kind==="past")
-    .sort((a,b)=>b._testDate-a._testDate);
-  const noDate = withDates.filter(r=>!r._testDate);
+  const allSorted = withDates.slice().sort((a,b)=>{
+    // null dates go last, otherwise ascending by test date
+    if(!a._testDate && !b._testDate) return 0;
+    if(!a._testDate) return 1;
+    if(!b._testDate) return -1;
+    return a._testDate-b._testDate;
+  });
 
-  document.getElementById("sTotal").textContent=withDates.length;
-  document.getElementById("sUpcoming").textContent=upcoming.length;
-  document.getElementById("sPast").textContent=past.length;
+  const upcoming = allSorted.filter(r=>r._testDate && r._urg.kind!=="past");
+  const past = allSorted.filter(r=>r._testDate && r._urg.kind==="past").reverse();
+  const noDate = allSorted.filter(r=>!r._testDate);
 
   function cardHTML(r,i){
     const u=r._urg;
@@ -740,18 +806,38 @@ function render(rows){
     </article>`;
   }
 
+  function section(icon,title,arr){
+    if(!arr.length) return "";
+    return `<div class="section-h"><h2>${icon} ${title}</h2><span class="count">${arr.length}</span></div>
+            <div class="list">${arr.map(cardHTML).join("")}</div>`;
+  }
+
   let html="";
-  if(upcoming.length){
-    html+=`<div class="section-h"><h2>${SVG_UP} Upcoming Tests</h2><span class="count">${upcoming.length}</span></div>`;
-    html+=`<div class="list">${upcoming.map(cardHTML).join("")}</div>`;
-  }
-  if(noDate.length){
-    html+=`<div class="section-h"><h2>${SVG_CAL} Date Not Set</h2><span class="count">${noDate.length}</span></div>`;
-    html+=`<div class="list">${noDate.map(cardHTML).join("")}</div>`;
-  }
-  if(past.length){
-    html+=`<div class="section-h"><h2>${SVG_PAST} Past Tests</h2><span class="count">${past.length}</span></div>`;
-    html+=`<div class="list">${past.map(cardHTML).join("")}</div>`;
+
+  if(FILTER==="all"){
+    html += section(SVG_UP,"Upcoming Tests",upcoming);
+    html += section(SVG_CAL,"Date Not Set",noDate);
+    html += section(SVG_PAST,"Past Tests",past);
+  } else if(FILTER==="upcoming"){
+    if(!upcoming.length){
+      html=`<div class="state">
+        <div class="state-ico">${SVG_UP}</div>
+        <h3>No upcoming tests</h3>
+        <p>You have no scheduled tests ahead. Add one in your sheet to see it here.</p>
+      </div>`;
+    } else {
+      html = section(SVG_UP,"Upcoming Tests",upcoming);
+    }
+  } else if(FILTER==="past"){
+    if(!past.length){
+      html=`<div class="state">
+        <div class="state-ico">${SVG_PAST}</div>
+        <h3>No past tests</h3>
+        <p>Once a test date passes, it will appear here.</p>
+      </div>`;
+    } else {
+      html = section(SVG_PAST,"Past Tests",past);
+    }
   }
 
   out.innerHTML=html;
@@ -810,11 +896,22 @@ async function boot(){
   }
 
   const rawHeaders=rows[0];
-  const objs=rows.slice(1)
+  ROWS=rows.slice(1)
     .map(r=>rowToObject(rawHeaders,r))
     .filter(o=>o.applied_job || o.test_date);
 
-  render(objs);
+  // compute stats once
+  const today=todayPKT();
+  let up=0, past=0;
+  ROWS.forEach(r=>{
+    const d=parseDate(r.test_date);
+    if(!d) return;
+    const diff=daysBetween(today,d);
+    if(diff<0) past++; else up++;
+  });
+  STATS={ total:ROWS.length, upcoming:up, past:past };
+
+  render();
 }
 boot();
 </script>
