@@ -166,6 +166,31 @@ body{
   background:var(--brand);border-color:var(--brand);color:#fff;
 }
 
+.progress-btn{
+  background:var(--ok-bg);
+  border-color:var(--ok-br);
+  color:var(--ok);
+}
+.progress-btn:hover{
+  background:var(--ok);border-color:var(--ok);color:#fff;
+}
+.load-btn{
+  background:var(--warn-bg);
+  border-color:var(--warn-br);
+  color:var(--warn);
+}
+.load-btn:hover{
+  background:var(--warn);border-color:var(--warn);color:#fff;
+}
+.danger-btn{
+  background:var(--err-bg);
+  border-color:var(--err-br);
+  color:var(--err);
+}
+.danger-btn:hover{
+  background:var(--err);border-color:var(--err);color:#fff;
+}
+
 .version{
   display:inline-flex;align-items:center;
   padding:5px 10px;border-radius:8px;
@@ -176,14 +201,61 @@ body{
 }
 .version:hover{border-color:var(--border-2);color:var(--text)}
 
-.page-top{padding:26px 0 8px}
+.page-top{padding:24px 0 6px}
 
-/* SEARCH ROW — search + category dropdown + clear */
+/* PROGRESS BAR */
+.progress-wrap{
+  display:flex;align-items:center;gap:14px;
+  padding:11px 15px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;
+  margin-bottom:14px;
+  transition:all .2s ease;
+}
+.progress-wrap:hover{border-color:var(--border-2)}
+.progress-labels{
+  display:flex;flex-direction:column;gap:2px;
+  min-width:110px;
+}
+.progress-labels .p-title{
+  font-size:.66rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text-3);
+}
+.progress-labels .p-count{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.85rem;font-weight:600;
+  color:var(--text);
+  font-variant-numeric:tabular-nums;
+}
+.progress-labels .p-count b{color:var(--ok)}
+.progress-bar{
+  flex:1;
+  height:8px;border-radius:99px;
+  background:var(--bg-elev);
+  overflow:hidden;
+  position:relative;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--brand),var(--brand-2));
+  border-radius:99px;
+  transition:width .4s cubic-bezier(.32,.72,0,1);
+  box-shadow:0 0 10px -2px var(--brand-shadow);
+}
+.progress-pct{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;font-weight:700;
+  color:var(--brand-text);
+  min-width:42px;text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+
 .searchrow{
   display:grid;
   grid-template-columns:1fr 200px auto;
   gap:10px;
-  margin-bottom:16px;
+  margin-bottom:14px;
 }
 @media (max-width:780px){
   .searchrow{grid-template-columns:1fr 1fr}
@@ -215,7 +287,6 @@ input:focus,.select:focus{
   box-shadow:0 0 0 3px var(--brand-soft);
 }
 
-/* select with arrow */
 .field-arrow{position:relative}
 .field-arrow::after{
   content:"";
@@ -243,6 +314,7 @@ input:focus,.select:focus{
 }
 .btn-clear:hover{border-color:var(--border-2);color:var(--text);background:var(--surface-2)}
 
+/* chips */
 .chips{
   display:flex;gap:6px;flex-wrap:wrap;
   margin-bottom:16px;padding-bottom:2px;
@@ -260,6 +332,8 @@ input:focus,.select:focus{
   background:var(--brand);border-color:var(--brand);color:#fff;
   box-shadow:0 3px 10px -4px var(--brand-shadow);
 }
+.chip.read.on{background:var(--ok);border-color:var(--ok)}
+.chip.unread.on{background:var(--warn);border-color:var(--warn);color:#fff}
 .chip .n{font-family:'JetBrains Mono',monospace;margin-left:5px;opacity:.7;font-size:.68rem}
 
 .infobar{
@@ -271,6 +345,7 @@ input:focus,.select:focus{
 
 .list{display:flex;flex-direction:column;gap:8px}
 
+/* CARD */
 .card{
   background:var(--surface);
   border:1px solid var(--border);
@@ -293,6 +368,16 @@ input:focus,.select:focus{
 .card:active{transform:scale(.998)}
 .card:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
+/* read state — subtle dimmed + green accent */
+.card.is-read{
+  background:var(--ok-bg);
+  border-color:var(--ok-br);
+}
+.card.is-read:hover{
+  background:color-mix(in srgb,var(--ok-bg) 80%,var(--surface-2));
+  border-color:var(--ok);
+}
+
 .card::before{
   content:"";
   position:absolute;left:0;top:0;bottom:0;width:3px;
@@ -302,6 +387,7 @@ input:focus,.select:focus{
 .card.V\.Imp::before{background:var(--err)}
 .card.Imp::before{background:var(--warn)}
 .card.Note::before{background:var(--info)}
+.card.is-read::before{background:var(--ok)}
 
 .card-row-top{display:flex;align-items:center;gap:8px;min-width:0}
 .card-meta{display:flex;gap:5px;flex-wrap:nowrap;flex:1;min-width:0;overflow:hidden}
@@ -348,8 +434,9 @@ input:focus,.select:focus{
 .badge.imp{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-br)}
 .badge.note{color:var(--info);background:var(--info-bg);border-color:var(--info-br)}
 .badge.other{color:var(--text-3);background:var(--muted-bg);border-color:var(--muted-br)}
+.badge.read{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-br)}
 
-/* MEMORY — 5 lines on mobile, 2 on desktop */
+/* MEMORY */
 .card-memory{
   display:-webkit-box;
   -webkit-line-clamp:5;
@@ -401,6 +488,7 @@ input:focus,.select:focus{
   padding-top:4px;
   margin-top:1px;
   border-top:1px dashed var(--border);
+  min-height:20px;
 }
 .card-foot-left{
   display:inline-flex;align-items:center;gap:6px;
@@ -413,12 +501,35 @@ input:focus,.select:focus{
 .card-foot-left.note{color:var(--info)}
 .card-foot-left svg{width:11px;height:11px}
 
+/* click/read counter */
+.read-count{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2px 8px;border-radius:99px;
+  background:var(--muted-bg);
+  color:var(--text-3);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;font-weight:700;
+  letter-spacing:.02em;
+  transition:all .2s ease;
+  margin-left:6px;
+}
+.read-count.has-read{
+  background:var(--ok-bg);
+  color:var(--ok);
+  border:1px solid var(--ok-br);
+}
+.read-count svg{width:10px;height:10px}
+
 .card-foot-right{
   display:inline-flex;align-items:center;gap:5px;
   font-size:.66rem;font-weight:500;
   color:var(--text-3);
   transition:color .2s ease;
+  cursor:pointer;
+  padding:2px 6px;
+  border-radius:5px;
 }
+.card-foot-right:hover{background:var(--surface-2);color:var(--text)}
 .card-foot-right svg{
   width:12px;height:12px;
   transition:transform .22s ease;
@@ -474,13 +585,23 @@ footer{
 
 @media (max-width:640px){
   .shell{padding:0 14px}
-  .topbar-in{padding:11px 14px;gap:8px}
+  .topbar-in{padding:11px 14px;gap:6px}
   .brand-txt span{display:none}
-  .clock{padding:4px 9px;font-size:.68rem}
-  .clock .ampm{font-size:.58rem}
-  .icon-btn{width:34px;height:34px}
+  .brand-txt b{font-size:.82rem}
+  .clock{padding:4px 8px;font-size:.66rem}
+  .clock .ampm{font-size:.56rem}
+  .icon-btn{width:32px;height:32px;border-radius:9px}
+  .icon-btn svg{width:15px;height:15px}
   .version{padding:4px 8px;font-size:.68rem}
-  .page-top{padding:18px 0 6px}
+  .page-top{padding:16px 0 4px}
+
+  .progress-wrap{padding:9px 12px;gap:10px;margin-bottom:12px}
+  .progress-labels{min-width:86px}
+  .progress-labels .p-title{font-size:.6rem}
+  .progress-labels .p-count{font-size:.76rem}
+  .progress-pct{font-size:.72rem;min-width:38px}
+  .progress-bar{height:6px}
+
   .searchrow{grid-template-columns:1fr 1fr;gap:8px}
   .searchrow .field-full{grid-column:1 / -1}
   input,.select{padding:10px 12px;font-size:.82rem}
@@ -497,11 +618,41 @@ footer{
   .tag.ref{font-size:.62rem}
   .badge{font-size:.56rem;padding:2px 7px}
   .chip{font-size:.68rem;padding:4px 9px}
+  .read-count{font-size:.58rem;padding:2px 6px}
 }
 @media (max-width:400px){
   .version{display:none}
   .tag.cat{display:none}
+  .card-foot-right span{display:none}
 }
+
+/* toast */
+.toast{
+  position:fixed;
+  bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--bg-elev);
+  border:1px solid var(--border-2);
+  color:var(--text);
+  padding:11px 18px;
+  border-radius:10px;
+  font-size:.82rem;
+  font-weight:500;
+  box-shadow:var(--shadow-lg, 0 20px 40px -10px rgba(0,0,0,.4));
+  opacity:0;
+  pointer-events:none;
+  transition:all .25s cubic-bezier(.32,.72,0,1);
+  z-index:200;
+  display:flex;align-items:center;gap:10px;
+  max-width:90vw;
+}
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.toast.ok{border-color:var(--ok-br);background:color-mix(in srgb,var(--ok-bg) 60%,var(--bg-elev))}
+.toast.err{border-color:var(--err-br);background:color-mix(in srgb,var(--err-bg) 60%,var(--bg-elev))}
+.toast svg{width:16px;height:16px;flex-shrink:0}
 
 ::selection{background:var(--brand-soft);color:var(--text)}
 ::-webkit-scrollbar{width:9px;height:9px}
@@ -536,6 +687,22 @@ footer{
       <span class="ampm" id="pktAmPm">--</span>
     </div>
 
+    <button class="icon-btn progress-btn" id="exportBtn" title="Download progress CSV" aria-label="Download progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </button>
+
+    <button class="icon-btn load-btn" id="importBtn" title="Load progress CSV" aria-label="Load progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+    </button>
+
     <a class="icon-btn sheet-btn" id="sheetBtn" href="#" target="_blank" rel="noopener" aria-label="Open Google Sheet" title="Open sheet">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -564,8 +731,21 @@ footer{
   </div>
 </div>
 
+<input type="file" id="fileInput" accept=".csv,text/csv" style="display:none" />
+
 <div class="shell">
   <div class="page-top"></div>
+
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span class="p-title">Progress</span>
+      <span class="p-count"><b id="pRead">0</b> / <span id="pTotal">0</span></span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="pFill" style="width:0%"></div>
+    </div>
+    <div class="progress-pct" id="pPct">0%</div>
+  </div>
 
   <div class="searchrow">
     <div class="field field-full">
@@ -600,10 +780,14 @@ footer{
   <footer>Data · Google Sheets · Times shown in Pakistan Standard Time (UTC+5)</footer>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv";
 const SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1SJRPdkff35aF60k--P-_Mf7s7m0TM1BFlLSPhdkUuK4/edit";
+const LS_KEY = "mc-read-v1";
 
+/* PKT clock */
 const PKT_OFFSET_MIN = 5 * 60;
 function nowInPKT(){
   const now = new Date();
@@ -627,6 +811,7 @@ setInterval(tickClock, 15000);
 
 document.getElementById("sheetBtn").href = SHEET_EDIT_URL;
 
+/* theme */
 const themeBtn=document.getElementById("themeBtn");
 const themeColorMeta=document.getElementById("themeColorMeta");
 function applyThemeColor(){
@@ -642,6 +827,40 @@ themeBtn.addEventListener("click",()=>{
   applyThemeColor();
 });
 
+/* toast helper */
+let toastTimer=null;
+function toast(msg, kind=""){
+  const el=document.getElementById("toast");
+  el.className="toast "+(kind||"");
+  el.innerHTML = (kind==="ok"
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+    : kind==="err"
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    : '') + '<span>'+esc(msg)+'</span>';
+  requestAnimationFrame(()=>el.classList.add("show"));
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove("show"),2400);
+}
+
+/* read-tracking store */
+function loadReadStore(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw) return {};
+    const p=JSON.parse(raw);
+    return (p && typeof p === "object") ? p : {};
+  }catch(e){ return {}; }
+}
+function saveReadStore(obj){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(obj)); }catch(e){}
+}
+/* key uniquely identifies a card across sessions: category||reference */
+function rowKey(r){
+  return String(r.category||"").trim()+"||"+String(r.reference||"").trim();
+}
+let READ = loadReadStore(); // { key: {count:n, last:ts} }
+
+/* CSV parser */
 function parseCSV(t){
   const rows=[];let row=[],f="",q=false;
   for(let i=0;i<t.length;i++){
@@ -690,7 +909,23 @@ function statusMeta(raw){
 
 let ALL=[];
 let VIEW=[];
-let F={q:"", status:"", category:""};
+let F={q:"", status:"", category:"", read:""};
+
+function renderProgress(){
+  const total=ALL.length;
+  const readCount=ALL.filter(r=>READ[rowKey(r)]).length;
+  const pct=total?Math.round(readCount*100/total):0;
+  document.getElementById("pRead").textContent=readCount;
+  document.getElementById("pTotal").textContent=total;
+  document.getElementById("pFill").style.width=pct+"%";
+  document.getElementById("pPct").textContent=pct+"%";
+
+  // update read/unread chip counts
+  const chipAll=document.querySelector('.chip.read[data-read="read"]');
+  const chipUn=document.querySelector('.chip.read[data-read="unread"]');
+  if(chipAll) chipAll.querySelector(".n").textContent=readCount;
+  if(chipUn) chipUn.querySelector(".n").textContent=(total-readCount);
+}
 
 function render(){
   const out=document.getElementById("out");
@@ -707,29 +942,38 @@ function render(){
       <p>Try a different search or clear the filters.</p>
     </div>`;
     info.innerHTML=`Showing <b>0</b> of <b>${ALL.length}</b>`;
+    renderProgress();
     return;
   }
   info.innerHTML=`Showing <b>${VIEW.length}</b> of <b>${ALL.length}</b> cards`;
 
   out.innerHTML=VIEW.map((r,i)=>{
     const sm=statusMeta(r.status);
-    // Google search: Reference + Memory + Category
+    const key=rowKey(r);
+    const rec=READ[key];
+    const count=rec?rec.count:0;
+    const isRead=count>0;
+
+    // Google: reference + memory + category
     const parts=[r.reference, r.memory, r.category].filter(Boolean).map(x=>String(x).trim());
     const googleUrl = "https://www.google.com/search?q=" + encodeURIComponent(parts.join(" "));
-    return `<article class="card ${sm.cls}" data-idx="${i}" style="animation-delay:${Math.min(i*14,200)}ms">
+
+    return `<article class="card ${sm.cls} ${isRead?'is-read':''}" data-key="${esc(key)}" data-idx="${i}" style="animation-delay:${Math.min(i*14,200)}ms">
       <div class="card-row-top">
         <div class="card-meta">
           <span class="tag ref">${esc(r.reference||"—")}</span>
           ${r.category?`<span class="tag cat">${esc(r.category)}</span>`:""}
         </div>
+        <span class="badge ${sm.cls}">${esc(sm.label)}</span>
       </div>
       <a class="card-memory" href="${googleUrl}" target="_blank" rel="noopener" title="Search on Google: reference + memory + category">${esc(r.memory||"")}</a>
       <div class="card-row-bot">
         <span class="card-foot-left ${sm.cls}">
-          ${sm.cls==="vimp"?`<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 15 9l7 .5-5.5 4.5L18 21l-6-4-6 4 1.5-7L2 9.5 9 9z"/></svg>`:""}
-          ${sm.cls==="imp"?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 15 9l7 .5-5.5 4.5L18 21l-6-4-6 4 1.5-7L2 9.5 9 9z"/></svg>`:""}
-          ${sm.cls==="note"?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`:""}
-          <span>${esc(sm.label)}</span>
+          <span class="read-count ${count>0?'has-read':''}" title="Times opened">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            ${count}×
+          </span>
+          ${isRead?'<span style="color:var(--ok)">● Read</span>':'<span style="opacity:.7">○ Unread</span>'}
         </span>
         <span class="card-foot-right">
           <span>Full detail</span>
@@ -739,51 +983,64 @@ function render(){
         </span>
       </div>
       <div class="card-detail">
-        <div class="detail-row">
-          <div class="detail-l">Row</div>
-          <div class="detail-v"><strong>${esc(r.row||"—")}</strong></div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-l">Category</div>
-          <div class="detail-v"><strong>${esc(r.category||"—")}</strong></div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-l">Reference</div>
-          <div class="detail-v"><strong>${esc(r.reference||"—")}</strong></div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-l">Memory</div>
-          <div class="detail-v">${esc(r.memory||"")}</div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-l">Status</div>
-          <div class="detail-v"><strong>${esc(r.status||"—")}</strong></div>
-        </div>
+        <div class="detail-row"><div class="detail-l">Row</div><div class="detail-v"><strong>${esc(r.row||"—")}</strong></div></div>
+        <div class="detail-row"><div class="detail-l">Category</div><div class="detail-v"><strong>${esc(r.category||"—")}</strong></div></div>
+        <div class="detail-row"><div class="detail-l">Reference</div><div class="detail-v"><strong>${esc(r.reference||"—")}</strong></div></div>
+        <div class="detail-row"><div class="detail-l">Memory</div><div class="detail-v">${esc(r.memory||"")}</div></div>
+        <div class="detail-row"><div class="detail-l">Status</div><div class="detail-v"><strong>${esc(r.status||"—")}</strong></div></div>
+        <div class="detail-row"><div class="detail-l">Times opened</div><div class="detail-v"><strong>${count}</strong>${rec?` · last ${new Date(rec.last).toLocaleString()}`:""}</div></div>
       </div>
     </article>`;
   }).join("");
 
-  // memory link stops propagation so card doesn't toggle
+  // memory link stops propagation
   out.querySelectorAll(".card-memory").forEach(a=>{
     a.addEventListener("click",e=>e.stopPropagation());
     a.addEventListener("keydown",e=>e.stopPropagation());
   });
 
-  // card click toggles detail
+  // card toggle + increment count
   out.querySelectorAll(".card").forEach(el=>{
     el.addEventListener("click",e=>{
       if(e.target.closest(".card-memory")) return;
+      const key=el.dataset.key;
+      // increment read count
+      const rec=READ[key]||{count:0,last:0};
+      rec.count++;
+      rec.last=Date.now();
+      READ[key]=rec;
+      saveReadStore(READ);
+
+      // update UI in-place
+      el.classList.add("is-read");
       el.classList.toggle("open");
+      const rc=el.querySelector(".read-count");
+      if(rc){
+        rc.textContent="";
+        rc.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> '+rec.count+"×";
+        rc.classList.add("has-read");
+      }
+      // update the small read/unread text in the footer
+      const fl=el.querySelector(".card-foot-left");
+      if(fl){
+        const lastSpan=fl.lastElementChild;
+        if(lastSpan){
+          lastSpan.outerHTML='<span style="color:var(--ok)">● Read</span>';
+        }
+      }
+      renderProgress();
     });
   });
 
-  // chevron also toggles
+  // chevron also increments count + toggles
   out.querySelectorAll(".card-foot-right").forEach(x=>{
     x.addEventListener("click",e=>{
       e.stopPropagation();
-      x.closest(".card").classList.toggle("open");
+      x.closest(".card").click();
     });
   });
+
+  renderProgress();
 }
 
 function apply(){
@@ -791,6 +1048,8 @@ function apply(){
   VIEW=ALL.filter(r=>{
     if(F.status && String(r.status||"").trim()!==F.status) return false;
     if(F.category && String(r.category||"").trim()!==F.category) return false;
+    if(F.read==="read" && !READ[rowKey(r)]) return false;
+    if(F.read==="unread" && READ[rowKey(r)]) return false;
     if(s){
       const hay=[r.category,r.reference,r.memory,r.status,r.row].join(" ").toLowerCase();
       if(!hay.includes(s)) return false;
@@ -815,16 +1074,33 @@ function buildChips(){
     return a.localeCompare(b);
   });
 
+  const readCount=ALL.filter(r=>READ[rowKey(r)]).length;
+  const unreadCount=ALL.length-readCount;
+
   const chips=document.getElementById("chips");
   chips.innerHTML=
     `<button class="chip on" data-status="">All <span class="n">${ALL.length}</span></button>` +
-    keys.map(k=>`<button class="chip" data-status="${esc(k)}">${esc(k)} <span class="n">${counts[k]}</span></button>`).join("");
+    keys.map(k=>`<button class="chip" data-status="${esc(k)}">${esc(k)} <span class="n">${counts[k]}</span></button>`).join("") +
+    `<button class="chip read" data-read="read">Read <span class="n">${readCount}</span></button>` +
+    `<button class="chip unread" data-read="unread">Unread <span class="n">${unreadCount}</span></button>`;
 
   chips.querySelectorAll(".chip").forEach(c=>{
     c.addEventListener("click",()=>{
-      chips.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));
+      const isReadChip = c.classList.contains("read") || c.classList.contains("unread");
+      chips.querySelectorAll(".chip").forEach(x=>{
+        // only clear chips in the same "group" (status vs read)
+        const xIsRead = x.classList.contains("read") || x.classList.contains("unread");
+        if(isReadChip === xIsRead) x.classList.remove("on");
+      });
       c.classList.add("on");
-      F.status=c.dataset.status;
+      if(isReadChip){
+        F.read = c.dataset.read;
+      } else {
+        F.status = c.dataset.status;
+        F.read = "";
+        // also unset any read chip
+        chips.querySelectorAll(".chip.read,.chip.unread").forEach(x=>x.classList.remove("on"));
+      }
       apply();
     });
   });
@@ -833,7 +1109,6 @@ function buildChips(){
 function buildCategoryDropdown(){
   const cats=[...new Set(ALL.map(r=>String(r.category||"").trim()).filter(Boolean))].sort();
   const sel=document.getElementById("fCat");
-  // keep existing first option
   cats.forEach(c=>{
     const o=document.createElement("option");
     o.value=c;o.textContent=c;
@@ -846,9 +1121,96 @@ document.getElementById("fCat").addEventListener("change",e=>{F.category=e.targe
 document.getElementById("clearBtn").addEventListener("click",()=>{
   document.getElementById("q").value="";
   document.getElementById("fCat").value="";
-  F.q=""; F.status=""; F.category="";
-  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.dataset.status===""));
+  F.q=""; F.status=""; F.category=""; F.read="";
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.dataset.status==="" && !c.dataset.read));
   apply();
+});
+
+/* ============ EXPORT / IMPORT READ PROGRESS ============ */
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  // CSV: row,reference,category,count,last
+  const rows=[["row","reference","category","count","last"]];
+  ALL.forEach(r=>{
+    const k=rowKey(r);
+    const rec=READ[k];
+    if(rec && rec.count>0){
+      rows.push([
+        r.row||"",
+        r.reference||"",
+        r.category||"",
+        rec.count,
+        new Date(rec.last).toISOString()
+      ]);
+    }
+  });
+  if(rows.length<2){
+    toast("Nothing read yet — open a card first.", "err");
+    return;
+  }
+  const csv=rows.map(row=>row.map(field=>{
+    const s=String(field==null?"":field);
+    return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }).join(",")).join("\n");
+
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  const stamp=new Date().toISOString().slice(0,10);
+  a.href=url;
+  a.download=`memory-cards-progress-${stamp}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(`Downloaded ${rows.length-1} read card${rows.length-1===1?"":"s"}.`, "ok");
+});
+
+document.getElementById("importBtn").addEventListener("click",()=>{
+  document.getElementById("fileInput").click();
+});
+document.getElementById("fileInput").addEventListener("change",(e)=>{
+  const file=e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const txt=String(ev.target.result||"");
+      const rows=parseCSV(txt);
+      if(rows.length<2) throw new Error("Empty CSV");
+      const H=rows[0].map(h=>h.trim().toLowerCase());
+      const idxRow=H.indexOf("row");
+      const idxRef=H.indexOf("reference");
+      const idxCat=H.indexOf("category");
+      const idxCount=H.indexOf("count");
+      const idxLast=H.indexOf("last");
+      if(idxRef<0 && idxCat<0) throw new Error("Missing reference/category columns");
+
+      // build merged store: prefer max count, latest last
+      const merged = Object.assign({}, READ);
+      let added=0;
+      rows.slice(1).forEach(r=>{
+        const ref=(idxRef>=0?(r[idxRef]||""):"").trim();
+        const cat=(idxCat>=0?(r[idxCat]||""):"").trim();
+        const key=cat+"||"+ref;
+        const cnt=idxCount>=0?parseInt(r[idxCount]||"0",10)||0:1;
+        const last=idxLast>=0?(Date.parse(r[idxLast])||Date.now()):Date.now();
+        const prev=merged[key];
+        if(!prev || cnt>prev.count){
+          merged[key]={count:cnt,last:Math.max(last, prev?prev.last:0)};
+          added++;
+        }
+      });
+      READ=merged;
+      saveReadStore(READ);
+      buildChips();
+      apply();
+      toast(`Loaded ${added} record${added===1?"":"s"} from ${file.name}`, "ok");
+    }catch(err){
+      toast("Could not read file: "+err.message, "err");
+    }
+    e.target.value="";
+  };
+  reader.readAsText(file);
 });
 
 function rowToObject(rawHeaders, rawRow){
