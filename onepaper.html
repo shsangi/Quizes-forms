@@ -188,14 +188,8 @@ body.locked{overflow:hidden;touch-action:none}
 [data-theme="light"] .theme-btn .icon-sun{opacity:0;transform:rotate(90deg) scale(.6)}
 [data-theme="light"] .theme-btn .icon-moon{opacity:1;transform:rotate(0) scale(1)}
 
-/* HERO */
-.hero{padding:44px 0 26px}
-.hero h1{
-  font-size:clamp(1.55rem,4vw,2.15rem);
-  font-weight:800;letter-spacing:-.033em;line-height:1.1;
-  margin-bottom:10px;
-}
-.hero p{color:var(--text-2);font-size:.94rem;max-width:560px;line-height:1.6;transition:color .3s ease}
+/* page top spacing (replaces hero) */
+.page-top{padding:28px 0 0}
 
 /* TABS */
 .tabs{
@@ -218,11 +212,9 @@ body.locked{overflow:hidden;touch-action:none}
 }
 .tab:hover{color:var(--text);background:var(--surface-2)}
 .tab.on{background:var(--brand);color:#fff;box-shadow:0 4px 14px -6px var(--brand-shadow)}
-.tab-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6;flex-shrink:0}
 .tab-count{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;opacity:.75}
 .tab.on .tab-count{opacity:.95}
 
-/* SEARCH */
 .searchrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
 .field{position:relative}
 .field-icon{
@@ -259,9 +251,6 @@ input:focus,.select:focus{
 }
 .resultbar b{color:var(--text-2);font-weight:600;font-variant-numeric:tabular-nums}
 
-/* ============================================================
-   CARD — new layout: header row (idx + tags + pill), then question
-   ============================================================ */
 .list{display:flex;flex-direction:column;gap:8px}
 
 .card{
@@ -286,7 +275,6 @@ input:focus,.select:focus{
 .card:active{transform:scale(.997)}
 .card:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
-/* header row: everything on one line */
 .card-head{
   display:flex;
   align-items:center;
@@ -344,7 +332,6 @@ input:focus,.select:focus{
   flex-shrink:1;
 }
 
-/* result pill — sits in the header row, no absolute positioning */
 .pill{
   flex-shrink:0;
   padding:4px 10px;border-radius:999px;
@@ -364,7 +351,6 @@ input:focus,.select:focus{
 .pill.err{color:var(--err);background:var(--err-bg);border-color:var(--err-br)}
 .pill.warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-br)}
 
-/* question text */
 .card-q{
   font-size:.92rem;font-weight:500;line-height:1.5;
   color:var(--text);letter-spacing:-.008em;
@@ -387,7 +373,6 @@ input:focus,.select:focus{
 }
 .card:hover .card-q::after{background-color:var(--brand);transform:translateX(2px)}
 
-/* MODAL */
 .backdrop{
   position:fixed;inset:0;z-index:100;
   background:var(--scrim);
@@ -573,17 +558,13 @@ footer{
   transition:all .3s ease;
 }
 
-/* ============================================================
-   MOBILE — tighten layout, tags truncate gracefully
-   ============================================================ */
 @media (max-width:640px){
   .shell{padding:0 14px}
   .topbar-in{padding:11px 14px;gap:8px}
   .brand-txt span{display:none}
   .version{padding:4px 8px;font-size:.68rem}
   .theme-btn{width:34px;height:34px}
-  .hero{padding:30px 0 20px}
-  .hero h1{font-size:1.5rem}
+  .page-top{padding:18px 0 0}
   .searchrow{grid-template-columns:1fr}
   .tab{padding:9px 10px;font-size:.8rem;min-width:88px}
 
@@ -601,8 +582,6 @@ footer{
   .sect-h{margin:18px 0 8px}
   .prose{padding:13px;font-size:.84rem}
 }
-
-/* very narrow phones — hide module tag, keep subject */
 @media (max-width:400px){
   .tag.module{display:none}
 }
@@ -653,16 +632,13 @@ footer{
 </div>
 
 <div class="shell">
-  <section class="hero">
-    <h1>Study smarter, one question at a time.</h1>
-    <p>Filter by result, subject, and module. Tap any card to open the full breakdown — options, correct answer, and detailed explanations.</p>
-  </section>
+  <div class="page-top"></div>
 
   <div class="tabs" id="tabs" role="tablist">
-    <button class="tab on" data-tab="all"><span class="tab-dot"></span>All <span class="tab-count" id="tabAll">0</span></button>
-    <button class="tab" data-tab="correct"><span class="tab-dot"></span>Correct <span class="tab-count" id="tabCorrect">0</span></button>
-    <button class="tab" data-tab="incorrect"><span class="tab-dot"></span>Incorrect <span class="tab-count" id="tabIncorrect">0</span></button>
-    <button class="tab" data-tab="pending"><span class="tab-dot"></span>Pending <span class="tab-count" id="tabPending">0</span></button>
+    <button class="tab on" data-tab="all">All <span class="tab-count" id="tabAll">0</span></button>
+    <button class="tab" data-tab="correct">Correct <span class="tab-count" id="tabCorrect">0</span></button>
+    <button class="tab" data-tab="incorrect">Incorrect <span class="tab-count" id="tabIncorrect">0</span></button>
+    <button class="tab" data-tab="pending">Pending <span class="tab-count" id="tabPending">0</span></button>
   </div>
 
   <div class="searchrow">
@@ -729,7 +705,7 @@ themeBtn.addEventListener("click",()=>{
   applyThemeColor();
 });
 
-/* CSV */
+/* CSV parser */
 function parseCSV(t){
   const rows=[];let row=[],f="",q=false;
   for(let i=0;i<t.length;i++){
