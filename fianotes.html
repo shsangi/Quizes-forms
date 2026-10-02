@@ -612,8 +612,9 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   display:grid;place-items:center;
   box-shadow:0 4px 14px -4px var(--brand-shadow);
   flex-shrink:0;
+  font-size:1.05rem;
+  line-height:1;
 }
-.modal-icon svg{width:18px;height:18px;color:#fff}
 .modal-title{display:flex;flex-direction:column;line-height:1.2;min-width:0;flex:1}
 .modal-title b{font-size:.98rem;font-weight:700;letter-spacing:-.02em}
 .modal-title span{font-size:.72rem;color:var(--text-3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -621,9 +622,9 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   width:34px;height:34px;border-radius:9px;background:var(--surface);
   border:1px solid var(--border);color:var(--text-2);cursor:pointer;
   display:grid;place-items:center;transition:all .18s ease;flex-shrink:0;
+  font-size:1rem;
 }
 .modal-close:hover{background:var(--err-bg);border-color:var(--err-br);color:var(--err);}
-.modal-close svg{width:15px;height:15px}
 
 .modal-body{
   padding:16px 18px 18px;
@@ -635,7 +636,7 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 .modal-body::-webkit-scrollbar{width:8px}
 .modal-body::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:8px;border:2px solid var(--bg-elev)}
 
-/* Tabs — 4-column grid that always fits */
+/* Tabs — 4-column grid, emoji-driven */
 .report-tabs{
   display:grid;
   grid-template-columns:repeat(4, minmax(0,1fr));
@@ -668,7 +669,11 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   min-width:0;
   line-height:1.2;
 }
-.report-tab svg{width:13px;height:13px;opacity:.75;transition:opacity .15s ease;flex-shrink:0;}
+.report-tab .tab-emoji{
+  font-size:.92rem;
+  line-height:1;
+  flex-shrink:0;
+}
 .report-tab span.tab-label{overflow:hidden;text-overflow:ellipsis;}
 .report-tab:hover{color:var(--text);background:var(--surface-2)}
 .report-tab.on{
@@ -676,7 +681,6 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   color:#fff;
   box-shadow:0 3px 10px -4px var(--brand-shadow);
 }
-.report-tab.on svg{opacity:1}
 
 /* Stat cards */
 .report-stats{
@@ -707,9 +711,10 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 .stat-label{
   font-size:.62rem;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:var(--text-3);
-  margin-bottom:4px;display:block;
+  margin-bottom:4px;display:flex;align-items:center;gap:5px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+.stat-label .sl-emoji{font-size:.8rem;line-height:1;flex-shrink:0}
 .stat-value{
   font-size:1.5rem;font-weight:800;
   letter-spacing:-.03em;color:var(--text);
@@ -734,6 +739,8 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   display:flex;align-items:center;
   justify-content:space-between;gap:8px;
 }
+.report-sec-title .rst-left{display:inline-flex;align-items:center;gap:6px;min-width:0;}
+.report-sec-title .rst-left .rst-emoji{font-size:.86rem;line-height:1;flex-shrink:0}
 .report-sec-title .count-badge{
   font-family:'JetBrains Mono',monospace;
   font-size:.66rem;font-weight:700;
@@ -761,7 +768,10 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   color:var(--text-2);
   min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
 }
+.cat-name .cat-emoji{font-size:.85rem;line-height:1;flex-shrink:0}
+.cat-name .cat-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .cat-bar{
   height:5px;
   background:var(--muted-bg);
@@ -832,7 +842,11 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 }
 
 .report-empty{padding:40px 20px;text-align:center;color:var(--text-3);}
-.report-empty svg{width:34px;height:34px;color:var(--text-3);opacity:.5;margin-bottom:10px;}
+.report-empty .re-emoji{
+  font-size:2.4rem;line-height:1;
+  display:block;margin-bottom:10px;
+  opacity:.55;
+}
 .report-empty p{font-size:.82rem;margin-top:4px;}
 
 .day-group{margin-bottom:14px}
@@ -844,7 +858,7 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   color:var(--text-2);letter-spacing:.01em;
 }
 .day-head .dh-left{display:inline-flex;align-items:center;gap:7px;min-width:0}
-.day-head svg{width:12px;height:12px;color:var(--brand-text);flex-shrink:0;}
+.day-head .dh-emoji{font-size:.9rem;line-height:1;flex-shrink:0}
 .day-head .dh-count{
   font-family:'JetBrains Mono',monospace;
   color:var(--brand-text);font-size:.68rem;
@@ -852,36 +866,21 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   border-radius:99px;flex-shrink:0;
 }
 
-/* ============================================================
-   MOBILE-FIRST MODAL (max-width 640px) — full-screen sheet
-   ============================================================ */
+/* MOBILE-FIRST MODAL (max-width 640px) */
 @media (max-width:640px){
-  .modal-backdrop{
-    padding:0;
-    align-items:stretch;
-  }
+  .modal-backdrop{padding:0;align-items:stretch;}
   .modal{
-    max-width:100%;
-    width:100%;
-    height:100%;
-    max-height:100vh;
-    max-height:100dvh;
-    border-radius:0;
-    border-left:none;
-    border-right:none;
-    border-top:none;
-    border-bottom:none;
-    transform:translateY(100%);
-    margin:0;
+    max-width:100%;width:100%;height:100%;
+    max-height:100vh;max-height:100dvh;
+    border-radius:0;border:none;
+    transform:translateY(100%);margin:0;
   }
   .modal-backdrop.show .modal{transform:translateY(0)}
   .modal-head{
-    padding:14px 14px 12px;
-    gap:10px;
+    padding:14px 14px 12px;gap:10px;
     padding-top:calc(14px + env(safe-area-inset-top, 0px));
   }
-  .modal-icon{width:34px;height:34px;border-radius:9px}
-  .modal-icon svg{width:17px;height:17px}
+  .modal-icon{width:34px;height:34px;border-radius:9px;font-size:1rem}
   .modal-title b{font-size:.94rem}
   .modal-title span{font-size:.68rem}
   .modal-close{width:32px;height:32px}
@@ -889,71 +888,34 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
     padding:14px 14px 20px;
     padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px));
   }
-
-  /* Tabs stay 4-across and fit beautifully */
-  .report-tabs{
-    gap:3px;
-    padding:3px;
-    border-radius:10px;
-    margin-bottom:14px;
-  }
-  .report-tab{
-    padding:9px 4px;
-    font-size:.7rem;
-    gap:4px;
-    border-radius:7px;
-  }
-  .report-tab svg{width:12px;height:12px}
-  .report-tab span.tab-label{
-    /* show label even on small screens, but allow ellipsis */
-    max-width:100%;
-  }
-
+  .report-tabs{gap:3px;padding:3px;border-radius:10px;margin-bottom:14px;}
+  .report-tab{padding:9px 4px;font-size:.7rem;gap:4px;border-radius:7px;}
+  .report-tab .tab-emoji{font-size:.86rem}
   .report-stats{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
   .report-stats .stat-card:last-child{grid-column:1 / -1;}
   .stat-card{padding:11px 12px}
   .stat-value{font-size:1.35rem}
   .stat-label{font-size:.58rem}
   .stat-sub{font-size:.64rem}
-
   .cat-row{grid-template-columns:1fr 70px auto;gap:8px;padding:8px 10px;}
   .cat-name{font-size:.76rem}
   .cat-count{font-size:.68rem;min-width:28px}
-
   .read-list{max-height:none}
   .read-item{padding:9px 10px;gap:8px;}
   .read-item-ref{font-size:.58rem;padding:2px 6px;max-width:80px;}
   .read-item-mem{font-size:.78rem}
   .read-item-meta{font-size:.62rem}
-
   .day-head{font-size:.68rem;padding:5px 9px}
   .day-head .dh-count{font-size:.62rem}
 }
 
-/* Very narrow phones — keep 4 tabs but tighten further */
+/* Very narrow phones */
 @media (max-width:380px){
-  .report-tab{
-    padding:8px 2px;
-    font-size:.64rem;
-    gap:3px;
-  }
-  .report-tab svg{width:11px;height:11px}
-  .report-tab span.tab-label{
-    /* hide text on ultra narrow, keep icon */
-    display:none;
-  }
-  .report-tab::before{
-    /* fallback: show 1-letter initial to still distinguish */
-    content: attr(data-short);
-    font-weight:800;
-    font-size:.72rem;
-    letter-spacing:.02em;
-  }
+  .report-tab{padding:8px 2px;font-size:.64rem;gap:3px;}
+  .report-tab .tab-emoji{font-size:.8rem}
   .report-tab span.tab-label{display:none}
-  .report-tab svg{display:none}
 }
 
-/* Tablets */
 @media (min-width:641px) and (max-width:900px){
   .modal{max-width:620px}
 }
@@ -1112,21 +1074,12 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 <div class="modal-backdrop" id="reportModal" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 3v18h18"/>
-          <path d="M7 15l4-4 3 3 5-7"/>
-        </svg>
-      </div>
+      <div class="modal-icon" aria-hidden="true">📊</div>
       <div class="modal-title">
         <b id="reportTitle">Progress Report</b>
         <span id="reportSubtitle">Your reading activity</span>
       </div>
-      <button class="modal-close" id="reportClose" aria-label="Close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-      </button>
+      <button class="modal-close" id="reportClose" aria-label="Close">✕</button>
     </div>
     <div class="modal-body" id="reportBody"></div>
   </div>
@@ -1253,8 +1206,7 @@ function markRead(r){
   READ[key]=rec;
 
   HISTORY.push({
-    ts: now,
-    key: key,
+    ts: now, key: key,
     ref: String(r.reference||""),
     cat: String(r.category||""),
     mem: String(r.memory||"").slice(0, 220),
@@ -1306,6 +1258,24 @@ function statusMeta(raw){
   return {cls:"other",label:s||"—",rank:3};
 }
 
+/* Emoji picker for categories — deterministic hash so each category gets a stable icon */
+const CAT_EMOJI_POOL = ["📘","📗","📙","📕","📓","📔","📒","📚","🧠","💡","🔬","🧪","⚗️","🩺","💊","🦴","🫀","🧬","🩻","🧫","🌡️","💉","🩹","🔎","🗂️","📖","🗒️","📝","🎓","🧩","⭐","🔖","🎯","🏷️","🧭"];
+const CAT_EMOJI_CACHE = new Map();
+function catEmoji(name){
+  const key = String(name||"").trim();
+  if(!key) return "📁";
+  if(CAT_EMOJI_CACHE.has(key)) return CAT_EMOJI_CACHE.get(key);
+  let h = 2166136261;
+  for(let i=0;i<key.length;i++){
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const idx = Math.abs(h) % CAT_EMOJI_POOL.length;
+  const e = CAT_EMOJI_POOL[idx];
+  CAT_EMOJI_CACHE.set(key, e);
+  return e;
+}
+
 let ALL=[];
 let VIEW=[];
 let F={q:"", status:[], category:[], read:"", sort:"default"};
@@ -1326,6 +1296,7 @@ class MultiSelect {
   }
   setOptions(options){
     this.options = options;
+    // Keep selected values that still exist
     const valid = new Set(options.map(o=>o.value));
     this.selected = this.selected.filter(v=>valid.has(v));
     this._renderList();
@@ -1755,20 +1726,40 @@ function resetAllFilters(){
   apply();
 }
 
+/* ============================================================
+   BUILD FILTER SELECTS — always from FULL ALL dataset
+   ============================================================ */
 function buildCategorySelect(){
-  const counts={};
-  ALL.forEach(r=>{
-    const c = String(r.category||"").trim();
-    if(c) counts[c]=(counts[c]||0)+1;
-  });
+  // Rebuild from scratch using every row in ALL
+  const counts = {};
+  for(let i=0;i<ALL.length;i++){
+    const c = String(ALL[i].category||"").trim();
+    if(c) counts[c] = (counts[c]||0) + 1;
+  }
   const cats = Object.keys(counts).sort((a,b)=>a.localeCompare(b));
-  const options = cats.map(c=>({value:c, label:c, count:counts[c]}));
-  if(MS_CATEGORY) MS_CATEGORY.setOptions(options);
-  else MS_CATEGORY = new MultiSelect("msCategory", {
-    placeholder:"All Categories", searchPlaceholder:"Search categories…",
-    options, onChange:(vals)=>{ F.category = vals; apply(); }
-  });
+  const options = cats.map(c=>({
+    value: c,
+    label: catEmoji(c) + "  " + c,
+    count: counts[c]
+  }));
+
+  if(MS_CATEGORY){
+    MS_CATEGORY.setOptions(options);
+  } else {
+    MS_CATEGORY = new MultiSelect("msCategory", {
+      placeholder: "All Categories",
+      searchPlaceholder: "Search " + cats.length + " categories…",
+      options: options,
+      onChange: (vals)=>{ F.category = vals; apply(); }
+    });
+  }
+  // Update search placeholder to reflect total count
+  if(MS_CATEGORY && MS_CATEGORY.searchInput){
+    MS_CATEGORY.searchPlaceholder = "Search " + cats.length + " categories…";
+    MS_CATEGORY.searchInput.placeholder = MS_CATEGORY.searchPlaceholder;
+  }
 }
+
 function buildPrioritySelect(){
   const counts={};
   ALL.forEach(r=>{
@@ -1790,6 +1781,7 @@ function buildPrioritySelect(){
     options, onChange:(vals)=>{ F.status = vals; apply(); }
   });
 }
+
 function buildStatusSelect(){
   const readCount=ALL.filter(r=>READ[rowKey(r)]).length;
   const unreadCount=ALL.length-readCount;
@@ -1905,21 +1897,48 @@ function eventsInRange(period){
   return HISTORY.filter(h => h.ts >= from && h.ts <= to);
 }
 
-/* Look up a full row object from ALL for a history event */
-function findRowByKey(key){
-  // key = category + "||" + reference
-  const [cat, ref] = key.split("||");
-  return ALL.find(r => String(r.category||"").trim()===cat && String(r.reference||"").trim()===ref) || null;
+/* Emoji for tab / day / section */
+const EMO = {
+  last: "⏱️",
+  daily: "📅",
+  weekly: "🗓️",
+  monthly: "📆",
+  topics: "📚",
+  total: "🔁",
+  cats: "🏷️",
+  byCat: "📊",
+  items: "✅",
+  calendar: "📅",
+  newTag: "🆕"
+};
+
+function renderTabsHTML(activePeriod){
+  return `
+    <button class="report-tab ${activePeriod==="last"?'on':''}" data-period="last" aria-label="Last read">
+      <span class="tab-emoji">${EMO.last}</span>
+      <span class="tab-label">Last</span>
+    </button>
+    <button class="report-tab ${activePeriod==="daily"?'on':''}" data-period="daily" aria-label="Daily">
+      <span class="tab-emoji">${EMO.daily}</span>
+      <span class="tab-label">Daily</span>
+    </button>
+    <button class="report-tab ${activePeriod==="weekly"?'on':''}" data-period="weekly" aria-label="Weekly">
+      <span class="tab-emoji">${EMO.weekly}</span>
+      <span class="tab-label">Weekly</span>
+    </button>
+    <button class="report-tab ${activePeriod==="monthly"?'on':''}" data-period="monthly" aria-label="Monthly">
+      <span class="tab-emoji">${EMO.monthly}</span>
+      <span class="tab-label">Monthly</span>
+    </button>
+  `;
 }
 
 function renderReport(){
   const period = RPT.period;
   const events = eventsInRange(period);
   const counted = events.filter(e => e.counted);
-  const uniqueKeys = new Set(events.map(e=>e.key));
   const uniqueCountedKeys = new Set(counted.map(e=>e.key));
 
-  // RANGE LABEL
   let periodLabel = "";
   if(period === "last"){
     const dayKey = getLastReadDayKey();
@@ -1940,26 +1959,20 @@ function renderReport(){
   }
   reportSubtitle.textContent = periodLabel;
 
-  // CATEGORY BREAKDOWN — always use ALL data (full dataset)
-  // Count every card in the whole sheet per category
+  // ALL categories from the FULL dataset
   const allCatCount = {};
   ALL.forEach(r=>{
     const c = String(r.category||"").trim() || "Uncategorized";
     allCatCount[c] = (allCatCount[c]||0) + 1;
   });
-
-  // Also count read-per-category for this period (using counted events)
   const periodCatReads = {};
   counted.forEach(e=>{
     const c = e.cat || "Uncategorized";
     periodCatReads[c] = (periodCatReads[c]||0) + 1;
   });
-
-  // Build a combined category list: total (from ALL) + read (from period)
   const allCatKeys = Object.keys(allCatCount).sort((a,b)=>a.localeCompare(b));
   const maxAll = allCatKeys.length ? Math.max(...allCatKeys.map(k=>allCatCount[k])) : 1;
 
-  // Group events by day for the list
   const byDay = {};
   events.forEach(e=>{
     const dk = dayKeyFromTs(e.ts);
@@ -1971,19 +1984,14 @@ function renderReport(){
   const totalCounted = counted.length;
   const uniqueTopics = uniqueCountedKeys.size;
   const categoriesCount = allCatKeys.length;
-
   const hasAnyActivity = HISTORY.length > 0;
 
   if(!hasAnyActivity){
     reportSubtitle.textContent = "No reading activity yet";
     reportBody.innerHTML = `
-      <div class="report-tabs">
-        ${renderTabsHTML(period)}
-      </div>
+      <div class="report-tabs">${renderTabsHTML(period)}</div>
       <div class="report-empty">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/>
-        </svg>
+        <span class="re-emoji">📖</span>
         <p style="font-weight:600;color:var(--text-2)">No reading activity yet</p>
         <p>Open a memory card to start tracking your progress.</p>
       </div>
@@ -1993,32 +2001,30 @@ function renderReport(){
   }
 
   reportBody.innerHTML = `
-    <div class="report-tabs">
-      ${renderTabsHTML(period)}
-    </div>
+    <div class="report-tabs">${renderTabsHTML(period)}</div>
 
     <div class="report-stats">
       <div class="stat-card ok">
-        <span class="stat-label">Topics Read</span>
+        <span class="stat-label"><span class="sl-emoji">${EMO.topics}</span>Topics Read</span>
         <div class="stat-value">${uniqueTopics}</div>
         <div class="stat-sub">unique cards</div>
       </div>
       <div class="stat-card">
-        <span class="stat-label">Total Reads</span>
+        <span class="stat-label"><span class="sl-emoji">${EMO.total}</span>Total Reads</span>
         <div class="stat-value">${totalEvents}</div>
         <div class="stat-sub">${totalCounted} new · ${totalEvents-totalCounted} repeat</div>
       </div>
       <div class="stat-card info">
-        <span class="stat-label">Categories</span>
+        <span class="stat-label"><span class="sl-emoji">${EMO.cats}</span>Categories</span>
         <div class="stat-value">${categoriesCount}</div>
-        <div class="stat-sub">${categoriesCount} total in sheet</div>
+        <div class="stat-sub">total in sheet</div>
       </div>
     </div>
 
     ${allCatKeys.length ? `
       <div class="report-section">
         <div class="report-sec-title">
-          <span>All Categories (sheet)</span>
+          <span class="rst-left"><span class="rst-emoji">${EMO.byCat}</span>All Categories (sheet)</span>
           <span class="count-badge">${categoriesCount}</span>
         </div>
         <div class="cat-list">
@@ -2028,7 +2034,10 @@ function renderReport(){
             const pct = Math.round(total / maxAll * 100);
             return `
               <div class="cat-row">
-                <span class="cat-name" title="${esc(c)} — ${reads} read in period">${esc(c)}</span>
+                <span class="cat-name" title="${esc(c)} — ${reads} read in period">
+                  <span class="cat-emoji">${catEmoji(c)}</span>
+                  <span class="cat-txt">${esc(c)}</span>
+                </span>
                 <span class="cat-bar" title="${reads} of ${total} read in period">
                   <span class="cat-bar-inner" style="width:${pct}%"></span>
                 </span>
@@ -2043,7 +2052,7 @@ function renderReport(){
     ${dayKeys.length ? `
       <div class="report-section">
         <div class="report-sec-title">
-          <span>Read Items</span>
+          <span class="rst-left"><span class="rst-emoji">${EMO.items}</span>Read Items</span>
           <span class="count-badge">${totalEvents}</span>
         </div>
         <div class="read-list">
@@ -2051,7 +2060,7 @@ function renderReport(){
             <div class="day-group">
               <div class="day-head">
                 <span class="dh-left">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <span class="dh-emoji">${EMO.calendar}</span>
                   ${esc(formatDayLabelKey(dk))}
                 </span>
                 <span class="dh-count">${byDay[dk].length}</span>
@@ -2062,10 +2071,10 @@ function renderReport(){
                   <span class="read-item-body">
                     <div class="read-item-mem">${esc(e.mem||"")}</div>
                     <div class="read-item-meta">
-                      <span>${esc(e.cat||"Uncategorized")}</span>
+                      <span>${catEmoji(e.cat)} ${esc(e.cat||"Uncategorized")}</span>
                       <span class="dot">·</span>
                       <span class="read-item-time">${formatTime(e.ts)}</span>
-                      ${e.counted ? '<span class="dot">·</span><span style="color:var(--ok);font-weight:600">new</span>' : ''}
+                      ${e.counted ? `<span class="dot">·</span><span style="color:var(--ok);font-weight:600">${EMO.newTag} new</span>` : ''}
                     </div>
                   </span>
                 </a>
@@ -2077,9 +2086,7 @@ function renderReport(){
     ` : `
       <div class="report-section">
         <div class="report-empty" style="padding:26px 12px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>
-          </svg>
+          <span class="re-emoji">⏱️</span>
           <p style="font-weight:600;color:var(--text-2)">No reads in this period</p>
           <p>Try a different tab.</p>
         </div>
@@ -2088,25 +2095,6 @@ function renderReport(){
   `;
 
   bindReportTabs();
-}
-
-function renderTabsHTML(activePeriod){
-  // data-short gives a 1-letter fallback used on ultra-narrow screens
-  return `
-    <button class="report-tab ${activePeriod==="last"?'on':''}" data-period="last" data-short="L" aria-label="Last read">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
-      <span class="tab-label">Last</span>
-    </button>
-    <button class="report-tab ${activePeriod==="daily"?'on':''}" data-period="daily" data-short="D" aria-label="Daily">
-      <span class="tab-label">Daily</span>
-    </button>
-    <button class="report-tab ${activePeriod==="weekly"?'on':''}" data-period="weekly" data-short="W" aria-label="Weekly">
-      <span class="tab-label">Weekly</span>
-    </button>
-    <button class="report-tab ${activePeriod==="monthly"?'on':''}" data-period="monthly" data-short="M" aria-label="Monthly">
-      <span class="tab-label">Monthly</span>
-    </button>
-  `;
 }
 
 function bindReportTabs(){
@@ -2248,10 +2236,13 @@ async function fetchData(showToast){
     ALL=rows.slice(1)
       .map(r=>rowToObject(rawHeaders,r))
       .filter(o=>o.memory || o.reference);
+
+    // Order matters: build selects AFTER ALL is fully populated
     buildCategorySelect();
     buildPrioritySelect();
     buildStatusSelect();
     apply();
+
     if(showToast) toast(`Refreshed — ${ALL.length} cards loaded.`, "ok");
   } catch(err){
     out.innerHTML=`<div class="state">
