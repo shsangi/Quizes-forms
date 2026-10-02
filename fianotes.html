@@ -345,7 +345,6 @@ input:focus,.select:focus{
 
 .list{display:flex;flex-direction:column;gap:8px}
 
-/* LOAD MORE BAR */
 .load-more-wrap{
   display:flex;flex-direction:column;align-items:center;gap:8px;
   padding:22px 0 8px;
@@ -389,6 +388,9 @@ input:focus,.select:focus{
 }
 .all-loaded svg{width:14px;height:14px;color:var(--ok)}
 
+/* ============================================================
+   CARD — with category always visible on top
+   ============================================================ */
 .card{
   background:var(--surface);
   border:1px solid var(--border);
@@ -426,8 +428,22 @@ input:focus,.select:focus{
 .card.Note::before{background:var(--info)}
 .card.is-read::before{background:var(--ok)}
 
-.card-row-top{display:flex;align-items:center;gap:8px;min-width:0}
-.card-meta{display:flex;gap:5px;flex-wrap:nowrap;flex:1;min-width:0;overflow:hidden}
+/* top row: REF + CATEGORY on the left, BADGE on the right */
+.card-row-top{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  flex-wrap:nowrap;
+}
+.card-meta{
+  display:flex;
+  gap:5px;
+  flex-wrap:nowrap;
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+}
 
 .tag{
   padding:3px 8px;border-radius:5px;
@@ -444,10 +460,20 @@ input:focus,.select:focus{
   border-color:var(--brand-border);
   color:var(--brand-text);
   font-family:'JetBrains Mono',monospace;
-  flex-shrink:0;letter-spacing:0;text-transform:none;
+  flex-shrink:0;
+  letter-spacing:0;
+  text-transform:none;
   font-size:.66rem;
 }
-.tag.cat{flex-shrink:1;text-transform:uppercase}
+/* Category always visible — takes remaining space, truncates if needed */
+.tag.cat{
+  flex-shrink:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  display:block;
+}
 
 .badge{
   flex-shrink:0;
@@ -580,9 +606,7 @@ footer{
   text-align:center;color:var(--text-3);font-size:.76rem;
 }
 
-/* ============================================================
-   FLOATING ACTION BUTTON (FAB) + scroll arrows
-   ============================================================ */
+/* FAB */
 .fab-stack{
   position:fixed;
   right:22px;
@@ -626,7 +650,7 @@ footer{
 }
 .fab.refresh svg{width:22px;height:22px}
 .fab.refresh:hover{
-  transform:translateY(-3px) rotate(0deg);
+  transform:translateY(-3px);
   box-shadow:0 20px 40px -12px var(--brand-shadow),0 6px 18px -4px rgba(0,0,0,.35);
 }
 .fab.refresh.spinning svg{
@@ -650,7 +674,6 @@ footer{
   pointer-events:auto;
 }
 
-/* tooltip */
 .fab[data-tip]::after{
   content:attr(data-tip);
   position:absolute;
@@ -673,7 +696,6 @@ footer{
 }
 .fab:hover[data-tip]::after{opacity:1}
 
-/* mobile: shrink + reposition */
 @media (max-width:640px){
   .shell{padding:0 14px}
   .topbar-in{padding:11px 14px;gap:6px}
@@ -717,7 +739,6 @@ footer{
 
 @media (max-width:400px){
   .version{display:none}
-  .tag.cat{display:none}
   .card-foot-right span{display:none}
 }
 
@@ -884,7 +905,6 @@ footer{
   <footer>Data · Google Sheets · Times shown in Pakistan Standard Time (UTC+5)</footer>
 </div>
 
-<!-- ============ FLOATING ACTION STACK ============ -->
 <div class="fab-stack">
   <button class="fab scroll" id="scrollBottomBtn" data-tip="Scroll to bottom" aria-label="Scroll to bottom">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -910,12 +930,9 @@ footer{
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv";
 const SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1BLOOydCf9vAAWuqM4J3LR0PGcIosijzw5o_JhbsT3gM/edit";
 const LS_KEY = "mn-read-v2";
-
-/* PAGINATION */
 const PAGE_SIZE = 200;
-let LOADED = 0; // how many of the filtered VIEW are currently rendered
+let LOADED = 0;
 
-/* PKT clock */
 const PKT_OFFSET_MIN = 5 * 60;
 function nowInPKT(){
   const now = new Date();
@@ -944,7 +961,6 @@ function todayPKTKey(){
 
 document.getElementById("sheetBtn").href = SHEET_EDIT_URL;
 
-/* theme */
 const themeBtn=document.getElementById("themeBtn");
 const themeColorMeta=document.getElementById("themeColorMeta");
 function applyThemeColor(){
@@ -1056,17 +1072,12 @@ let ALL=[];
 let VIEW=[];
 let F={q:"", status:"", category:"", read:"", sort:"default"};
 
-/* ============================================================
-   INFOBAR — reflects VIEW (filtered) + displayed page
-   ============================================================ */
 function renderInfoBar(){
   const total=ALL.length;
-  // Shown counts: how many rendered vs total in current view
   const shownOnPage = Math.min(LOADED, VIEW.length);
   document.getElementById("ibLeft").innerHTML =
     `<b>${shownOnPage}</b><span class="sep">/</span><b>${VIEW.length}</b>&nbsp;of&nbsp;<b>${total}</b>`;
 
-  // Read progress computed within filtered VIEW
   const viewRead = VIEW.filter(r=>READ[rowKey(r)]).length;
   const viewTotal = VIEW.length;
   const pct = viewTotal ? Math.round(viewRead*100/viewTotal) : 0;
@@ -1091,7 +1102,7 @@ function cardHTML(r, i){
     <div class="card-row-top">
       <div class="card-meta">
         <span class="tag ref">${esc(r.reference||"—")}</span>
-        ${r.category?`<span class="tag cat">${esc(r.category)}</span>`:""}
+        <span class="tag cat">${esc(r.category||"—")}</span>
       </div>
       <span class="badge ${sm.cls}">${esc(sm.label)}</span>
     </div>
@@ -1124,13 +1135,11 @@ function cardHTML(r, i){
   </article>`;
 }
 
-/* render only the current page chunk (first LOADED items of VIEW) */
 function renderPage(){
   const out=document.getElementById("out");
   const chunk=VIEW.slice(0, LOADED);
   out.innerHTML=chunk.map(cardHTML).join("");
 
-  // wire events on rendered cards
   out.querySelectorAll(".card-memory").forEach(a=>{
     a.addEventListener("click",e=>{
       e.stopPropagation();
@@ -1171,7 +1180,6 @@ function renderPage(){
   renderInfoBar();
 }
 
-/* "Load N more" footer */
 function renderLoadMore(){
   const wrap=document.getElementById("loadMoreWrap");
   if(!VIEW.length){
@@ -1202,7 +1210,6 @@ function renderLoadMore(){
     btn.addEventListener("click",()=>{
       const prev=LOADED;
       LOADED=Math.min(LOADED+PAGE_SIZE, VIEW.length);
-      // append only the new cards (faster than full re-render)
       appendCards(prev, LOADED);
       renderLoadMore();
       renderInfoBar();
@@ -1210,7 +1217,6 @@ function renderLoadMore(){
   }
 }
 
-/* append a slice of VIEW [from, to) into the list, wiring events */
 function appendCards(from, to){
   const out=document.getElementById("out");
   const slice=VIEW.slice(from, to);
@@ -1220,7 +1226,6 @@ function appendCards(from, to){
   frag.innerHTML=slice.map((r,i)=>cardHTML(r, i)).join("");
   out.appendChild(frag);
 
-  // wire events only on the new cards
   const newCards = frag.querySelectorAll(".card");
   newCards.forEach(el=>{
     const key=el.dataset.key;
@@ -1309,7 +1314,6 @@ function apply(){
     });
   }
 
-  // reset pagination on any filter change
   LOADED = Math.min(PAGE_SIZE, VIEW.length);
 
   const out=document.getElementById("out");
@@ -1428,7 +1432,6 @@ function buildChips(){
 function buildCategoryDropdown(){
   const cats=[...new Set(ALL.map(r=>String(r.category||"").trim()).filter(Boolean))].sort();
   const sel=document.getElementById("fCat");
-  // keep "All Categories" first
   const current=sel.value;
   sel.innerHTML='<option value="">All Categories</option>';
   cats.forEach(c=>{
@@ -1443,7 +1446,6 @@ document.getElementById("q").addEventListener("input",e=>{F.q=e.target.value;app
 document.getElementById("fCat").addEventListener("change",e=>{F.category=e.target.value;apply();});
 document.getElementById("fSort").addEventListener("change",e=>{F.sort=e.target.value;apply();});
 
-/* export / import */
 document.getElementById("exportBtn").addEventListener("click",()=>{
   const rows=[["row","reference","category","count","last","lastDay"]];
   ALL.forEach(r=>{
@@ -1530,9 +1532,6 @@ function rowToObject(rawHeaders, rawRow){
   return obj;
 }
 
-/* ============================================================
-   FETCH + REFRESH
-   ============================================================ */
 let isFetching=false;
 
 async function fetchData(showToast){
@@ -1572,7 +1571,6 @@ async function fetchData(showToast){
   }
 }
 
-/* refresh button */
 const refreshBtn=document.getElementById("refreshBtn");
 refreshBtn.addEventListener("click",async()=>{
   refreshBtn.classList.add("spinning");
@@ -1583,7 +1581,6 @@ refreshBtn.addEventListener("click",async()=>{
   }
 });
 
-/* scroll arrows */
 const scrollTopBtn=document.getElementById("scrollTopBtn");
 const scrollBottomBtn=document.getElementById("scrollBottomBtn");
 
@@ -1604,7 +1601,6 @@ scrollBottomBtn.addEventListener("click",()=>{
   window.scrollTo({top:document.documentElement.scrollHeight,behavior:"smooth"});
 });
 
-/* boot */
 fetchData(false);
 </script>
 </body>
