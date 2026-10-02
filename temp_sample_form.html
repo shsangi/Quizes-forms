@@ -1,1587 +1,638 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Self Learners · Login & Quiz</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
-  <style>
-    /* ---------- RESET & BASE ---------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f0f4f9;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.2rem;
-    }
-
-    /* ---------- TOAST NOTIFICATIONS ---------- */
-    .toast-container {
-      position: fixed;
-      top: 1.5rem;
-      right: 1.5rem;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-      max-width: 380px;
-      width: 100%;
-    }
-    .toast {
-      padding: 0.9rem 1.2rem;
-      border-radius: 16px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-      animation: slideInRight 0.4s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    .toast.success {
-      background: #d4edda;
-      color: #155724;
-      border-left: 4px solid #28a745;
-    }
-    .toast.error {
-      background: #f8d7da;
-      color: #721c24;
-      border-left: 4px solid #dc3545;
-    }
-    .toast.warning {
-      background: #fff3cd;
-      color: #856404;
-      border-left: 4px solid #ffc107;
-    }
-    .toast.info {
-      background: #d1ecf1;
-      color: #0c5460;
-      border-left: 4px solid #17a2b8;
-    }
-    .toast .toast-icon {
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-    .toast .toast-close {
-      margin-left: auto;
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: inherit;
-      opacity: 0.6;
-      padding: 0 0.2rem;
-      transition: 0.2s;
-    }
-    .toast .toast-close:hover {
-      opacity: 1;
-    }
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeOut {
-      to { opacity: 0; transform: translateY(-10px); }
-    }
-    .toast.removing {
-      animation: fadeOut 0.3s ease forwards;
-    }
-
-    /* ---------- LOGIN SCREEN ---------- */
-    .login-wrapper {
-      max-width: 420px;
-      width: 100%;
-      background: white;
-      border-radius: 2.5rem;
-      padding: 2.8rem 2.2rem;
-      box-shadow: 0 25px 60px -15px rgba(0, 20, 30, 0.2);
-      transition: 0.3s;
-    }
-    .login-wrapper .logo {
-      width: 80px;
-      height: 80px;
-      border-radius: 20px;
-      object-fit: contain;
-      background: #f0f4f9;
-      padding: 10px;
-      margin: 0 auto 1rem;
-      display: block;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-    }
-    .login-wrapper h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 0.2rem;
-      text-align: center;
-    }
-    .login-wrapper .sub {
-      color: #6c8a9e;
-      font-size: 0.9rem;
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .login-wrapper label {
-      display: block;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #1f4d66;
-      margin-bottom: 0.3rem;
-    }
-    .login-wrapper .input-group {
-      position: relative;
-      margin-bottom: 1.2rem;
-    }
-    .login-wrapper .input-group input {
-      width: 100%;
-      padding: 0.9rem 1.2rem;
-      padding-right: 3.2rem;
-      border: 2px solid #e2eaf2;
-      border-radius: 60px;
-      font-size: 1rem;
-      font-family: 'Inter', sans-serif;
-      transition: border 0.25s, box-shadow 0.25s;
-      background: #fafcfe;
-    }
-    .login-wrapper .input-group input:focus {
-      outline: none;
-      border-color: #2f7b9e;
-      box-shadow: 0 0 0 4px rgba(47, 123, 158, 0.12);
-    }
-    .login-wrapper .toggle-password {
-      position: absolute;
-      right: 1.2rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.2rem;
-      color: #8aa3b5;
-      padding: 0.3rem;
-      border-radius: 30px;
-      transition: 0.2s;
-    }
-    .login-wrapper .toggle-password:hover {
-      color: #0b2a3b;
-      background: #f0f4f9;
-    }
-    .login-wrapper .btn-primary {
-      width: 100%;
-      background: linear-gradient(145deg, #0b2a3b, #1a4b62);
-      border: none;
-      color: white;
-      font-weight: 600;
-      font-size: 1.05rem;
-      padding: 0.9rem;
-      border-radius: 60px;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(11, 42, 59, 0.2);
-      transition: 0.2s;
-      margin-top: 0.4rem;
-    }
-    .login-wrapper .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(11, 42, 59, 0.25);
-    }
-    .login-wrapper .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .login-wrapper .login-footer {
-      text-align: center;
-      font-size: 0.8rem;
-      color: #8aa3b5;
-      margin-top: 1.2rem;
-    }
-
-    /* ---------- QUIZ SCREEN ---------- */
-    .quiz-wrapper {
-      max-width: 920px;
-      width: 100%;
-      background: white;
-      border-radius: 2.5rem;
-      padding: 2.2rem 2.5rem 2rem;
-      box-shadow: 0 25px 60px -15px rgba(0, 20, 30, 0.15);
-      display: none;
-      animation: fadeIn 0.5s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .quiz-wrapper .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.5rem 1.2rem;
-      margin-bottom: 0.3rem;
-    }
-    .quiz-wrapper .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-    .quiz-wrapper .brand-logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      object-fit: contain;
-      background: #f0f4f9;
-      padding: 6px;
-      flex-shrink: 0;
-    }
-    .quiz-wrapper .brand-title h1 {
-      font-size: 1.5rem;
-      font-weight: 800;
-      background: linear-gradient(145deg, #0b2a3b, #1b5a7a);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      line-height: 1.2;
-    }
-    .quiz-wrapper .brand-title .subtitle {
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: #6c8a9e;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    .quiz-wrapper .user-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      background: #f0f4f9;
-      padding: 0.3rem 1rem 0.3rem 0.8rem;
-      border-radius: 60px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #1f4d66;
-    }
-    .quiz-wrapper .user-badge .avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: 30px;
-      background: linear-gradient(145deg, #1b5a7a, #2f7b9e);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-    .quiz-wrapper .session-restore {
-      font-size: 0.7rem;
-      color: #6c8a9e;
-      background: #eef3f8;
-      padding: 0.15rem 0.8rem;
-      border-radius: 30px;
-      margin-left: 0.5rem;
-    }
-
-    .quiz-wrapper .timer-line {
-      text-align: center;
-      padding: 0.1rem 0 0.6rem;
-      font-weight: 500;
-      font-size: 0.95rem;
-      color: #1f4d66;
-      letter-spacing: 0.3px;
-      font-variant-numeric: tabular-nums;
-    }
-    .quiz-wrapper .timer-line .timer {
-      font-weight: 700;
-      color: #0b2a3b;
-      background: #f0f4f9;
-      padding: 0.15rem 1.2rem;
-      border-radius: 60px;
-    }
-    .quiz-wrapper .timer-line .timer.warning {
-      color: #856404;
-      background: #fff3cd;
-    }
-    .quiz-wrapper .timer-line .timer.danger {
-      color: #b33c3c;
-      background: #f8d7da;
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .quiz-wrapper .progress-block {
-      background: #e8eff5;
-      height: 8px;
-      border-radius: 20px;
-      margin: 0.4rem 0 1.2rem;
-      overflow: hidden;
-    }
-    .quiz-wrapper .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #2f7b9e, #4ba3c7);
-      border-radius: 20px;
-      transition: width 0.5s ease;
-    }
-
-    .quiz-wrapper .q-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-wrap: wrap;
-      gap: 0.4rem 1rem;
-      margin-bottom: 0.3rem;
-    }
-    .quiz-wrapper .q-label {
-      font-weight: 700;
-      font-size: 0.8rem;
-      color: #1f4d66;
-      background: #eaf1f8;
-      padding: 0.2rem 1.2rem;
-      border-radius: 40px;
-      letter-spacing: 0.5px;
-    }
-    .quiz-wrapper .q-category {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #1f5672;
-      background: rgba(26, 90, 122, 0.06);
-      padding: 0.15rem 1.2rem;
-      border-radius: 30px;
-      border: 1px solid rgba(26, 90, 122, 0.08);
-    }
-
-    .quiz-wrapper .question-text {
-      font-size: 1.4rem;
-      font-weight: 600;
-      line-height: 1.6;
-      color: #0a212b;
-      margin: 0.6rem 0 1.6rem;
-      min-height: 4rem;
-      padding: 0.2rem 0;
-    }
-
-    .quiz-wrapper .options-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-      margin-bottom: 1.6rem;
-    }
-    .quiz-wrapper .option-btn {
-      background: white;
-      border: 2px solid #e2eaf2;
-      border-radius: 60px;
-      padding: 0.85rem 1.8rem;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #1d3847;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-    }
-    .quiz-wrapper .option-btn:hover:not(:disabled) {
-      background: #f5faff;
-      border-color: #6fa6c7;
-      transform: translateX(4px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    }
-    .quiz-wrapper .option-btn .letter {
-      background: #e7f0f7;
-      color: #1a5a7a;
-      font-weight: 700;
-      width: 32px;
-      height: 32px;
-      border-radius: 30px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: 0.2s;
-    }
-    .quiz-wrapper .option-btn.correct {
-      background: #d4edda;
-      border-color: #28a745;
-      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
-    }
-    .quiz-wrapper .option-btn.correct .letter {
-      background: #28a745;
-      color: white;
-    }
-    .quiz-wrapper .option-btn.wrong {
-      background: #f8d7da;
-      border-color: #dc3545;
-      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
-    }
-    .quiz-wrapper .option-btn.wrong .letter {
-      background: #dc3545;
-      color: white;
-    }
-    .quiz-wrapper .option-btn:disabled {
-      cursor: default;
-      opacity: 0.85;
-    }
-    .quiz-wrapper .option-btn:disabled:hover {
-      transform: none;
-      box-shadow: none;
-    }
-
-    .quiz-wrapper .action-bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin: 0.2rem 0 1.2rem;
-    }
-    .quiz-wrapper .feedback-msg {
-      font-weight: 500;
-      font-size: 0.9rem;
-      padding: 0.4rem 1.4rem;
-      border-radius: 60px;
-      background: #f0f4f9;
-      min-height: 2.8rem;
-      display: flex;
-      align-items: center;
-      flex: 1;
-      gap: 0.5rem;
-    }
-    .quiz-wrapper .feedback-msg .no-answer {
-      font-size: 0.7rem;
-      color: #999;
-      font-weight: 400;
-    }
-    .quiz-wrapper .nav-group {
-      display: flex;
-      gap: 0.7rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .quiz-wrapper .btn-primary {
-      background: linear-gradient(145deg, #0b2a3b, #1a4b62);
-      border: none;
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 0.6rem 2.4rem;
-      border-radius: 60px;
-      cursor: pointer;
-      box-shadow: 0 6px 18px rgba(11, 42, 59, 0.16);
-      transition: 0.2s;
-    }
-    .quiz-wrapper .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(11, 42, 59, 0.2);
-    }
-    .quiz-wrapper .btn-primary:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .quiz-wrapper .overview-section {
-      margin-top: 1.2rem;
-      border-top: 2px solid #eef3f8;
-      padding-top: 1rem;
-    }
-    .quiz-wrapper .overview-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.6rem;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-    .quiz-wrapper .overview-header span {
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: #1f4d66;
-      letter-spacing: 0.5px;
-    }
-    .quiz-wrapper .legend {
-      display: flex;
-      gap: 0.8rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: #2d5a72;
-      flex-wrap: wrap;
-    }
-    .quiz-wrapper .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      background: #f5f8fc;
-      padding: 0.15rem 0.7rem 0.15rem 0.4rem;
-      border-radius: 30px;
-    }
-    .quiz-wrapper .legend-item .count {
-      font-weight: 700;
-      font-size: 0.75rem;
-      min-width: 1.2rem;
-      text-align: center;
-    }
-    .quiz-wrapper .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 30px;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-    .quiz-wrapper .legend-dot.correct-dot { background: #28a745; }
-    .quiz-wrapper .legend-dot.wrong-dot { background: #dc3545; }
-    .quiz-wrapper .legend-dot.active { background: #2f7b9e; }
-    .quiz-wrapper .legend-dot.pending { background: #dce6ef; }
-
-    .quiz-wrapper .grid-dots {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      justify-content: center;
-      margin-top: 0.3rem;
-    }
-    .quiz-wrapper .grid-dot {
-      width: 34px;
-      height: 34px;
-      border-radius: 30px;
-      background: #e8eff5;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.7rem;
-      color: #1d4b61;
-      transition: 0.2s;
-      cursor: default;
-    }
-    .quiz-wrapper .grid-dot.active {
-      background: #2f7b9e;
-      color: white;
-      box-shadow: 0 0 0 3px rgba(47, 123, 158, 0.25);
-      transform: scale(1.05);
-    }
-    .quiz-wrapper .grid-dot.correct-dot {
-      background: #28a745;
-      color: white;
-    }
-    .quiz-wrapper .grid-dot.wrong-dot {
-      background: #dc3545;
-      color: white;
-    }
-    .quiz-wrapper .grid-dot.no-answer-dot {
-      background: #adb5bd;
-      color: white;
-    }
-    .quiz-wrapper .grid-dot.timeout {
-      background: #6c757d;
-      color: white;
-      opacity: 0.5;
-    }
-
-    .quiz-wrapper .result-card {
-      text-align: center;
-      padding: 1.5rem 0.5rem 0.5rem;
-      display: none;
-    }
-    .quiz-wrapper .result-card .result-icon {
-      font-size: 4rem;
-      margin-bottom: 0.5rem;
-    }
-    .quiz-wrapper .result-card h2 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #0b2a3b;
-    }
-    .quiz-wrapper .result-score {
-      font-size: 4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #1a5a7a, #48a0c7);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin: 0.2rem 0 0.1rem;
-    }
-    .quiz-wrapper .result-msg {
-      color: #1f4b61;
-      font-size: 1.1rem;
-      margin: 0.2rem 0 1.6rem;
-    }
-
-    /* ---------- RESPONSIVE ---------- */
-    @media (max-width: 600px) {
-      .login-wrapper { padding: 2rem 1.4rem; }
-      .login-wrapper h1 { font-size: 1.6rem; }
-      .quiz-wrapper { padding: 1.4rem 1rem; }
-      .quiz-wrapper .brand-logo { width: 38px; height: 38px; }
-      .quiz-wrapper .brand-title h1 { font-size: 1.2rem; }
-      .quiz-wrapper .question-text { font-size: 1.1rem; min-height: 3rem; }
-      .quiz-wrapper .option-btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
-      .quiz-wrapper .action-bar { flex-direction: column; align-items: stretch; }
-      .quiz-wrapper .btn-primary { width: 100%; justify-content: center; }
-      .quiz-wrapper .nav-group { width: 100%; }
-      .quiz-wrapper .grid-dot { width: 30px; height: 30px; font-size: 0.65rem; }
-      .quiz-wrapper .legend { font-size: 0.6rem; gap: 0.3rem; }
-      .quiz-wrapper .legend-item { padding: 0.1rem 0.4rem 0.1rem 0.3rem; }
-      .quiz-wrapper .user-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem 0.2rem 0.5rem; }
-      .quiz-wrapper .user-badge .avatar { width: 24px; height: 24px; font-size: 0.6rem; }
-      .toast-container { top: 0.8rem; right: 0.8rem; max-width: calc(100% - 1.6rem); }
-      .quiz-wrapper .session-restore { display: none; }
-    }
-
-    /* ---------- SCROLLBAR ---------- */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f0f4f9; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb { background: #b0c8d8; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #8aa3b5; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civil Servants Act, 1973 — FIA MCQs Quick Reference</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 20px;
+    line-height: 1.5;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+    border-radius: 16px;
+    padding: 32px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    border: 1px solid #2d5a87;
+  }
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  header p {
+    color: #94a3b8;
+    font-size: 0.95rem;
+  }
+  header .badge {
+    display: inline-block;
+    background: #f59e0b;
+    color: #0f172a;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: 10px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .controls input,
+  .controls select {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .controls input:focus,
+  .controls select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+  }
+  .controls input {
+    flex: 1;
+    min-width: 220px;
+  }
+  .controls select {
+    min-width: 160px;
+    cursor: pointer;
+  }
+  .controls .count {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid #1e293b;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 900px;
+  }
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  thead th {
+    background: #1e293b;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.8px;
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 2px solid #334155;
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid #1e293b;
+    transition: background 0.15s;
+  }
+  tbody tr:hover {
+    background: #1e293b;
+  }
+  tbody tr:nth-child(even) {
+    background: #0f172a;
+  }
+  tbody tr:nth-child(even):hover {
+    background: #1e293b;
+  }
+  td {
+    padding: 11px 12px;
+    vertical-align: top;
+    color: #cbd5e1;
+  }
+  td.row-num {
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-align: center;
+    width: 50px;
+  }
+  td.ref {
+    color: #38bdf8;
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 0.82rem;
+  }
+  td.category {
+    color: #a78bfa;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.82rem;
+  }
+  td.memory {
+    color: #e2e8f0;
+    line-height: 1.55;
+    min-width: 400px;
+  }
+  .status {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .status.vimp {
+    background: #dc2626;
+    color: #fff;
+  }
+  .status.imp {
+    background: #f59e0b;
+    color: #0f172a;
+  }
+  .status.note {
+    background: #475569;
+    color: #cbd5e1;
+  }
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+    font-size: 1rem;
+  }
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    header { padding: 20px 16px; }
+    header h1 { font-size: 1.3rem; }
+    .controls input, .controls select { font-size: 0.82rem; padding: 8px 12px; }
+    td.memory { min-width: 260px; font-size: 0.8rem; }
+  }
+</style>
 </head>
 <body>
+<div class="container">
+  <header>
+    <h1>Civil Servants Act, 1973 <span class="badge">FIA MCQs</span></h1>
+    <p>One-line memory notes for every Section, Sub-section, Clause &amp; Rule — with importance status</p>
+  </header>
 
-  <!-- ============================================================ -->
-  <!-- TOAST CONTAINER -->
-  <!-- ============================================================ -->
-  <div class="toast-container" id="toastContainer"></div>
-
-  <!-- ============================================================ -->
-  <!-- LOGIN SCREEN -->
-  <!-- ============================================================ -->
-  <div class="login-wrapper" id="loginScreen">
-    <img class="logo" id="loginLogo"
-         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230b2a3b'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter, sans-serif' font-size='38' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
-         alt="Logo" />
-    <h1>Self Learners</h1>
-    <p class="sub">Sign in to continue your quiz</p>
-
-    <label for="emailInput">Email / Username</label>
-    <div class="input-group">
-      <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username" />
-    </div>
-
-    <label for="passwordInput">Password</label>
-    <div class="input-group">
-      <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password" />
-      <button class="toggle-password" id="togglePasswordBtn" type="button" aria-label="Toggle password visibility">
-        👁️
-      </button>
-    </div>
-
-    <button class="btn-primary" id="loginBtn">Sign In</button>
-    <div class="login-footer">
-      <span id="loginStatus">Loading user data...</span>
-    </div>
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍 Search by reference, keyword, or content...">
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+      <option value="Civil Servants Act, 1973">Civil Servants Act, 1973</option>
+      <option value="APT Rules, 1973">APT Rules, 1973</option>
+      <option value="Intl Orgs Rules, 2016">Intl Orgs Rules, 2016</option>
+      <option value="E&D Rules, 2020">E&D Rules, 2020</option>
+      <option value="E&D Rules, 1973">E&D Rules, 1973</option>
+    </select>
+    <select id="statusFilter">
+      <option value="">All Statuses</option>
+      <option value="V.Imp">V.Imp (Very Important)</option>
+      <option value="Imp">Imp (Important)</option>
+      <option value="Note">Note</option>
+    </select>
+    <span class="count" id="countDisplay"></span>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- QUIZ SCREEN -->
-  <!-- ============================================================ -->
-  <div class="quiz-wrapper" id="quizScreen">
-    <!-- header -->
-    <div class="top-bar">
-      <div class="brand">
-        <img class="brand-logo" id="quizLogo"
-             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='14' fill='%230b2a3b'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter, sans-serif' font-size='24' font-weight='800' fill='white'%3ESL%3C/text%3E%3C/svg%3E"
-             alt="Logo" />
-        <div class="brand-title">
-          <h1 id="quizTitle">Loading...</h1>
-          <span class="subtitle" id="quizSubtitle">Self Learners</span>
-        </div>
-      </div>
-      <div class="user-badge" id="userBadge">
-        <span class="avatar" id="userAvatar">U</span>
-        <span id="userNameDisplay">User</span>
-        <span class="session-restore" id="sessionBadge"></span>
-      </div>
-    </div>
-
-    <!-- timer -->
-    <div class="timer-line">
-      ⏱️ <span class="timer" id="timerDisplay">00:00</span>
-    </div>
-
-    <div id="quizContent">
-      <!-- progress -->
-      <div class="progress-block">
-        <div class="progress-fill" id="progressFill" style="width:0%;"></div>
-      </div>
-
-      <!-- question area -->
-      <div id="questionArea">
-        <div class="q-meta">
-          <span class="q-label" id="qNumber">QUESTION 1 OF 0</span>
-          <span class="q-category" id="qCategory">📚 Loading...</span>
-        </div>
-        <div class="question-text" id="questionText">Loading questions from spreadsheet...</div>
-
-        <div class="options-grid" id="optionsContainer"></div>
-
-        <div class="action-bar">
-          <div class="feedback-msg" id="feedbackMessage">
-            <span>✨</span> Select an answer
-          </div>
-          <div class="nav-group">
-            <button class="btn-primary" id="nextBtn" disabled>Next →</button>
-          </div>
-        </div>
-
-        <!-- overview -->
-        <div class="overview-section">
-          <div class="overview-header">
-            <span>📊 OVERVIEW</span>
-            <div class="legend" id="legendContainer">
-              <span class="legend-item"><span class="legend-dot correct-dot"></span> Correct <span class="count" id="correctCount">0</span></span>
-              <span class="legend-item"><span class="legend-dot wrong-dot"></span> Wrong <span class="count" id="wrongCount">0</span></span>
-              <span class="legend-item"><span class="legend-dot active"></span> Active <span class="count" id="activeCount">0</span></span>
-              <span class="legend-item"><span class="legend-dot pending"></span> Pending <span class="count" id="pendingCount">0</span></span>
-            </div>
-          </div>
-          <div class="grid-dots" id="dotGrid"></div>
-        </div>
-      </div>
-
-      <!-- result -->
-      <div class="result-card" id="resultArea">
-        <div class="result-icon" id="resultIcon">🏆</div>
-        <h2>Quiz Complete!</h2>
-        <div class="result-score" id="finalScore">0 / 0</div>
-        <p class="result-msg" id="resultMessage">Keep learning, Self Learner!</p>
-        <button class="btn-primary" id="restartFromResult">⟳ Try Again</button>
-      </div>
-    </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Category</th>
+          <th>Reference</th>
+          <th>One-Line Memory</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
   </div>
-
-  <!-- ============================================================ -->
-  <!-- JAVASCRIPT -->
-  <!-- ============================================================ -->
-  <script>
-    (function() {
-      // --------------------------------------------------------------
-      // 1. CONFIGURATION – CSV EXPORT URLs
-      // --------------------------------------------------------------
-      const LOGIN_CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=2051134983';
-      const QUIZ_CSV_URL = 'https://docs.google.com/spreadsheets/d/1snRQ9V8cBfl9lOa2rJ9K26jXqe5FSgUdc4gbKbAh3ZU/export?format=csv&gid=1660453242';
-      const LOGO_URL = 'https://lh3.googleusercontent.com/d/1HSG8m9oD2294rVVNOYekkbBJZlBKLfVL';
-
-      // --------------------------------------------------------------
-      // 2. TOAST SYSTEM
-      // --------------------------------------------------------------
-      const toastContainer = document.getElementById('toastContainer');
-
-      function showToast(message, type = 'info', duration = 4000) {
-        const icons = {
-          success: '✅',
-          error: '❌',
-          warning: '⚠️',
-          info: 'ℹ️'
-        };
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-          <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
-          <span>${message}</span>
-          <button class="toast-close" aria-label="Close notification">✕</button>
-        `;
-        toastContainer.appendChild(toast);
-
-        toast.querySelector('.toast-close').addEventListener('click', () => {
-          removeToast(toast);
-        });
-
-        setTimeout(() => {
-          removeToast(toast);
-        }, duration);
-
-        return toast;
-      }
-
-      function removeToast(toast) {
-        if (toast.classList.contains('removing')) return;
-        toast.classList.add('removing');
-        setTimeout(() => {
-          if (toast.parentNode) toast.parentNode.removeChild(toast);
-        }, 300);
-      }
-
-      // --------------------------------------------------------------
-      // 3. DOM REFS – LOGIN
-      // --------------------------------------------------------------
-      const loginScreen = document.getElementById('loginScreen');
-      const quizScreen = document.getElementById('quizScreen');
-      const emailInput = document.getElementById('emailInput');
-      const passwordInput = document.getElementById('passwordInput');
-      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-      const loginBtn = document.getElementById('loginBtn');
-      const loginStatus = document.getElementById('loginStatus');
-      const loginLogo = document.getElementById('loginLogo');
-
-      // --------------------------------------------------------------
-      // 4. DOM REFS – QUIZ
-      // --------------------------------------------------------------
-      const progressFill = document.getElementById('progressFill');
-      const qNumber = document.getElementById('qNumber');
-      const qCategory = document.getElementById('qCategory');
-      const questionText = document.getElementById('questionText');
-      const optionsContainer = document.getElementById('optionsContainer');
-      const feedbackMessage = document.getElementById('feedbackMessage');
-      const nextBtn = document.getElementById('nextBtn');
-      const restartFromResult = document.getElementById('restartFromResult');
-      const questionArea = document.getElementById('questionArea');
-      const resultArea = document.getElementById('resultArea');
-      const finalScore = document.getElementById('finalScore');
-      const resultMessage = document.getElementById('resultMessage');
-      const resultIcon = document.getElementById('resultIcon');
-      const dotGrid = document.getElementById('dotGrid');
-      const timerDisplay = document.getElementById('timerDisplay');
-      const quizTitle = document.getElementById('quizTitle');
-      const quizSubtitle = document.getElementById('quizSubtitle');
-      const correctCount = document.getElementById('correctCount');
-      const wrongCount = document.getElementById('wrongCount');
-      const activeCount = document.getElementById('activeCount');
-      const pendingCount = document.getElementById('pendingCount');
-      const quizLogo = document.getElementById('quizLogo');
-      const userBadge = document.getElementById('userBadge');
-      const userAvatar = document.getElementById('userAvatar');
-      const userNameDisplay = document.getElementById('userNameDisplay');
-      const sessionBadge = document.getElementById('sessionBadge');
-
-      // --------------------------------------------------------------
-      // 5. LOAD LOGO
-      // --------------------------------------------------------------
-      function loadLogo(imgElement) {
-        if (!LOGO_URL) return;
-        const img = new Image();
-        img.onload = function() { imgElement.src = LOGO_URL; };
-        img.onerror = function() { /* keep fallback */ };
-        img.src = LOGO_URL;
-      }
-      loadLogo(loginLogo);
-      loadLogo(quizLogo);
-
-      // --------------------------------------------------------------
-      // 6. PASSWORD TOGGLE
-      // --------------------------------------------------------------
-      let passwordVisible = false;
-      togglePasswordBtn.addEventListener('click', function() {
-        passwordVisible = !passwordVisible;
-        passwordInput.type = passwordVisible ? 'text' : 'password';
-        togglePasswordBtn.textContent = passwordVisible ? '🙈' : '👁️';
-      });
-
-      // --------------------------------------------------------------
-      // 7. SESSION MANAGEMENT
-      // --------------------------------------------------------------
-      const SESSION_KEY = 'quiz_session_data';
-
-      function saveSession() {
-        const sessionData = {
-          user: loggedInUser,
-          questions: questions,
-          currentIndex: currentIndex,
-          score: score,
-          answerStatus: answerStatus,
-          quizCompleted: quizCompleted,
-          quizTimedOut: quizTimedOut,
-          timeRemaining: timeRemaining,
-          totalQuestions: totalQuestions,
-          quizTitleText: quizTitleText,
-          timestamp: new Date().toISOString()
-        };
-        try {
-          sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
-        } catch (e) {
-          console.warn('Could not save session:', e);
-        }
-      }
-
-      function loadSession() {
-        try {
-          const raw = sessionStorage.getItem(SESSION_KEY);
-          if (!raw) return null;
-          const data = JSON.parse(raw);
-          // Check if session is less than 24 hours old
-          const age = Date.now() - new Date(data.timestamp).getTime();
-          if (age > 24 * 60 * 60 * 1000) {
-            sessionStorage.removeItem(SESSION_KEY);
-            return null;
-          }
-          return data;
-        } catch (e) {
-          return null;
-        }
-      }
-
-      function clearSession() {
-        sessionStorage.removeItem(SESSION_KEY);
-      }
-
-      // --------------------------------------------------------------
-      // 8. LOGIN SYSTEM
-      // --------------------------------------------------------------
-      let users = [];
-      let isLoadingUsers = true;
-      let loggedInUser = null;
-
-      function fetchUsers() {
-        loginStatus.textContent = '⏳ Loading user data...';
-        loginBtn.disabled = true;
-
-        showToast('Loading user credentials...', 'info', 2000);
-
-        fetch(LOGIN_CSV_URL)
-          .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.text();
-          })
-          .then(csvText => {
-            users = parseLoginCSV(csvText);
-            isLoadingUsers = false;
-            loginStatus.textContent = `✅ ${users.length} users loaded`;
-            loginBtn.disabled = false;
-            showToast(`✅ ${users.length} users loaded. Please sign in.`, 'success', 3000);
-
-            // Check for saved session after users loaded
-            checkForSession();
-          })
-          .catch(err => {
-            console.error('Login load error:', err);
-            loginStatus.textContent = '⚠️ Failed to load user data';
-            loginBtn.disabled = true;
-            showToast('⚠️ Failed to load user data. Please refresh or check the CSV link.', 'error', 5000);
-          });
-      }
-
-      function parseLoginCSV(text) {
-        const lines = text.split('\n').filter(line => line.trim() !== '');
-        if (lines.length < 2) return [];
-        const result = [];
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCSVLine(lines[i]);
-          if (cols.length < 2) continue;
-          const email = cols[0] ? cols[0].trim() : '';
-          const password = cols[1] ? cols[1].trim() : '';
-          if (email && password) result.push({ email, password });
-        }
-        return result;
-      }
-
-      function handleLogin() {
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
-
-        if (!email || !password) {
-          showToast('⚠️ Please enter both email and password.', 'warning', 3000);
-          return;
-        }
-        if (isLoadingUsers) {
-          showToast('⏳ User data is still loading. Please wait.', 'warning', 2500);
-          return;
-        }
-
-        const matched = users.find(u =>
-          u.email.toLowerCase() === email.toLowerCase() &&
-          u.password === password
-        );
-
-        if (matched) {
-          loggedInUser = matched;
-          // Clear any old session
-          clearSession();
-          showToast(`✅ Welcome, ${matched.email}!`, 'success', 2500);
-          initQuizForUser(matched);
-        } else {
-          showToast('❌ Invalid email or password. Please try again.', 'error', 3000);
-          loginStatus.textContent = '❌ Login failed';
-        }
-      }
-
-      // --------------------------------------------------------------
-      // 9. SESSION RESTORE CHECK
-      // --------------------------------------------------------------
-      function checkForSession() {
-        const session = loadSession();
-        if (!session || !session.user) return;
-
-        // Verify user still exists in the loaded users list
-        const userExists = users.some(u => 
-          u.email.toLowerCase() === session.user.email.toLowerCase()
-        );
-        if (!userExists) {
-          clearSession();
-          return;
-        }
-
-        // Restore session
-        loggedInUser = session.user;
-        questions = session.questions || [];
-        currentIndex = session.currentIndex || 0;
-        score = session.score || 0;
-        answerStatus = session.answerStatus || [];
-        quizCompleted = session.quizCompleted || false;
-        quizTimedOut = session.quizTimedOut || false;
-        timeRemaining = session.timeRemaining || 0;
-        totalQuestions = session.totalQuestions || 0;
-        quizTitleText = session.quizTitleText || 'Quiz';
-
-        // If quiz was already completed, show result
-        if (quizCompleted) {
-          showToast(`🔄 Restoring completed quiz for ${loggedInUser.email}`, 'info', 3000);
-          loginScreen.style.display = 'none';
-          quizScreen.style.display = 'block';
-          updateUserBadge(loggedInUser);
-          sessionBadge.textContent = '↻ Restored';
-          showResult();
-          return;
-        }
-
-        // If questions exist, restore the quiz state
-        if (questions.length > 0) {
-          showToast(`🔄 Welcome back, ${loggedInUser.email}! Resuming quiz...`, 'success', 3000);
-          loginScreen.style.display = 'none';
-          quizScreen.style.display = 'block';
-          updateUserBadge(loggedInUser);
-          sessionBadge.textContent = '↻ Restored';
-          restoreQuiz();
-          return;
-        }
-
-        // If no questions, but user logged in, fetch fresh
-        if (loggedInUser) {
-          loginScreen.style.display = 'none';
-          quizScreen.style.display = 'block';
-          updateUserBadge(loggedInUser);
-          sessionBadge.textContent = '↻ Restored';
-          fetchQuizQuestions();
-        }
-      }
-
-      // --------------------------------------------------------------
-      // 10. QUIZ SYSTEM
-      // --------------------------------------------------------------
-      let questions = [];
-      let currentIndex = 0;
-      let score = 0;
-      let isAnswered = false;
-      let quizCompleted = false;
-      let quizTimedOut = false;
-      let answerStatus = [];
-      let timerInterval = null;
-      let timeRemaining = 0;
-      let totalQuestions = 0;
-      let quizTitleText = 'Quiz';
-
-      function initQuizForUser(user) {
-        loginScreen.style.display = 'none';
-        quizScreen.style.display = 'block';
-        updateUserBadge(user);
-        sessionBadge.textContent = '';
-        fetchQuizQuestions();
-      }
-
-      function updateUserBadge(user) {
-        const initial = user.email.charAt(0).toUpperCase();
-        userAvatar.textContent = initial;
-        userNameDisplay.textContent = user.email;
-      }
-
-      function restoreQuiz() {
-        // Set UI state
-        quizTitle.textContent = quizTitleText;
-        quizSubtitle.textContent = 'Self Learners';
-        
-        // Restore timer
-        if (timeRemaining > 0 && !quizCompleted) {
-          updateTimerDisplay();
-          startTimerFrom(timeRemaining);
-        }
-
-        // Restore progress
-        const progressPercent = totalQuestions > 0 ? (currentIndex / totalQuestions) * 100 : 0;
-        progressFill.style.width = progressPercent + '%';
-
-        // Render the current question
-        if (currentIndex < questions.length) {
-          renderQuestion(currentIndex);
-        } else {
-          showResult();
-        }
-        
-        renderDots();
-        updateLegendCounts();
-        
-        // Show restore notification
-        showToast(`✅ Quiz restored. Question ${currentIndex + 1} of ${totalQuestions}`, 'info', 2500);
-      }
-
-      function startTimerFrom(seconds) {
-        timeRemaining = seconds;
-        updateTimerDisplay();
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-          timeRemaining--;
-          updateTimerDisplay();
-          // Save session periodically (every 5 seconds)
-          if (timeRemaining % 5 === 0) saveSession();
-          if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            handleTimeout();
-          }
-        }, 1000);
-      }
-
-      function fetchQuizQuestions() {
-        questionText.textContent = '📥 Fetching questions...';
-        feedbackMessage.innerHTML = '<span>⏳</span> Loading...';
-        showToast('📥 Loading quiz questions...', 'info', 2000);
-
-        fetch(QUIZ_CSV_URL)
-          .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.text();
-          })
-          .then(csvText => {
-            const parsed = parseQuizCSV(csvText);
-            if (parsed.questions.length === 0) throw new Error('No questions found');
-            questions = parsed.questions;
-            quizTitleText = parsed.title || 'Quiz';
-            totalQuestions = questions.length;
-            answerStatus = new Array(totalQuestions).fill(null);
-            currentIndex = 0;
-            score = 0;
-            quizCompleted = false;
-            quizTimedOut = false;
-            showToast(`✅ ${totalQuestions} questions loaded!`, 'success', 2500);
-            startQuiz();
-          })
-          .catch(err => {
-            console.error('Quiz load error:', err);
-            questionText.textContent = '❌ Failed to load questions. Please check the CSV link.';
-            feedbackMessage.innerHTML = '<span>❌</span> Error loading questions';
-            showToast('❌ Failed to load quiz questions. Please check the CSV link.', 'error', 5000);
-          });
-      }
-
-      function parseQuizCSV(text) {
-        const lines = text.split('\n').filter(line => line.trim() !== '');
-        if (lines.length < 2) return { questions: [], title: 'Quiz' };
-
-        let title = 'Quiz';
-        const result = [];
-
-        if (lines.length > 0) {
-          const firstRow = parseCSVLine(lines[0]);
-          if (firstRow.length > 2 && firstRow[2]) {
-            title = firstRow[2].trim() || 'Quiz';
-          }
-        }
-
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCSVLine(lines[i]);
-          if (cols.length < 6) continue;
-          const question = cols[4] ? cols[4].trim() : '';
-          if (!question) continue;
-          const options = [
-            cols[5] ? cols[5].trim() : '',
-            cols[6] ? cols[6].trim() : '',
-            cols[7] ? cols[7].trim() : '',
-            cols[8] ? cols[8].trim() : ''
-          ];
-          const correctAnswer = cols[9] ? cols[9].trim() : '';
-          let correctIndex = -1;
-          if (correctAnswer) {
-            for (let j = 0; j < options.length; j++) {
-              if (options[j] === correctAnswer) { correctIndex = j; break; }
-            }
-          }
-          result.push({
-            question,
-            options,
-            correct: correctIndex,
-            correctText: correctAnswer || 'No answer in db'
-          });
-        }
-        return { questions: result, title };
-      }
-
-      function parseCSVLine(line) {
-        const result = [];
-        let current = '';
-        let inQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-          const ch = line[i];
-          if (inQuotes) {
-            if (ch === '"' && (i + 1 < line.length && line[i + 1] === '"')) {
-              current += '"';
-              i++;
-            } else if (ch === '"') {
-              inQuotes = false;
-            } else {
-              current += ch;
-            }
-          } else {
-            if (ch === '"') {
-              inQuotes = true;
-            } else if (ch === ',') {
-              result.push(current.trim());
-              current = '';
-            } else {
-              current += ch;
-            }
-          }
-        }
-        result.push(current.trim());
-        return result;
-      }
-
-      // ----- Timer -----
-      function startTimer() {
-        timeRemaining = totalQuestions * 60;
-        updateTimerDisplay();
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-          timeRemaining--;
-          updateTimerDisplay();
-          // Save session every 5 seconds
-          if (timeRemaining % 5 === 0) saveSession();
-          if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            handleTimeout();
-          }
-        }, 1000);
-      }
-
-      function updateTimerDisplay() {
-        const mins = Math.floor(timeRemaining / 60);
-        const secs = timeRemaining % 60;
-        timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        timerDisplay.classList.remove('warning', 'danger');
-        if (timeRemaining < 60) timerDisplay.classList.add('danger');
-        else if (timeRemaining < 300) timerDisplay.classList.add('warning');
-      }
-
-      function handleTimeout() {
-        quizTimedOut = true;
-        quizCompleted = true;
-        document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-        feedbackMessage.innerHTML = '<span>⏰</span> Time is up! Quiz automatically submitted.';
-        feedbackMessage.style.background = '#fff3cd';
-        nextBtn.disabled = true;
-        showToast('⏰ Time is up! Quiz submitted.', 'warning', 3000);
-        saveSession();
-        setTimeout(showResult, 1500);
-      }
-
-      // ----- Quiz Flow -----
-      function startQuiz() {
-        if (questions.length === 0) {
-          questionText.textContent = '⚠️ No questions found.';
-          return;
-        }
-        quizTitle.textContent = quizTitleText;
-        quizSubtitle.textContent = 'Self Learners';
-
-        currentIndex = 0;
-        score = 0;
-        isAnswered = false;
-        quizCompleted = false;
-        quizTimedOut = false;
-        answerStatus = new Array(questions.length).fill(null);
-        resultArea.style.display = 'none';
-        questionArea.style.display = 'block';
-
-        renderQuestion(0);
-        renderDots();
-        updateLegendCounts();
-        startTimer();
-        saveSession();
-      }
-
-      function renderQuestion(index) {
-        const q = questions[index];
-        if (!q) return;
-
-        const total = questions.length;
-        progressFill.style.width = ((index) / total * 100) + '%';
-
-        qNumber.textContent = `QUESTION ${index+1} OF ${total}`;
-        qCategory.textContent = `📚 Question ${index+1}`;
-        questionText.textContent = q.question;
-
-        const letters = ['A', 'B', 'C', 'D'];
-        optionsContainer.innerHTML = '';
-        q.options.forEach((opt, idx) => {
-          const btn = document.createElement('button');
-          btn.className = 'option-btn';
-          btn.innerHTML = `<span class="letter">${letters[idx]}</span> ${opt || '(Empty)'}`;
-          btn.dataset.index = idx;
-          btn.addEventListener('click', () => handleOptionClick(idx));
-          if (!opt || quizTimedOut) {
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
-          }
-          optionsContainer.appendChild(btn);
-        });
-
-        if (q.correct === -1) {
-          feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(Column J doesn't match any choice)</span>`;
-          feedbackMessage.style.background = '#fff3cd';
-          if (!quizTimedOut && !quizCompleted) {
-            setTimeout(() => {
-              if (!isAnswered && !quizCompleted) {
-                answerStatus[currentIndex] = null;
-                isAnswered = true;
-                nextBtn.disabled = false;
-                renderDots();
-                updateLegendCounts();
-                feedbackMessage.innerHTML = `⏭️ Skipped (no answer in db) <span class="no-answer">Moving to next question</span>`;
-                feedbackMessage.style.background = '#e9ecef';
-                showToast('⏭️ No answer in database. Skipping.', 'warning', 2000);
-                saveSession();
-              }
-            }, 800);
-          }
-        } else {
-          if (!quizTimedOut && !quizCompleted) {
-            feedbackMessage.innerHTML = '<span>✨</span> Select an answer';
-            feedbackMessage.style.background = '#f0f4f9';
-          }
-        }
-
-        isAnswered = false;
-        nextBtn.disabled = true;
-
-        document.querySelectorAll('.option-btn').forEach(btn => {
-          btn.disabled = quizTimedOut || quizCompleted;
-          btn.classList.remove('correct', 'wrong');
-        });
-
-        resultArea.style.display = 'none';
-        questionArea.style.display = 'block';
-        renderDots();
-        updateLegendCounts();
-        saveSession();
-      }
-
-      function handleOptionClick(selectedIdx) {
-        if (isAnswered || quizTimedOut || quizCompleted) return;
-        const q = questions[currentIndex];
-        if (q.correct === -1) {
-          feedbackMessage.innerHTML = `⚠️ No answer in db <span class="no-answer">(This question has no matching answer in Column J)</span>`;
-          feedbackMessage.style.background = '#fff3cd';
-          return;
-        }
-
-        const isCorrect = (selectedIdx === q.correct);
-        const allOptions = document.querySelectorAll('.option-btn');
-
-        allOptions.forEach(btn => btn.disabled = true);
-        allOptions.forEach((btn, idx) => {
-          if (idx === q.correct) btn.classList.add('correct');
-          else if (idx === selectedIdx && !isCorrect) btn.classList.add('wrong');
-        });
-
-        if (isCorrect) {
-          score += 1;
-          feedbackMessage.innerHTML = '<span>✅</span> Correct! +1 point';
-          feedbackMessage.style.background = '#d4edda';
-          answerStatus[currentIndex] = true;
-          showToast('✅ Correct!', 'success', 1500);
-        } else {
-          feedbackMessage.innerHTML = `❌ The correct answer was "${q.options[q.correct]}"`;
-          feedbackMessage.style.background = '#f8d7da';
-          answerStatus[currentIndex] = false;
-          showToast(`❌ Incorrect. The answer was "${q.options[q.correct]}"`, 'error', 2500);
-        }
-
-        isAnswered = true;
-        nextBtn.disabled = false;
-        renderDots();
-        updateLegendCounts();
-        saveSession();
-      }
-
-      function goToNext() {
-        if (!isAnswered || quizCompleted) return;
-        if (currentIndex + 1 < questions.length) {
-          currentIndex++;
-          renderQuestion(currentIndex);
-        } else {
-          if (!quizTimedOut) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-          }
-          showResult();
-        }
-      }
-
-      function showResult() {
-        quizCompleted = true;
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-
-        questionArea.style.display = 'none';
-        resultArea.style.display = 'block';
-
-        const total = questions.length;
-        const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
-        finalScore.textContent = `${score} / ${total}`;
-        progressFill.style.width = '100%';
-
-        let msg = quizTimedOut ? '⏰ Time ran out! ' : '';
-        msg += getScoreMessage(score, total);
-        resultMessage.textContent = msg;
-
-        if (percentage === 100) resultIcon.textContent = '🌟';
-        else if (percentage >= 70) resultIcon.textContent = '🎉';
-        else if (percentage >= 40) resultIcon.textContent = '📖';
-        else resultIcon.textContent = '💪';
-
-        nextBtn.disabled = true;
-        renderDots();
-        updateLegendCounts();
-        clearSession(); // Clear session when quiz is complete
-        showToast(`🏁 Quiz complete! Score: ${score}/${total} (${percentage}%)`, 'info', 4000);
-      }
-
-      function getScoreMessage(score, total) {
-        const pct = total > 0 ? Math.round((score / total) * 100) : 0;
-        if (pct === 100) return '🌟 Perfect! You are a true Self Learner!';
-        else if (pct >= 70) return '👏 Great job! Keep growing every day!';
-        else if (pct >= 40) return '📖 Good effort! Review and try again.';
-        else return '💪 Learning is a journey. Keep practicing!';
-      }
-
-      function renderDots() {
-        dotGrid.innerHTML = '';
-        const total = questions.length;
-        for (let i = 0; i < total; i++) {
-          const dot = document.createElement('div');
-          dot.className = 'grid-dot';
-          dot.textContent = i + 1;
-
-          if (i === currentIndex && !quizCompleted && !quizTimedOut) {
-            dot.classList.add('active');
-          }
-          if (questions[i] && questions[i].correct === -1) {
-            dot.classList.add('no-answer-dot');
-          } else if (answerStatus[i] === true) {
-            dot.classList.add('correct-dot');
-          } else if (answerStatus[i] === false) {
-            dot.classList.add('wrong-dot');
-          }
-          if (quizTimedOut && answerStatus[i] === null && questions[i] && questions[i].correct !== -1) {
-            dot.classList.add('timeout');
-          }
-          dotGrid.appendChild(dot);
-        }
-      }
-
-      function updateLegendCounts() {
-        let correct = 0, wrong = 0, active = 0, pending = 0;
-        const total = questions.length;
-        for (let i = 0; i < total; i++) {
-          if (questions[i] && questions[i].correct === -1) {
-            pending++;
-          } else if (answerStatus[i] === true) {
-            correct++;
-          } else if (answerStatus[i] === false) {
-            wrong++;
-          } else if (i === currentIndex && !quizCompleted && !quizTimedOut) {
-            active++;
-          } else {
-            pending++;
-          }
-        }
-        correctCount.textContent = correct;
-        wrongCount.textContent = wrong;
-        activeCount.textContent = active;
-        pendingCount.textContent = pending;
-      }
-
-      function restartQuiz() {
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-        clearSession();
-        if (questions.length === 0) {
-          fetchQuizQuestions();
-          return;
-        }
-        showToast('🔄 Restarting quiz...', 'info', 1500);
-        currentIndex = 0;
-        score = 0;
-        isAnswered = false;
-        quizCompleted = false;
-        quizTimedOut = false;
-        answerStatus = new Array(questions.length).fill(null);
-        resultArea.style.display = 'none';
-        questionArea.style.display = 'block';
-        renderQuestion(0);
-        renderDots();
-        updateLegendCounts();
-        startTimer();
-        saveSession();
-      }
-
-      // --------------------------------------------------------------
-      // 11. EVENT LISTENERS
-      // --------------------------------------------------------------
-      loginBtn.addEventListener('click', handleLogin);
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !loginBtn.disabled) {
-          const active = document.activeElement;
-          if (active === emailInput || active === passwordInput) {
-            handleLogin();
-          }
-        }
-      });
-
-      nextBtn.addEventListener('click', goToNext);
-      restartFromResult.addEventListener('click', restartQuiz);
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !nextBtn.disabled && quizScreen.style.display !== 'none') {
-          goToNext();
-        }
-      });
-
-      // Save session before page unload
-      window.addEventListener('beforeunload', function() {
-        if (loggedInUser && !quizCompleted) {
-          saveSession();
-        }
-      });
-
-      // --------------------------------------------------------------
-      // 12. INIT
-      // --------------------------------------------------------------
-      fetchUsers();
-    })();
-  </script>
+</div>
+
+<script>
+const DATA = [
+  {row:1,cat:"Civil Servants Act, 1973",ref:"S.1",mem:"Short title: Civil Servants Act, 1973; applies to all civil servants wherever they may be; comes into force at once.",status:"V.Imp"},
+  {row:2,cat:"Civil Servants Act, 1973",ref:"S.2(a)",mem:"\"Ad hoc appointment\" = appointment of duly qualified person otherwise than by prescribed method, pending regular recruitment.",status:"Imp"},
+  {row:3,cat:"Civil Servants Act, 1973",ref:"S.2(b)",mem:"\"Civil servant\" = member of All-Pakistan Service / civil service of Federation / holds civil post in Federation affairs (incl. defence); excludes deputationists, contract/work-charged/contingency staff, and workers/workmen.",status:"V.Imp"},
+  {row:4,cat:"Civil Servants Act, 1973",ref:"S.2(c)",mem:"\"Initial appointment\" = appointment otherwise than by promotion or transfer.",status:"Imp"},
+  {row:5,cat:"Civil Servants Act, 1973",ref:"S.2(d)",mem:"\"Pay\" = monthly amount + technical pay, special pay, personal pay, and other emoluments declared as pay.",status:"Imp"},
+  {row:6,cat:"Civil Servants Act, 1973",ref:"S.2(e)",mem:"\"Permanent post\" = post sanctioned without limit of time.",status:"Imp"},
+  {row:7,cat:"Civil Servants Act, 1973",ref:"S.2(f)",mem:"\"Prescribed\" = prescribed by rules.",status:"Imp"},
+  {row:8,cat:"Civil Servants Act, 1973",ref:"S.2(g)",mem:"\"Rules\" = rules made or deemed made under this Act.",status:"Imp"},
+  {row:9,cat:"Civil Servants Act, 1973",ref:"S.2(h)",mem:"\"Selection authority\" = FPSC, departmental selection board/committee, or other authority recommending appointments/promotions.",status:"Imp"},
+  {row:10,cat:"Civil Servants Act, 1973",ref:"S.2(i)",mem:"\"Temporary post\" = post other than a permanent post.",status:"Imp"},
+  {row:11,cat:"Civil Servants Act, 1973",ref:"S.2(2)",mem:"Appointment deemed regular if made in prescribed manner.",status:"Imp"},
+  {row:12,cat:"Civil Servants Act, 1973",ref:"S.3(1)",mem:"Terms & conditions of service = as provided in Act and rules.",status:"V.Imp"},
+  {row:13,cat:"Civil Servants Act, 1973",ref:"S.3(2)",mem:"Terms & conditions cannot be varied to disadvantage of civil servant.",status:"V.Imp"},
+  {row:14,cat:"Civil Servants Act, 1973",ref:"S.3(3)",mem:"Federal Govt may transfer devolved Ministry/Division civil servant to Province (18th Amendment); becomes Province civil servant on same terms.",status:"Imp"},
+  {row:15,cat:"Civil Servants Act, 1973",ref:"S.3(4)",mem:"Federal Govt may transfer civil servant in ICT to another Ministry/Division after abolition (18th Amendment).",status:"Imp"},
+  {row:16,cat:"Civil Servants Act, 1973",ref:"S.3(5)",mem:"Seniority of transferred civil servants (3&4) determined by concerned Province/Ministry/Division per rules.",status:"Imp"},
+  {row:17,cat:"Civil Servants Act, 1973",ref:"S.3(6)",mem:"Civil servants of devolved Ministries in FATA, Gilgit-Baltistan, AJK dealt by Presidential Order.",status:"Imp"},
+  {row:18,cat:"Civil Servants Act, 1973",ref:"S.3 (Removal of Difficulties)",mem:"Federal Govt may make Order to remove difficulties in Civil Servants (Amendment) Act, 2016; power expires after 1 year.",status:"Note"},
+  {row:19,cat:"Civil Servants Act, 1973",ref:"S.4",mem:"Every civil servant holds office during the pleasure of the President.",status:"V.Imp"},
+  {row:20,cat:"Civil Servants Act, 1973",ref:"S.5",mem:"Appointments to All-Pakistan Service / Federal civil service / civil post made by President or authorized person in prescribed manner.",status:"V.Imp"},
+  {row:21,cat:"Civil Servants Act, 1973",ref:"S.6(1)",mem:"Initial appointment (not ad hoc) = on probation as prescribed.",status:"V.Imp"},
+  {row:22,cat:"Civil Servants Act, 1973",ref:"S.6(2)",mem:"Promotion/transfer appointment may also be on probation.",status:"Imp"},
+  {row:23,cat:"Civil Servants Act, 1973",ref:"S.6(2) Proviso",mem:"Failure to pass prescribed exam/test/course/training during probation: initial recruit = discharged; promoter/transferee = reverted or discharged.",status:"V.Imp"},
+  {row:24,cat:"Civil Servants Act, 1973",ref:"S.6(2) Proviso (final)",mem:"Initial appointee probation not satisfactory until character & antecedents verified satisfactory.",status:"Imp"},
+  {row:25,cat:"Civil Servants Act, 1973",ref:"S.7(1)",mem:"On satisfactory completion of probation = eligible for confirmation.",status:"V.Imp"},
+  {row:26,cat:"Civil Servants Act, 1973",ref:"S.7(2)",mem:"Promoted on regular basis = eligible for confirmation after satisfactory service for prescribed period.",status:"Imp"},
+  {row:27,cat:"Civil Servants Act, 1973",ref:"S.7(3)",mem:"No confirmation against temporary post.",status:"V.Imp"},
+  {row:28,cat:"Civil Servants Act, 1973",ref:"S.7(4)",mem:"Retiring before confirmation does not bar confirmation or benefits.",status:"Imp"},
+  {row:29,cat:"Civil Servants Act, 1973",ref:"S.7(5)",mem:"Confirmation effective from permanent vacancy date or continuous officiation date, whichever is later.",status:"Imp"},
+  {row:30,cat:"Civil Servants Act, 1973",ref:"S.8(1)",mem:"Appointing authority prepares seniority list; no vested right to particular seniority.",status:"Imp"},
+  {row:31,cat:"Civil Servants Act, 1973",ref:"S.8(2)",mem:"Seniority reckoned with same service/cadre civil servants, whether same department or not.",status:"Imp"},
+  {row:32,cat:"Civil Servants Act, 1973",ref:"S.8(3)",mem:"Seniority on initial appointment determined as prescribed.",status:"Imp"},
+  {row:33,cat:"Civil Servants Act, 1973",ref:"S.8(4)",mem:"Seniority on promotion effective from date of regular appointment.",status:"V.Imp"},
+  {row:34,cat:"Civil Servants Act, 1973",ref:"S.9(1)",mem:"Civil servant with minimum prescribed qualifications eligible for promotion to higher post reserved for departmental promotion.",status:"V.Imp"},
+  {row:35,cat:"Civil Servants Act, 1973",ref:"S.9(1)(a)",mem:"Additional Secretary & Senior Joint Secretary (BS-20) may be filled by promotion from regularly constituted Occupational Groups/services.",status:"Imp"},
+  {row:36,cat:"Civil Servants Act, 1973",ref:"S.9(1)(b)",mem:"Secretary (BS-21) may be filled by promotion from BS-20 officers of Occupational Groups/services.",status:"Imp"},
+  {row:37,cat:"Civil Servants Act, 1973",ref:"S.9(2)",mem:"Promotion posts: selection post = merit; non-selection post = seniority-cum-fitness.",status:"V.Imp"},
+  {row:38,cat:"Civil Servants Act, 1973",ref:"S.9(3)",mem:"Promotion to BS-20 & 21 = on recommendations of Selection Board headed by Chairman FPSC.",status:"V.Imp"},
+  {row:39,cat:"Civil Servants Act, 1973",ref:"S.10",mem:"Civil servant liable to serve anywhere within/outside Pakistan in equivalent or higher post under Federal/Provincial Govt, local authority, corporation.",status:"V.Imp"},
+  {row:40,cat:"Civil Servants Act, 1973",ref:"S.10 Proviso 1",mem:"Does not apply to civil servant recruited specifically for a particular area/region.",status:"Imp"},
+  {row:41,cat:"Civil Servants Act, 1973",ref:"S.10 Proviso 2",mem:"Outside service/cadre post: pay terms not less favourable than original.",status:"Imp"},
+  {row:42,cat:"Civil Servants Act, 1973",ref:"S.10-A(1)",mem:"No civil servant shall serve in any international organization (incl. INGO, IFI, foreign donor agency) during service.",status:"V.Imp"},
+  {row:43,cat:"Civil Servants Act, 1973",ref:"S.10-A(2)",mem:"Exception: posted/deputed on behalf of Pakistan or with prior Federal Govt permission per rules laid before Parliament.",status:"Imp"},
+  {row:44,cat:"Civil Servants Act, 1973",ref:"S.11(1)(i)",mem:"Service may be terminated without notice during initial/extended probation.",status:"V.Imp"},
+  {row:45,cat:"Civil Servants Act, 1973",ref:"S.11(1)(i) Proviso",mem:"Promoted on probation/transferred: not terminated while holding lien; reverted instead.",status:"Imp"},
+  {row:46,cat:"Civil Servants Act, 1973",ref:"S.11(1)(ii)",mem:"Termination on expiry of initial/extended employment period.",status:"Imp"},
+  {row:47,cat:"Civil Servants Act, 1973",ref:"S.11(1)(iii)",mem:"Ad hoc appointment terminable on appointment of FPSC-recommended person.",status:"Imp"},
+  {row:48,cat:"Civil Servants Act, 1973",ref:"S.11(2)",mem:"On abolition/reduction of posts, most junior in cadre/service terminated ordinarily.",status:"V.Imp"},
+  {row:49,cat:"Civil Servants Act, 1973",ref:"S.11(3)",mem:"Temporary/ad hoc civil servant: termination on 14 days' notice or pay in lieu.",status:"V.Imp"},
+  {row:50,cat:"Civil Servants Act, 1973",ref:"S.11-A",mem:"Surplus civil servant from re-organization/abolition may be appointed to equal BS post; if no equivalent, lower post with protected pay.",status:"Imp"},
+  {row:51,cat:"Civil Servants Act, 1973",ref:"S.11-B(1)",mem:"Appointing authority may refer to FPSC if appointment made without prescribed procedure/qualification/experience/age limit.",status:"Imp"},
+  {row:52,cat:"Civil Servants Act, 1973",ref:"S.11-B(2)",mem:"On FPSC advice, appointing authority may pass just/equitable order; termination requires reasonable opportunity to show cause.",status:"Imp"},
+  {row:53,cat:"Civil Servants Act, 1973",ref:"S.11-B(3)",mem:"Appointment on FPSC advice = fresh appointment; seniority per Civil Servants (Seniority) Rules, 1993.",status:"Imp"},
+  {row:54,cat:"Civil Servants Act, 1973",ref:"S.12(1)",mem:"Ad hoc/temporary/officiating higher post appointee liable to reversion to lower post.",status:"V.Imp"},
+  {row:55,cat:"Civil Servants Act, 1973",ref:"S.12(2)",mem:"No dismissal/removal/reduction by authority subordinate to appointing authority.",status:"V.Imp"},
+  {row:56,cat:"Civil Servants Act, 1973",ref:"S.12(3)",mem:"No dismissal/removal/reduction until reasonable opportunity to show cause.",status:"V.Imp"},
+  {row:57,cat:"Civil Servants Act, 1973",ref:"S.12(3) Proviso (i)",mem:"Exception: conviction on criminal charge.",status:"V.Imp"},
+  {row:58,cat:"Civil Servants Act, 1973",ref:"S.12(3) Proviso (ii)",mem:"Exception: President/authorized person satisfied in writing that security of Pakistan makes it inexpedient.",status:"V.Imp"},
+  {row:59,cat:"Civil Servants Act, 1973",ref:"S.12-A",mem:"Omitted.",status:"Note"},
+  {row:60,cat:"Civil Servants Act, 1973",ref:"S.13(1)(i)",mem:"Retirement after 20 years qualifying service if competent authority directs in public interest.",status:"V.Imp"},
+  {row:61,cat:"Civil Servants Act, 1973",ref:"S.13(1)(ii)",mem:"If no direction, retirement on completion of 60 years of age.",status:"V.Imp"},
+  {row:62,cat:"Civil Servants Act, 1973",ref:"S.13(2)",mem:"No direction under 13(1)(i) until written grounds + reasonable opportunity to show cause.",status:"V.Imp"},
+  {row:63,cat:"Civil Servants Act, 1973",ref:"S.13 Explanation",mem:"\"Competent authority\" = appointing authority per Rule 6 of Civil Servants (APT) Rules, 1973.",status:"Imp"},
+  {row:64,cat:"Civil Servants Act, 1973",ref:"S.14(1)",mem:"Retired civil servant not re-employed under Federal Govt unless necessary in public interest + prior approval of authority next above appointing authority.",status:"V.Imp"},
+  {row:65,cat:"Civil Servants Act, 1973",ref:"S.14(1) Proviso",mem:"If appointing authority is President, re-employment with President's approval.",status:"Imp"},
+  {row:66,cat:"Civil Servants Act, 1973",ref:"S.14(2)",mem:"Civil servant may seek private employment during leave preparatory to retirement or after retirement, subject to Ex-Government Servants (Employment with Foreign Governments) (Prohibition) Act, 1966.",status:"Imp"},
+  {row:67,cat:"Civil Servants Act, 1973",ref:"S.14(2) Proviso",mem:"Prior approval of prescribed authority required if employment sought during leave preparatory to retirement or within 2 years of retirement.",status:"V.Imp"},
+  {row:68,cat:"Civil Servants Act, 1973",ref:"S.15",mem:"Conduct regulated by rules/instructions by Government or prescribed authority.",status:"Imp"},
+  {row:69,cat:"Civil Servants Act, 1973",ref:"S.16",mem:"Civil servant liable to prescribed disciplinary action and penalties per prescribed procedure.",status:"V.Imp"},
+  {row:70,cat:"Civil Servants Act, 1973",ref:"S.17",mem:"Civil servant entitled to pay sanctioned for post per rules; current charge/additional charge pay fixed per rules.",status:"V.Imp"},
+  {row:71,cat:"Civil Servants Act, 1973",ref:"S.17 Proviso 2",mem:"If dismissal/removal/reduction order later set aside, entitled to arrears as determined by setting-aside authority.",status:"Imp"},
+  {row:72,cat:"Civil Servants Act, 1973",ref:"S.18",mem:"Leave per applicable leave rules; grant depends on exigencies of service and competent authority's discretion.",status:"Imp"},
+  {row:73,cat:"Civil Servants Act, 1973",ref:"S.19(1)",mem:"On retirement, entitled to pension/gratuity as prescribed.",status:"V.Imp"},
+  {row:74,cat:"Civil Servants Act, 1973",ref:"S.19(2)",mem:"On death (before/after retirement), family entitled to pension/gratuity/both as prescribed.",status:"V.Imp"},
+  {row:75,cat:"Civil Servants Act, 1973",ref:"S.19(3)",mem:"No pension if dismissed/removed for discipline; Govt may sanction compassionate allowance up to 2/3 of admissible pension/gratuity.",status:"V.Imp"},
+  {row:76,cat:"Civil Servants Act, 1973",ref:"S.19(4)",mem:"If pension/gratuity delayed beyond 1 month, provisional anticipatory pension/gratuity paid; overpayment adjusted later.",status:"Imp"},
+  {row:77,cat:"Civil Servants Act, 1973",ref:"S.20(1)",mem:"Provident fund statement to be furnished before expiry of 3rd month of every financial year.",status:"Imp"},
+  {row:78,cat:"Civil Servants Act, 1973",ref:"S.20(2)",mem:"Uncredited subscription to be credited on prescribed evidence.",status:"Imp"},
+  {row:79,cat:"Civil Servants Act, 1973",ref:"S.21",mem:"Civil servants & families entitled to benefits under Central Employees Benevolent Fund and Group Insurance Act, 1969.",status:"Imp"},
+  {row:80,cat:"Civil Servants Act, 1973",ref:"S.22(1)",mem:"Appeal/review within 30 days of order if provided under rules.",status:"V.Imp"},
+  {row:81,cat:"Civil Servants Act, 1973",ref:"S.22(2)",mem:"If no appeal/review, representation to authority next above within 30 days.",status:"V.Imp"},
+  {row:82,cat:"Civil Servants Act, 1973",ref:"S.22(2) Proviso",mem:"No representation on fitness for particular post/promotion.",status:"V.Imp"},
+  {row:83,cat:"Civil Servants Act, 1973",ref:"S.23",mem:"Saving: President's power to deal justly/equitably not limited; but cannot be less favourable than Act/rules.",status:"Imp"},
+  {row:84,cat:"Civil Servants Act, 1973",ref:"S.23-A",mem:"Indemnity: no suit/prosecution for good faith official acts under Act/rules.",status:"Imp"},
+  {row:85,cat:"Civil Servants Act, 1973",ref:"S.23-B",mem:"Jurisdiction barred: no court questioning orders under Act, except Service Tribunals Act, 1973.",status:"V.Imp"},
+  {row:86,cat:"Civil Servants Act, 1973",ref:"S.24",mem:"President may remove difficulties; power expires 1 year after commencement.",status:"Imp"},
+  {row:87,cat:"Civil Servants Act, 1973",ref:"S.25(1)",mem:"President or authorized person may make rules for Act's purposes.",status:"V.Imp"},
+  {row:88,cat:"Civil Servants Act, 1973",ref:"S.25(2)",mem:"Existing rules/orders/instructions not inconsistent deemed made under Act.",status:"Imp"},
+  {row:89,cat:"Civil Servants Act, 1973",ref:"S.26",mem:"Civil Servants Ordinance, 1973 (XIV of 1973) repealed.",status:"V.Imp"},
+  {row:90,cat:"APT Rules, 1973",ref:"R.1",mem:"These rules = Civil Servants (Appointment, Promotion and Transfer) Rules, 1973.",status:"Imp"},
+  {row:91,cat:"APT Rules, 1973",ref:"R.2(a)",mem:"\"Appointing authority\" = person authorized under Rule 6.",status:"V.Imp"},
+  {row:92,cat:"APT Rules, 1973",ref:"R.2(b)",mem:"\"Selection Board\" = Board constituted by Prime Minister for BS-19 to 21 promotions/transfers.",status:"V.Imp"},
+  {row:93,cat:"APT Rules, 1973",ref:"R.2(c)",mem:"\"Commission\" = Federal Public Service Commission.",status:"Imp"},
+  {row:94,cat:"APT Rules, 1973",ref:"R.2(d)",mem:"\"Departmental Promotion Committee\" = for BS-18 and below promotions/transfers.",status:"V.Imp"},
+  {row:95,cat:"APT Rules, 1973",ref:"R.2(e)",mem:"\"Departmental Selection Committee\" = for initial appointment BS-1 and above (except FPSC purview).",status:"V.Imp"},
+  {row:96,cat:"APT Rules, 1973",ref:"R.2(f)",mem:"Omitted.",status:"Note"},
+  {row:97,cat:"APT Rules, 1973",ref:"R.3(1)",mem:"Appointments by: (a) promotion, (b) transfer, (c) initial appointment.",status:"V.Imp"},
+  {row:98,cat:"APT Rules, 1973",ref:"R.3(2)",mem:"Method/qualifications/conditions per Ministry/Division in consultation with Establishment Division.",status:"Imp"},
+  {row:99,cat:"APT Rules, 1973",ref:"R.3(3)",mem:"Surplus person from re-organization/abolition may be appointed to same BS post if qualified.",status:"Imp"},
+  {row:100,cat:"APT Rules, 1973",ref:"R.3(4)",mem:"Appointing authority may relax educational qualification/experience for surplus person with recorded reasons.",status:"Imp"},
+  {row:101,cat:"APT Rules, 1973",ref:"R.4(1)",mem:"Each Ministry/Division/Department/Office = one or more DPC and DSC.",status:"Imp"},
+  {row:102,cat:"APT Rules, 1973",ref:"R.4(2)",mem:"Each Committee = at least 3 members; one appointed Chairman.",status:"V.Imp"},
+  {row:103,cat:"APT Rules, 1973",ref:"R.5",mem:"If appointing authority (BS-15 and below) rejects DSC/DPC recommendation... (incomplete in source).",status:"Note"},
+  {row:104,cat:"APT Rules, 1973",ref:"R.6(1)",mem:"Appointing authorities: BS-20+ = Prime Minister; BS-17-19 = Secretary; BS-16 = notified officer; BS-3-15 = notified officer; BS-1-2 = notified officer.",status:"V.Imp"},
+  {row:105,cat:"APT Rules, 1973",ref:"R.6(1) Proviso",mem:"President's Secretariat BS-20+ = President.",status:"V.Imp"},
+  {row:106,cat:"APT Rules, 1973",ref:"R.6(2)",mem:"Special appointing authorities: Pakistan Audit Dept (AGP), Intelligence Bureau, Controller General of Accounts.",status:"Imp"},
+  {row:107,cat:"APT Rules, 1973",ref:"R.7",mem:"Promotions/transfers BS-2-18 = DPC recommendation; BS-19-21 = Selection Board recommendation.",status:"V.Imp"},
+  {row:108,cat:"APT Rules, 1973",ref:"R.7-A(1)",mem:"Competent authority may approve promotion from date of CSB/DPC recommendation.",status:"Imp"},
+  {row:109,cat:"APT Rules, 1973",ref:"R.7-A(2)",mem:"If officer expires/superannuates after recommendation but before notification = exempted from charge assumption; certificate issued.",status:"Imp"},
+  {row:110,cat:"APT Rules, 1973",ref:"R.8",mem:"Only qualified persons meeting conditions considered by DPC/CSB.",status:"V.Imp"},
+  {row:111,cat:"APT Rules, 1973",ref:"R.8-A",mem:"No regular promotion to BS-17-22 unless minimum service, training, departmental exam completed.",status:"V.Imp"},
+  {row:112,cat:"APT Rules, 1973",ref:"R.8-B(1)",mem:"Acting charge appointment if most senior eligible lacks specified length of service.",status:"Imp"},
+  {row:113,cat:"APT Rules, 1973",ref:"R.8-B(2)",mem:"Omitted.",status:"Note"},
+  {row:114,cat:"APT Rules, 1973",ref:"R.8-B(3)",mem:"Acting charge to most senior eligible officer in excess of promotion quota if no suitable officer available.",status:"Imp"},
+  {row:115,cat:"APT Rules, 1973",ref:"R.8-B(4)",mem:"Acting charge for posts vacant 6+ months; current charge for less than 6 months.",status:"V.Imp"},
+  {row:116,cat:"APT Rules, 1973",ref:"R.8-B(5)",mem:"Acting charge on DPC/CSB recommendation (same as BS-22).",status:"Imp"},
+  {row:117,cat:"APT Rules, 1973",ref:"R.8-B(6)",mem:"Acting charge ≠ regular promotion for any purpose including seniority.",status:"V.Imp"},
+  {row:118,cat:"APT Rules, 1973",ref:"R.8-B(7)",mem:"Acting charge confers no vested right for regular promotion.",status:"V.Imp"},
+  {row:119,cat:"APT Rules, 1973",ref:"R.9",mem:"Appointments by transfer from regular appointees in same/equivalent/identical BS posts.",status:"V.Imp"},
+  {row:120,cat:"APT Rules, 1973",ref:"R.10",mem:"Initial appointment to All-Pakistan Services/Federal civil services BS-16+ = FPSC tests/exams (except excluded).",status:"V.Imp"},
+  {row:121,cat:"APT Rules, 1973",ref:"R.11",mem:"Initial appointment BS-1-15 = DSC recommendation after newspaper advertisement.",status:"V.Imp"},
+  {row:122,cat:"APT Rules, 1973",ref:"R.12",mem:"Candidate must possess educational qualifications, experience, and be within age limit (unless relaxation rules).",status:"V.Imp"},
+  {row:123,cat:"APT Rules, 1973",ref:"R.12 Proviso",mem:"Experience prescribed = post-qualification experience unless specified otherwise.",status:"Imp"},
+  {row:124,cat:"APT Rules, 1973",ref:"R.12-A",mem:"Date of birth once recorded = final; no alteration permissible.",status:"V.Imp"},
+  {row:125,cat:"APT Rules, 1973",ref:"R.13",mem:"Candidate must be citizen of Pakistan; relaxation by Establishment Division.",status:"V.Imp"},
+  {row:126,cat:"APT Rules, 1973",ref:"R.13 Proviso 2",mem:"Temporary appointments in Pakistan Missions abroad: relaxation max 1 year at a time.",status:"Imp"},
+  {row:127,cat:"APT Rules, 1973",ref:"R.14",mem:"All-Pakistan basis posts (BS-16+ and BS-6-15 serving whole Pakistan) filled by merit/provincial quotas.",status:"V.Imp"},
+  {row:128,cat:"APT Rules, 1973",ref:"R.14 Quota Table",mem:"Merit 7.5%; Punjab 50%; Sindh 19% (Urban 7.6%, Rural 11.4%); KPK 11.5%; Balochistan 6%; Ex-FATA 3%; GB 1%; AJK 2%.",status:"V.Imp"},
+  {row:129,cat:"APT Rules, 1973",ref:"R.14 Proviso 1",mem:"If no suitable domicile candidate after 2 advertisements, fill on open merit contract (1 year + 1 year extension; FPSC nominations within 2 years).",status:"Imp"},
+  {row:130,cat:"APT Rules, 1973",ref:"R.14 Proviso 2",mem:"Head of Organization post: if no suitable person, open merit contract; if reserved for initial appointment, regular open merit.",status:"Imp"},
+  {row:131,cat:"APT Rules, 1973",ref:"R.15",mem:"BS-6-15 posts serving only a province/region = domiciled persons of that province/region.",status:"V.Imp"},
+  {row:132,cat:"APT Rules, 1973",ref:"R.15 Proviso 1",mem:"ICT-only posts BS-6-15: minimum 50% ICT domiciled by initial appointment.",status:"V.Imp"},
+  {row:133,cat:"APT Rules, 1973",ref:"R.15 Proviso 2",mem:"Proviso 1 not applicable to federal offices with jurisdiction beyond ICT; regional/provincial quotas apply.",status:"Imp"},
+  {row:134,cat:"APT Rules, 1973",ref:"R.16",mem:"BS-1-5 posts = ordinarily local basis (balloting omitted).",status:"Imp"},
+  {row:135,cat:"APT Rules, 1973",ref:"R.16 Proviso",mem:"ICT offices BS-1-5: minimum 50% ICT domiciled by initial appointment.",status:"Imp"},
+  {row:136,cat:"APT Rules, 1973",ref:"R.17",mem:"Candidate must be in good mental/bodily health, free from physical defect interfering with duties.",status:"V.Imp"},
+  {row:137,cat:"APT Rules, 1973",ref:"R.18",mem:"FPSC posts: requisition on prescribed form immediately; exceptional ad hoc appointment ≤6 months with prior FPSC clearance.",status:"Imp"},
+  {row:138,cat:"APT Rules, 1973",ref:"R.19",mem:"Urgent FPSC post: ad hoc ≤6 months with prior FPSC clearance; advertise and follow Part III procedure.",status:"V.Imp"},
+  {row:139,cat:"APT Rules, 1973",ref:"R.20",mem:"Short-term/temporary vacancies ≤6 months: fill otherwise than through FPSC on purely temporary basis after advertisement.",status:"Imp"},
+  {row:140,cat:"APT Rules, 1973",ref:"R.20-A(1)",mem:"Deputation: Provincial/autonomous/corporate person with minimum qualifications eligible; period ≤3 years extendable by 2 years.",status:"V.Imp"},
+  {row:141,cat:"APT Rules, 1973",ref:"R.20-A(2)",mem:"Civil servant may be sent on deputation to autonomous/semi-autonomous body or Provincial Govt on agreed terms.",status:"Imp"},
+  {row:142,cat:"APT Rules, 1973",ref:"R.20-A(3)",mem:"Pension contribution invariably made by borrowing organization.",status:"V.Imp"},
+  {row:143,cat:"APT Rules, 1973",ref:"R.20-A Proviso",mem:"Exemption: husband/wife same station, unmarried female at parents' residence, married female at husband's residence (non-govt employment).",status:"Imp"},
+  {row:144,cat:"APT Rules, 1973",ref:"R.21(1)",mem:"Probation period = 1 year for initial appointment, promotion, or transfer.",status:"V.Imp"},
+  {row:145,cat:"APT Rules, 1973",ref:"R.21(2)",mem:"Probation may be curtailed or extended up to 1 year.",status:"V.Imp"},
+  {row:146,cat:"APT Rules, 1973",ref:"R.21(3)",mem:"On successful completion, appointing authority terminates probation by specific order.",status:"V.Imp"},
+  {row:147,cat:"APT Rules, 1973",ref:"R.21(4)",mem:"If no order, probation deemed extended; after extended period, deemed successfully completed.",status:"V.Imp"},
+  {row:148,cat:"Intl Orgs Rules, 2016",ref:"R.1",mem:"These rules = Civil Servants (Service in International Organizations) Rules, 2016.",status:"V.Imp"},
+  {row:149,cat:"Intl Orgs Rules, 2016",ref:"R.1(2)",mem:"Apply to civil servants seeking employment on reserved/specific/open posts and deputation in international organizations.",status:"Imp"},
+  {row:150,cat:"Intl Orgs Rules, 2016",ref:"R.2(a)",mem:"\"Act\" = Civil Servants Act, 1973.",status:"Imp"},
+  {row:151,cat:"Intl Orgs Rules, 2016",ref:"R.2(b)",mem:"\"Appellate authority\" = authority next above competent authority.",status:"Imp"},
+  {row:152,cat:"Intl Orgs Rules, 2016",ref:"R.2(c)",mem:"\"Appointing authority\" = per Rule 6 of APT Rules, 1973.",status:"Imp"},
+  {row:153,cat:"Intl Orgs Rules, 2016",ref:"R.2(d)",mem:"\"Board\" = Special Selection Board under Rule 6.",status:"Imp"},
+  {row:154,cat:"Intl Orgs Rules, 2016",ref:"R.2(e)",mem:"\"Cadre\" = sanctioned strength of Service/Group including ex-cadre posts.",status:"Imp"},
+  {row:155,cat:"Intl Orgs Rules, 2016",ref:"R.2(f)",mem:"\"Competent authority\" = authority competent to approve deputation.",status:"Imp"},
+  {row:156,cat:"Intl Orgs Rules, 2016",ref:"R.3",mem:"No civil servant shall approach international organization without Federal Govt/competent authority approval.",status:"V.Imp"},
+  {row:157,cat:"Intl Orgs Rules, 2016",ref:"R.4(a)",mem:"For international assignment: 5 years service in cadre completed.",status:"V.Imp"},
+  {row:158,cat:"Intl Orgs Rules, 2016",ref:"R.4(b)",mem:"All Pakistan-specific foreign posts circulated among eligible officers with eligibility criteria.",status:"Imp"},
+  {row:159,cat:"Intl Orgs Rules, 2016",ref:"R.4(c)",mem:"Written qualifying test by concerned Ministry through reputed testing agency (open competitive).",status:"Imp"},
+  {row:160,cat:"Intl Orgs Rules, 2016",ref:"R.4(d)",mem:"Minimum qualifying score in written test = 60%.",status:"V.Imp"},
+  {row:161,cat:"Intl Orgs Rules, 2016",ref:"R.4(e)",mem:"Weightage: written test 80%, interview 20%.",status:"V.Imp"},
+  {row:162,cat:"Intl Orgs Rules, 2016",ref:"R.4(f)",mem:"No minimum passing marks for interview; no failure solely on interview performance.",status:"Imp"},
+  {row:163,cat:"Intl Orgs Rules, 2016",ref:"R.4 Proviso",mem:"Sensitive/strategic posts: selection per transparent manner determined by competent authority.",status:"Imp"},
+  {row:164,cat:"Intl Orgs Rules, 2016",ref:"R.5(1)",mem:"Civil servant may apply against open post in international organization (subject to Rule 3).",status:"Imp"},
+  {row:165,cat:"Intl Orgs Rules, 2016",ref:"R.5(2)",mem:"Selected candidate placed before Board for recommendation before competent authority; Board may interview.",status:"Imp"},
+  {row:166,cat:"Intl Orgs Rules, 2016",ref:"R.6(1)",mem:"Special Selection Board: Chairman = Secretary Cabinet Division; Members = Secretary Establishment, Economic Affairs, Foreign Affairs; Member-Secretary = Joint Secretary (Training), Establishment.",status:"V.Imp"},
+  {row:167,cat:"Intl Orgs Rules, 2016",ref:"R.6(2)",mem:"Secretary/head of organization/representative not below BS-21 may be co-opted member.",status:"Imp"},
+  {row:168,cat:"Intl Orgs Rules, 2016",ref:"R.6(3)",mem:"Board Secretary convenes meeting with Chairman's approval; Board considers offer and recommends to competent authority.",status:"Imp"},
+  {row:169,cat:"Intl Orgs Rules, 2016",ref:"R.7(1)",mem:"Competent authorities: BS-20+ = Prime Minister; BS-17-19 = Secretary Establishment Division; BS-1-16 = Secretary of Ministry/Division.",status:"V.Imp"},
+  {row:170,cat:"Intl Orgs Rules, 2016",ref:"R.7(2)",mem:"Competent authority may approve with/without stipulations including deputation period and extension.",status:"Imp"},
+  {row:171,cat:"Intl Orgs Rules, 2016",ref:"R.7(3)",mem:"Competent authority may refer back for reconsideration with recorded reasons.",status:"Imp"},
+  {row:172,cat:"Intl Orgs Rules, 2016",ref:"R.7(4)",mem:"If post abolished/withdrawn, Board recommendations lapse.",status:"Imp"},
+  {row:173,cat:"Intl Orgs Rules, 2016",ref:"R.8(a)",mem:"Ineligible: guilty of misconduct/inefficiency under E&D Rules, 1973 or convicted of moral turpitude.",status:"V.Imp"},
+  {row:174,cat:"Intl Orgs Rules, 2016",ref:"R.8(b)",mem:"Ineligible: not completed 3 years service after returning from immediately preceding deputation.",status:"V.Imp"},
+  {row:175,cat:"Intl Orgs Rules, 2016",ref:"R.9(1)",mem:"Deputation initially for approved tenure of borrowing international organization.",status:"Imp"},
+  {row:176,cat:"Intl Orgs Rules, 2016",ref:"R.9(2)",mem:"If period not specified: 3 years extendable to max 2 years with competent authority approval.",status:"V.Imp"},
+  {row:177,cat:"Intl Orgs Rules, 2016",ref:"R.9(3)",mem:"Retention after max 5 years = placed on static list.",status:"V.Imp"},
+  {row:178,cat:"Intl Orgs Rules, 2016",ref:"R.9(4)",mem:"Surety bond: revert to parent department on completion; default = misconduct under E&D Rules, 1973.",status:"V.Imp"},
+  {row:179,cat:"Intl Orgs Rules, 2016",ref:"R.10",mem:"Repeal of prior instruments/policy instructions on foreign assignment; prior orders unaffected.",status:"Note"},
+  {row:180,cat:"Intl Orgs Rules, 2016",ref:"Schedule [2]",mem:"\"Reserved/specific post\" = any post other than open post offered to Pakistan under bilateral/multilateral arrangement notified by Establishment Division with PM approval.",status:"Imp"},
+  {row:181,cat:"E&D Rules, 2020",ref:"R.1",mem:"These rules = Civil Servants (Efficiency and Discipline) Rules, 2020; apply to every civil servant.",status:"V.Imp"},
+  {row:182,cat:"E&D Rules, 2020",ref:"R.2(a)",mem:"\"Act\" = Civil Servants Act, 1973.",status:"Imp"},
+  {row:183,cat:"E&D Rules, 2020",ref:"R.2(b)",mem:"\"Accused\" = civil servant against whom action initiated under these rules.",status:"V.Imp"},
+  {row:184,cat:"E&D Rules, 2020",ref:"R.2(c)",mem:"\"Authority\" = appointing authority per Rule 6 of APT Rules, 1973.",status:"V.Imp"},
+  {row:185,cat:"E&D Rules, 2020",ref:"R.2(c) Proviso 1",mem:"Joint proceedings: authority for senior most civil servant = authority for all accused.",status:"Imp"},
+  {row:186,cat:"E&D Rules, 2020",ref:"R.2(c) Proviso 2",mem:"If President/PM is authority: cadre administrator performs all functions except initiating proceedings, appointing hearing officer, final decision.",status:"V.Imp"},
+  {row:187,cat:"E&D Rules, 2020",ref:"R.2(d)",mem:"\"Appellate authority\" = per Civil Servants (Appeal) Rules, 1977.",status:"Imp"},
+  {row:188,cat:"E&D Rules, 2020",ref:"R.2(1)(i)",mem:"\"Charges\" = allegations of omission/commission cognizable under rules.",status:"Imp"},
+  {row:189,cat:"E&D Rules, 2020",ref:"R.2(1)(ii)",mem:"\"Government\" = Federal, Provincial, AJK, or Gilgit-Baltistan Government.",status:"Imp"},
+  {row:190,cat:"E&D Rules, 2020",ref:"R.2(1)(iii)",mem:"\"Hearing officer\" = officer senior to accused for personal hearing.",status:"Imp"},
+  {row:191,cat:"E&D Rules, 2020",ref:"R.2(1)(iv)",mem:"\"Inefficiency\" = failure to efficiently perform assigned functions.",status:"V.Imp"},
+  {row:192,cat:"E&D Rules, 2020",ref:"R.2(1)(v)",mem:"\"Inquiry committee\" = 2+ officers headed by convener.",status:"Imp"},
+  {row:193,cat:"E&D Rules, 2020",ref:"R.2(1)(vi)",mem:"\"Inquiry officer\" = officer appointed to inquire into charges.",status:"Imp"},
+  {row:194,cat:"E&D Rules, 2020",ref:"R.2(1)(vii)",mem:"\"Misconduct\" = conduct prejudicial to good order/discipline, contrary to Conduct Rules 1964, unbecoming, asserting political influence, or plea bargain return of corruption gains.",status:"V.Imp"},
+  {row:195,cat:"E&D Rules, 2020",ref:"R.2(1)(viii)",mem:"\"Penalty\" = penalty prescribed under these rules.",status:"Imp"},
+  {row:196,cat:"E&D Rules, 2020",ref:"R.3(a)",mem:"Grounds: inefficient or ceased to be efficient.",status:"V.Imp"},
+  {row:197,cat:"E&D Rules, 2020",ref:"R.3(b)",mem:"Grounds: guilty of misconduct.",status:"V.Imp"},
+  {row:198,cat:"E&D Rules, 2020",ref:"R.3(c)(i)",mem:"Grounds: corrupt — possession of disproportionate pecuniary resources/property.",status:"V.Imp"},
+  {row:199,cat:"E&D Rules, 2020",ref:"R.3(c)(ii)",mem:"Grounds: corrupt — style of living beyond ostensible means.",status:"V.Imp"},
+  {row:200,cat:"E&D Rules, 2020",ref:"R.3(d)",mem:"Grounds: subversive activities, association with subversives, or disclosure of official secrets.",status:"V.Imp"},
+  {row:201,cat:"E&D Rules, 2020",ref:"R.4(1)",mem:"Authority may impose one or more penalties by written reasoned order.",status:"V.Imp"},
+  {row:202,cat:"E&D Rules, 2020",ref:"R.4(2)(a)",mem:"Minor penalty: censure.",status:"V.Imp"},
+  {row:203,cat:"E&D Rules, 2020",ref:"R.4(2)(b)",mem:"Minor penalty: withholding increment(s) max 3 years without cumulative effect.",status:"V.Imp"},
+  {row:204,cat:"E&D Rules, 2020",ref:"R.4(2)(b) Proviso",mem:"Not imposed on civil servant at max pay scale or superannuating within penalty period.",status:"Imp"},
+  {row:205,cat:"E&D Rules, 2020",ref:"R.4(2)(c)",mem:"Minor penalty: reduction to lower stage(s) max 3 stages without cumulative effect.",status:"V.Imp"},
+  {row:206,cat:"E&D Rules, 2020",ref:"R.4(2)(d)",mem:"Minor penalty: withholding promotion max 3 years (not for unfitness).",status:"V.Imp"},
+  {row:207,cat:"E&D Rules, 2020",ref:"R.4(2)(d) Proviso 1",mem:"Period counted from date junior considered for regular promotion first time.",status:"Imp"},
+  {row:208,cat:"E&D Rules, 2020",ref:"R.4(2)(d) Proviso 2",mem:"Not imposed if no further promotion prospects or superannuating during penalty.",status:"Imp"},
+  {row:209,cat:"E&D Rules, 2020",ref:"R.4(3)(a)",mem:"Major penalty: recovery of embezzled money/pecuniary loss.",status:"V.Imp"},
+  {row:210,cat:"E&D Rules, 2020",ref:"R.4(3)(b)",mem:"Major penalty: reduction to lower post and pay scale max 3 years.",status:"V.Imp"},
+  {row:211,cat:"E&D Rules, 2020",ref:"R.4(3)(b) Proviso",mem:"Not imposed if likely to superannuate within penalty period.",status:"Imp"},
+  {row:212,cat:"E&D Rules, 2020",ref:"R.4(3)(c)",mem:"Major penalty: compulsory retirement.",status:"V.Imp"},
+  {row:213,cat:"E&D Rules, 2020",ref:"R.4(3)(d)",mem:"Major penalty: removal from service.",status:"V.Imp"},
+  {row:214,cat:"E&D Rules, 2020",ref:"R.4(3)(e)",mem:"Major penalty: dismissal from service.",status:"V.Imp"},
+  {row:215,cat:"E&D Rules, 2020",ref:"R.4(4)",mem:"Removal ≠ disqualification; dismissal = disqualification for future Govt employment.",status:"V.Imp"},
+  {row:216,cat:"E&D Rules, 2020",ref:"R.4(5)",mem:"Proceedings not discontinued merely on sub-judice grounds; may defer if inquiry impedes justice.",status:"Imp"},
+  {row:217,cat:"E&D Rules, 2020",ref:"R.5(1)",mem:"Suspension/leave: initial max 120 days, extendable in writing; if not extended, suspension ceases.",status:"V.Imp"},
+  {row:218,cat:"E&D Rules, 2020",ref:"R.5(1) Proviso",mem:"Criminal offence + prison = deemed suspended from arrest date; if not arrested/released on bail, authority may suspend by order.",status:"V.Imp"},
+  {row:219,cat:"E&D Rules, 2020",ref:"R.5(2)",mem:"During suspension: entitled to pay, allowance, benefits per FR-53.",status:"V.Imp"},
+  {row:220,cat:"E&D Rules, 2020",ref:"R.5(3)",mem:"Leave under R5(1) = treated as on duty.",status:"Imp"},
+  {row:221,cat:"E&D Rules, 2020",ref:"R.5(4)",mem:"Absence during proceedings = extraordinary leave without pay.",status:"Imp"},
+  {row:222,cat:"E&D Rules, 2020",ref:"R.6",mem:"Proceedings initiated from date accused informed by written order (no inquiry) or date of inquiry order (inquiry).",status:"V.Imp"},
+  {row:223,cat:"E&D Rules, 2020",ref:"R.7(a)",mem:"No inquiry: inform accused in writing of grounds, charges, responsibility, proposed penalty.",status:"V.Imp"},
+  {row:224,cat:"E&D Rules, 2020",ref:"R.7(b)",mem:"Reasonable opportunity to show cause: 10–14 days (extendable).",status:"V.Imp"},
+  {row:225,cat:"E&D Rules, 2020",ref:"R.7(c)",mem:"Authority determines charges proved/not proved on reply or available record; decision within 30 days (except President/PM).",status:"V.Imp"},
+  {row:226,cat:"E&D Rules, 2020",ref:"R.7(d)",mem:"Personal hearing opportunity before penalty under R7(f) if charges proved.",status:"Imp"},
+  {row:227,cat:"E&D Rules, 2020",ref:"R.7(e)",mem:"Exonerate by written order if charges not proved.",status:"Imp"},
+  {row:228,cat:"E&D Rules, 2020",ref:"R.7(f)",mem:"Impose one or more penalties by written order if charges proved.",status:"V.Imp"},
+  {row:229,cat:"E&D Rules, 2020",ref:"R.8",mem:"Record/documents supplied to inquiry officer/committee within 7 days (extendable).",status:"Imp"},
+  {row:230,cat:"E&D Rules, 2020",ref:"R.9(1)(a)",mem:"Inquiry officer/convener as far as possible senior to accused; joint accused = senior to senior most.",status:"V.Imp"},
+  {row:231,cat:"E&D Rules, 2020",ref:"R.9(1)(b)",mem:"Grounds/charges communicated to accused within 14 days of initiation.",status:"V.Imp"},
+  {row:232,cat:"E&D Rules, 2020",ref:"R.9(1)(c)",mem:"Appointment of departmental representative by designation.",status:"Imp"},
+  {row:233,cat:"E&D Rules, 2020",ref:"R.9(1)(d)",mem:"Accused submits written defense within 10–14 days (extendable).",status:"V.Imp"},
+  {row:234,cat:"E&D Rules, 2020",ref:"R.9(2)",mem:"Multiple accused = single inquiry officer/committee senior to senior most accused.",status:"Imp"},
+  {row:235,cat:"E&D Rules, 2020",ref:"R.9(3)",mem:"Record and witness list communicated with inquiry orders.",status:"Imp"},
+  {row:236,cat:"E&D Rules, 2020",ref:"R.9(4)",mem:"Replacement of inquiry officer/member = authority appoints another.",status:"Imp"},
+  {row:237,cat:"E&D Rules, 2020",ref:"R.10(1)",mem:"Inquiry officer/committee examines oral/documentary evidence; cross-examination allowed.",status:"V.Imp"},
+  {row:238,cat:"E&D Rules, 2020",ref:"R.10(2)",mem:"If accused fails to reply, inquiry proceeds ex-parte.",status:"V.Imp"},
+  {row:239,cat:"E&D Rules, 2020",ref:"R.10(3)",mem:"Day-to-day hearing; adjournment max 7 days with recorded reasons.",status:"V.Imp"},
+  {row:240,cat:"E&D Rules, 2020",ref:"R.10(4)",mem:"Witness statements recorded in presence of accused and departmental representative.",status:"Imp"},
+  {row:241,cat:"E&D Rules, 2020",ref:"R.10(5)",mem:"Hampering inquiry: warning, then finding and completion in interest of justice.",status:"Imp"},
+  {row:242,cat:"E&D Rules, 2020",ref:"R.10(6)",mem:"Absence on medical grounds = deemed hampering unless medical leave sanctioned by authorized medical officer.",status:"Imp"},
+  {row:243,cat:"E&D Rules, 2020",ref:"R.10(7)",mem:"Inquiry completed within 60 days (extendable); report within 7 days; clear findings + recommendations.",status:"V.Imp"},
+  {row:244,cat:"E&D Rules, 2020",ref:"R.10(7) Proviso",mem:"Non-observance of time schedule does not vitiate inquiry.",status:"Imp"},
+  {row:245,cat:"E&D Rules, 2020",ref:"R.11(1)",mem:"Authority may call for record of pending case and pass fit order.",status:"Imp"},
+  {row:246,cat:"E&D Rules, 2020",ref:"R.11(2)",mem:"No order without informing accused in writing + opportunity to show cause + personal hearing if requested.",status:"V.Imp"},
+  {row:247,cat:"E&D Rules, 2020",ref:"R.11(2) Proviso",mem:"No opportunity if authority satisfied in writing that security of Pakistan makes it inexpedient.",status:"V.Imp"},
+  {row:248,cat:"E&D Rules, 2020",ref:"R.11(3)",mem:"Authority may call for case under E&D Rules, 1973 Rule 6A; power expires 1 year after disposal.",status:"Imp"},
+  {row:249,cat:"E&D Rules, 2020",ref:"R.12(1)",mem:"Inquiry officer/committee has civil court powers: summoning, documents, affidavits, commissions.",status:"V.Imp"},
+  {row:250,cat:"E&D Rules, 2020",ref:"R.12(2)",mem:"Proceedings = judicial proceedings under PPC sections 193 & 228.",status:"V.Imp"},
+  {row:251,cat:"E&D Rules, 2020",ref:"R.13(a)",mem:"Rules 7 & 9 not apply if dismissed/removed on conviction (fine/imprisonment).",status:"V.Imp"},
+  {row:252,cat:"E&D Rules, 2020",ref:"R.13(b)",mem:"Rules 7 & 9 not apply if authority satisfied in writing it is not reasonably practicable to give opportunity.",status:"V.Imp"},
+  {row:253,cat:"E&D Rules, 2020",ref:"R.14(1)",mem:"Training/scholarship nomination: if not yet joined, withdraw forthwith.",status:"Imp"},
+  {row:254,cat:"E&D Rules, 2020",ref:"R.14(2)",mem:"If already joined, complete training; proceedings deferred.",status:"Imp"},
+  {row:255,cat:"E&D Rules, 2020",ref:"R.14(3)",mem:"No denial of training due to proceedings for more than 1 year.",status:"Imp"},
+  {row:256,cat:"E&D Rules, 2020",ref:"R.14(4)",mem:"On leave: leave cancelled, called back to join proceedings.",status:"Imp"},
+  {row:257,cat:"E&D Rules, 2020",ref:"R.15(1)(a)",mem:"Departmental representative assists inquiry officer/committee, present with record each hearing.",status:"Imp"},
+  {row:258,cat:"E&D Rules, 2020",ref:"R.15(1)(b)",mem:"Cross-examine accused's witnesses; may cross-examine prosecution witnesses with permission.",status:"Imp"},
+  {row:259,cat:"E&D Rules, 2020",ref:"R.15(1)(c)",mem:"Rebut defense grounds before inquiry officer/committee.",status:"Imp"},
+  {row:260,cat:"E&D Rules, 2020",ref:"R.15(2)",mem:"Failure to perform duties = liable to departmental proceedings.",status:"Imp"},
+  {row:261,cat:"E&D Rules, 2020",ref:"R.16(1)",mem:"Authority examines report and case material; determines if inquiry per rules.",status:"V.Imp"},
+  {row:262,cat:"E&D Rules, 2020",ref:"R.16(2)",mem:"If satisfied, determines whether charges proved.",status:"V.Imp"},
+  {row:263,cat:"E&D Rules, 2020",ref:"R.16(3)",mem:"If inquiry not per rules/facts ignored: remand or de novo inquiry through different officer/committee.",status:"V.Imp"},
+  {row:264,cat:"E&D Rules, 2020",ref:"R.16(4)",mem:"Authority may require explanation; if omission not in good faith, proceed against inquiry officer/committee.",status:"Imp"},
+  {row:265,cat:"E&D Rules, 2020",ref:"R.16(5)",mem:"Charges not proved = exonerate by written order.",status:"V.Imp"},
+  {row:266,cat:"E&D Rules, 2020",ref:"R.16(6)(a)",mem:"Show cause notice: inform charges proved and proposed penalty.",status:"V.Imp"},
+  {row:267,cat:"E&D Rules, 2020",ref:"R.16(6)(b)",mem:"Reasonable opportunity to show cause: 10–14 days + personal hearing; indicate if wants personal hearing.",status:"V.Imp"},
+  {row:268,cat:"E&D Rules, 2020",ref:"R.16(6)(c)",mem:"Direct departmental representative to appear with record on hearing date.",status:"Imp"},
+  {row:269,cat:"E&D Rules, 2020",ref:"R.16(7)(a)",mem:"After reply/hearing: exonerate if charges not proved.",status:"V.Imp"},
+  {row:270,cat:"E&D Rules, 2020",ref:"R.16(7)(b)",mem:"Impose one or more penalties if charges proved.",status:"V.Imp"},
+  {row:271,cat:"E&D Rules, 2020",ref:"R.16(7)(b) Proviso (i)",mem:"Grave corruption proved = dismissal + recovery.",status:"V.Imp"},
+  {row:272,cat:"E&D Rules, 2020",ref:"R.16(7)(b) Proviso (ii)",mem:"Absence >1 year proved = compulsory retirement/removal/dismissal.",status:"V.Imp"},
+  {row:273,cat:"E&D Rules, 2020",ref:"R.16(8)",mem:"Decision within 30 days after reply/hearing (except PM), excluding vacancy period.",status:"V.Imp"},
+  {row:274,cat:"E&D Rules, 2020",ref:"R.17",mem:"Authority may call accused/departmental representative before him or hearing officer (senior to accused) for personal hearing.",status:"Imp"},
+  {row:275,cat:"E&D Rules, 2020",ref:"R.18(1)(a)",mem:"Deputationist: ask relevant Govt/borrowing organization to frame charges and forward to parent department.",status:"Imp"},
+  {row:276,cat:"E&D Rules, 2020",ref:"R.18(1)(b)",mem:"Or initiate proceedings on its own under these rules.",status:"Imp"},
+  {row:277,cat:"E&D Rules, 2020",ref:"R.18(2)",mem:"All Pakistan Service in Province: Establishment Division may refer to Chief Secretary for probe; initiate on findings or own if no findings in 2 months.",status:"Imp"},
+  {row:278,cat:"E&D Rules, 2020",ref:"R.18(2) Proviso",mem:"Chief Secretary of Province: Establishment Division frames charges and initiates with PM approval.",status:"V.Imp"},
+  {row:279,cat:"E&D Rules, 2020",ref:"R.19",mem:"Appeal per Civil Servants (Appeal) Rules, 1977; if penalty by President, no appeal but review application.",status:"V.Imp"},
+  {row:280,cat:"E&D Rules, 2020",ref:"R.20",mem:"No party shall be represented by advocate/counsel at any stage before appellate authority, authority, inquiry officer, or inquiry committee.",status:"V.Imp"},
+  {row:281,cat:"E&D Rules, 2020",ref:"R.21(1)",mem:"Government Servants (E&D) Rules, 1973 repealed for these civil servants; prior actions unaffected.",status:"V.Imp"},
+  {row:282,cat:"E&D Rules, 2020",ref:"R.21(2)",mem:"Pending proceedings immediately before commencement continue under repealed rules.",status:"V.Imp"},
+  {row:283,cat:"E&D Rules, 1973",ref:"R.1",mem:"These rules = Government Servants (Efficiency and Discipline) Rules, 1973; apply to every civil servant.",status:"V.Imp"},
+  {row:284,cat:"E&D Rules, 1973",ref:"R.2(1)",mem:"\"Accused\" = Government servant against whom action taken.",status:"Imp"},
+  {row:285,cat:"E&D Rules, 1973",ref:"R.2(2)",mem:"\"Authority\" = appointing authority per Rule 6 of APT Rules, 1973.",status:"V.Imp"},
+  {row:286,cat:"E&D Rules, 1973",ref:"R.2(2) Proviso",mem:"Pre-14 June 2000 proceedings: powers exercised by officer designated before that date.",status:"Imp"},
+  {row:287,cat:"E&D Rules, 1973",ref:"R.2(3)",mem:"\"Authorised officer\" = officer authorised by authority or authority itself.",status:"V.Imp"},
+  {row:288,cat:"E&D Rules, 1973",ref:"R.2(4)",mem:"\"Misconduct\" = conduct prejudicial to discipline, contrary to Conduct Rules 1964, unbecoming, or bringing political influence.",status:"V.Imp"},
+  {row:289,cat:"E&D Rules, 1973",ref:"R.2(5)",mem:"\"Penalty\" = penalty imposable under these rules.",status:"Imp"},
+  {row:290,cat:"E&D Rules, 1973",ref:"R.3(a)",mem:"Grounds: inefficient or ceased to be efficient.",status:"V.Imp"},
+  {row:291,cat:"E&D Rules, 1973",ref:"R.3(b)",mem:"Grounds: guilty of misconduct.",status:"V.Imp"},
+  {row:292,cat:"E&D Rules, 1973",ref:"R.3(c)(i)",mem:"Grounds: corrupt — disproportionate pecuniary resources/property.",status:"V.Imp"},
+  {row:293,cat:"E&D Rules, 1973",ref:"R.3(c)(ii)",mem:"Grounds: corrupt — living beyond ostensible means.",status:"V.Imp"},
+  {row:294,cat:"E&D Rules, 1973",ref:"R.3(c)(iii)",mem:"Grounds: corrupt — persistent reputation of being corrupt.",status:"V.Imp"},
+  {row:295,cat:"E&D Rules, 1973",ref:"R.4(1)(a)(i)",mem:"Minor penalty: censure.",status:"V.Imp"},
+  {row:296,cat:"E&D Rules, 1973",ref:"R.4(1)(a)(ii)",mem:"Minor penalty: withholding promotion/increment for specific period (not unfitness).",status:"V.Imp"},
+  {row:297,cat:"E&D Rules, 1973",ref:"R.4(1)(a)(iii)",mem:"Minor penalty: stoppage at efficiency bar for specific period (not unfitness).",status:"V.Imp"},
+  {row:298,cat:"E&D Rules, 1973",ref:"R.4(1)(a)(iv)",mem:"Minor penalty: recovery from pay for pecuniary loss by negligence/breach of orders.",status:"V.Imp"},
+  {row:299,cat:"E&D Rules, 1973",ref:"R.4(1)(b)(i)",mem:"Major penalty: reduction to lower post/time-scale/stage.",status:"V.Imp"},
+  {row:300,cat:"E&D Rules, 1973",ref:"R.4(1)(b)(ii)",mem:"Major penalty: compulsory retirement.",status:"V.Imp"},
+  {row:301,cat:"E&D Rules, 1973",ref:"R.4(1)(b)(iii)",mem:"Major penalty: removal from service.",status:"V.Imp"},
+  {row:302,cat:"E&D Rules, 1973",ref:"R.4(1)(b)(iv)",mem:"Major penalty: dismissal from service.",status:"V.Imp"},
+  {row:303,cat:"E&D Rules, 1973",ref:"R.4(2)",mem:"Removal ≠ disqualification; dismissal = disqualification for future employment.",status:"V.Imp"},
+  {row:304,cat:"E&D Rules, 1973",ref:"R.4(3)(a)",mem:"Removal/dismissal excludes discharge of probationer during probation.",status:"Imp"},
+  {row:305,cat:"E&D Rules, 1973",ref:"R.4(3)(b)",mem:"Excludes discharge of temporary appointee on expiry of appointment.",status:"Imp"},
+  {row:306,cat:"E&D Rules, 1973",ref:"R.4(3)(c)",mem:"Excludes discharge of contract employee per contract terms.",status:"Imp"},
+  {row:307,cat:"E&D Rules, 1973",ref:"R.5(1)(i)",mem:"Accused of subversion/corruption/misconduct: authorized officer may require leave or suspend with authority approval; continuation requires approval every 3 months.",status:"V.Imp"},
+  {row:308,cat:"E&D Rules, 1973",ref:"R.5(1)(i) Proviso",mem:"If authority is President/PM, powers exercised by Secretary Establishment Division.",status:"V.Imp"},
+  {row:309,cat:"E&D Rules, 1973",ref:"R.5(1)(ii)",mem:"Authorised officer decides inquiry through Inquiry Officer/Committee or not.",status:"V.Imp"},
+  {row:310,cat:"E&D Rules, 1973",ref:"R.5(1)(iii)(a)",mem:"No inquiry: inform accused in writing of proposed action and grounds.",status:"V.Imp"},
+  {row:311,cat:"E&D Rules, 1973",ref:"R.5(1)(iii)(b)",mem:"Reasonable opportunity to show cause; no opportunity if security of Pakistan makes it inexpedient.",status:"V.Imp"},
+  {row:312,cat:"E&D Rules, 1973",ref:"R.5(1)(iv)",mem:"On report/explanation: determine charge proved; minor penalty = pass orders; major penalty = forward to authority with recommendations.",status:"V.Imp"},
+  {row:313,cat:"E&D Rules, 1973",ref:"R.5(2)",mem:"Pakistan Missions abroad: powers under clauses (i) & (iv) subject to authority approval.",status:"Imp"},
+  {row:314,cat:"E&D Rules, 1973",ref:"R.6(1)",mem:"Inquiry officer/committee: frame charge, communicate with statement of allegations.",status:"V.Imp"},
+  {row:315,cat:"E&D Rules, 1973",ref:"R.6(2)",mem:"Accused submits written defense within 7–14 days; states if desires personal hearing.",status:"V.Imp"},
+  {row:316,cat:"E&D Rules, 1973",ref:"R.6(3)",mem:"Inquiry officer/committee examines evidence; accused entitled to cross-examine.",status:"V.Imp"},
+  {row:317,cat:"E&D Rules, 1973",ref:"R.6(4)",mem:"Day-to-day hearing; adjournment with written reasons reported to authorized officer; normally max 1 week.",status:"V.Imp"},
+  {row:318,cat:"E&D Rules, 1973",ref:"R.6(5)",mem:"Hampering inquiry: warning, then finding and completion for substantial justice.",status:"Imp"},
+  {row:319,cat:"E&D Rules, 1973",ref:"R.6(6)",mem:"Findings submitted within 10 days of conclusion (or extended period).",status:"V.Imp"},
+  {row:320,cat:"E&D Rules, 1973",ref:"R.6-A(1)",mem:"Authority may call for record of pending/disposed case and pass fit order.",status:"Imp"},
+  {row:321,cat:"E&D Rules, 1973",ref:"R.6-A(2)",mem:"No order without informing accused in writing + opportunity to show cause + personal hearing if requested.",status:"V.Imp"},
+  {row:322,cat:"E&D Rules, 1973",ref:"R.6-A(2) Proviso",mem:"No opportunity if authority satisfied in writing that security of Pakistan makes it inexpedient.",status:"V.Imp"},
+  {row:323,cat:"E&D Rules, 1973",ref:"R.7(1)(a)",mem:"Inquiry officer/committee has civil court powers: summoning, examining on oath.",status:"V.Imp"},
+  {row:324,cat:"E&D Rules, 1973",ref:"R.7(1)(b)",mem:"Powers: discovery and production of documents.",status:"Imp"},
+  {row:325,cat:"E&D Rules, 1973",ref:"R.7(1)(c)",mem:"Powers: receiving evidence on affidavits.",status:"Imp"},
+  {row:326,cat:"E&D Rules, 1973",ref:"R.7(1)(d)",mem:"Powers: issuing commissions for witnesses/documents.",status:"Imp"},
+  {row:327,cat:"E&D Rules, 1973",ref:"R.7(2)",mem:"Proceedings = judicial proceedings under PPC sections 193 & 228.",status:"V.Imp"},
+  {row:328,cat:"E&D Rules, 1973",ref:"R.8(a)",mem:"Rule 5 not apply if dismissed/removed/reduced on conviction (fine/imprisonment).",status:"V.Imp"},
+  {row:329,cat:"E&D Rules, 1973",ref:"R.8(b)",mem:"Rule 5 not apply if authority satisfied in writing it is not reasonably practicable to give opportunity.",status:"V.Imp"},
+  {row:330,cat:"E&D Rules, 1973",ref:"R.8-A",mem:"If not dismissed/removed/reduced/compulsory retired after leave order: rejoin duty; leave treated as duty on full pay.",status:"Imp"},
+  {row:331,cat:"E&D Rules, 1973",ref:"R.9",mem:"Deputationist/provincial service: borrowing authority forwards report to lending authority; lending authority takes action per rules.",status:"Imp"},
+  {row:332,cat:"E&D Rules, 1973",ref:"R.10",mem:"Appeal per Civil Servants (Appeal) Rules, 1977; if penalty by President, no appeal but review application.",status:"V.Imp"},
+  {row:333,cat:"E&D Rules, 1973",ref:"R.10-A",mem:"No party shall be represented by advocate before authority, authorized officer, inquiry officer, or inquiry committee.",status:"V.Imp"},
+  {row:334,cat:"E&D Rules, 1973",ref:"R.11",mem:"Government Servants (E&D) Rules, 1960 and Civilian Employees in Defence Services (CCA) Rules, 1961 repealed; prior actions unaffected.",status:"V.Imp"}
+];
+
+const tableBody = document.getElementById('tableBody');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const statusFilter = document.getElementById('statusFilter');
+const countDisplay = document.getElementById('countDisplay');
+
+function statusClass(s) {
+  if (s === 'V.Imp') return 'vimp';
+  if (s === 'Imp') return 'imp';
+  return 'note';
+}
+
+function render(data) {
+  if (data.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="5" class="empty">No matching records found.</td></tr>';
+    countDisplay.textContent = '0 of 334 records';
+    return;
+  }
+  let html = '';
+  for (const r of data) {
+    html += `<tr>
+      <td class="row-num">${r.row}</td>
+      <td class="category">${r.cat}</td>
+      <td class="ref">${r.ref}</td>
+      <td class="memory">${r.mem}</td>
+      <td><span class="status ${statusClass(r.status)}">${r.status}</span></td>
+    </tr>`;
+  }
+  tableBody.innerHTML = html;
+  countDisplay.textContent = `${data.length} of ${DATA.length} records`;
+}
+
+function filterData() {
+  const q = searchInput.value.toLowerCase().trim();
+  const cat = categoryFilter.value;
+  const stat = statusFilter.value;
+
+  const filtered = DATA.filter(r => {
+    if (cat && r.cat !== cat) return false;
+    if (stat && r.status !== stat) return false;
+    if (q) {
+      const hay = (r.cat + ' ' + r.ref + ' ' + r.mem + ' ' + r.status + ' ' + r.row).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  render(filtered);
+}
+
+searchInput.addEventListener('input', filterData);
+categoryFilter.addEventListener('change', filterData);
+statusFilter.addEventListener('change', filterData);
+
+// Initial render
+render(DATA);
+</script>
 </body>
 </html>
