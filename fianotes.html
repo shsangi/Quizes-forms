@@ -176,16 +176,6 @@ body{
 .load-btn{background:var(--warn-bg);border-color:var(--warn-br);color:var(--warn)}
 .load-btn:hover{background:var(--warn);border-color:var(--warn);color:#fff}
 
-.version-pill{
-  display:inline-flex;align-items:center;
-  padding:5px 10px;border-radius:8px;
-  background:var(--surface);border:1px solid var(--border);
-  color:var(--text-2);font-size:.72rem;font-weight:600;
-  letter-spacing:.02em;font-family:'JetBrains Mono',monospace;
-  transition:all .2s ease;white-space:nowrap;
-}
-.version-pill:hover{border-color:var(--border-2);color:var(--text)}
-
 .page-top{padding:22px 0 6px}
 
 .filters{
@@ -232,7 +222,6 @@ input[type="search"]:focus{
   box-shadow:0 0 0 3px var(--brand-soft);
 }
 
-/* MULTI-SELECT */
 .ms{position:relative;width:100%;}
 .ms-trigger{
   width:100%;min-height:44px;padding:7px 34px 7px 14px;
@@ -537,7 +526,6 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   .clock .ampm{font-size:.56rem}
   .icon-btn{width:32px;height:32px;border-radius:9px}
   .icon-btn svg{width:15px;height:15px}
-  .version-pill{padding:4px 8px;font-size:.68rem}
   .page-top{padding:14px 0 4px}
   .filters{padding:12px;gap:10px}
   .af-tag{font-size:.66rem;padding:2px 7px 2px 9px}
@@ -564,7 +552,6 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 }
 
 @media (max-width:400px){
-  .version-pill{display:none}
   .card-foot-right span{display:none}
 }
 
@@ -582,7 +569,7 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 .toast svg{width:16px;height:16px;flex-shrink:0}
 
 /* ============================================================
-   PROGRESS REPORT MODAL
+   PROGRESS REPORT MODAL — fully mobile-friendly
    ============================================================ */
 .modal-backdrop{
   position:fixed;inset:0;z-index:300;
@@ -594,6 +581,7 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   display:flex;align-items:flex-start;justify-content:center;
   padding:24px 16px;
   overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
 }
 .modal-backdrop.show{opacity:1;pointer-events:auto}
 .modal{
@@ -607,6 +595,7 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   margin:auto 0;
   display:flex;flex-direction:column;
   max-height:calc(100vh - 48px);
+  max-height:calc(100dvh - 48px);
   overflow:hidden;
 }
 .modal-backdrop.show .modal{transform:translateY(0) scale(1)}
@@ -627,9 +616,9 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 .modal-icon svg{width:18px;height:18px;color:#fff}
 .modal-title{display:flex;flex-direction:column;line-height:1.2;min-width:0;flex:1}
 .modal-title b{font-size:.98rem;font-weight:700;letter-spacing:-.02em}
-.modal-title span{font-size:.72rem;color:var(--text-3);font-weight:500}
+.modal-title span{font-size:.72rem;color:var(--text-3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .modal-close{
-  width:32px;height:32px;border-radius:9px;background:var(--surface);
+  width:34px;height:34px;border-radius:9px;background:var(--surface);
   border:1px solid var(--border);color:var(--text-2);cursor:pointer;
   display:grid;place-items:center;transition:all .18s ease;flex-shrink:0;
 }
@@ -641,29 +630,30 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   overflow-y:auto;
   flex:1;
   min-height:0;
+  -webkit-overflow-scrolling:touch;
 }
 .modal-body::-webkit-scrollbar{width:8px}
 .modal-body::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:8px;border:2px solid var(--bg-elev)}
 
-/* Tabs */
+/* Tabs — 4-column grid that always fits */
 .report-tabs{
-  display:inline-flex;
-  gap:3px;
-  padding:3px;
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:4px;
+  padding:4px;
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:10px;
+  border-radius:11px;
   margin-bottom:16px;
   width:100%;
 }
 .report-tab{
-  flex:1;
-  padding:8px 12px;
+  padding:9px 6px;
   background:transparent;
   border:none;
   border-radius:8px;
   color:var(--text-2);
-  font-size:.78rem;
+  font-size:.76rem;
   font-weight:600;
   cursor:pointer;
   transition:all .15s ease;
@@ -671,10 +661,15 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
+  gap:5px;
   white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+  line-height:1.2;
 }
-.report-tab svg{width:13px;height:13px;opacity:.7;transition:opacity .15s ease}
+.report-tab svg{width:13px;height:13px;opacity:.75;transition:opacity .15s ease;flex-shrink:0;}
+.report-tab span.tab-label{overflow:hidden;text-overflow:ellipsis;}
 .report-tab:hover{color:var(--text);background:var(--surface-2)}
 .report-tab.on{
   background:var(--brand);
@@ -686,12 +681,9 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 /* Stat cards */
 .report-stats{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:10px;
   margin-bottom:16px;
-}
-@media (max-width:520px){
-  .report-stats{grid-template-columns:1fr 1fr;gap:8px}
 }
 .stat-card{
   background:var(--surface);
@@ -701,12 +693,12 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   transition:all .2s ease;
   position:relative;
   overflow:hidden;
+  min-width:0;
 }
 .stat-card:hover{border-color:var(--border-2);background:var(--surface-2);}
 .stat-card::after{
   content:"";position:absolute;top:0;left:0;right:0;height:2px;
-  background:var(--brand);
-  opacity:.7;
+  background:var(--brand);opacity:.7;
 }
 .stat-card.ok::after{background:var(--ok)}
 .stat-card.warn::after{background:var(--warn)}
@@ -715,21 +707,20 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 .stat-label{
   font-size:.62rem;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:var(--text-3);
-  margin-bottom:4px;
-  display:block;
+  margin-bottom:4px;display:block;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .stat-value{
   font-size:1.5rem;font-weight:800;
-  letter-spacing:-.03em;
-  color:var(--text);
+  letter-spacing:-.03em;color:var(--text);
   font-family:'JetBrains Mono',monospace;
-  line-height:1.1;
-  font-variant-numeric:tabular-nums;
+  line-height:1.1;font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .stat-sub{
   font-size:.68rem;color:var(--text-3);
-  margin-top:2px;
-  font-weight:500;
+  margin-top:2px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
 /* Section */
@@ -741,22 +732,23 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   color:var(--text-3);
   margin-bottom:10px;
   display:flex;align-items:center;
-  justify-content:space-between;
-  gap:8px;
+  justify-content:space-between;gap:8px;
 }
 .report-sec-title .count-badge{
   font-family:'JetBrains Mono',monospace;
   font-size:.66rem;font-weight:700;
   padding:2px 8px;border-radius:99px;
   background:var(--muted-bg);color:var(--text-3);
-  letter-spacing:.02em;
-  text-transform:none;
+  letter-spacing:.02em;text-transform:none;
 }
 
 /* Category bars */
 .cat-list{display:flex;flex-direction:column;gap:8px}
 .cat-row{
-  display:flex;align-items:center;gap:10px;
+  display:grid;
+  grid-template-columns:1fr 90px auto;
+  align-items:center;
+  gap:10px;
   padding:8px 11px;
   background:var(--surface);
   border:1px solid var(--border);
@@ -767,17 +759,15 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 .cat-name{
   font-size:.8rem;font-weight:600;
   color:var(--text-2);
-  flex:1;min-width:0;
+  min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .cat-bar{
-  flex:1;
   height:5px;
   background:var(--muted-bg);
   border-radius:99px;
   overflow:hidden;
-  min-width:60px;
-  max-width:120px;
+  width:100%;
 }
 .cat-bar-inner{
   height:100%;
@@ -794,12 +784,12 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 }
 
 /* Read items list */
-.read-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;padding-right:2px;}
+.read-list{display:flex;flex-direction:column;gap:6px;max-height:380px;overflow-y:auto;padding-right:2px;}
 .read-list::-webkit-scrollbar{width:6px}
 .read-list::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:6px}
 .read-item{
   display:flex;align-items:flex-start;gap:10px;
-  padding:9px 11px;
+  padding:10px 12px;
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:9px;
@@ -817,14 +807,14 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   color:var(--brand-text);
   font-family:'JetBrains Mono',monospace;
   font-size:.62rem;font-weight:600;
-  letter-spacing:0;
-  margin-top:1px;
+  letter-spacing:0;margin-top:1px;
+  max-width:100px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .read-item-body{flex:1;min-width:0}
 .read-item-mem{
   font-size:.8rem;font-weight:500;
-  color:var(--text);
-  line-height:1.45;
+  color:var(--text);line-height:1.45;
   display:-webkit-box;
   -webkit-line-clamp:2;
   -webkit-box-orient:vertical;
@@ -833,52 +823,139 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 .read-item-meta{
   font-size:.66rem;color:var(--text-3);
   margin-top:3px;
-  display:flex;align-items:center;gap:6px;
-  flex-wrap:wrap;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
 }
 .read-item-meta .dot{opacity:.5}
 .read-item-time{
   font-family:'JetBrains Mono',monospace;
-  font-variant-numeric:tabular-nums;
-  color:var(--text-3);
+  font-variant-numeric:tabular-nums;color:var(--text-3);
 }
 
-/* Empty state in modal */
-.report-empty{
-  padding:40px 20px;
-  text-align:center;
-  color:var(--text-3);
-}
-.report-empty svg{
-  width:34px;height:34px;
-  color:var(--text-3);
-  opacity:.5;
-  margin-bottom:10px;
-}
+.report-empty{padding:40px 20px;text-align:center;color:var(--text-3);}
+.report-empty svg{width:34px;height:34px;color:var(--text-3);opacity:.5;margin-bottom:10px;}
 .report-empty p{font-size:.82rem;margin-top:4px;}
 
-/* Day group */
 .day-group{margin-bottom:14px}
 .day-head{
   display:flex;align-items:center;justify-content:space-between;
-  padding:6px 10px;
-  background:var(--surface-2);
-  border-radius:7px;
-  margin-bottom:6px;
-  font-size:.72rem;
-  font-weight:700;
-  color:var(--text-2);
-  letter-spacing:.01em;
+  padding:6px 10px;background:var(--surface-2);
+  border-radius:7px;margin-bottom:6px;
+  font-size:.72rem;font-weight:700;
+  color:var(--text-2);letter-spacing:.01em;
 }
-.day-head .dh-left{display:inline-flex;align-items:center;gap:7px}
-.day-head svg{width:12px;height:12px;color:var(--brand-text)}
+.day-head .dh-left{display:inline-flex;align-items:center;gap:7px;min-width:0}
+.day-head svg{width:12px;height:12px;color:var(--brand-text);flex-shrink:0;}
 .day-head .dh-count{
   font-family:'JetBrains Mono',monospace;
-  color:var(--brand-text);
-  font-size:.68rem;
-  padding:1px 6px;
-  background:var(--brand-soft);
-  border-radius:99px;
+  color:var(--brand-text);font-size:.68rem;
+  padding:1px 6px;background:var(--brand-soft);
+  border-radius:99px;flex-shrink:0;
+}
+
+/* ============================================================
+   MOBILE-FIRST MODAL (max-width 640px) — full-screen sheet
+   ============================================================ */
+@media (max-width:640px){
+  .modal-backdrop{
+    padding:0;
+    align-items:stretch;
+  }
+  .modal{
+    max-width:100%;
+    width:100%;
+    height:100%;
+    max-height:100vh;
+    max-height:100dvh;
+    border-radius:0;
+    border-left:none;
+    border-right:none;
+    border-top:none;
+    border-bottom:none;
+    transform:translateY(100%);
+    margin:0;
+  }
+  .modal-backdrop.show .modal{transform:translateY(0)}
+  .modal-head{
+    padding:14px 14px 12px;
+    gap:10px;
+    padding-top:calc(14px + env(safe-area-inset-top, 0px));
+  }
+  .modal-icon{width:34px;height:34px;border-radius:9px}
+  .modal-icon svg{width:17px;height:17px}
+  .modal-title b{font-size:.94rem}
+  .modal-title span{font-size:.68rem}
+  .modal-close{width:32px;height:32px}
+  .modal-body{
+    padding:14px 14px 20px;
+    padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Tabs stay 4-across and fit beautifully */
+  .report-tabs{
+    gap:3px;
+    padding:3px;
+    border-radius:10px;
+    margin-bottom:14px;
+  }
+  .report-tab{
+    padding:9px 4px;
+    font-size:.7rem;
+    gap:4px;
+    border-radius:7px;
+  }
+  .report-tab svg{width:12px;height:12px}
+  .report-tab span.tab-label{
+    /* show label even on small screens, but allow ellipsis */
+    max-width:100%;
+  }
+
+  .report-stats{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  .report-stats .stat-card:last-child{grid-column:1 / -1;}
+  .stat-card{padding:11px 12px}
+  .stat-value{font-size:1.35rem}
+  .stat-label{font-size:.58rem}
+  .stat-sub{font-size:.64rem}
+
+  .cat-row{grid-template-columns:1fr 70px auto;gap:8px;padding:8px 10px;}
+  .cat-name{font-size:.76rem}
+  .cat-count{font-size:.68rem;min-width:28px}
+
+  .read-list{max-height:none}
+  .read-item{padding:9px 10px;gap:8px;}
+  .read-item-ref{font-size:.58rem;padding:2px 6px;max-width:80px;}
+  .read-item-mem{font-size:.78rem}
+  .read-item-meta{font-size:.62rem}
+
+  .day-head{font-size:.68rem;padding:5px 9px}
+  .day-head .dh-count{font-size:.62rem}
+}
+
+/* Very narrow phones — keep 4 tabs but tighten further */
+@media (max-width:380px){
+  .report-tab{
+    padding:8px 2px;
+    font-size:.64rem;
+    gap:3px;
+  }
+  .report-tab svg{width:11px;height:11px}
+  .report-tab span.tab-label{
+    /* hide text on ultra narrow, keep icon */
+    display:none;
+  }
+  .report-tab::before{
+    /* fallback: show 1-letter initial to still distinguish */
+    content: attr(data-short);
+    font-weight:800;
+    font-size:.72rem;
+    letter-spacing:.02em;
+  }
+  .report-tab span.tab-label{display:none}
+  .report-tab svg{display:none}
+}
+
+/* Tablets */
+@media (min-width:641px) and (max-width:900px){
+  .modal{max-width:620px}
 }
 
 ::selection{background:var(--brand-soft);color:var(--text)}
@@ -1058,8 +1135,8 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv";
 const SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1BLOOydCf9vAAWuqM4J3LR0PGcIosijzw5o_JhbsT3gM/edit";
-const LS_KEY = "mn-read-v2";           // daily-count store (existing)
-const LS_HISTORY_KEY = "mn-history-v1"; // event log: every single read with timestamp
+const LS_KEY = "mn-read-v2";
+const LS_HISTORY_KEY = "mn-history-v1";
 const APP_VERSION = "v1.5";
 const PAGE_SIZE = 200;
 let LOADED = 0;
@@ -1150,7 +1227,6 @@ function loadHistoryStore(){
 }
 function saveHistoryStore(arr){
   try{
-    // Keep last 5000 events to prevent unbounded growth
     const trimmed = arr.length > 5000 ? arr.slice(arr.length-5000) : arr;
     localStorage.setItem(LS_HISTORY_KEY, JSON.stringify(trimmed));
   }catch(e){}
@@ -1176,7 +1252,6 @@ function markRead(r){
   rec.last=now;
   READ[key]=rec;
 
-  // Always log an event (even same-day re-reads), so daily report is accurate
   HISTORY.push({
     ts: now,
     key: key,
@@ -1480,10 +1555,7 @@ function renderPage(){
       if(e.target.closest(".card-memory")) return;
       const key=el.dataset.key;
       const r=ALL.find(x=>rowKey(x)===key);
-      if(r){
-        markRead(r);
-        saveReadStore(READ);
-      }
+      if(r){ markRead(r); saveReadStore(READ); }
       el.classList.toggle("open");
       updateCardUI(el, key);
       renderInfoBar();
@@ -1752,7 +1824,7 @@ document.getElementById("fSort").addEventListener("change",e=>{F.sort=e.target.v
 /* ============================================================
    PROGRESS REPORT
    ============================================================ */
-const RPT = { period: "last" };  // "last" | "daily" | "weekly" | "monthly"
+const RPT = { period: "last" };
 
 const reportModal = document.getElementById("reportModal");
 const reportBody = document.getElementById("reportBody");
@@ -1781,9 +1853,8 @@ document.addEventListener("keydown",(e)=>{
   if(e.key === "Escape" && reportModal.classList.contains("show")) closeReport();
 });
 
-// Date range helpers
 function startOfDayMs(ms){
-  const p = new Date(ms); // treat as local-ish; fine for day boundaries
+  const p = new Date(ms);
   p.setHours(0,0,0,0);
   return p.getTime();
 }
@@ -1799,9 +1870,9 @@ function getRange(period){
   }
   if(period === "weekly"){
     const p = new Date(now);
-    const dow = p.getDay(); // 0=Sun
+    const dow = p.getDay();
     const mon = new Date(p);
-    mon.setDate(p.getDate() - ((dow + 6) % 7)); // Monday start
+    mon.setDate(p.getDate() - ((dow + 6) % 7));
     mon.setHours(0,0,0,0);
     const sun = new Date(mon);
     sun.setDate(mon.getDate() + 6);
@@ -1819,7 +1890,6 @@ function getRange(period){
 
 function getLastReadDayKey(){
   if(!HISTORY.length) return null;
-  // most recent event
   let latest = 0;
   for(const h of HISTORY){ if(h.ts > latest) latest = h.ts; }
   return latest ? dayKeyFromTs(latest) : null;
@@ -1835,35 +1905,21 @@ function eventsInRange(period){
   return HISTORY.filter(h => h.ts >= from && h.ts <= to);
 }
 
-function renderReport(){
-  if(!HISTORY.length && !Object.keys(READ).length){
-    reportSubtitle.textContent = "No reading activity yet";
-    reportBody.innerHTML = `
-      <div class="report-empty">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/>
-        </svg>
-        <p style="font-weight:600;color:var(--text-2)">No reading activity yet</p>
-        <p>Open a memory card to start tracking your progress.</p>
-      </div>
-      <div class="report-tabs" style="margin-top:16px">
-        <button class="report-tab on" data-period="last">Last Read</button>
-        <button class="report-tab" data-period="daily">Daily</button>
-        <button class="report-tab" data-period="weekly">Weekly</button>
-        <button class="report-tab" data-period="monthly">Monthly</button>
-      </div>
-    `;
-    bindReportTabs();
-    return;
-  }
+/* Look up a full row object from ALL for a history event */
+function findRowByKey(key){
+  // key = category + "||" + reference
+  const [cat, ref] = key.split("||");
+  return ALL.find(r => String(r.category||"").trim()===cat && String(r.reference||"").trim()===ref) || null;
+}
 
+function renderReport(){
   const period = RPT.period;
   const events = eventsInRange(period);
-  const counted = events.filter(e => e.counted); // only first-read-of-day events count as "new"
+  const counted = events.filter(e => e.counted);
   const uniqueKeys = new Set(events.map(e=>e.key));
   const uniqueCountedKeys = new Set(counted.map(e=>e.key));
 
-  // Range label
+  // RANGE LABEL
   let periodLabel = "";
   if(period === "last"){
     const dayKey = getLastReadDayKey();
@@ -1882,17 +1938,26 @@ function renderReport(){
     const { from } = getRange("monthly");
     periodLabel = new Date(from).toLocaleString(undefined,{month:"long", year:"numeric"});
   }
-
   reportSubtitle.textContent = periodLabel;
 
-  // Category breakdown (based on counted events)
-  const catCount = {};
+  // CATEGORY BREAKDOWN — always use ALL data (full dataset)
+  // Count every card in the whole sheet per category
+  const allCatCount = {};
+  ALL.forEach(r=>{
+    const c = String(r.category||"").trim() || "Uncategorized";
+    allCatCount[c] = (allCatCount[c]||0) + 1;
+  });
+
+  // Also count read-per-category for this period (using counted events)
+  const periodCatReads = {};
   counted.forEach(e=>{
     const c = e.cat || "Uncategorized";
-    catCount[c] = (catCount[c]||0) + 1;
+    periodCatReads[c] = (periodCatReads[c]||0) + 1;
   });
-  const catSorted = Object.entries(catCount).sort((a,b)=>b[1]-a[1]);
-  const maxCat = catSorted.length ? catSorted[0][1] : 1;
+
+  // Build a combined category list: total (from ALL) + read (from period)
+  const allCatKeys = Object.keys(allCatCount).sort((a,b)=>a.localeCompare(b));
+  const maxAll = allCatKeys.length ? Math.max(...allCatKeys.map(k=>allCatCount[k])) : 1;
 
   // Group events by day for the list
   const byDay = {};
@@ -1900,21 +1965,36 @@ function renderReport(){
     const dk = dayKeyFromTs(e.ts);
     (byDay[dk] = byDay[dk] || []).push(e);
   });
-  const dayKeys = Object.keys(byDay).sort((a,b)=>b.localeCompare(a)); // newest first
+  const dayKeys = Object.keys(byDay).sort((a,b)=>b.localeCompare(a));
 
   const totalEvents = events.length;
   const totalCounted = counted.length;
   const uniqueTopics = uniqueCountedKeys.size;
+  const categoriesCount = allCatKeys.length;
+
+  const hasAnyActivity = HISTORY.length > 0;
+
+  if(!hasAnyActivity){
+    reportSubtitle.textContent = "No reading activity yet";
+    reportBody.innerHTML = `
+      <div class="report-tabs">
+        ${renderTabsHTML(period)}
+      </div>
+      <div class="report-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/>
+        </svg>
+        <p style="font-weight:600;color:var(--text-2)">No reading activity yet</p>
+        <p>Open a memory card to start tracking your progress.</p>
+      </div>
+    `;
+    bindReportTabs();
+    return;
+  }
 
   reportBody.innerHTML = `
     <div class="report-tabs">
-      <button class="report-tab ${period==="last"?'on':''}" data-period="last">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
-        Last Read
-      </button>
-      <button class="report-tab ${period==="daily"?'on':''}" data-period="daily">Daily</button>
-      <button class="report-tab ${period==="weekly"?'on':''}" data-period="weekly">Weekly</button>
-      <button class="report-tab ${period==="monthly"?'on':''}" data-period="monthly">Monthly</button>
+      ${renderTabsHTML(period)}
     </div>
 
     <div class="report-stats">
@@ -1930,25 +2010,32 @@ function renderReport(){
       </div>
       <div class="stat-card info">
         <span class="stat-label">Categories</span>
-        <div class="stat-value">${catSorted.length}</div>
-        <div class="stat-sub">${catSorted.length ? esc(catSorted[0][0]) + " top" : "—"}</div>
+        <div class="stat-value">${categoriesCount}</div>
+        <div class="stat-sub">${categoriesCount} total in sheet</div>
       </div>
     </div>
 
-    ${catSorted.length ? `
+    ${allCatKeys.length ? `
       <div class="report-section">
         <div class="report-sec-title">
-          <span>By Category</span>
-          <span class="count-badge">${catSorted.length}</span>
+          <span>All Categories (sheet)</span>
+          <span class="count-badge">${categoriesCount}</span>
         </div>
         <div class="cat-list">
-          ${catSorted.map(([c, n])=>`
-            <div class="cat-row">
-              <span class="cat-name" title="${esc(c)}">${esc(c)}</span>
-              <span class="cat-bar"><span class="cat-bar-inner" style="width:${Math.round(n/maxCat*100)}%"></span></span>
-              <span class="cat-count">${n}</span>
-            </div>
-          `).join("")}
+          ${allCatKeys.map(c=>{
+            const total = allCatCount[c];
+            const reads = periodCatReads[c] || 0;
+            const pct = Math.round(total / maxAll * 100);
+            return `
+              <div class="cat-row">
+                <span class="cat-name" title="${esc(c)} — ${reads} read in period">${esc(c)}</span>
+                <span class="cat-bar" title="${reads} of ${total} read in period">
+                  <span class="cat-bar-inner" style="width:${pct}%"></span>
+                </span>
+                <span class="cat-count" title="${reads} read of ${total} total">${reads}/${total}</span>
+              </div>
+            `;
+          }).join("")}
         </div>
       </div>
     ` : ""}
@@ -1971,7 +2058,7 @@ function renderReport(){
               </div>
               ${byDay[dk].slice().reverse().map(e=>`
                 <a class="read-item" href="https://www.google.com/search?q=${encodeURIComponent([e.ref, e.mem, e.cat].filter(Boolean).join(" "))}" target="_blank" rel="noopener">
-                  <span class="read-item-ref">${esc(e.ref||"—")}</span>
+                  <span class="read-item-ref" title="${esc(e.ref||"—")}">${esc(e.ref||"—")}</span>
                   <span class="read-item-body">
                     <div class="read-item-mem">${esc(e.mem||"")}</div>
                     <div class="read-item-meta">
@@ -2001,6 +2088,25 @@ function renderReport(){
   `;
 
   bindReportTabs();
+}
+
+function renderTabsHTML(activePeriod){
+  // data-short gives a 1-letter fallback used on ultra-narrow screens
+  return `
+    <button class="report-tab ${activePeriod==="last"?'on':''}" data-period="last" data-short="L" aria-label="Last read">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+      <span class="tab-label">Last</span>
+    </button>
+    <button class="report-tab ${activePeriod==="daily"?'on':''}" data-period="daily" data-short="D" aria-label="Daily">
+      <span class="tab-label">Daily</span>
+    </button>
+    <button class="report-tab ${activePeriod==="weekly"?'on':''}" data-period="weekly" data-short="W" aria-label="Weekly">
+      <span class="tab-label">Weekly</span>
+    </button>
+    <button class="report-tab ${activePeriod==="monthly"?'on':''}" data-period="monthly" data-short="M" aria-label="Monthly">
+      <span class="tab-label">Monthly</span>
+    </button>
+  `;
 }
 
 function bindReportTabs(){
