@@ -165,9 +165,6 @@ body{
 
 .page-top{padding:22px 0 6px}
 
-/* ============================================================
-   FILTER PANEL
-   ============================================================ */
 .filters{
   background:var(--surface);
   border:1px solid var(--border);
@@ -308,9 +305,7 @@ input:focus,.select:focus{
 .af-reset:hover{background:var(--err);border-color:var(--err);color:#fff}
 .af-reset svg{width:11px;height:11px}
 
-/* ============================================================
-   INFOBAR — small, with inline progress on the right
-   ============================================================ */
+/* INFOBAR */
 .infobar{
   display:flex;align-items:center;justify-content:space-between;
   gap:10px;
@@ -328,9 +323,6 @@ input:focus,.select:focus{
   white-space:nowrap;
 }
 .infobar b{color:var(--text-2);font-weight:600}
-.infobar .ib-right{
-  color:var(--text-3);
-}
 .infobar .ib-right b.read{color:var(--ok);font-weight:700}
 .infobar .ib-right b.total{color:var(--text-2);font-weight:600}
 .infobar .ib-right .pct{
@@ -348,14 +340,10 @@ input:focus,.select:focus{
   border-color:var(--muted-br);
   color:var(--text-3);
 }
-.infobar .sep{
-  color:var(--text-3);
-  opacity:.5;
-}
+.infobar .sep{color:var(--text-3);opacity:.5}
 
 .list{display:flex;flex-direction:column;gap:8px}
 
-/* CARD */
 .card{
   background:var(--surface);
   border:1px solid var(--border);
@@ -434,10 +422,6 @@ input:focus,.select:focus{
 .badge.note{color:var(--info);background:var(--info-bg);border-color:var(--info-br)}
 .badge.other{color:var(--text-3);background:var(--muted-bg);border-color:var(--muted-br)}
 
-/* ============================================================
-   MEMORY — 20 lines on mobile, 20 lines on desktop (per request)
-   Actually: 20 lines everywhere as the max; expands fully when card opened
-   ============================================================ */
 .card-memory{
   display:-webkit-box;
   -webkit-line-clamp:20;
@@ -801,7 +785,6 @@ themeBtn.addEventListener("click",()=>{
   applyThemeColor();
 });
 
-/* toast */
 let toastTimer=null;
 function toast(msg, kind=""){
   const el=document.getElementById("toast");
@@ -816,7 +799,7 @@ function toast(msg, kind=""){
   toastTimer=setTimeout(()=>el.classList.remove("show"),2400);
 }
 
-/* read store — one increment per calendar day (PKT) */
+/* read store */
 function loadReadStore(){
   try{
     const raw=localStorage.getItem(LS_KEY);
@@ -849,7 +832,6 @@ function markRead(r){
   return true;
 }
 
-/* CSV */
 function parseCSV(t){
   const rows=[];let row=[],f="",q=false;
   for(let i=0;i<t.length;i++){
@@ -900,20 +882,25 @@ let ALL=[];
 let VIEW=[];
 let F={q:"", status:"", category:"", read:"", sort:"default"};
 
-/* compact info + progress renderer */
+/* ============================================================
+   INFOBAR — reflects current filter (VIEW) not the whole dataset
+   ============================================================ */
 function renderInfoBar(){
+  // Left: "VIEW / Total" — how many are shown vs. the whole dataset
+  const shown=VIEW.length;
   const total=ALL.length;
-  const readCount=ALL.filter(r=>READ[rowKey(r)]).length;
-  const pct=total?Math.round(readCount*100/total):0;
 
-  // left: "334/334 Total"
+  // Right: read progress computed ONLY within the filtered view
+  // This makes the numbers change when you apply filters.
+  const viewRead = VIEW.filter(r=>READ[rowKey(r)]).length;
+  const viewTotal = VIEW.length;
+  const pct = viewTotal ? Math.round(viewRead*100/viewTotal) : 0;
+
   document.getElementById("ibLeft").innerHTML =
-    `<b>${VIEW.length}</b><span class="sep">/</span><b>${total}</b>&nbsp;Total`;
+    `<b>${shown}</b><span class="sep">/</span><b>${total}</b>&nbsp;Total`;
 
-  // right: "6/200 (3%Read)"
-  const right = document.getElementById("ibRight");
-  right.innerHTML =
-    `<b class="read">${readCount}</b><span class="sep">/</span><b class="total">${total}</b>` +
+  document.getElementById("ibRight").innerHTML =
+    `<b class="read">${viewRead}</b><span class="sep">/</span><b class="total">${viewTotal}</b>` +
     `<span class="pct ${pct===0?'zero':''}">${pct}%Read</span>`;
 }
 
