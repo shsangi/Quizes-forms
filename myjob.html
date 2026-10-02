@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#0a0b0f" id="themeColorMeta" />
-<title>Job Applications · Tracker</title>
+<title>My Jobs · Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -151,12 +151,13 @@ body{
   box-shadow:0 4px 14px -4px var(--brand-shadow);
   flex-shrink:0;
 }
-.brand-mark svg{width:16px;height:16px}
+.brand-mark svg{width:18px;height:18px}
 .brand-txt{display:flex;flex-direction:column;line-height:1.15;min-width:0}
 .brand-txt b{font-weight:700;font-size:.92rem;letter-spacing:-.02em}
 .brand-txt span{font-size:.68rem;font-weight:500;color:var(--text-3);letter-spacing:.01em}
 .topbar-spacer{flex:1}
 
+/* clock chip */
 .clock{
   display:inline-flex;align-items:center;gap:7px;
   padding:5px 11px;border-radius:8px;
@@ -177,7 +178,51 @@ body{
   flex-shrink:0;
 }
 @keyframes pulse{50%{opacity:.4}}
-.clock .tz{color:var(--text-3);font-size:.62rem;font-weight:500;margin-left:1px}
+.clock .ampm{
+  color:var(--brand-text);
+  font-size:.62rem;
+  font-weight:700;
+  letter-spacing:.06em;
+}
+
+/* icon buttons */
+.icon-btn{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-2);cursor:pointer;
+  display:grid;place-items:center;
+  transition:all .2s ease;flex-shrink:0;
+  text-decoration:none;
+  position:relative;overflow:hidden;
+}
+.icon-btn:hover{
+  background:var(--surface-2);border-color:var(--border-2);
+  color:var(--text);transform:translateY(-1px);
+}
+.icon-btn:active{transform:translateY(0)}
+.icon-btn svg{width:16px;height:16px}
+
+/* theme btn keeps dual icons */
+.theme-btn svg{
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;
+  position:absolute;
+}
+[data-theme="dark"] .theme-btn .icon-moon{opacity:0;transform:rotate(-90deg) scale(.6)}
+[data-theme="dark"] .theme-btn .icon-sun{opacity:1;transform:rotate(0) scale(1)}
+[data-theme="light"] .theme-btn .icon-sun{opacity:0;transform:rotate(90deg) scale(.6)}
+[data-theme="light"] .theme-btn .icon-moon{opacity:1;transform:rotate(0) scale(1)}
+
+/* sheet open button — slightly accented */
+.sheet-btn{
+  background:var(--brand-soft);
+  border-color:var(--brand-border);
+  color:var(--brand-text);
+}
+.sheet-btn:hover{
+  background:var(--brand);
+  border-color:var(--brand);
+  color:#fff;
+}
 
 .version{
   display:inline-flex;align-items:center;gap:6px;
@@ -190,29 +235,9 @@ body{
 .version:hover{border-color:var(--border-2);color:var(--text)}
 .version-dot{width:6px;height:6px;border-radius:50%;background:var(--brand);box-shadow:0 0 6px var(--brand)}
 
-.theme-btn{
-  width:36px;height:36px;border-radius:10px;
-  background:var(--surface);border:1px solid var(--border);
-  color:var(--text-2);cursor:pointer;
-  display:grid;place-items:center;
-  transition:all .2s ease;flex-shrink:0;
-  position:relative;overflow:hidden;
-}
-.theme-btn:hover{background:var(--surface-2);border-color:var(--border-2);color:var(--text);transform:translateY(-1px)}
-.theme-btn:active{transform:translateY(0)}
-.theme-btn svg{
-  width:16px;height:16px;
-  transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;
-  position:absolute;
-}
-[data-theme="dark"] .theme-btn .icon-moon{opacity:0;transform:rotate(-90deg) scale(.6)}
-[data-theme="dark"] .theme-btn .icon-sun{opacity:1;transform:rotate(0) scale(1)}
-[data-theme="light"] .theme-btn .icon-sun{opacity:0;transform:rotate(90deg) scale(.6)}
-[data-theme="light"] .theme-btn .icon-moon{opacity:1;transform:rotate(0) scale(1)}
-
 .page-top{padding:28px 0 8px}
 
-/* STATS — 3 columns */
+/* STATS */
 .stats{
   display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
   margin-bottom:26px;
@@ -233,8 +258,6 @@ body{
 }
 .stat-v.muted{color:var(--text-3)}
 .stat-v.ok{color:var(--ok)}
-.stat-v.warn{color:var(--warn)}
-.stat-v.err{color:var(--err)}
 
 /* SECTION HEADER */
 .section-h{
@@ -259,9 +282,7 @@ body{
 
 .list{display:flex;flex-direction:column;gap:6px}
 
-/* ============================================================
-   JOB CARD — compact single-row layout
-   ============================================================ */
+/* JOB CARD — compact single-row */
 .job{
   background:var(--surface);
   border:1px solid var(--border);
@@ -292,7 +313,6 @@ body{
 .job.urgent-far::before{background:var(--ok)}
 .job.urgent-past::before{background:var(--border-2)}
 
-/* compact date chip */
 .job-date{
   flex-shrink:0;
   display:inline-flex;
@@ -321,55 +341,30 @@ body{
 .job.urgent-far .job-date .d-day{color:var(--ok)}
 .job.urgent-past .job-date{opacity:.6}
 
-/* main info — title + inline meta */
-.job-body{
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  gap:3px;
-}
+.job-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .job-title{
-  font-size:.9rem;
-  font-weight:600;
-  letter-spacing:-.012em;
-  line-height:1.3;
+  font-size:.9rem;font-weight:600;
+  letter-spacing:-.012em;line-height:1.3;
   color:var(--text);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .job-meta{
-  display:flex;
-  gap:12px;
-  font-size:.72rem;
-  color:var(--text-3);
-  min-width:0;
-  overflow:hidden;
+  display:flex;gap:12px;
+  font-size:.72rem;color:var(--text-3);
+  min-width:0;overflow:hidden;
 }
-.job-meta .m{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  min-width:0;
-}
+.job-meta .m{display:inline-flex;align-items:center;gap:5px;min-width:0}
 .job-meta .m svg{width:11px;height:11px;opacity:.7;flex-shrink:0}
 .job-meta .m b{
-  color:var(--text-2);
-  font-weight:500;
+  color:var(--text-2);font-weight:500;
   font-variant-numeric:tabular-nums;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .job-meta .m.empty b{color:var(--text-3);font-style:italic}
 
-/* badge — compact inline */
 .job-badge{
   flex-shrink:0;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
+  display:inline-flex;align-items:center;gap:6px;
 }
 .badge{
   padding:3px 9px;border-radius:999px;
@@ -396,7 +391,6 @@ body{
   white-space:nowrap;
 }
 
-/* STATES */
 .state{padding:70px 20px;text-align:center}
 .state-ico{
   width:52px;height:52px;border-radius:13px;margin:0 auto 15px;
@@ -425,9 +419,9 @@ footer{
   .topbar-in{padding:11px 14px;gap:8px}
   .brand-txt span{display:none}
   .clock{padding:4px 9px;font-size:.68rem}
-  .clock .tz{display:none}
+  .clock .ampm{font-size:.58rem}
+  .icon-btn{width:34px;height:34px}
   .version{padding:4px 8px;font-size:.68rem}
-  .theme-btn{width:34px;height:34px}
   .page-top{padding:18px 0 6px}
 
   .stats{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:20px}
@@ -437,17 +431,8 @@ footer{
 
   .section-h{margin:20px 0 9px}
 
-  /* on mobile, wrap to two lines: date+title on top, meta+badge below */
-  .job{
-    padding:10px 12px;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-  .job-date{
-    min-width:70px;
-    padding:4px 8px;
-    font-size:.68rem;
-  }
+  .job{padding:10px 12px;gap:10px;flex-wrap:wrap}
+  .job-date{min-width:70px;padding:4px 8px;font-size:.68rem}
   .job-date .d-mon{font-size:.62rem}
   .job-date .d-year{font-size:.58rem}
   .job-body{flex:1 1 100%;order:2}
@@ -457,7 +442,7 @@ footer{
 }
 @media (max-width:400px){
   .version .v-num{display:none}
-  .job-meta .m:nth-child(3){display:none} /* hide venue on tiny screens */
+  .job-meta .m:nth-child(3){display:none}
 }
 
 ::selection{background:var(--brand-soft);color:var(--text)}
@@ -475,30 +460,39 @@ footer{
   <div class="topbar-in">
     <div class="brand">
       <div class="brand-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="7" width="20" height="14" rx="2"/>
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        <!-- Boy icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M12 4V2"/>
+          <path d="M14 3.5a2.5 2.5 0 1 1 0 5"/>
+          <path d="M4 21a8 8 0 0 1 16 0"/>
         </svg>
       </div>
       <div class="brand-txt">
-        <b>Job Applications</b>
-        <span>Test Date Tracker</span>
+        <b>My Jobs</b>
+        <span>Application Tracker</span>
       </div>
     </div>
     <div class="topbar-spacer"></div>
 
+    <!-- PKT clock with AM/PM -->
     <div class="clock" title="Pakistan Standard Time (UTC+5)">
       <span class="clock-dot"></span>
-      <span id="pktClock">--:--:--</span>
-      <span class="tz">PKT</span>
+      <span id="pktClock">--:--</span>
+      <span class="ampm" id="pktAmPm">--</span>
     </div>
 
-    <div class="version" title="App version">
-      <span class="version-dot"></span>
-      <span class="v-num">v1.0.0</span>
-    </div>
+    <!-- Open sheet link -->
+    <a class="icon-btn sheet-btn" id="sheetBtn" href="#" target="_blank" rel="noopener" aria-label="Open Google Sheet" title="Open sheet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="8" y1="13" x2="16" y2="13"/>
+        <line x1="8" y1="17" x2="13" y2="17"/>
+      </svg>
+    </a>
 
-    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">
+    <button class="icon-btn theme-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="4"/>
         <path d="M12 2v2"/><path d="M12 20v2"/>
@@ -510,6 +504,11 @@ footer{
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
     </button>
+
+    <div class="version" title="App version">
+      <span class="version-dot"></span>
+      <span class="v-num">v1.0.0</span>
+    </div>
   </div>
 </div>
 
@@ -542,9 +541,20 @@ footer{
 </div>
 
 <script>
+/* ============================================================
+   CONFIG — change SHEET_EDIT_URL to your sheet's shareable link
+   ============================================================ */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUBCdhjwLbdOb968RwtVQYOy_0xLl1x9OQDoctPsD-wfO_c6ob5zUElpUpUxPeyhrwKOt321WiXTSa/pub?output=csv";
+// The shareable/edit URL for the "open sheet" button. Derive from CSV_URL by default,
+// but you can hardcode your sheet's edit link here for precision.
+const SHEET_EDIT_URL = (function(){
+  // Try to derive a usable edit URL from the published CSV URL.
+  // Published URLs use /d/e/<long-id>/pub — we can't reliably reverse them to /d/<short-id>/edit,
+  // so if you want the button to open your sheet, set this to your actual edit/share URL below.
+  return "https://docs.google.com/spreadsheets/d/1ZyNsGzLEgQo1D-wNejLdGw9WQ2POSBP604dz66buWTY/edit";
+})();
 
-/* Pakistan Standard Time (UTC+5, no DST) */
+/* ---------- Pakistan Standard Time ---------- */
 const PKT_OFFSET_MIN = 5 * 60;
 
 function nowInPKT(){
@@ -553,13 +563,24 @@ function nowInPKT(){
   return new Date(utcMs + PKT_OFFSET_MIN * 60000);
 }
 function pad2(n){ return String(n).padStart(2,"0"); }
+
 function tickClock(){
   const pkt = nowInPKT();
-  const el = document.getElementById("pktClock");
-  if(el) el.textContent = `${pad2(pkt.getHours())}:${pad2(pkt.getMinutes())}:${pad2(pkt.getSeconds())}`;
+  let h = pkt.getHours();
+  const m = pkt.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12; if(h === 0) h = 12;
+  const timeEl = document.getElementById("pktClock");
+  const ampmEl = document.getElementById("pktAmPm");
+  if(timeEl) timeEl.textContent = `${pad2(h)}:${pad2(m)}`;
+  if(ampmEl) ampmEl.textContent = ampm;
 }
 tickClock();
-setInterval(tickClock, 1000);
+setInterval(tickClock, 1000 * 15); // refresh every 15s (no seconds shown)
+
+/* Sheet open link */
+const sheetBtn = document.getElementById("sheetBtn");
+sheetBtn.href = SHEET_EDIT_URL;
 
 /* theme */
 const themeBtn=document.getElementById("themeBtn");
@@ -681,8 +702,7 @@ function render(rows){
     out.innerHTML=`<div class="state">
       <div class="state-ico">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="7" width="20" height="14" rx="2"/>
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
         </svg>
       </div>
       <h3>No applications yet</h3>
