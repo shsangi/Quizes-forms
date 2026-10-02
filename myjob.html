@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0b0f" id="themeColorMeta" />
+<title>Job Applications · Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    var t = localStorage.getItem('jt-theme');
+    if(!t){ t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'; }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<style>
+:root,
+[data-theme="dark"]{
+  --bg:#0a0b0f;
+  --bg-elev:#111319;
+  --surface:#16181f;
+  --surface-2:#1c1f28;
+  --border:#252832;
+  --border-2:#333847;
+  --text:#eceef3;
+  --text-2:#9498a5;
+  --text-3:#6a6f7e;
+
+  --brand:#6366f1;
+  --brand-2:#8b5cf6;
+  --brand-soft:rgba(99,102,241,.14);
+  --brand-border:rgba(99,102,241,.32);
+  --brand-text:#a5b1ff;
+  --brand-shadow:rgba(99,102,241,.55);
+
+  --ok:#22c55e;
+  --ok-bg:rgba(34,197,94,.11);
+  --ok-br:rgba(34,197,94,.32);
+
+  --err:#ef4444;
+  --err-bg:rgba(239,68,68,.11);
+  --err-br:rgba(239,68,68,.32);
+
+  --warn:#f59e0b;
+  --warn-bg:rgba(245,158,11,.11);
+  --warn-br:rgba(245,158,11,.32);
+
+  --info:#38bdf8;
+  --info-bg:rgba(56,189,248,.11);
+  --info-br:rgba(56,189,248,.32);
+
+  --muted-bg:rgba(148,152,165,.09);
+  --muted-br:rgba(148,152,165,.22);
+
+  --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+  --amb-a:rgba(99,102,241,.14);
+  --amb-b:rgba(139,92,246,.11);
+}
+[data-theme="light"]{
+  --bg:#f6f7fb;
+  --bg-elev:#ffffff;
+  --surface:#ffffff;
+  --surface-2:#f2f3f8;
+  --border:#e4e6ee;
+  --border-2:#cfd3df;
+  --text:#0d1017;
+  --text-2:#5a5f6e;
+  --text-3:#8a8f9e;
+
+  --brand:#4f46e5;
+  --brand-2:#7c3aed;
+  --brand-soft:rgba(79,70,229,.09);
+  --brand-border:rgba(79,70,229,.24);
+  --brand-text:#4f46e5;
+  --brand-shadow:rgba(79,70,229,.35);
+
+  --ok:#16a34a;
+  --ok-bg:rgba(22,163,74,.09);
+  --ok-br:rgba(22,163,74,.28);
+
+  --err:#dc2626;
+  --err-bg:rgba(220,38,38,.09);
+  --err-br:rgba(220,38,38,.28);
+
+  --warn:#d97706;
+  --warn-bg:rgba(217,119,6,.09);
+  --warn-br:rgba(217,119,6,.28);
+
+  --info:#0284c7;
+  --info-bg:rgba(2,132,199,.09);
+  --info-br:rgba(2,132,199,.28);
+
+  --muted-bg:rgba(90,95,110,.08);
+  --muted-br:rgba(90,95,110,.2);
+
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --amb-a:rgba(79,70,229,.09);
+  --amb-b:rgba(124,58,237,.07);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  font-feature-settings:"cv11","ss01";
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.55;
+  letter-spacing:-.011em;
+  overflow-x:hidden;
+  transition:background .3s ease,color .3s ease;
+}
+
+.amb{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.amb::before{
+  content:"";position:absolute;width:900px;height:900px;top:-400px;left:-200px;
+  background:radial-gradient(circle,var(--amb-a),transparent 62%);
+  filter:blur(60px);transition:background .4s ease;
+}
+.amb::after{
+  content:"";position:absolute;width:700px;height:700px;top:-260px;right:-200px;
+  background:radial-gradient(circle,var(--amb-b),transparent 60%);
+  filter:blur(60px);transition:background .4s ease;
+}
+
+.shell{max-width:900px;margin:0 auto;padding:0 20px}
+
+/* TOPBAR */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  backdrop-filter:blur(22px) saturate(1.4);
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);
+  background:color-mix(in srgb,var(--bg) 78%,transparent);
+  border-bottom:1px solid var(--border);
+  transition:background .3s ease,border-color .3s ease;
+}
+.topbar-in{
+  max-width:900px;margin:0 auto;padding:12px 20px;
+  display:flex;align-items:center;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:11px}
+.brand-mark{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--brand),var(--brand-2));
+  display:grid;place-items:center;
+  box-shadow:0 4px 14px -4px var(--brand-shadow);
+  flex-shrink:0;
+}
+.brand-mark svg{width:16px;height:16px}
+.brand-txt{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand-txt b{font-weight:700;font-size:.92rem;letter-spacing:-.02em}
+.brand-txt span{font-size:.68rem;font-weight:500;color:var(--text-3);letter-spacing:.01em}
+.topbar-spacer{flex:1}
+
+.version{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 10px;border-radius:8px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-2);font-size:.72rem;font-weight:600;
+  letter-spacing:.02em;font-family:'JetBrains Mono',monospace;
+  transition:all .2s ease;white-space:nowrap;
+}
+.version:hover{border-color:var(--border-2);color:var(--text)}
+.version-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--brand);box-shadow:0 0 6px var(--brand);
+}
+
+.theme-btn{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text-2);cursor:pointer;
+  display:grid;place-items:center;
+  transition:all .2s ease;flex-shrink:0;
+  position:relative;overflow:hidden;
+}
+.theme-btn:hover{
+  background:var(--surface-2);border-color:var(--border-2);
+  color:var(--text);transform:translateY(-1px);
+}
+.theme-btn:active{transform:translateY(0)}
+.theme-btn svg{
+  width:16px;height:16px;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;
+  position:absolute;
+}
+[data-theme="dark"] .theme-btn .icon-moon{opacity:0;transform:rotate(-90deg) scale(.6)}
+[data-theme="dark"] .theme-btn .icon-sun{opacity:1;transform:rotate(0) scale(1)}
+[data-theme="light"] .theme-btn .icon-sun{opacity:0;transform:rotate(90deg) scale(.6)}
+[data-theme="light"] .theme-btn .icon-moon{opacity:1;transform:rotate(0) scale(1)}
+
+/* PAGE TOP */
+.page-top{padding:32px 0 8px}
+
+/* STATS */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:28px;
+}
+.stat{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px 16px;
+  transition:all .2s ease;
+}
+.stat:hover{border-color:var(--border-2)}
+.stat-l{
+  font-size:.66rem;font-weight:600;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:5px;
+}
+.stat-v{
+  font-size:1.45rem;font-weight:700;
+  letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+  font-family:'JetBrains Mono',monospace;
+}
+.stat-v.muted{color:var(--text-3)}
+.stat-v.ok{color:var(--ok)}
+.stat-v.warn{color:var(--warn)}
+.stat-v.err{color:var(--err)}
+
+/* SECTION HEADER */
+.section-h{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:28px 0 12px;
+  padding:0 2px;
+}
+.section-h h2{
+  font-size:.72rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text-3);
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.section-h h2 svg{width:13px;height:13px}
+.section-h::after{
+  content:"";flex:1;height:1px;background:var(--border);
+}
+.section-h .count{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.7rem;
+  font-weight:600;
+  padding:2px 7px;
+  border-radius:5px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text-3);
+}
+
+/* LIST */
+.list{display:flex;flex-direction:column;gap:8px}
+
+/* JOB CARD */
+.job{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px 18px;
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  transition:all .2s cubic-bezier(.32,.72,0,1);
+  animation:rise .3s cubic-bezier(.32,.72,0,1) both;
+  position:relative;
+  overflow:hidden;
+}
+@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.job:hover{
+  border-color:var(--border-2);
+  background:var(--surface-2);
+  box-shadow:var(--shadow-sm);
+}
+/* urgency stripe */
+.job::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:3px;
+  background:var(--stripe,var(--muted-br));
+  transition:background .2s ease;
+}
+.job.urgent-near::before{background:var(--err)}
+.job.urgent-soon::before{background:var(--warn)}
+.job.urgent-far::before{background:var(--ok)}
+.job.urgent-past::before{background:var(--border-2)}
+
+/* date block on the left */
+.job-date{
+  flex-shrink:0;
+  width:74px;
+  text-align:center;
+  padding:10px 6px;
+  border-radius:10px;
+  background:var(--bg-elev);
+  border:1px solid var(--border);
+  transition:all .2s ease;
+}
+.job-date .d-day{
+  font-size:1.45rem;
+  font-weight:800;
+  letter-spacing:-.04em;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  margin-bottom:3px;
+}
+.job-date .d-mon{
+  font-size:.68rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text-2);
+}
+.job-date .d-year{
+  font-size:.6rem;
+  font-weight:500;
+  color:var(--text-3);
+  margin-top:1px;
+  font-family:'JetBrains Mono',monospace;
+}
+.job.urgent-near .job-date{border-color:var(--err-br);background:var(--err-bg)}
+.job.urgent-near .job-date .d-day{color:var(--err)}
+.job.urgent-soon .job-date{border-color:var(--warn-br);background:var(--warn-bg)}
+.job.urgent-soon .job-date .d-day{color:var(--warn)}
+.job.urgent-far .job-date .d-day{color:var(--ok)}
+.job.urgent-past .job-date{opacity:.65}
+
+/* body */
+.job-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.job-title{
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:-.015em;
+  line-height:1.35;
+  color:var(--text);
+}
+.job-meta{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  font-size:.78rem;
+  color:var(--text-3);
+}
+.job-meta .m{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.job-meta .m svg{width:12px;height:12px;opacity:.75}
+.job-meta .m b{
+  color:var(--text-2);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+.job-meta .m.empty b{color:var(--text-3);font-style:italic;font-weight:500}
+
+/* badges */
+.job-badges{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:flex-end;
+  flex-shrink:0;
+}
+.badge{
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:.63rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  border:1px solid;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  white-space:nowrap;
+  line-height:1.5;
+}
+.badge::before{
+  content:"";
+  width:5px;height:5px;border-radius:50%;
+  background:currentColor;flex-shrink:0;
+}
+.badge.ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-br)}
+.badge.err{color:var(--err);background:var(--err-bg);border-color:var(--err-br)}
+.badge.warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-br)}
+.badge.info{color:var(--info);background:var(--info-bg);border-color:var(--info-br)}
+.badge.muted{color:var(--text-3);background:var(--muted-bg);border-color:var(--muted-br)}
+
+.badge-sub{
+  font-size:.62rem;
+  font-weight:500;
+  color:var(--text-3);
+  font-variant-numeric:tabular-nums;
+}
+
+/* STATES */
+.state{padding:70px 20px;text-align:center}
+.state-ico{
+  width:52px;height:52px;border-radius:13px;margin:0 auto 15px;
+  background:var(--surface);border:1px solid var(--border);
+  display:grid;place-items:center;color:var(--text-3);
+}
+.state-ico svg{width:22px;height:22px}
+.state h3{font-size:1rem;font-weight:600;margin-bottom:6px;letter-spacing:-.02em}
+.state p{color:var(--text-3);font-size:.85rem;max-width:420px;margin:0 auto;line-height:1.6}
+.loader{
+  width:26px;height:26px;margin:0 auto 13px;
+  border:2px solid var(--border);border-top-color:var(--brand);
+  border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* FOOTER */
+footer{
+  margin-top:44px;padding:22px 0;
+  border-top:1px solid var(--border);
+  text-align:center;color:var(--text-3);font-size:.76rem;
+}
+
+/* RESPONSIVE */
+@media (max-width:640px){
+  .shell{padding:0 14px}
+  .topbar-in{padding:11px 14px;gap:8px}
+  .brand-txt span{display:none}
+  .version{padding:4px 8px;font-size:.68rem}
+  .theme-btn{width:34px;height:34px}
+  .page-top{padding:20px 0 6px}
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+    margin-bottom:22px;
+  }
+  .stat{padding:11px 13px}
+  .stat-v{font-size:1.25rem}
+
+  .section-h{margin:22px 0 10px}
+
+  .job{
+    padding:14px 15px 14px 17px;
+    gap:13px;
+    flex-wrap:wrap;
+  }
+  .job-date{
+    width:64px;
+    padding:8px 5px;
+  }
+  .job-date .d-day{font-size:1.25rem}
+  .job-date .d-mon{font-size:.62rem}
+  .job-date .d-year{font-size:.55rem}
+
+  .job-badges{
+    flex-direction:row;
+    align-items:center;
+    width:100%;
+    justify-content:flex-start;
+    order:3;
+    margin-top:2px;
+  }
+  .job-title{font-size:.95rem}
+  .job-meta{font-size:.74rem;gap:12px}
+}
+
+@media (max-width:400px){
+  .job-meta{gap:9px}
+  .job-meta .m svg{width:11px;height:11px}
+}
+
+::selection{background:var(--brand-soft);color:var(--text)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:9px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:var(--text-3)}
+</style>
+</head>
+<body>
+
+<div class="amb"></div>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+      </div>
+      <div class="brand-txt">
+        <b>Job Applications</b>
+        <span>Test Date Tracker</span>
+      </div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="version" title="App version">
+      <span class="version-dot"></span>
+      <span>v1.0.0</span>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2"/><path d="M12 20v2"/>
+        <path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+        <path d="M2 12h2"/><path d="M20 12h2"/>
+        <path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="page-top"></div>
+
+  <section class="stats" id="stats">
+    <div class="stat">
+      <div class="stat-l">Total</div>
+      <div class="stat-v" id="sTotal">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-l">Upcoming</div>
+      <div class="stat-v ok" id="sUpcoming">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-l">This Week</div>
+      <div class="stat-v warn" id="sWeek">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-l">Past</div>
+      <div class="stat-v muted" id="sPast">—</div>
+    </div>
+  </section>
+
+  <div id="out">
+    <div class="state">
+      <div class="loader"></div>
+      <p>Fetching applications…</p>
+    </div>
+  </div>
+
+  <footer>Data · Google Sheets · Built with vanilla JS</footer>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — swap CSV_URL or paste INLINE_CSV
+   ============================================================ */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUBCdhjwLbdOb968RwtVQYOy_0xLl1x9OQDoctPsD-wfO_c6ob5zUElpUpUxPeyhrwKOt321WiXTSa/pub?output=csv";
+const INLINE_CSV = `Sr No,Applied Job,Test Date,Applied On
+1,CSS,10/10/2026,23/8/2026
+2,FIA Superintendent,26/8/2026,12/10/2026
+3,SPSC,22/9/2026,
+4,EC Senior and Junior Assistant,,
+`;
+
+/* ---------- theme ---------- */
+const themeBtn=document.getElementById("themeBtn");
+const themeColorMeta=document.getElementById("themeColorMeta");
+function applyThemeColor(){
+  const t=document.documentElement.getAttribute("data-theme");
+  themeColorMeta.setAttribute("content",t==="light"?"#f6f7fb":"#0a0b0f");
+}
+applyThemeColor();
+themeBtn.addEventListener("click",()=>{
+  const cur=document.documentElement.getAttribute("data-theme");
+  const next=cur==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  localStorage.setItem("jt-theme",next);
+  applyThemeColor();
+});
+
+/* ---------- CSV ---------- */
+function parseCSV(t){
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<t.length;i++){
+    const c=t[i],n=t[i+1];
+    if(q){
+      if(c==='"'&&n==='"'){f+='"';i++;}
+      else if(c==='"'){q=false;}
+      else f+=c;
+    } else {
+      if(c==='"')q=true;
+      else if(c===','){row.push(f);f="";}
+      else if(c==='\n'){row.push(f);rows.push(row);row=[];f="";}
+      else if(c==='\r'){}
+      else f+=c;
+    }
+  }
+  if(f||row.length){row.push(f);rows.push(row);}
+  return rows.filter(r=>r.some(c=>c&&c.trim()!==""));
+}
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- date parsing (DD/MM/YYYY) ---------- */
+function parseDate(str){
+  if(!str) return null;
+  const s=String(str).trim();
+  if(!s) return null;
+  // DD/MM/YYYY or D/M/YYYY
+  let m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if(m){
+    let d=+m[1], mo=+m[2], y=+m[3];
+    if(y<100) y+=2000;
+    const dt=new Date(y,mo-1,d);
+    if(isNaN(dt.getTime())) return null;
+    return dt;
+  }
+  // fallback: let JS try
+  const dt=new Date(s);
+  return isNaN(dt.getTime())?null:dt;
+}
+function fmtDate(dt){
+  if(!dt) return null;
+  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return {
+    day:dt.getDate(),
+    mon:months[dt.getMonth()],
+    year:dt.getFullYear(),
+    full:`${dt.getDate()} ${months[dt.getMonth()]} ${dt.getFullYear()}`
+  };
+}
+function daysBetween(a,b){
+  const ms=24*60*60*1000;
+  const a0=new Date(a.getFullYear(),a.getMonth(),a.getDate());
+  const b0=new Date(b.getFullYear(),b.getMonth(),b.getDate());
+  return Math.round((b0-a0)/ms);
+}
+
+const TODAY=new Date();
+TODAY.setHours(0,0,0,0);
+
+/* ---------- urgency ---------- */
+function urgencyFor(testDate){
+  if(!testDate) return {kind:"past",cls:"urgent-past",badge:"muted",label:"No date",sub:""};
+  const diff=daysBetween(TODAY,testDate);
+  if(diff<0) return {kind:"past",cls:"urgent-past",badge:"muted",label:"Past",sub:`${Math.abs(diff)} day${Math.abs(diff)===1?"":"s"} ago`};
+  if(diff===0) return {kind:"today",cls:"urgent-near",badge:"err",label:"Today",sub:"Test is today"};
+  if(diff===1) return {kind:"tomorrow",cls:"urgent-near",badge:"err",label:"Tomorrow",sub:"1 day left"};
+  if(diff<=7) return {kind:"week",cls:"urgent-soon",badge:"warn",label:"This week",sub:`in ${diff} days`};
+  if(diff<=30) return {kind:"month",cls:"urgent-far",badge:"info",label:"Upcoming",sub:`in ${diff} days`};
+  return {kind:"far",cls:"urgent-far",badge:"ok",label:"Upcoming",sub:`in ${diff} days`};
+}
+
+/* ---------- render ---------- */
+const SVG_CAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+const SVG_SEND='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+const SVG_UP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+const SVG_PAST='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+
+function render(rows){
+  const out=document.getElementById("out");
+
+  if(!rows.length){
+    out.innerHTML=`<div class="state">
+      <div class="state-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+      </div>
+      <h3>No applications yet</h3>
+      <p>Add rows to your sheet — they'll appear here automatically.</p>
+    </div>`;
+    return;
+  }
+
+  const withDates = rows.map(r=>{
+    const testDate=parseDate(r["Test Date"]);
+    const appliedOn=parseDate(r["Applied On"]);
+    const urg=urgencyFor(testDate);
+    return {...r, _testDate:testDate, _appliedOn:appliedOn, _urg:urg};
+  });
+
+  // Split: upcoming (test date >= today) vs past
+  const upcoming = withDates
+    .filter(r=>r._testDate && r._urg.kind!=="past")
+    .sort((a,b)=>a._testDate-b._testDate);
+  const past = withDates
+    .filter(r=>r._testDate && r._urg.kind==="past")
+    .sort((a,b)=>b._testDate-a._testDate);
+  const noDate = withDates.filter(r=>!r._testDate);
+
+  // Stats
+  const total=rows.length;
+  const week=withDates.filter(r=>r._urg.kind==="today"||r._urg.kind==="tomorrow"||r._urg.kind==="week").length;
+  document.getElementById("sTotal").textContent=total;
+  document.getElementById("sUpcoming").textContent=upcoming.length;
+  document.getElementById("sWeek").textContent=week;
+  document.getElementById("sPast").textContent=past.length;
+
+  function cardHTML(r,i){
+    const u=r._urg;
+    const fDate=r._testDate?fmtDate(r._testDate):{day:"—",mon:"TBD",year:""};
+    const applied=r._appliedOn?fmtDate(r._appliedOn).full:null;
+
+    return `<article class="job ${u.cls}" style="animation-delay:${Math.min(i*30,240)}ms">
+      <div class="job-date">
+        <div class="d-day">${fDate.day}</div>
+        <div class="d-mon">${fDate.mon}</div>
+        ${fDate.year?`<div class="d-year">${fDate.year}</div>`:""}
+      </div>
+      <div class="job-body">
+        <div class="job-title">${esc(r["Applied Job"]||"Untitled")}</div>
+        <div class="job-meta">
+          <span class="m">
+            ${SVG_CAL}
+            <span>Test:</span>
+            <b>${r._testDate?fmtDate(r._testDate).full:"Not set"}</b>
+          </span>
+          <span class="m ${applied?'':'empty'}">
+            ${SVG_SEND}
+            <span>Applied:</span>
+            <b>${applied||"Not set"}</b>
+          </span>
+        </div>
+      </div>
+      <div class="job-badges">
+        <span class="badge ${u.badge}">${u.label}</span>
+        ${u.sub?`<span class="badge-sub">${u.sub}</span>`:""}
+      </div>
+    </article>`;
+  }
+
+  let html="";
+  if(upcoming.length){
+    html+=`<div class="section-h"><h2>${SVG_UP} Upcoming Tests</h2><span class="count">${upcoming.length}</span></div>`;
+    html+=`<div class="list">${upcoming.map((r,i)=>cardHTML(r,i)).join("")}</div>`;
+  }
+  if(noDate.length){
+    html+=`<div class="section-h"><h2>${SVG_CAL} Date Not Set</h2><span class="count">${noDate.length}</span></div>`;
+    html+=`<div class="list">${noDate.map((r,i)=>cardHTML(r,i)).join("")}</div>`;
+  }
+  if(past.length){
+    html+=`<div class="section-h"><h2>${SVG_PAST} Past Tests</h2><span class="count">${past.length}</span></div>`;
+    html+=`<div class="list">${past.map((r,i)=>cardHTML(r,i)).join("")}</div>`;
+  }
+
+  out.innerHTML=html;
+}
+
+/* ---------- boot ---------- */
+(async function boot(){
+  let txt="";
+  // Prefer inline if set — avoids network entirely
+  if(INLINE_CSV.trim()){
+    txt=INLINE_CSV;
+  } else {
+    try{
+      const res=await fetch(CSV_URL);
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      txt=await res.text();
+    } catch(err){
+      // fall back to inline
+      if(INLINE_CSV.trim()){
+        txt=INLINE_CSV;
+      } else {
+        document.getElementById("out").innerHTML=`<div class="state">
+          <div class="state-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/>
+            </svg>
+          </div>
+          <h3>Could not load data</h3>
+          <p>${esc(err.message)}<br><br>Serve this page over a local HTTP server, or paste your CSV into the INLINE_CSV variable.</p>
+        </div>`;
+        return;
+      }
+    }
+  }
+
+  const rows=parseCSV(txt);
+  if(rows.length<2){
+    document.getElementById("out").innerHTML=`<div class="state">
+      <div class="state-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/>
+        </svg>
+      </div>
+      <h3>Sheet is empty</h3>
+      <p>Add a header row and at least one data row.</p>
+    </div>`;
+    return;
+  }
+
+  const H=rows[0].map((h,i)=>h.trim()||("Col"+i));
+  const objs=rows.slice(1)
+    .map(r=>{const o={};H.forEach((h,i)=>o[h]=(r[i]||"").trim());return o;})
+    .filter(o=>o["Applied Job"]||o["Test Date"]);
+
+  render(objs);
+})();
+</script>
+</body>
+</html>
