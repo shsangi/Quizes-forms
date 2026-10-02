@@ -130,7 +130,6 @@ body{
 
 .shell{max-width:900px;margin:0 auto;padding:0 20px}
 
-/* TOPBAR */
 .topbar{
   position:sticky;top:0;z-index:40;
   backdrop-filter:blur(22px) saturate(1.4);
@@ -157,7 +156,6 @@ body{
 .brand-txt span{font-size:.68rem;font-weight:500;color:var(--text-3);letter-spacing:.01em}
 .topbar-spacer{flex:1}
 
-/* clock chip */
 .clock{
   display:inline-flex;align-items:center;gap:7px;
   padding:5px 11px;border-radius:8px;
@@ -185,7 +183,6 @@ body{
   letter-spacing:.06em;
 }
 
-/* icon buttons */
 .icon-btn{
   width:36px;height:36px;border-radius:10px;
   background:var(--surface);border:1px solid var(--border);
@@ -202,7 +199,6 @@ body{
 .icon-btn:active{transform:translateY(0)}
 .icon-btn svg{width:16px;height:16px}
 
-/* theme btn keeps dual icons */
 .theme-btn svg{
   transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;
   position:absolute;
@@ -212,7 +208,6 @@ body{
 [data-theme="light"] .theme-btn .icon-sun{opacity:0;transform:rotate(90deg) scale(.6)}
 [data-theme="light"] .theme-btn .icon-moon{opacity:1;transform:rotate(0) scale(1)}
 
-/* sheet open button — slightly accented */
 .sheet-btn{
   background:var(--brand-soft);
   border-color:var(--brand-border);
@@ -224,8 +219,9 @@ body{
   color:#fff;
 }
 
+/* Version badge — no dot */
 .version{
-  display:inline-flex;align-items:center;gap:6px;
+  display:inline-flex;align-items:center;
   padding:5px 10px;border-radius:8px;
   background:var(--surface);border:1px solid var(--border);
   color:var(--text-2);font-size:.72rem;font-weight:600;
@@ -233,11 +229,9 @@ body{
   transition:all .2s ease;white-space:nowrap;
 }
 .version:hover{border-color:var(--border-2);color:var(--text)}
-.version-dot{width:6px;height:6px;border-radius:50%;background:var(--brand);box-shadow:0 0 6px var(--brand)}
 
 .page-top{padding:28px 0 8px}
 
-/* STATS */
 .stats{
   display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
   margin-bottom:26px;
@@ -259,7 +253,6 @@ body{
 .stat-v.muted{color:var(--text-3)}
 .stat-v.ok{color:var(--ok)}
 
-/* SECTION HEADER */
 .section-h{
   display:flex;align-items:center;gap:10px;
   margin:24px 0 10px;padding:0 2px;
@@ -282,7 +275,6 @@ body{
 
 .list{display:flex;flex-direction:column;gap:6px}
 
-/* JOB CARD — compact single-row */
 .job{
   background:var(--surface);
   border:1px solid var(--border);
@@ -413,7 +405,6 @@ footer{
   text-align:center;color:var(--text-3);font-size:.76rem;
 }
 
-/* RESPONSIVE */
 @media (max-width:640px){
   .shell{padding:0 14px}
   .topbar-in{padding:11px 14px;gap:8px}
@@ -460,7 +451,6 @@ footer{
   <div class="topbar-in">
     <div class="brand">
       <div class="brand-mark">
-        <!-- Boy icon -->
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="8" r="4"/>
           <path d="M12 4V2"/>
@@ -475,15 +465,13 @@ footer{
     </div>
     <div class="topbar-spacer"></div>
 
-    <!-- PKT clock with AM/PM -->
     <div class="clock" title="Pakistan Standard Time (UTC+5)">
       <span class="clock-dot"></span>
       <span id="pktClock">--:--</span>
       <span class="ampm" id="pktAmPm">--</span>
     </div>
 
-    <!-- Open sheet link -->
-    <a class="icon-btn sheet-btn" id="sheetBtn" href="#" target="_blank" rel="noopener" aria-label="Open Google Sheet" title="Open sheet">
+    <a class="icon-btn sheet-btn" id="sheetBtn" href="https://docs.google.com/spreadsheets/d/1SJRPdkff35aF60k--P-_Mf7s7m0TM1BFlLSPhdkUuK4/edit" target="_blank" rel="noopener" aria-label="Open Google Sheet" title="Open sheet">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
         <polyline points="14 2 14 8 20 8"/>
@@ -506,7 +494,6 @@ footer{
     </button>
 
     <div class="version" title="App version">
-      <span class="version-dot"></span>
       <span class="v-num">v1.0.0</span>
     </div>
   </div>
@@ -542,28 +529,18 @@ footer{
 
 <script>
 /* ============================================================
-   CONFIG — change SHEET_EDIT_URL to your sheet's shareable link
+   LIVE DATA from your jobs sheet
    ============================================================ */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUBCdhjwLbdOb968RwtVQYOy_0xLl1x9OQDoctPsD-wfO_c6ob5zUElpUpUxPeyhrwKOt321WiXTSa/pub?output=csv";
-// The shareable/edit URL for the "open sheet" button. Derive from CSV_URL by default,
-// but you can hardcode your sheet's edit link here for precision.
-const SHEET_EDIT_URL = (function(){
-  // Try to derive a usable edit URL from the published CSV URL.
-  // Published URLs use /d/e/<long-id>/pub — we can't reliably reverse them to /d/<short-id>/edit,
-  // so if you want the button to open your sheet, set this to your actual edit/share URL below.
-  return "https://docs.google.com/spreadsheets/d/1ZyNsGzLEgQo1D-wNejLdGw9WQ2POSBP604dz66buWTY/edit";
-})();
 
-/* ---------- Pakistan Standard Time ---------- */
+/* Pakistan Standard Time */
 const PKT_OFFSET_MIN = 5 * 60;
-
 function nowInPKT(){
   const now = new Date();
   const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
   return new Date(utcMs + PKT_OFFSET_MIN * 60000);
 }
 function pad2(n){ return String(n).padStart(2,"0"); }
-
 function tickClock(){
   const pkt = nowInPKT();
   let h = pkt.getHours();
@@ -576,11 +553,7 @@ function tickClock(){
   if(ampmEl) ampmEl.textContent = ampm;
 }
 tickClock();
-setInterval(tickClock, 1000 * 15); // refresh every 15s (no seconds shown)
-
-/* Sheet open link */
-const sheetBtn = document.getElementById("sheetBtn");
-sheetBtn.href = SHEET_EDIT_URL;
+setInterval(tickClock, 1000 * 15);
 
 /* theme */
 const themeBtn=document.getElementById("themeBtn");
@@ -620,7 +593,6 @@ function parseCSV(t){
 }
 const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-/* header normalization */
 function normalizeHeader(h){
   let s = String(h||"").trim().toLowerCase();
   s = s.replace(/\s+/g," ");
@@ -634,7 +606,6 @@ function normalizeHeader(h){
   return s;
 }
 
-/* date parsing */
 function parseDate(str){
   if(!str) return null;
   const s=String(str).trim();
