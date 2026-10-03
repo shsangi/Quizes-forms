@@ -418,7 +418,7 @@ input[type="search"]:focus{
 .all-loaded svg{width:14px;height:14px;color:var(--ok)}
 
 /* ============================================================
-   CARD
+   CARD — ref moved to its own line
    ============================================================ */
 .card{
   background:var(--surface);border:1px solid var(--border);
@@ -441,16 +441,18 @@ input[type="search"]:focus{
 .card.Note::before{background:var(--info)}
 .card.is-read::before{background:var(--ok)}
 
+/* Row 1: card number (left) + priority badge (right) */
 .card-row-top{
   display:flex;align-items:center;gap:8px;
   min-width:0;flex-wrap:nowrap;
+  justify-content:space-between;
 }
 .card-meta{
-  display:flex;gap:5px;flex-wrap:nowrap;flex:1;min-width:0;overflow:hidden;
+  display:flex;gap:5px;flex-wrap:nowrap;min-width:0;overflow:hidden;
   align-items:center;
 }
 
-/* Card number badge — small, before ref */
+/* Card number badge */
 .card-num{
   display:inline-flex;
   align-items:center;
@@ -487,18 +489,36 @@ input[type="search"]:focus{
   color:#fff;
 }
 
-.tag{
-  padding:3px 8px;border-radius:5px;font-size:.6rem;font-weight:600;
-  letter-spacing:.05em;background:var(--bg-elev);border:1px solid var(--border);
-  color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  min-width:0;max-width:100%;
+/* Row 2: reference on its own line */
+.card-ref-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+  margin-top:-3px;
 }
 .tag.ref{
-  background:var(--brand-soft);border-color:var(--brand-border);color:var(--brand-text);
-  font-family:'JetBrains Mono',monospace;flex-shrink:0;letter-spacing:0;
-  text-transform:none;font-size:.66rem;
+  display:inline-flex;align-items:center;
+  padding:3px 9px;border-radius:6px;
+  background:var(--brand-soft);
+  border:1px solid var(--brand-border);
+  color:var(--brand-text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.68rem;font-weight:700;
+  letter-spacing:0;
+  text-transform:none;
+  max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.tag.ref::before{
+  content:"";
+  width:5px;height:5px;border-radius:50%;
+  background:var(--brand);
+  flex-shrink:0;
+  margin-right:6px;
 }
 
+/* Row 3: category */
 .card-cat-row{
   display:flex;
   align-items:center;
@@ -516,7 +536,7 @@ input[type="search"]:focus{
   letter-spacing:.06em;
   font-weight:700;
   background:var(--surface-2);
-  border-color:var(--border-2);
+  border:1px solid var(--border-2);
   color:var(--text-2);
   padding:3px 9px;
   border-radius:6px;
@@ -527,7 +547,7 @@ input[type="search"]:focus{
 .tag.cat::before{
   content:"";
   width:5px;height:5px;border-radius:50%;
-  background:var(--brand);
+  background:var(--info);
   flex-shrink:0;
 }
 
@@ -627,6 +647,44 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 }
 .fab:hover[data-tip]::after{opacity:1}
 
+/* Save position toast — subtle notice on restore */
+.restore-toast{
+  position:fixed;
+  top:calc(60px + env(safe-area-inset-top, 0px));
+  left:50%;
+  transform:translateX(-50%) translateY(-10px);
+  background:var(--bg-elev);
+  border:1px solid var(--brand-border);
+  color:var(--brand-text);
+  padding:8px 14px;
+  border-radius:10px;
+  font-size:.74rem;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  box-shadow:var(--shadow-lg);
+  opacity:0;
+  pointer-events:none;
+  transition:all .3s cubic-bezier(.32,.72,0,1);
+  z-index:250;
+  white-space:nowrap;
+  max-width:90vw;
+}
+.restore-toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.restore-toast svg{width:14px;height:14px;flex-shrink:0}
+.restore-toast button{
+  background:none;border:none;color:inherit;cursor:pointer;
+  padding:0;font-family:inherit;font-weight:700;
+  opacity:.75;text-decoration:underline;
+  font-size:.72rem;
+  margin-left:2px;
+}
+.restore-toast button:hover{opacity:1}
+
 @media (max-width:640px){
   .shell{padding:0 14px}
   .topbar-in{padding:11px 14px;gap:6px}
@@ -649,8 +707,7 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   .card{padding:12px 13px 10px;gap:8px}
   .card-memory{font-size:.87rem;padding:6px 8px;margin:-2px -3px}
   .detail-row{grid-template-columns:80px 1fr;gap:10px;font-size:.78rem}
-  .tag{font-size:.56rem;padding:2px 6px}
-  .tag.ref{font-size:.62rem}
+  .tag.ref{font-size:.62rem;padding:2px 7px}
   .tag.cat{font-size:.58rem;padding:2px 8px}
   .card-num{font-size:.58rem;min-width:20px;height:17px;padding:0 5px}
   .badge{font-size:.56rem;padding:2px 7px}
@@ -660,6 +717,11 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
   .fab.scroll svg{width:16px;height:16px}
   .fab[data-tip]::after{display:none}
   .load-more-btn{padding:10px 18px;font-size:.8rem}
+  .restore-toast{
+    top:calc(56px + env(safe-area-inset-top, 0px));
+    padding:7px 12px;
+    font-size:.7rem;
+  }
 }
 
 @media (max-width:400px){
@@ -1042,7 +1104,7 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
       <div class="brand-txt">
         <div class="brand-line1">
           <b>My Notes</b>
-          <span class="brand-version" id="brandVersion">v1.6</span>
+          <span class="brand-version" id="brandVersion">v1.7</span>
         </div>
         <span>Memory Cards</span>
       </div>
@@ -1168,6 +1230,15 @@ footer{margin-top:44px;padding:22px 0;border-top:1px solid var(--border);text-al
 
 <div class="toast" id="toast"></div>
 
+<!-- Restore position notice -->
+<div class="restore-toast" id="restoreToast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><polyline points="3 3 3 8 8 8"/>
+  </svg>
+  <span>Restored to your last position</span>
+  <button id="restoreTopBtn">Top</button>
+</div>
+
 <!-- ============ PROGRESS REPORT MODAL ============ -->
 <div class="modal-backdrop" id="reportModal" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
   <div class="modal">
@@ -1197,9 +1268,12 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-H
 const SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1BLOOydCf9vAAWuqM4J3LR0PGcIosijzw5o_JhbsT3gM/edit";
 const LS_KEY = "mn-read-v2";
 const LS_HISTORY_KEY = "mn-history-v1";
-const APP_VERSION = "v1.6";
+const LS_SCROLL_KEY = "mn-scroll-pos-v1";
+const LS_FILTERS_KEY = "mn-filters-v1";
+const APP_VERSION = "v1.7";
 const PAGE_SIZE = 200;
 let LOADED = 0;
+let SUPPRESS_SCROLL_SAVE = false;
 
 document.getElementById("brandVersion").textContent = APP_VERSION;
 
@@ -1264,6 +1338,74 @@ function toast(msg, kind=""){
   requestAnimationFrame(()=>el.classList.add("show"));
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove("show"),2400);
+}
+
+/* ============================================================
+   SCROLL POSITION PERSISTENCE
+   ============================================================ */
+function saveScrollPos(){
+  if(SUPPRESS_SCROLL_SAVE) return;
+  try{
+    const pos = {
+      y: window.scrollY,
+      loaded: LOADED,
+      ts: Date.now()
+    };
+    sessionStorage.setItem(LS_SCROLL_KEY, JSON.stringify(pos));
+  }catch(e){}
+}
+function loadScrollPos(){
+  try{
+    const raw = sessionStorage.getItem(LS_SCROLL_KEY);
+    if(!raw) return null;
+    const p = JSON.parse(raw);
+    if(!p || typeof p.y !== "number") return null;
+    // Only restore if within last 12 hours (session-ish)
+    if(Date.now() - (p.ts||0) > 12*60*60*1000) return null;
+    return p;
+  }catch(e){ return null; }
+}
+function clearScrollPos(){
+  try{ sessionStorage.removeItem(LS_SCROLL_KEY); }catch(e){}
+}
+
+/* Save scroll position on scroll (throttled) */
+let scrollSaveTimer = null;
+window.addEventListener("scroll", ()=>{
+  if(SUPPRESS_SCROLL_SAVE) return;
+  clearTimeout(scrollSaveTimer);
+  scrollSaveTimer = setTimeout(saveScrollPos, 200);
+}, {passive:true});
+
+/* Save on page hide / visibility change (screen off, tab switch, app background) */
+window.addEventListener("pagehide", saveScrollPos);
+window.addEventListener("beforeunload", saveScrollPos);
+document.addEventListener("visibilitychange", ()=>{
+  if(document.visibilityState === "hidden") saveScrollPos();
+});
+
+/* ============================================================
+   FILTER PERSISTENCE (so restored position makes sense)
+   ============================================================ */
+function saveFilters(){
+  try{
+    localStorage.setItem(LS_FILTERS_KEY, JSON.stringify(F));
+  }catch(e){}
+}
+function loadFilters(){
+  try{
+    const raw = localStorage.getItem(LS_FILTERS_KEY);
+    if(!raw) return null;
+    const p = JSON.parse(raw);
+    if(!p || typeof p !== "object") return null;
+    return {
+      q: String(p.q||""),
+      status: Array.isArray(p.status) ? p.status : [],
+      category: Array.isArray(p.category) ? p.category : [],
+      read: String(p.read||""),
+      sort: String(p.sort||"default")
+    };
+  }catch(e){ return null; }
 }
 
 function loadReadStore(){
@@ -1547,7 +1689,7 @@ function renderInfoBar(){
     `<span class="pct ${pct===0?'zero':''}">${pct}%Read</span>`;
 }
 
-/* Card now takes an `index` and `total` for numbering */
+/* Card: ref now on its own line */
 function cardHTML(r, i, index, total){
   const sm=statusMeta(r.status);
   const key=rowKey(r);
@@ -1562,9 +1704,11 @@ function cardHTML(r, i, index, total){
     <div class="card-row-top">
       <div class="card-meta">
         <span class="card-num" title="Card ${index} of ${total}">${numLabel}</span>
-        <span class="tag ref">${esc(r.reference||"—")}</span>
       </div>
       <span class="badge ${sm.cls}">${esc(sm.label)}</span>
+    </div>
+    <div class="card-ref-row">
+      <span class="tag ref" title="${esc(r.reference||"—")}">${esc(r.reference||"—")}</span>
     </div>
     <div class="card-cat-row">
       <span class="tag cat">${esc(r.category||"Uncategorized")}</span>
@@ -1604,7 +1748,13 @@ function renderPage(){
   const chunk=VIEW.slice(0, LOADED);
   const total = VIEW.length;
   out.innerHTML=chunk.map((r, i)=>cardHTML(r, i, i+1, total)).join("");
-  out.querySelectorAll(".card-memory").forEach(a=>{
+  bindCardEvents(out);
+  renderLoadMore();
+  renderInfoBar();
+}
+
+function bindCardEvents(container){
+  container.querySelectorAll(".card-memory").forEach(a=>{
     a.addEventListener("click",e=>{
       e.stopPropagation();
       const key=a.dataset.key;
@@ -1617,7 +1767,7 @@ function renderPage(){
     });
     a.addEventListener("keydown",e=>e.stopPropagation());
   });
-  out.querySelectorAll(".card").forEach(el=>{
+  container.querySelectorAll(".card").forEach(el=>{
     el.addEventListener("click",e=>{
       if(e.target.closest(".card-memory")) return;
       const key=el.dataset.key;
@@ -1628,14 +1778,12 @@ function renderPage(){
       renderInfoBar();
     });
   });
-  out.querySelectorAll(".card-foot-right").forEach(x=>{
+  container.querySelectorAll(".card-foot-right").forEach(x=>{
     x.addEventListener("click",e=>{
       e.stopPropagation();
       x.closest(".card").click();
     });
   });
-  renderLoadMore();
-  renderInfoBar();
 }
 
 function renderLoadMore(){
@@ -1681,38 +1829,7 @@ function appendCards(from, to){
   frag.style.display="contents";
   frag.innerHTML=slice.map((r, i)=>cardHTML(r, i, from+i+1, total)).join("");
   out.appendChild(frag);
-  const newCards = frag.querySelectorAll(".card");
-  newCards.forEach(el=>{
-    const key=el.dataset.key;
-    const mem=el.querySelector(".card-memory");
-    if(mem){
-      mem.addEventListener("click",e=>{
-        e.stopPropagation();
-        const r=ALL.find(x=>rowKey(x)===key);
-        if(!r) return;
-        markRead(r);
-        saveReadStore(READ);
-        updateCardUI(el, key);
-        renderInfoBar();
-      });
-      mem.addEventListener("keydown",e=>e.stopPropagation());
-    }
-    el.addEventListener("click",e=>{
-      if(e.target.closest(".card-memory")) return;
-      const r=ALL.find(x=>rowKey(x)===key);
-      if(r){ markRead(r); saveReadStore(READ); }
-      el.classList.toggle("open");
-      updateCardUI(el, key);
-      renderInfoBar();
-    });
-    const right=el.querySelector(".card-foot-right");
-    if(right){
-      right.addEventListener("click",e=>{
-        e.stopPropagation();
-        el.click();
-      });
-    }
-  });
+  bindCardEvents(frag);
 }
 
 function updateCardUI(el, key){
@@ -1736,11 +1853,7 @@ function updateCardUI(el, key){
   }
 }
 
-function hasActiveFilters(){
-  return !!(F.q || F.status.length || F.category.length || F.read || F.sort!=="default");
-}
-
-function apply(){
+function apply(skipPersist){
   const s=F.q.toLowerCase().trim();
   VIEW=ALL.filter(r=>{
     if(F.status.length && !F.status.includes(String(r.status||"").trim())) return false;
@@ -1781,10 +1894,12 @@ function apply(){
     document.getElementById("loadMoreWrap").innerHTML="";
     renderInfoBar();
     renderActiveFilters();
+    if(!skipPersist) saveFilters();
     return;
   }
   renderPage();
   renderActiveFilters();
+  if(!skipPersist) saveFilters();
 }
 
 function renderActiveFilters(){
@@ -1824,6 +1939,7 @@ function resetAllFilters(){
   if(MS_CATEGORY) MS_CATEGORY.setSelected([]);
   if(MS_PRIORITY) MS_PRIORITY.setSelected([]);
   if(MS_STATUS) MS_STATUS.setSelected([]);
+  clearScrollPos();
   apply();
 }
 
@@ -2297,7 +2413,7 @@ async function fetchData(showToast){
     buildCategorySelect();
     buildPrioritySelect();
     buildStatusSelect();
-    apply();
+    apply(true); /* skip persist — we'll handle restore separately */
     if(showToast) toast(`Refreshed — ${ALL.length} cards loaded.`, "ok");
   } catch(err){
     out.innerHTML=`<div class="state">
@@ -2318,6 +2434,8 @@ async function fetchData(showToast){
 const refreshBtn=document.getElementById("refreshBtn");
 refreshBtn.addEventListener("click",async()=>{
   refreshBtn.classList.add("spinning");
+  /* Clear saved scroll on manual refresh */
+  clearScrollPos();
   try{ await fetchData(true); }
   finally{ setTimeout(()=>refreshBtn.classList.remove("spinning"), 850); }
 });
@@ -2336,7 +2454,77 @@ updateScrollButtons();
 scrollTopBtn.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
 scrollBottomBtn.addEventListener("click",()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:"smooth"}));
 
-fetchData(false);
+/* Restore toast controls */
+const restoreToastEl = document.getElementById("restoreToast");
+let restoreToastTimer = null;
+function showRestoreToast(){
+  restoreToastEl.classList.add("show");
+  clearTimeout(restoreToastTimer);
+  restoreToastTimer = setTimeout(()=>restoreToastEl.classList.remove("show"), 4000);
+}
+function hideRestoreToast(){
+  restoreToastEl.classList.remove("show");
+  clearTimeout(restoreToastTimer);
+}
+document.getElementById("restoreTopBtn").addEventListener("click", ()=>{
+  window.scrollTo({top:0, behavior:"smooth"});
+  clearScrollPos();
+  hideRestoreToast();
+});
+
+/* ============================================================
+   INIT — restore filters + scroll, then fetch
+   ============================================================ */
+(function init(){
+  /* Restore filters first so apply() yields the same view */
+  const savedF = loadFilters();
+  if(savedF){
+    F = savedF;
+    const qEl = document.getElementById("q");
+    if(qEl) qEl.value = F.q || "";
+    const sortEl = document.getElementById("fSort");
+    if(sortEl) sortEl.value = F.sort || "default";
+  }
+
+  /* Check if there's a scroll position to restore */
+  const saved = loadScrollPos();
+  const willRestore = !!(saved && saved.y > 40);
+
+  fetchData(false).then(()=>{
+    /* After data is loaded and cards are rendered, restore scroll */
+    if(!willRestore) return;
+
+    /* If we need more cards loaded than default page, load them until we reach saved count */
+    const needLoaded = Math.min(saved.loaded || PAGE_SIZE, VIEW.length);
+    if(needLoaded > LOADED){
+      const prev = LOADED;
+      LOADED = needLoaded;
+      appendCards(prev, LOADED);
+      renderLoadMore();
+      renderInfoBar();
+    }
+
+    /* Apply filters to multiselect triggers so UI matches F state */
+    if(MS_CATEGORY && F.category.length) MS_CATEGORY.setSelected(F.category);
+    if(MS_PRIORITY && F.status.length) MS_PRIORITY.setSelected(F.status);
+    if(MS_STATUS && F.read) MS_STATUS.setSelected([F.read]);
+
+    /* Restore scroll position after layout settles */
+    SUPPRESS_SCROLL_SAVE = true;
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        window.scrollTo({top: saved.y, behavior: "instant" in window ? "instant" : "auto"});
+        /* Show restore notice only if position is meaningfully far down */
+        if(saved.y > 200) showRestoreToast();
+        /* Re-enable saving after a short delay */
+        setTimeout(()=>{ SUPPRESS_SCROLL_SAVE = false; }, 500);
+      });
+    });
+  });
+})();
+
+/* Also persist scroll when user backgrounds the tab on mobile */
+window.addEventListener("blur", saveScrollPos);
 </script>
 </body>
 </html>
