@@ -14,16 +14,17 @@
          border-radius:16px;padding:10px 14px;margin-bottom:12px;
          box-shadow:0 8px 20px -6px rgba(10,30,63,.12);display:flex;
          justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .title{font-weight:800;color:#0a1e3f;font-size:1rem;flex:1;min-width:0}
-    .top-right{display:flex;gap:6px;align-items:center}
-    .pill{background:#e0f2fe;color:#0284c7;font-weight:800;font-size:.6rem;
-          padding:.24rem .55rem;border-radius:9999px;border:1px solid #7dd3fc}
+    .title{font-weight:800;color:#0a1e3f;font-size:.95rem;flex:1;min-width:120px}
+    .right{display:flex;gap:6px;align-items:center}
+    .pill{background:#e0f2fe;color:#0284c7;font-weight:800;font-size:.62rem;
+          padding:.28rem .6rem;border-radius:9999px;border:1px solid #7dd3fc}
     .timer{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
-           font-weight:800;font-size:.6rem;padding:.24rem .55rem;border-radius:9999px}
-    .menu-btn{background:#e0f2fe;color:#0284c7;border:1.5px solid #7dd3fc;
-              width:32px;height:32px;border-radius:10px;font-size:1rem;cursor:pointer;
-              display:flex;align-items:center;justify-content:center;font-family:inherit}
-    .menu-btn:hover{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+           font-weight:800;font-size:.62rem;padding:.28rem .6rem;border-radius:9999px}
+    .dots-btn{background:#f8fafc;border:1.5px solid #e2e8f0;width:32px;height:32px;
+              border-radius:10px;cursor:pointer;font-size:1rem;color:#475569;
+              display:flex;align-items:center;justify-content:center;transition:all .15s;
+              font-family:inherit;font-weight:800;line-height:1}
+    .dots-btn:hover{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
     .card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;
           padding:22px;box-shadow:0 20px 40px -12px rgba(10,30,63,.18)}
     .q{font-weight:700;font-size:1.1rem;color:#0a1e3f;line-height:1.55;margin-bottom:16px}
@@ -85,78 +86,69 @@
     .stat.inv{background:#fef3c7;border-color:#fcd34d;color:#92400e}
     .result-icon{font-size:3rem;margin-bottom:8px}
 
-    /* ---------- DRAWER ---------- */
-    .ovl{position:fixed;inset:0;background:rgba(10,30,63,.55);backdrop-filter:blur(6px);
-         z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
-    .ovl.open{opacity:1;pointer-events:auto}
+    /* DRAWER */
+    .overlay{position:fixed;inset:0;background:rgba(10,30,63,.55);backdrop-filter:blur(6px);
+             z-index:900;opacity:0;pointer-events:none;transition:opacity .25s}
+    .overlay.on{opacity:1;pointer-events:auto}
     .drawer{position:fixed;top:0;right:0;bottom:0;width:min(92vw,400px);background:#fff;
-            box-shadow:-20px 0 60px -12px rgba(10,30,63,.35);z-index:101;
-            transform:translateX(105%);transition:transform .35s cubic-bezier(.16,1,.3,1);
-            display:flex;flex-direction:column;overflow:hidden}
-    .drawer.open{transform:translateX(0)}
-    .dr-head{padding:14px 18px;background:linear-gradient(135deg,#0ea5e9,#0284c7);
-             color:#fff;display:flex;justify-content:space-between;align-items:center}
-    .dr-head h3{font-size:1rem;font-weight:800}
-    .dr-close{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);
-              color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;
-              font-size:1rem;font-family:inherit}
-    .dr-body{padding:16px 18px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px}
-    .fl{font-weight:700;font-size:.75rem;color:#0a1e3f;margin-bottom:6px;
-        text-transform:uppercase;letter-spacing:.04em;display:block}
-    .inp{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:9999px;
-         font-family:inherit;font-size:.85rem;background:#f8fafc;outline:none}
-    .inp:focus{border-color:#0ea5e9;background:#fff;box-shadow:0 0 0 4px rgba(14,165,233,.1)}
-    .ms-box{position:relative}
-    .ms-trigger{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:9999px;
-                background:#f8fafc;font-family:inherit;font-size:.85rem;font-weight:600;
-                text-align:left;cursor:pointer;display:flex;justify-content:space-between;
-                align-items:center;gap:8px;color:#0f1419}
-    .ms-trigger:hover{border-color:#0ea5e9}
-    .ms-trigger .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;
-                     color:#475569}
-    .ms-trigger .lbl.has{color:#0284c7;font-weight:800}
-    .ms-trigger .arw{font-size:.6rem;color:#0284c7;transition:transform .2s}
-    .ms-box.open .ms-trigger .arw{transform:rotate(180deg)}
-    .ms-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;
-             border:1.5px solid #e2e8f0;border-radius:14px;
-             box-shadow:0 16px 40px -10px rgba(10,30,63,.25);max-height:280px;
-             overflow-y:auto;padding:6px;z-index:5;display:none}
-    .ms-box.open .ms-menu{display:block}
-    .ms-sr{padding:8px 10px;border-bottom:1px dashed #e2e8f0;margin-bottom:4px}
-    .ms-sr input{width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:9999px;
-                 font-family:inherit;font-size:.8rem;outline:none;background:#fff}
-    .ms-sr input:focus{border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.1)}
-    .ms-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;
-            cursor:pointer;font-size:.82rem;font-weight:600;color:#0f1419}
-    .ms-opt:hover{background:#e0f2fe}
-    .ms-opt.sel{background:#0ea5e9;color:#fff}
-    .ms-opt .ck{width:16px;height:16px;border-radius:4px;border:1.5px solid #cbd5e1;
-                display:flex;align-items:center;justify-content:center;font-size:.65rem;
-                flex-shrink:0}
-    .ms-opt.sel .ck{background:#fff;color:#0284c7;border-color:#fff}
-    .ms-empty{text-align:center;padding:14px;font-size:.78rem;color:#94a3b8;font-style:italic}
-    .cnt-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-    .cnt-opt{padding:10px 6px;border:1.5px solid #e2e8f0;border-radius:12px;
-             background:#f8fafc;font-family:inherit;font-size:.82rem;font-weight:800;
-             color:#475569;cursor:pointer;transition:all .15s}
-    .cnt-opt:hover{border-color:#0ea5e9;background:#e0f2fe}
-    .cnt-opt.sel{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
-                 border-color:#0284c7;box-shadow:0 4px 10px rgba(2,132,199,.3)}
-    .dr-foot{padding:14px 18px;border-top:1.5px solid #e2e8f0;display:flex;gap:10px}
-    .dr-foot .btn{flex:1}
-    .btn-ghost{background:#f8fafc;color:#475569;border:1.5px solid #e2e8f0;box-shadow:none}
-    .btn-ghost:hover{background:#e0f2fe;color:#0284c7;border-color:#0ea5e9}
-    .dr-info{font-size:.68rem;color:#94a3b8;text-align:center;padding:0 18px 14px}
+            z-index:901;transform:translateX(105%);transition:transform .35s cubic-bezier(.16,1,.3,1);
+            display:flex;flex-direction:column;box-shadow:-20px 0 60px -12px rgba(10,30,63,.35)}
+    .drawer.on{transform:translateX(0)}
+    .dhead{padding:14px 18px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
+           display:flex;justify-content:space-between;align-items:center}
+    .dhead h3{font-size:1rem;font-weight:800}
+    .dclose{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);
+            color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;
+            font-family:inherit;font-weight:800;font-size:.9rem}
+    .dbody{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+    .flabel{font-size:.72rem;font-weight:800;color:#0a1e3f;text-transform:uppercase;
+            letter-spacing:.06em;margin-bottom:6px;display:block}
+    .finput{width:100%;padding:.7rem .9rem;border:1.5px solid #e2e8f0;border-radius:12px;
+            font-family:inherit;font-size:.85rem;outline:none;background:#f8fafc}
+    .finput:focus{border-color:#0ea5e9;background:#fff;box-shadow:0 0 0 3px rgba(14,165,233,.12)}
+    .chips-box{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+    .cchip{display:inline-flex;align-items:center;gap:4px;background:#0ea5e9;color:#fff;
+           font-size:.68rem;font-weight:700;padding:.25rem .55rem;border-radius:9999px}
+    .cchip button{background:0 0;border:none;color:#fff;font-size:.85rem;cursor:pointer;
+                  font-weight:800;padding:0;line-height:1;font-family:inherit}
+    .dd{position:relative}
+    .dd-box{border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;
+            padding:.55rem .7rem;min-height:42px;cursor:pointer;
+            display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.82rem;font-weight:600;color:#475569}
+    .dd-box:hover{border-color:#0ea5e9}
+    .dd-box .arrow{margin-left:auto;font-size:.6rem;color:#94a3b8;transition:transform .2s}
+    .dd.on .arrow{transform:rotate(180deg)}
+    .dd-menu{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;
+             border:1.5px solid #e2e8f0;border-radius:12px;box-shadow:0 16px 40px -10px rgba(10,30,63,.25);
+             max-height:240px;overflow-y:auto;padding:.35rem;z-index:10;display:none}
+    .dd.on .dd-menu{display:block}
+    .dd-item{padding:.5rem .7rem;border-radius:8px;font-size:.8rem;font-weight:600;
+             cursor:pointer;display:flex;align-items:center;gap:.5rem;color:#0f1419}
+    .dd-item:hover{background:#e0f2fe;color:#0284c7}
+    .dd-item.sel{background:#0ea5e9;color:#fff}
+    .dd-item .chk{width:16px;height:16px;border:1.5px solid #cbd5e1;border-radius:4px;
+                  display:flex;align-items:center;justify-content:center;font-size:.7rem;
+                  color:#fff;flex-shrink:0}
+    .dd-item.sel .chk{background:#fff;color:#0284c7;border-color:#fff}
+    .count-row{display:flex;gap:6px;flex-wrap:wrap}
+    .cb{padding:.5rem .85rem;border:1.5px solid #e2e8f0;border-radius:9999px;background:#fff;
+        cursor:pointer;font-family:inherit;font-weight:700;font-size:.78rem;color:#475569;transition:all .15s}
+    .cb:hover{border-color:#0ea5e9;color:#0284c7}
+    .cb.on{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border-color:#0284c7}
+    .dload{width:100%;padding:.85rem;border:none;border-radius:9999px;font-family:inherit;
+           font-weight:800;font-size:.9rem;color:#fff;cursor:pointer;
+           background:linear-gradient(135deg,#10b981,#059669);
+           box-shadow:0 4px 12px rgba(5,150,105,.3)}
   </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
     <div class="title" id="title">Loading…</div>
-    <div class="top-right">
+    <div class="right">
       <span class="pill" id="count">0/0</span>
       <span class="timer" id="timer">00:00</span>
-      <button class="menu-btn" id="menuBtn" title="Filter & Search">☰</button>
+      <button class="dots-btn" id="dotsBtn" title="Filters">⋯</button>
     </div>
   </div>
 
@@ -168,75 +160,57 @@
   </div>
 </div>
 
-<!-- Drawer -->
-<div class="ovl" id="ovl"></div>
+<!-- DRAWER -->
+<div class="overlay" id="overlay"></div>
 <aside class="drawer" id="drawer">
-  <div class="dr-head">
-    <h3>🔍 Filter MCQs</h3>
-    <button class="dr-close" id="drClose">✕</button>
+  <div class="dhead">
+    <h3>⚙️ Filters</h3>
+    <button class="dclose" id="dClose">✕</button>
   </div>
-  <div class="dr-body">
+  <div class="dbody">
     <div>
-      <label class="fl">Search</label>
-      <input type="text" class="inp" id="srch" placeholder="Search questions, topics, jobs…">
+      <label class="flabel">🔍 Search (case-insensitive)</label>
+      <input class="finput" id="searchBox" placeholder="Search question, topic, subject…" autocomplete="off">
     </div>
 
     <div>
-      <label class="fl">💼 Jobs</label>
-      <div class="ms-box" id="jobBox">
-        <button class="ms-trigger" id="jobTrigger">
-          <span class="lbl" id="jobLbl">All Jobs</span>
-          <span class="arw">▼</span>
-        </button>
-        <div class="ms-menu" id="jobMenu">
-          <div class="ms-sr"><input type="text" id="jobSr" placeholder="Search jobs…"></div>
-          <div id="jobOpts"></div>
-        </div>
+      <label class="flabel">💼 Jobs</label>
+      <div class="chips-box" id="jobChips"></div>
+      <div class="dd" id="jobDd">
+        <div class="dd-box" id="jobBox"><span id="jobText">All jobs</span><span class="arrow">▼</span></div>
+        <div class="dd-menu" id="jobMenu"></div>
       </div>
     </div>
 
     <div>
-      <label class="fl">📚 Subjects</label>
-      <div class="ms-box" id="subjBox">
-        <button class="ms-trigger" id="subjTrigger">
-          <span class="lbl" id="subjLbl">All Subjects</span>
-          <span class="arw">▼</span>
-        </button>
-        <div class="ms-menu" id="subjMenu">
-          <div class="ms-sr"><input type="text" id="subjSr" placeholder="Search subjects…"></div>
-          <div id="subjOpts"></div>
-        </div>
+      <label class="flabel">📚 Subjects</label>
+      <div class="chips-box" id="subjChips"></div>
+      <div class="dd" id="subjDd">
+        <div class="dd-box" id="subjBox"><span id="subjText">All subjects</span><span class="arrow">▼</span></div>
+        <div class="dd-menu" id="subjMenu"></div>
       </div>
     </div>
 
     <div>
-      <label class="fl">📊 Questions to load</label>
-      <div class="cnt-opts" id="cntOpts">
-        <button class="cnt-opt" data-n="5">5</button>
-        <button class="cnt-opt" data-n="10">10</button>
-        <button class="cnt-opt" data-n="20">20</button>
-        <button class="cnt-opt" data-n="100">100</button>
-        <button class="cnt-opt" data-n="200">200</button>
-        <button class="cnt-opt sel" data-n="all">All</button>
+      <label class="flabel"># MCQs to load</label>
+      <div class="count-row" id="countRow">
+        <button class="cb" data-n="5">5</button>
+        <button class="cb" data-n="10">10</button>
+        <button class="cb on" data-n="20">20</button>
+        <button class="cb" data-n="100">100</button>
+        <button class="cb" data-n="200">200</button>
+        <button class="cb" data-n="0">All</button>
       </div>
     </div>
-  </div>
-  <div class="dr-info" id="drInfo">0 questions match</div>
-  <div class="dr-foot">
-    <button class="btn btn-ghost" id="drReset">⟲ Reset</button>
-    <button class="btn" id="drLoad">Load</button>
+
+    <button class="dload" id="loadBtn">🔄 Load Quiz</button>
   </div>
 </aside>
 
 <script>
 const QUIZ_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
-
-let allRaw=[];            // all questions from sheet (unfiltered)
-let qs=[],ans=[],cur=0,time=0,timer=null,total=0,invalidSet=new Set();
-
-// filters
-let selJobs=[], selSubjs=[], srchQ='', loadCount='all';
-let jobSrText='', subjSrText='';
+let all=[],qs=[],ans=[],cur=0,time=0,timer=null,total=0,invalidSet=new Set();
+let selJobs=new Set(),selSubjs=new Set(),pickN=20,searchQ='';
 
 const $=id=>document.getElementById(id);
 const clean=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim();
@@ -250,170 +224,40 @@ const findCorrect=(raw,opts)=>{if(!raw)return -1;const r=clean(raw);
   if(/^[A-Da-d]$/.test(r))return 'abcd'.indexOf(r.toLowerCase());
   if(/^[1-4]$/.test(r))return +r-1;return -1};
 const titleCase=s=>!s?'':clean(s).split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
-const same=(a,b)=>clean(a).toLowerCase()===clean(b).toLowerCase();
+const eq=(a,b)=>clean(a).toLowerCase()===clean(b).toLowerCase();
 
-const SPECIAL_PATTERNS=[
-  /all\s+of\s+(the\s+)?above/i,
-  /none\s+of\s+(the\s+)?above/i,
-  /above\s+all/i,
-  /\bboth\b/i,
-  /^\s*none\s*$/i,
-  /all\s+of\s+these/i
-];
-const isSpecial=o=>{const t=clean(o);return t&&SPECIAL_PATTERNS.some(p=>p.test(t))};
+const SPECIAL=[/all\s+of\s+(the\s+)?above/i,/none\s+of\s+(the\s+)?above/i,/above\s+all/i,/\bboth\b/i,/^\s*none\s*$/i,/all\s+of\s+these/i];
+const isSpecial=o=>{const t=clean(o);return t&&SPECIAL.some(p=>p.test(t))};
 
-function shuffleOptionsKept(opts){
+function shuffleOpts(opts){
   const fixed={},free=[];
-  opts.forEach((o,i)=>{if(isSpecial(o))fixed[i]=o;else free.push({text:o})});
+  opts.forEach((o,i)=>{ if(isSpecial(o))fixed[i]=o; else free.push(o); });
   const sh=shuffle(free);
-  const result=new Array(opts.length);
-  Object.keys(fixed).forEach(k=>{result[+k]=fixed[k]});
+  const out=new Array(opts.length);
+  Object.keys(fixed).forEach(k=>out[+k]=fixed[k]);
   let p=0;
-  for(let i=0;i<result.length;i++) if(result[i]===undefined) result[i]=sh[p++].text;
-  return result;
-}
-
-function shuffleByCategory(list){
-  const buckets=new Map();
-  list.forEach(it=>{
-    const k=[it.job||'',it.subject||'',it.topic||''].join('|||');
-    if(!buckets.has(k)) buckets.set(k,[]);
-    buckets.get(k).push(it);
-  });
-  const keys=shuffle([...buckets.keys()]);
-  const out=[];
-  keys.forEach(k=>out.push(...shuffle(buckets.get(k))));
+  for(let i=0;i<out.length;i++) if(out[i]===undefined) out[i]=sh[p++];
   return out;
 }
 
-/* ---------------- DRAWER LOGIC ---------------- */
-function openDrawer(){$('ovl').classList.add('open');$('drawer').classList.add('open');document.body.style.overflow='hidden'}
-function closeDrawer(){$('ovl').classList.remove('open');$('drawer').classList.remove('open');document.body.style.overflow='';closeAllMs()}
-function closeAllMs(){['jobBox','subjBox'].forEach(id=>$(id).classList.remove('open'))}
-
-function jobsList(){
-  const set=new Set();allRaw.forEach(q=>{if(q.job)set.add(q.job)});
-  return [...set].sort((a,b)=>titleCase(a).localeCompare(titleCase(b)));
-}
-function subjectsForSelectedJobs(){
-  const set=new Set();
-  allRaw.forEach(q=>{
-    if(selJobs.length && !selJobs.some(j=>same(j,q.job)))return;
-    if(q.subject)set.add(q.subject);
+function shuffleByCategory(list){
+  const b=new Map();
+  list.forEach(it=>{
+    const k=[it.job,it.subject,it.topic].map(s=>clean(s).toLowerCase()).join('|||');
+    if(!b.has(k))b.set(k,[]);
+    b.get(k).push(it);
   });
-  return [...set].sort((a,b)=>titleCase(a).localeCompare(titleCase(b)));
+  const keys=shuffle([...b.keys()]),out=[];
+  keys.forEach(k=>out.push(...shuffle(b.get(k))));
+  return out;
 }
 
-function renderJobOpts(){
-  const list=jobsList().filter(j=>titleCase(j).toLowerCase().includes(jobSrText.toLowerCase()));
-  const el=$('jobOpts');
-  if(!list.length){el.innerHTML='<div class="ms-empty">No jobs found</div>';return}
-  el.innerHTML=list.map(j=>{
-    const s=selJobs.some(x=>same(x,j));
-    return `<div class="ms-opt ${s?'sel':''}" data-job="${encodeURIComponent(j)}">
-      <span class="ck">${s?'✓':''}</span><span>${titleCase(j)}</span>
-    </div>`;
-  }).join('');
-  el.querySelectorAll('.ms-opt').forEach(o=>{
-    o.onclick=e=>{
-      e.stopPropagation();
-      const j=decodeURIComponent(o.dataset.job);
-      if(selJobs.some(x=>same(x,j))) selJobs=selJobs.filter(x=>!same(x,j));
-      else selJobs.push(j);
-      // Drop subjects that no longer belong to any selected job
-      const allowed=subjectsForSelectedJobs();
-      selSubjs=selSubjs.filter(s=>allowed.some(a=>same(a,s)));
-      updateLbls();renderJobOpts();renderSubjOpts();updateInfo();
-    };
-  });
-}
-function renderSubjOpts(){
-  const list=subjectsForSelectedJobs().filter(s=>titleCase(s).toLowerCase().includes(subjSrText.toLowerCase()));
-  const el=$('subjOpts');
-  if(!list.length){el.innerHTML='<div class="ms-empty">${selJobs.length?'No subjects for selected jobs':'No subjects available'}</div>';return}
-  el.innerHTML=list.map(s=>{
-    const sel=selSubjs.some(x=>same(x,s));
-    return `<div class="ms-opt ${sel?'sel':''}" data-subj="${encodeURIComponent(s)}">
-      <span class="ck">${sel?'✓':''}</span><span>${titleCase(s)}</span>
-    </div>`;
-  }).join('');
-  el.querySelectorAll('.ms-opt').forEach(o=>{
-    o.onclick=e=>{
-      e.stopPropagation();
-      const s=decodeURIComponent(o.dataset.subj);
-      if(selSubjs.some(x=>same(x,s))) selSubjs=selSubjs.filter(x=>!same(x,s));
-      else selSubjs.push(s);
-      updateLbls();renderSubjOpts();updateInfo();
-    };
-  });
-}
-function updateLbls(){
-  const jl=$('jobLbl'), sl=$('subjLbl');
-  if(selJobs.length===0){jl.textContent='All Jobs';jl.classList.remove('has')}
-  else if(selJobs.length===1){jl.textContent=titleCase(selJobs[0]);jl.classList.add('has')}
-  else{jl.textContent=selJobs.length+' jobs selected';jl.classList.add('has')}
-  if(selSubjs.length===0){sl.textContent='All Subjects';sl.classList.remove('has')}
-  else if(selSubjs.length===1){sl.textContent=titleCase(selSubjs[0]);sl.classList.add('has')}
-  else{sl.textContent=selSubjs.length+' subjects selected';sl.classList.add('has')}
-}
-
-function applyFiltersToRaw(){
-  const q=srchQ.toLowerCase().trim();
-  return allRaw.filter(x=>{
-    if(selJobs.length && !selJobs.some(j=>same(j,x.job)))return false;
-    if(selSubjs.length && !selSubjs.some(s=>same(s,x.subject)))return false;
-    if(q){
-      const hay=[x.q,x.subject,x.topic,x.job,...x.opts].join(' ').toLowerCase();
-      if(!hay.includes(q))return false;
-    }
-    return true;
-  });
-}
-function updateInfo(){
-  const n=applyFiltersToRaw().length;
-  $('drInfo').textContent=n+' question'+(n!==1?'s':'')+' match';
-}
-
-/* ---------------- LOAD QUIZ ---------------- */
-function buildAndStart(){
-  let filtered=applyFiltersToRaw();
-  filtered=shuffleByCategory(filtered);
-  if(loadCount!=='all'){
-    const n=parseInt(loadCount,10);
-    if(filtered.length>n)filtered=filtered.slice(0,n);
-  }
-  qs=filtered.map(x=>{
-    const newOpts=shuffleOptionsKept(x.opts);
-    const correctText=x.opts[x.correct];
-    const newCorrect=correctText!==undefined
-      ? newOpts.findIndex(o=>clean(o)===clean(correctText))
-      : -1;
-    return {...x,opts:newOpts,correct:newCorrect};
-  });
-  invalidSet=new Set();
-  qs.forEach((x,i)=>{if(x.correct===-1)invalidSet.add(i)});
-  total=qs.length;ans=Array(total).fill(null);cur=0;
-  time=total*60;
-  $('count').textContent='0/'+total;
-  $('title').textContent=(selJobs.length===1?titleCase(selJobs[0])+' MCQs':'All Jobs MCQs');
-
-  clearInterval(timer);
-  if(total===0){
-    $('body').innerHTML='<div class="load">No questions match filters</div>';
-    $('grid').innerHTML='';$('endWrap').innerHTML='';$('stats').innerHTML='';
-    $('timer').textContent='00:00';
-    return;
-  }
-  startTimer();render();grid();renderEnd();stats();
-}
-
-/* ---------------- ORIGINAL QUIZ LOGIC ---------------- */
 async function load(){
   try{
     const r=await fetch(QUIZ_URL+'&_t='+Date.now(),{cache:'no-store'});
     const text=await r.text();
     const lines=text.split('\n').filter(l=>l.trim());
-    allRaw=[];
+    all=[];
     for(let i=1;i<lines.length;i++){
       const c=parseCSV(lines[i]);
       if(c.length<9||!c[1])continue;
@@ -421,17 +265,147 @@ async function load(){
       if(show==='0'||show==='false'||show==='no')continue;
       const opts=[c[2]||'',c[3]||'',c[4]||'',c[5]||''].map(clean);
       const correct=findCorrect(c[6],opts);
-      allRaw.push({q:c[1],opts,correct,subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
+      all.push({q:c[1],opts,correct,subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
     }
-    // initial load = all questions
-    buildAndStart();
-    renderJobOpts();renderSubjOpts();updateLbls();updateInfo();
-  }catch(e){
-    console.error(e);
-    $('body').innerHTML='<div class="load">❌ Failed to load</div>';
-  }
+    buildMenus();
+    applyAndLoad();
+  }catch(e){console.error(e);$('body').innerHTML='<div class="load">❌ Failed to load</div>'}
 }
 
+function applyAndLoad(){
+  // filter
+  let list=all.slice();
+  if(selJobs.size) list=list.filter(x=>[...selJobs].some(j=>eq(j,x.job)));
+  if(selSubjs.size) list=list.filter(x=>[...selSubjs].some(s=>eq(s,x.subject)));
+  if(searchQ){
+    const q=searchQ.toLowerCase();
+    list=list.filter(x=>
+      (x.q||'').toLowerCase().includes(q) ||
+      (x.subject||'').toLowerCase().includes(q) ||
+      (x.topic||'').toLowerCase().includes(q) ||
+      (x.job||'').toLowerCase().includes(q) ||
+      x.opts.some(o=>(o||'').toLowerCase().includes(q))
+    );
+  }
+  list=shuffleByCategory(list);
+  if(pickN>0) list=list.slice(0,pickN);
+  qs=list.map(x=>{
+    const newOpts=shuffleOpts(x.opts);
+    const ct=x.opts[x.correct];
+    const nc=ct!==undefined? newOpts.findIndex(o=>eq(o,ct)) : -1;
+    return {...x,opts:newOpts,correct:nc};
+  });
+  invalidSet=new Set();
+  qs.forEach((x,i)=>{if(x.correct===-1)invalidSet.add(i)});
+  total=qs.length;ans=Array(total).fill(null);cur=0;time=total*60;
+  $('title').textContent=`${selJobs.size?[...selJobs].map(titleCase).join(', '):'All Jobs'} MCQs`;
+  $('count').textContent='0/'+total;
+  closeDrawer();
+  clearInterval(timer);startTimer();render();grid();renderEnd();stats();
+  scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildMenus(){
+  const jobs=[...new Set(all.map(x=>clean(x.job)).filter(Boolean))].sort();
+  $('jobMenu').innerHTML=
+    `<div class="dd-item" data-v=""><span class="chk">✓</span>All jobs</div>`+
+    jobs.map(j=>`<div class="dd-item" data-v="${j}"><span class="chk"></span>${titleCase(j)}</div>`).join('');
+  $('jobMenu').querySelectorAll('.dd-item').forEach(el=>{
+    el.onclick=e=>{
+      e.stopPropagation();
+      const v=el.dataset.v;
+      if(!v){ selJobs.clear(); }
+      else { if(selJobs.has(v))selJobs.delete(v); else selJobs.add(v); }
+      refreshJobMenu();refreshSubjectMenu();
+    };
+  });
+  refreshJobMenu();refreshSubjectMenu();
+}
+
+function refreshJobMenu(){
+  const items=$('jobMenu').querySelectorAll('.dd-item');
+  items.forEach(el=>{
+    const v=el.dataset.v;
+    const on=v? selJobs.has(v) : selJobs.size===0;
+    el.classList.toggle('sel',on);
+    el.querySelector('.chk').textContent=on?'✓':'';
+  });
+  $('jobText').textContent=selJobs.size===0?'All jobs':`${selJobs.size} selected`;
+  renderChips('jobChips',selJobs,v=>{selJobs.delete(v);refreshJobMenu();refreshSubjectMenu()});
+}
+
+function refreshSubjectMenu(){
+  // subjects limited to currently selected jobs (or all if none)
+  const pool = selJobs.size===0
+    ? all
+    : all.filter(x=>[...selJobs].some(j=>eq(j,x.job)));
+  const subs=[...new Set(pool.map(x=>clean(x.subject)).filter(Boolean))].sort();
+  // drop selected subjects no longer in pool
+  [...selSubjs].forEach(s=>{if(!subs.some(x=>eq(x,s)))selSubjs.delete(s)});
+  $('subjMenu').innerHTML=
+    `<div class="dd-item" data-v=""><span class="chk">✓</span>All subjects</div>`+
+    subs.map(s=>`<div class="dd-item" data-v="${s}"><span class="chk"></span>${titleCase(s)}</div>`).join('');
+  $('subjMenu').querySelectorAll('.dd-item').forEach(el=>{
+    el.onclick=e=>{
+      e.stopPropagation();
+      const v=el.dataset.v;
+      if(!v){ selSubjs.clear(); }
+      else { if(selSubjs.has(v))selSubjs.delete(v); else selSubjs.add(v); }
+      refreshSubjectMenu();
+    };
+  });
+  const items=$('subjMenu').querySelectorAll('.dd-item');
+  items.forEach(el=>{
+    const v=el.dataset.v;
+    const on=v? selSubjs.has(v) : selSubjs.size===0;
+    el.classList.toggle('sel',on);
+    el.querySelector('.chk').textContent=on?'✓':'';
+  });
+  $('subjText').textContent=selSubjs.size===0?'All subjects':`${selSubjs.size} selected`;
+  renderChips('subjChips',selSubjs,v=>{selSubjs.delete(v);refreshSubjectMenu()});
+}
+
+function renderChips(containerId,set,onRemove){
+  const box=$(containerId);
+  box.innerHTML=[...set].map(v=>
+    `<span class="cchip">${titleCase(v)} <button data-v="${v}">×</button></span>`
+  ).join('');
+  box.querySelectorAll('button').forEach(b=>{
+    b.onclick=e=>{e.stopPropagation();onRemove(b.dataset.v)};
+  });
+}
+
+// Drawer wiring
+const overlay=$('overlay'),drawer=$('drawer');
+function openDrawer(){overlay.classList.add('on');drawer.classList.add('on')}
+function closeDrawer(){overlay.classList.remove('on');drawer.classList.remove('on')}
+$('dotsBtn').onclick=openDrawer;
+$('dClose').onclick=closeDrawer;
+overlay.onclick=closeDrawer;
+
+// Dropdown toggles
+$('jobBox').onclick=e=>{e.stopPropagation();$('jobDd').classList.toggle('on');$('subjDd').classList.remove('on')};
+$('subjBox').onclick=e=>{e.stopPropagation();$('subjDd').classList.toggle('on');$('jobDd').classList.remove('on')};
+document.addEventListener('click',()=>{$('jobDd').classList.remove('on');$('subjDd').classList.remove('on')});
+$('jobMenu').addEventListener('click',e=>e.stopPropagation());
+$('subjMenu').addEventListener('click',e=>e.stopPropagation());
+
+// Search
+$('searchBox').addEventListener('input',()=>{searchQ=$('searchBox').value.trim()});
+
+// Count selector
+$('countRow').querySelectorAll('.cb').forEach(b=>{
+  b.onclick=()=>{
+    $('countRow').querySelectorAll('.cb').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    pickN=+b.dataset.n;
+  };
+});
+
+// Load button
+$('loadBtn').onclick=applyAndLoad;
+
+// ===== Quiz rendering =====
 function startTimer(){
   clearInterval(timer);
   timer=setInterval(()=>{
@@ -440,6 +414,7 @@ function startTimer(){
     if(time<=0){clearInterval(timer);end()}
   },1000);
 }
+
 function stats(){
   let ok=0,bad=0,pend=0,inv=0;
   for(let i=0;i<total;i++){
@@ -454,11 +429,12 @@ function stats(){
   if(inv>0)h+=`<span class="stat inv">⚠️ Invalid <span class="n">${inv}</span></span>`;
   $('stats').innerHTML=h;
 }
+
 function render(){
-  const x=qs[cur];if(!x)return;
+  const x=qs[cur];if(!x){$('body').innerHTML='<div class="load">No questions match filters</div>';return}
   const isInv=invalidSet.has(cur);
   const done=ans[cur]!==null||isInv;
-  const letters=['A','B','C','D'];
+  const L=['A','B','C','D'];
   let h=`<div class="q">${cur+1}. ${x.q}</div>`;
   x.opts.forEach((o,i)=>{
     let cls='opt';
@@ -467,49 +443,33 @@ function render(){
       else if(i===ans[cur])cls+=' bad';
     }
     h+=`<button class="${cls}" data-i="${i}" ${done?'disabled':''}>
-      <span class="k">${letters[i]}</span><span>${o||'(Empty)'}</span></button>`;
+      <span class="k">${L[i]}</span><span>${o||'(Empty)'}</span></button>`;
   });
-  if(done && (x.subject||x.topic||x.job)){
+  if(done&&(x.subject||x.topic||x.job)){
     h+='<div class="chips">';
     if(x.subject)h+=`<span class="chip subject">📚 ${titleCase(x.subject)}</span>`;
     if(x.topic)h+=`<span class="chip topic">🏷️ ${titleCase(x.topic)}</span>`;
     if(x.job)h+=`<span class="chip job">💼 ${titleCase(x.job)}</span>`;
     h+='</div>';
   }
-  if(isInv){
-    h+=`<div class="invalid-msg">⚠️ Invalid question — correct answer not found in options</div>`;
-  }
+  if(isInv)h+=`<div class="invalid-msg">⚠️ Invalid question — correct answer not found in options</div>`;
   h+=`<div class="bar">
-    <button class="btn btn-outline" id="prev" ${cur===0?'disabled':''}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Back
-    </button>
-    <button class="btn" id="next" ${cur===total-1?'disabled':''}>
-      Next
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
+    <button class="btn btn-outline" id="prev" ${cur===0?'disabled':''}>◀ Back</button>
+    <button class="btn" id="next" ${cur===total-1?'disabled':''}>Next ▶</button>
   </div>`;
   $('body').innerHTML=h;
-  if(!isInv){
-    $('body').querySelectorAll('.opt:not([disabled])').forEach(b=>{
-      b.onclick=()=>{
-        ans[cur]=+b.dataset.i;
-        $('count').textContent=(ans.filter(a=>a!==null).length)+'/'+total;
-        render();grid();stats();
-      };
-    });
-  }
+  if(!isInv)$('body').querySelectorAll('.opt:not([disabled])').forEach(b=>{
+    b.onclick=()=>{ans[cur]=+b.dataset.i;$('count').textContent=(ans.filter(a=>a!==null).length)+'/'+total;render();grid();stats()};
+  });
   $('prev')&&($('prev').onclick=()=>{cur--;render();grid();stats()});
   $('next')&&($('next').onclick=()=>{cur++;render();grid();stats()});
 }
+
 function renderEnd(){
-  $('endWrap').innerHTML=`
-    <button class="btn btn-green" id="end">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-      End Quiz
-    </button>`;
+  $('endWrap').innerHTML=`<button class="btn btn-green" id="end">🏁 End Quiz</button>`;
   $('end').onclick=end;
 }
+
 function grid(){
   let h='';
   qs.forEach((x,i)=>{
@@ -524,83 +484,26 @@ function grid(){
     d.onclick=()=>{cur=+d.dataset.i;render();grid();stats();scrollTo({top:0,behavior:'smooth'})};
   });
 }
+
 function end(){
   clearInterval(timer);
   const right=qs.filter((x,i)=>ans[i]===x.correct).length;
-  const pct=total?Math.round((right/total)*100):0;
+  const pct=Math.round((right/total)*100);
   let icon,msg;
-  if(right===total&&total>0){icon='🌟';msg='Perfect score!';}
-  else if(pct>=70){icon='👏';msg='Great job!';}
-  else{icon='💪';msg='Keep practicing!';}
+  if(right===total){icon='🌟';msg='Perfect score!'}
+  else if(pct>=70){icon='👏';msg='Great job!'}
+  else{icon='💪';msg='Keep practicing!'}
   $('body').innerHTML=`
     <div style="text-align:center;padding:20px">
       <div class="result-icon">${icon}</div>
       <div style="font-size:2.6rem;font-weight:900;color:#0284c7">${right} / ${total}</div>
-      <div style="color:#475569;margin:10px 0 20px;font-weight:600">
-        ${msg} — ${pct}% correct
-      </div>
-      <button class="btn" onclick="location.reload()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        Try again
-      </button>
+      <div style="color:#475569;margin:10px 0 20px;font-weight:600">${msg} — ${pct}% correct</div>
+      <button class="btn" onclick="location.reload()">⟳ Try again</button>
     </div>`;
   $('grid').innerHTML='';
   $('endWrap').innerHTML='';
   $('stats').innerHTML='';
 }
-
-/* ---------------- UI WIRING ---------------- */
-$('menuBtn').onclick=openDrawer;
-$('drClose').onclick=closeDrawer;
-$('ovl').onclick=closeDrawer;
-
-$('jobTrigger').onclick=e=>{
-  e.stopPropagation();
-  const wasOpen=$('jobBox').classList.contains('open');
-  closeAllMs();
-  if(!wasOpen)$('jobBox').classList.add('open');
-  $('jobSr').focus();
-};
-$('subjTrigger').onclick=e=>{
-  e.stopPropagation();
-  const wasOpen=$('subjBox').classList.contains('open');
-  closeAllMs();
-  if(!wasOpen)$('subjBox').classList.add('open');
-  $('subjSr').focus();
-};
-document.addEventListener('click',e=>{
-  if(!$('jobBox').contains(e.target) && !$('subjBox').contains(e.target))closeAllMs();
-});
-
-$('jobSr').oninput=e=>{jobSrText=e.target.value;renderJobOpts()};
-$('subjSr').oninput=e=>{subjSrText=e.target.value;renderSubjOpts()};
-
-// count options
-document.querySelectorAll('.cnt-opt').forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll('.cnt-opt').forEach(x=>x.classList.remove('sel'));
-    b.classList.add('sel');
-    loadCount=b.dataset.n;
-  };
-});
-
-// search (case insensitive, live info update)
-$('srch').oninput=e=>{srchQ=e.target.value;updateInfo()};
-
-// reset
-$('drReset').onclick=()=>{
-  selJobs=[];selSubjs=[];srchQ='';jobSrText='';subjSrText='';loadCount='all';
-  $('srch').value='';$('jobSr').value='';$('subjSr').value='';
-  document.querySelectorAll('.cnt-opt').forEach(x=>x.classList.toggle('sel',x.dataset.n==='all'));
-  updateLbls();renderJobOpts();renderSubjOpts();updateInfo();
-};
-
-// load
-$('drLoad').onclick=()=>{
-  closeDrawer();
-  buildAndStart();
-  scrollTo({top:0,behavior:'smooth'});
-};
 
 load();
 </script>
