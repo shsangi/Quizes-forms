@@ -20,7 +20,6 @@
           padding:.28rem .6rem;border-radius:9999px;border:1px solid #7dd3fc}
     .timer{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
            font-weight:800;font-size:.62rem;padding:.28rem .6rem;border-radius:9999px}
-    /* Chrome-style vertical 3 dots */
     .dots-btn{background:transparent;border:none;width:32px;height:32px;
               border-radius:50%;cursor:pointer;color:#475569;
               display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -88,7 +87,6 @@
     .stat.inv{background:#fef3c7;border-color:#fcd34d;color:#92400e}
     .result-icon{font-size:3rem;margin-bottom:8px}
 
-    /* DRAWER */
     .overlay{position:fixed;inset:0;background:rgba(10,30,63,.55);backdrop-filter:blur(6px);
              z-index:900;opacity:0;pointer-events:none;transition:opacity .25s}
     .overlay.on{opacity:1;pointer-events:auto}
@@ -109,6 +107,7 @@
             font-family:inherit;font-size:.85rem;outline:none;background:#f8fafc}
     .finput:focus{border-color:#0ea5e9;background:#fff;box-shadow:0 0 0 3px rgba(14,165,233,.12)}
     .chips-box{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+    .chips-box:empty{display:none}
     .cchip{display:inline-flex;align-items:center;gap:4px;background:#0ea5e9;color:#fff;
            font-size:.68rem;font-weight:700;padding:.25rem .55rem;border-radius:9999px}
     .cchip button{background:0 0;border:none;color:#fff;font-size:.85rem;cursor:pointer;
@@ -132,6 +131,7 @@
                   display:flex;align-items:center;justify-content:center;font-size:.7rem;
                   color:#fff;flex-shrink:0}
     .dd-item.sel .chk{background:#fff;color:#0284c7;border-color:#fff}
+    .dd-empty{padding:.8rem;text-align:center;font-size:.78rem;color:#94a3b8;font-style:italic}
     .count-row{display:flex;gap:6px;flex-wrap:wrap}
     .cb{padding:.5rem .85rem;border:1.5px solid #e2e8f0;border-radius:9999px;background:#fff;
         cursor:pointer;font-family:inherit;font-weight:700;font-size:.78rem;color:#475569;transition:all .15s}
@@ -170,7 +170,6 @@
   </div>
 </div>
 
-<!-- DRAWER -->
 <div class="overlay" id="overlay"></div>
 <aside class="drawer" id="drawer">
   <div class="dhead">
@@ -238,7 +237,8 @@ const findCorrect=(raw,opts)=>{if(!raw)return -1;const r=clean(raw);
   if(/^[A-Da-d]$/.test(r))return 'abcd'.indexOf(r.toLowerCase());
   if(/^[1-4]$/.test(r))return +r-1;return -1};
 const titleCase=s=>!s?'':clean(s).split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
-const eq=(a,b)=>clean(a).toLowerCase()===clean(b).toLowerCase();
+// Normalized key for comparisons — always lowercase + trimmed
+const nk=s=>clean(s).toLowerCase();
 
 const SPECIAL=[/all\s+of\s+(the\s+)?above/i,/none\s+of\s+(the\s+)?above/i,/above\s+all/i,/\bboth\b/i,/^\s*none\s*$/i,/all\s+of\s+these/i];
 const isSpecial=o=>{const t=clean(o);return t&&SPECIAL.some(p=>p.test(t))};
@@ -257,7 +257,7 @@ function shuffleOpts(opts){
 function shuffleByCategory(list){
   const b=new Map();
   list.forEach(it=>{
-    const k=[it.job,it.subject,it.topic].map(s=>clean(s).toLowerCase()).join('|||');
+    const k=[it.job,it.subject,it.topic].map(nk).join('|||');
     if(!b.has(k))b.set(k,[]);
     b.get(k).push(it);
   });
@@ -281,6 +281,9 @@ async function load(){
       const correct=findCorrect(c[6],opts);
       all.push({q:c[1],opts,correct,subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
     }
+    console.log('[Quiz] Loaded', all.length, 'questions');
+    console.log('[Quiz] Unique jobs:', [...new Set(all.map(x=>clean(x.job)).filter(Boolean))].length);
+    console.log('[Quiz] Unique subjects:', [...new Set(all.map(x=>clean(x.subject)).filter(Boolean))].length);
     buildMenus();
     applyAndLoad();
   }catch(e){console.error(e);$('body').innerHTML='<div class="load">❌ Failed to load</div>'}
@@ -288,14 +291,17 @@ async function load(){
 
 function applyAndLoad(){
   let list=all.slice();
-
-  // Invalids-only mode
   if(invalidsMode){
     list=list.filter(x=>x.correct===-1);
   } else {
-    // normal filters
-    if(selJobs.size) list=list.filter(x=>[...selJobs].some(j=>eq(j,x.job)));
-    if(selSubjs.size) list=list.filter(x=>[...selSubjs].some(s=>eq(s,x.subject)));
+    if(selJobs.size){
+      const keys=[...selJobs];
+      list=list.filter(x=>keys.includes(nk(x.job)));
+    }
+    if(selSubjs.size){
+      const keys=[...selSubjs];
+      list=list.filter(x=>keys.includes(nk(x.subject)));
+    }
     if(searchQ){
       const q=searchQ.toLowerCase();
       list=list.filter(x=>
@@ -307,46 +313,45 @@ function applyAndLoad(){
       );
     }
   }
-
   list=shuffleByCategory(list);
   if(pickN>0) list=list.slice(0,pickN);
-
   qs=list.map(x=>{
     const newOpts=shuffleOpts(x.opts);
     const ct=x.opts[x.correct];
-    const nc=ct!==undefined? newOpts.findIndex(o=>eq(o,ct)) : -1;
+    const nc=ct!==undefined? newOpts.findIndex(o=>nk(o)===nk(ct)) : -1;
     return {...x,opts:newOpts,correct:nc};
   });
   invalidSet=new Set();
   qs.forEach((x,i)=>{if(x.correct===-1)invalidSet.add(i)});
   total=qs.length;ans=Array(total).fill(null);cur=0;time=total*60;
-
-  if(invalidsMode){
-    $('title').textContent='⚠️ Invalid Questions';
-  } else {
-    $('title').textContent=`${selJobs.size?[...selJobs].map(titleCase).join(', '):'All Jobs'} MCQs`;
-  }
+  if(invalidsMode) $('title').textContent='⚠️ Invalid Questions';
+  else if(selJobs.size) $('title').textContent=`${selJobs.size} Job(s) MCQs`;
+  else $('title').textContent='All Jobs MCQs';
   $('count').textContent='0/'+total;
   closeDrawer();
   clearInterval(timer);startTimer();render();grid();renderEnd();stats();
   scrollTo({top:0,behavior:'smooth'});
 }
 
+// ---- MENUS: store raw cleaned string as value, display titleCase ----
 function buildMenus(){
-  const jobs=[...new Set(all.map(x=>clean(x.job)).filter(Boolean))].sort();
+  const jobs=[...new Set(all.map(x=>clean(x.job)).filter(Boolean))].sort((a,b)=>
+    titleCase(a).localeCompare(titleCase(b)));
   $('jobMenu').innerHTML=
     `<div class="dd-item" data-v=""><span class="chk">✓</span>All jobs</div>`+
-    jobs.map(j=>`<div class="dd-item" data-v="${j}"><span class="chk"></span>${titleCase(j)}</div>`).join('');
+    jobs.map(j=>`<div class="dd-item" data-v="${nk(j)}"><span class="chk"></span>${titleCase(j)}</div>`).join('');
   $('jobMenu').querySelectorAll('.dd-item').forEach(el=>{
     el.onclick=e=>{
       e.stopPropagation();
       const v=el.dataset.v;
       if(!v){ selJobs.clear(); }
       else { if(selJobs.has(v))selJobs.delete(v); else selJobs.add(v); }
-      refreshJobMenu();refreshSubjectMenu();
+      refreshJobMenu();
+      refreshSubjectMenu();
     };
   });
-  refreshJobMenu();refreshSubjectMenu();
+  refreshJobMenu();
+  refreshSubjectMenu();
 }
 
 function refreshJobMenu(){
@@ -357,19 +362,42 @@ function refreshJobMenu(){
     el.classList.toggle('sel',on);
     el.querySelector('.chk').textContent=on?'✓':'';
   });
-  $('jobText').textContent=selJobs.size===0?'All jobs':`${selJobs.size} selected`;
-  renderChips('jobChips',selJobs,v=>{selJobs.delete(v);refreshJobMenu();refreshSubjectMenu()});
+  $('jobText').textContent=selJobs.size===0?'All jobs':`${selJobs.size} job(s) selected`;
+  renderChips('jobChips',selJobs,v=>{
+    selJobs.delete(v);
+    refreshJobMenu();
+    refreshSubjectMenu();
+  });
 }
 
 function refreshSubjectMenu(){
+  // Pool = questions matching currently selected jobs (or all if none)
   const pool = selJobs.size===0
     ? all
-    : all.filter(x=>[...selJobs].some(j=>eq(j,x.job)));
-  const subs=[...new Set(pool.map(x=>clean(x.subject)).filter(Boolean))].sort();
-  [...selSubjs].forEach(s=>{if(!subs.some(x=>eq(x,s)))selSubjs.delete(s)});
-  $('subjMenu').innerHTML=
-    `<div class="dd-item" data-v=""><span class="chk">✓</span>All subjects</div>`+
-    subs.map(s=>`<div class="dd-item" data-v="${s}"><span class="chk"></span>${titleCase(s)}</div>`).join('');
+    : all.filter(x=>selJobs.has(nk(x.job)));
+
+  // Build unique subject map: key = normalized, label = display
+  const subjMap=new Map();
+  pool.forEach(x=>{
+    const raw=clean(x.subject);
+    if(!raw)return;
+    const key=nk(raw);
+    if(!subjMap.has(key)) subjMap.set(key, titleCase(raw));
+  });
+
+  // Prune selected subjects that no longer exist in the pool
+  [...selSubjs].forEach(s=>{ if(!subjMap.has(s)) selSubjs.delete(s); });
+
+  const entries=[...subjMap.entries()].sort((a,b)=>a[1].localeCompare(b[1]));
+
+  if(!entries.length){
+    $('subjMenu').innerHTML=`<div class="dd-empty">${selJobs.size?'No subjects for selected jobs':'No subjects available'}</div>`;
+  } else {
+    $('subjMenu').innerHTML=
+      `<div class="dd-item" data-v=""><span class="chk">✓</span>All subjects</div>`+
+      entries.map(([k,label])=>`<div class="dd-item" data-v="${k}"><span class="chk"></span>${label}</div>`).join('');
+  }
+
   $('subjMenu').querySelectorAll('.dd-item').forEach(el=>{
     el.onclick=e=>{
       e.stopPropagation();
@@ -379,6 +407,7 @@ function refreshSubjectMenu(){
       refreshSubjectMenu();
     };
   });
+
   const items=$('subjMenu').querySelectorAll('.dd-item');
   items.forEach(el=>{
     const v=el.dataset.v;
@@ -386,14 +415,29 @@ function refreshSubjectMenu(){
     el.classList.toggle('sel',on);
     el.querySelector('.chk').textContent=on?'✓':'';
   });
-  $('subjText').textContent=selSubjs.size===0?'All subjects':`${selSubjs.size} selected`;
-  renderChips('subjChips',selSubjs,v=>{selSubjs.delete(v);refreshSubjectMenu()});
+  $('subjText').textContent=selSubjs.size===0?'All subjects':`${selSubjs.size} subject(s) selected`;
+  renderChips('subjChips',selSubjs,v=>{
+    selSubjs.delete(v);
+    refreshSubjectMenu();
+  });
 }
 
 function renderChips(containerId,set,onRemove){
   const box=$(containerId);
-  box.innerHTML=[...set].map(v=>
-    `<span class="cchip">${titleCase(v)} <button data-v="${v}">×</button></span>`
+  if(!box)return;
+  const labels=[];
+  set.forEach(v=>{
+    // find a display label from `all`
+    const found=all.find(x=>nk(x.job)===v || nk(x.subject)===v);
+    let label=v;
+    if(found){
+      if(nk(found.job)===v) label=titleCase(found.job);
+      else if(nk(found.subject)===v) label=titleCase(found.subject);
+    }
+    labels.push({v,label});
+  });
+  box.innerHTML=labels.map(({v,label})=>
+    `<span class="cchip">${label} <button data-v="${v}">×</button></span>`
   ).join('');
   box.querySelectorAll('button').forEach(b=>{
     b.onclick=e=>{e.stopPropagation();onRemove(b.dataset.v)};
@@ -416,7 +460,6 @@ $('subjMenu').addEventListener('click',e=>e.stopPropagation());
 
 $('searchBox').addEventListener('input',()=>{searchQ=$('searchBox').value.trim()});
 
-// Count selector
 $('countRow').querySelectorAll('.cb').forEach(b=>{
   b.onclick=()=>{
     $('countRow').querySelectorAll('.cb').forEach(x=>x.classList.remove('on'));
@@ -427,14 +470,14 @@ $('countRow').querySelectorAll('.cb').forEach(b=>{
   };
 });
 
-// Load + Reset
 $('loadBtn').onclick=applyAndLoad;
 $('resetBtn').onclick=()=>{
   selJobs.clear();selSubjs.clear();searchQ='';invalidsMode=false;pickN=20;
   $('searchBox').value='';
   $('countRow').querySelectorAll('.cb').forEach(x=>x.classList.remove('on'));
   $('countRow').querySelector('.cb[data-n="20"]').classList.add('on');
-  refreshJobMenu();refreshSubjectMenu();
+  refreshJobMenu();
+  refreshSubjectMenu();
 };
 
 // ===== Quiz =====
