@@ -116,12 +116,62 @@ const findCorrect=(raw,opts)=>{if(!raw)return -1;const r=clean(raw);
   if(/^[1-4]$/.test(r))return +r-1;return -1};
 const titleCase=s=>!s?'':clean(s).split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
 
+// Detect special "fixed position" options
+const SPECIAL_PATTERNS=[
+  /all\s+of\s+(the\s+)?above/i,
+  /none\s+of\s+(the\s+)?above/i,
+  /above\s+all/i,
+  /\bboth\b/i,
+  /^\s*none\s*$/i,
+  /all\s+of\s+these/i
+];
+const isSpecial=o=>{const t=clean(o);return t&&SPECIAL_PATTERNS.some(p=>p.test(t))};
+
+// Shuffle options — keep special ones at their original index
+function shuffleOptionsKept(opts){
+  const fixed={};   // index -> option text (must stay)
+  const free=[];    // {text, originalIndex} — can move
+  opts.forEach((o,i)=>{
+    if(isSpecial(o)) fixed[i]=o;
+    else free.push({text:o,idx:i});
+  });
+  const shuffled=shuffle(free);
+  const result=new Array(opts.length);
+  // place fixed first
+  Object.keys(fixed).forEach(k=>{result[+k]=fixed[k]});
+  // fill remaining slots in order
+  let p=0;
+  for(let i=0;i<result.length;i++){
+    if(result[i]===undefined) result[i]=shuffled[p++].text;
+  }
+  return result;
+}
+
+// Group-wise shuffle: Job → Subject → Topic, shuffled inside each group
+function shuffleByCategory(list){
+  // bucket by job|subject|topic
+  const buckets=new Map();
+  list.forEach(item=>{
+    const key=[item.job||'',item.subject||'',item.topic||''].join('|||');
+    if(!buckets.has(key)) buckets.set(key,[]);
+    buckets.get(key).push(item);
+  });
+  // shuffle bucket order
+  const keys=shuffle([...buckets.keys()]);
+  const out=[];
+  keys.forEach(k=>{
+    const group=shuffle(buckets.get(k));
+    out.push(...group);
+  });
+  return out;
+}
+
 async function load(){
   try{
     const r=await fetch(QUIZ_URL+'&_t='+Date.now(),{cache:'no-store'});
     const text=await r.text();
     const lines=text.split('\n').filter(l=>l.trim());
-    qs=[];invalidSet=new Set();
+    let raw=[];
     for(let i=1;i<lines.length;i++){
       const c=parseCSV(lines[i]);
       if(c.length<9||!c[1])continue;
@@ -129,15 +179,30 @@ async function load(){
       if(show==='0'||show==='false'||show==='no')continue;
       const opts=[c[2]||'',c[3]||'',c[4]||'',c[5]||''].map(clean);
       const correct=findCorrect(c[6],opts);
-      qs.push({q:c[1],opts,correct,subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
+      raw.push({q:c[1],opts,correct,subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
     }
-    qs=shuffle(qs).map(x=>{const s=shuffle(x.opts);return{...x,opts:s,correct:s.indexOf(x.opts[x.correct])}});
+
+    // 1) Group-wise shuffle by Job → Subject → Topic
+    let ordered=shuffleByCategory(raw);
+
+    // 2) Shuffle options (keeping special ones pinned)
+    qs=ordered.map(x=>{
+      const newOpts=shuffleOptionsKept(x.opts);
+      // Recompute correct index by matching text
+      const correctText=x.opts[x.correct];
+      const newCorrect=correctText!==undefined
+        ? newOpts.findIndex(o=>clean(o)===clean(correctText))
+        : -1;
+      return {...x,opts:newOpts,correct:newCorrect};
+    });
+
     qs.forEach((x,i)=>{if(x.correct===-1)invalidSet.add(i)});
     total=qs.length;ans=Array(total).fill(null);time=total*60;cur=0;
     $('title').textContent='All Jobs MCQs';
     $('count').textContent='0/'+total;
     startTimer();render();grid();renderEnd();stats();
   }catch(e){
+    console.error(e);
     $('body').innerHTML='<div class="load">❌ Failed to load</div>';
   }
 }
@@ -190,7 +255,6 @@ function render(){
     h+='</div>';
   }
 
-  // Invalid message below Job chip
   if(isInv){
     h+=`<div class="invalid-msg">⚠️ Invalid question — correct answer not found in options</div>`;
   }
