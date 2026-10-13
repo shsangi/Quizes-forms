@@ -1,41 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0ea5e9">
-<title>Self Learners · MCQs</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
-body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;color:#0f1419}
-.wrap{width:100%;max-width:920px;padding:16px}
-.top{position:sticky;top:0;z-index:10;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px 16px;margin-bottom:12px;box-shadow:0 8px 20px -6px rgba(10,30,63,.12);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.title{font-weight:800;color:#0a1e3f;font-size:1rem}
-.pill{background:#e0f2fe;color:#0284c7;font-weight:800;font-size:.72rem;padding:.35rem .75rem;border-radius:9999px;border:1px solid #7dd3fc}
-.timer{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-weight:800;font-size:.72rem;padding:.35rem .75rem;border-radius:9999px}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:22px;box-shadow:0 20px 40px -12px rgba(10,30,63,.18)}
-.q{font-weight:700;font-size:1.1rem;color:#0a1e3f;line-height:1.55;margin-bottom:16px}
-.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid #e2e8f0;border-radius:9999px;padding:14px 18px;font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit;transition:all .15s;color:#0f1419}
-.opt:hover:not(:disabled){background:#e0f2fe;border-color:#0ea5e9}
-.opt .k{background:#e0f2fe;color:#0284c7;font-weight:800;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.opt.ok{background:#d1fae5;border-color:#059669}.opt.ok .k{background:#059669;color:#fff}
-.opt.bad{background:#fee2e2;border-color:#dc2626}.opt.bad .k{background:#dc2626;color:#fff}
-.opt:disabled{cursor:default}
-.bar{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
-.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border:none;font-weight:700;font-size:.9rem;padding:.7rem 1.4rem;border-radius:9999px;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 4px 12px rgba(2,132,199,.25)}
-.btn:active{transform:scale(.96)}.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
-.btn-o{background:#fff;color:#0284c7;border:1.5px solid #bae6fd;box-shadow:0 2px 8px rgba(2,132,199,.08)}
-.btn svg{width:18px;height:18px}
-.load{padding:60px;text-align:center;color:#475569;font-weight:600}
-.grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px}
-.dot{width:28px;height:28px;border-radius:50%;background:#f4f6fa;border:2px solid transparent;font-size:.68rem;font-weight:700;color:#94a3b8;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit}
-.dot.ok{background:#059669;color:#fff}.dot.bad{background:#dc2626;color:#fff}.dot.cur{border-color:#0284c7;transform:scale(1.15)}
-.end-wrap{margin-top:16px;display:flex;justify-content:center}
-.end-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;font-weight:800;font-size:.95rem;padding:.85rem 2rem;border-radius:9999px;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 6px 18px rgba(217,119,6,.35)}
-.end-btn:active{transform:scale(.96)}.end-btn svg{width:20px;height:20px}
-.result-icon{font-size:3rem;margin-bottom:8px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0ea5e9">
+  <title>Self Learners · MCQs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+    body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;color:#0f1419}
+    .wrap{width:100%;max-width:920px;padding:16px}
+    .top{position:sticky;top:0;z-index:10;background:#fff;border:1px solid #e2e8f0;
+         border-radius:16px;padding:12px 16px;margin-bottom:12px;
+         box-shadow:0 8px 20px -6px rgba(10,30,63,.12);display:flex;
+         justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .title{font-weight:800;color:#0a1e3f;font-size:1rem}
+    .pill{background:#e0f2fe;color:#0284c7;font-weight:800;font-size:.72rem;
+          padding:.35rem .75rem;border-radius:9999px;border:1px solid #7dd3fc}
+    .timer{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
+           font-weight:800;font-size:.72rem;padding:.35rem .75rem;border-radius:9999px}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;
+          padding:22px;box-shadow:0 20px 40px -12px rgba(10,30,63,.18)}
+    .q{font-weight:700;font-size:1.1rem;color:#0a1e3f;line-height:1.55;margin-bottom:16px}
+    .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+         background:#fff;border:1.5px solid #e2e8f0;border-radius:9999px;
+         padding:14px 18px;font-size:.95rem;font-weight:600;cursor:pointer;
+         margin-bottom:10px;font-family:inherit;transition:all .15s;color:#0f1419}
+    .opt:hover:not(:disabled){background:#e0f2fe;border-color:#0ea5e9}
+    .opt .k{background:#e0f2fe;color:#0284c7;font-weight:800;width:28px;height:28px;
+            border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .opt.ok{background:#d1fae5;border-color:#059669}
+    .opt.ok .k{background:#059669;color:#fff}
+    .opt.bad{background:#fee2e2;border-color:#dc2626}
+    .opt.bad .k{background:#dc2626;color:#fff}
+    .opt:disabled{cursor:default}
+    .bar{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+         background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border:none;
+         font-weight:700;font-size:.9rem;padding:.7rem 1.4rem;border-radius:9999px;
+         cursor:pointer;font-family:inherit;transition:all .15s;
+         box-shadow:0 4px 12px rgba(2,132,199,.25)}
+    .btn:active{transform:scale(.96)}
+    .btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+    .btn-outline{background:#fff;color:#0284c7;border:1.5px solid #bae6fd;
+                 box-shadow:0 2px 8px rgba(2,132,199,.08)}
+    .btn-outline:hover:not(:disabled){background:#f0f9ff}
+    .btn-green{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 4px 12px rgba(5,150,105,.3)}
+    .btn svg{width:18px;height:18px;flex-shrink:0}
+    .load{padding:60px;text-align:center;color:#475569;font-weight:600}
+    .grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px}
+    .dot{width:28px;height:28px;border-radius:50%;background:#f4f6fa;border:2px solid transparent;
+         font-size:.68rem;font-weight:700;color:#94a3b8;display:flex;align-items:center;
+         justify-content:center;cursor:pointer;font-family:inherit}
+    .dot.ok{background:#059669;color:#fff}
+    .dot.bad{background:#dc2626;color:#fff}
+    .dot.cur{border-color:#0284c7;transform:scale(1.15)}
+    .end-wrap{margin-top:16px;display:flex;justify-content:center}
+    .end-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+             background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;
+             font-weight:800;font-size:.95rem;padding:.85rem 2rem;border-radius:9999px;
+             cursor:pointer;font-family:inherit;transition:all .15s;
+             box-shadow:0 6px 18px rgba(217,119,6,.35)}
+    .end-btn:active{transform:scale(.96)}
+    .end-btn svg{width:20px;height:20px}
+    .result-icon{font-size:3rem;margin-bottom:8px}
+  </style>
 </head>
 <body>
 <div class="wrap">
@@ -52,96 +81,135 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
     <div class="end-wrap" id="endWrap"></div>
   </div>
 </div>
+
 <script>
-const URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
+const QUIZ_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
 let qs=[],ans=[],cur=0,time=0,timer=null,total=0;
+
 const $=id=>document.getElementById(id);
-const cl=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim();
-const csv=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];
-if(q){if(ch==='"'&&l[i+1]==='"'){c+='"';i++}else if(ch==='"')q=false;else c+=ch}
-else{if(ch==='"')q=true;else if(ch===','){r.push(cl(c));c=''}else c+=ch}}r.push(cl(c));return r};
-const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const fc=(r,o)=>{if(!r)return -1;const x=cl(r);for(let i=0;i<o.length;i++)if(cl(o[i])===x)return i;
-if(/^[A-Da-d]$/.test(x))return 'abcd'.indexOf(x.toLowerCase());if(/^[1-4]$/.test(x))return +x-1;return -1};
+const clean=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim();
+const parseCSV=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];
+  if(q){if(ch==='"'&&l[i+1]==='"'){c+='"';i++}else if(ch==='"')q=false;else c+=ch}
+  else{if(ch==='"')q=true;else if(ch===','){r.push(clean(c));c=''}else c+=ch}}
+  r.push(clean(c));return r};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const findCorrect=(raw,opts)=>{if(!raw)return -1;const r=clean(raw);
+  for(let i=0;i<opts.length;i++)if(clean(opts[i])===r)return i;
+  if(/^[A-Da-d]$/.test(r))return 'abcd'.indexOf(r.toLowerCase());
+  if(/^[1-4]$/.test(r))return +r-1;return -1};
 
 async function load(){
-try{
-const r=await fetch(URL+'&_t='+Date.now(),{cache:'no-store'});
-const lines=(await r.text()).split('\n').filter(l=>l.trim());qs=[];
-for(let i=1;i<lines.length;i++){
-const c=csv(lines[i]);if(c.length<9||!c[1])continue;
-const o=[c[2]||'',c[3]||'',c[4]||'',c[5]||''].map(cl);
-qs.push({q:c[1],opts:o,correct:fc(c[6],o)});
-}
-qs=shuffle(qs).map(x=>{const s=shuffle(x.opts);return{...x,opts:s,correct:s.indexOf(x.opts[x.correct])}});
-total=qs.length;ans=Array(total).fill(null);time=total*60;cur=0;
-$('title').textContent='All Jobs MCQs';$('count').textContent='0/'+total;
-startTimer();render();grid();
-}catch(e){$('body').innerHTML='<div class="load">❌ Failed to load</div>'}
+  try{
+    const r=await fetch(QUIZ_URL+'&_t='+Date.now(),{cache:'no-store'});
+    const text=await r.text();
+    const lines=text.split('\n').filter(l=>l.trim());
+    qs=[];
+    for(let i=1;i<lines.length;i++){
+      const c=parseCSV(lines[i]);
+      if(c.length<9||!c[1])continue;
+      const opts=[c[2]||'',c[3]||'',c[4]||'',c[5]||''].map(clean);
+      const correct=findCorrect(c[6],opts);
+      qs.push({q:c[1],opts,correct,subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
+    }
+    qs=shuffle(qs).map(x=>{const s=shuffle(x.opts);return{...x,opts:s,correct:s.indexOf(x.opts[x.correct])}});
+    total=qs.length;ans=Array(total).fill(null);time=total*60;cur=0;
+    $('title').textContent='All Jobs MCQs';
+    $('count').textContent='0/'+total;
+    startTimer();render();grid();
+  }catch(e){
+    $('body').innerHTML='<div class="load">❌ Failed to load</div>';
+  }
 }
 
 function startTimer(){
-clearInterval(timer);
-timer=setInterval(()=>{
-time--;const m=Math.floor(time/60),s=time%60;
-$('timer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-if(time<=0){clearInterval(timer);end()}
-},1000);
+  clearInterval(timer);
+  timer=setInterval(()=>{
+    time--;const m=Math.floor(time/60),s=time%60;
+    $('timer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    if(time<=0){clearInterval(timer);end()}
+  },1000);
 }
 
-const ARROW_L='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
-const ARROW_R='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-const FLAG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
-
 function render(){
-const x=qs[cur];if(!x)return;
-const done=ans[cur]!==null,L=['A','B','C','D'];
-let h=`<div class="q">${cur+1}. ${x.q}</div>`;
-x.opts.forEach((o,i)=>{
-let c='opt';if(done){if(i===x.correct)c+=' ok';else if(i===ans[cur])c+=' bad'}
-h+=`<button class="${c}" data-i="${i}" ${done?'disabled':''}><span class="k">${L[i]}</span><span>${o||'(Empty)'}</span></button>`;
-});
-h+=`<div class="bar">
-<button class="btn btn-o" id="prev" ${cur===0?'disabled':''}>${ARROW_L} Back</button>
-<button class="btn" id="next" ${cur===total-1?'disabled':''}>Next ${ARROW_R}</button>
-</div>`;
-$('body').innerHTML=h;
-$('body').querySelectorAll('.opt:not([disabled])').forEach(b=>{
-b.onclick=()=>{ans[cur]=+b.dataset.i;$('count').textContent=ans.filter(a=>a!==null).length+'/'+total;render();grid()};
-});
-$('prev')&&($('prev').onclick=()=>{cur--;render();grid()});
-$('next')&&($('next').onclick=()=>{cur++;render();grid()});
+  const x=qs[cur];if(!x)return;
+  const done=ans[cur]!==null;
+  const letters=['A','B','C','D'];
+  let h=`<div class="q">${cur+1}. ${x.q}</div>`;
+  x.opts.forEach((o,i)=>{
+    let cls='opt';
+    if(done){
+      if(i===x.correct)cls+=' ok';
+      else if(i===ans[cur])cls+=' bad';
+    }
+    h+=`<button class="${cls}" data-i="${i}" ${done?'disabled':''}>
+      <span class="k">${letters[i]}</span><span>${o||'(Empty)'}</span></button>`;
+  });
+  h+=`<div class="bar">
+    <button class="btn btn-outline" id="prev" ${cur===0?'disabled':''}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>
+    <button class="btn" id="next" ${cur===total-1?'disabled':''}>
+      Next
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>`;
+  $('body').innerHTML=h;
+
+  $('body').querySelectorAll('.opt:not([disabled])').forEach(b=>{
+    b.onclick=()=>{ans[cur]=+b.dataset.i;$('count').textContent=(ans.filter(a=>a!==null).length)+'/'+total;render();grid()};
+  });
+  $('prev')&&($('prev').onclick=()=>{cur--;render();grid()});
+  $('next')&&($('next').onclick=()=>{cur++;render();grid()});
 }
 
 function grid(){
-let h='';
-qs.forEach((x,i)=>{
-let c='dot';if(ans[i]!==null)c+=(ans[i]===x.correct?' ok':' bad');if(i===cur)c+=' cur';
-h+=`<button class="${c}" data-i="${i}">${i+1}</button>`;
-});
-$('grid').innerHTML=h;
-$('grid').querySelectorAll('.dot').forEach(d=>{
-d.onclick=()=>{cur=+d.dataset.i;render();grid();scrollTo({top:0,behavior:'smooth'})};
-});
-$('endWrap').innerHTML=`<button class="end-btn" id="end">${FLAG} End Quiz</button>`;
-$('end').onclick=end;
+  let h='';
+  qs.forEach((x,i)=>{
+    let c='dot';
+    if(ans[i]!==null)c+=(ans[i]===x.correct?' ok':' bad');
+    if(i===cur)c+=' cur';
+    h+=`<button class="${c}" data-i="${i}">${i+1}</button>`;
+  });
+  $('grid').innerHTML=h;
+  $('grid').querySelectorAll('.dot').forEach(d=>{
+    d.onclick=()=>{cur=+d.dataset.i;render();grid();scrollTo({top:0,behavior:'smooth'})};
+  });
+
+  // End Quiz button below the numbers
+  $('endWrap').innerHTML=`
+    <button class="end-btn" id="end">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      End Quiz
+    </button>`;
+  $('end')&&($('end').onclick=end);
 }
 
 function end(){
-clearInterval(timer);
-const right=qs.filter((x,i)=>ans[i]===x.correct).length;
-const pct=Math.round(right/total*100);
-const icon=right===total?'🌟':pct>=70?'👏':'💪';
-const msg=right===total?'Perfect score!':pct>=70?'Great job!':'Keep practicing!';
-$('body').innerHTML=`
-<div style="text-align:center;padding:20px">
-<div class="result-icon">${icon}</div>
-<div style="font-size:2.6rem;font-weight:900;color:#0284c7">${right} / ${total}</div>
-<div style="color:#475569;margin:10px 0 20px;font-weight:600">${msg} — ${pct}% correct</div>
-<button class="btn" onclick="location.reload()">⟳ Try again</button>
-</div>`;
-$('grid').innerHTML='';$('endWrap').innerHTML='';
+  clearInterval(timer);
+  const done=ans.filter(a=>a!==null);
+  const right=qs.filter((x,i)=>ans[i]===x.correct).length;
+  const pct=Math.round((right/total)*100);
+  let icon,msg;
+  if(right===total){icon='🌟';msg='Perfect score!';}
+  else if(pct>=70){icon='👏';msg='Great job!';}
+  else{icon='💪';msg='Keep practicing!';}
+  $('body').innerHTML=`
+    <div style="text-align:center;padding:20px">
+      <div class="result-icon">${icon}</div>
+      <div style="font-size:2.6rem;font-weight:900;color:#0284c7">${right} / ${total}</div>
+      <div style="color:#475569;margin:10px 0 20px;font-weight:600">
+        ${msg} — ${pct}% correct
+      </div>
+      <button class="btn" onclick="location.reload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Try again
+      </button>
+    </div>`;
+  $('grid').innerHTML='';
+  $('endWrap').innerHTML='';
 }
+
 load();
 </script>
 </body>
