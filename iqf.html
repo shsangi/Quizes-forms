@@ -55,14 +55,8 @@
     .dot.ok{background:#059669;color:#fff}
     .dot.bad{background:#dc2626;color:#fff}
     .dot.cur{border-color:#0284c7;transform:scale(1.15)}
-    .end-wrap{margin-top:16px;display:flex;justify-content:center}
-    .end-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
-             background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;
-             font-weight:800;font-size:.95rem;padding:.85rem 2rem;border-radius:9999px;
-             cursor:pointer;font-family:inherit;transition:all .15s;
-             box-shadow:0 6px 18px rgba(217,119,6,.35)}
-    .end-btn:active{transform:scale(.96)}
-    .end-btn svg{width:20px;height:20px}
+    .end-wrap{display:flex;justify-content:center;margin-top:16px;padding-top:16px;
+              border-top:1px solid #e2e8f0}
     .result-icon{font-size:3rem;margin-bottom:8px}
   </style>
 </head>
@@ -115,7 +109,7 @@ async function load(){
     total=qs.length;ans=Array(total).fill(null);time=total*60;cur=0;
     $('title').textContent='All Jobs MCQs';
     $('count').textContent='0/'+total;
-    startTimer();render();grid();
+    startTimer();render();grid();renderEnd();
   }catch(e){
     $('body').innerHTML='<div class="load">❌ Failed to load</div>';
   }
@@ -163,6 +157,15 @@ function render(){
   $('next')&&($('next').onclick=()=>{cur++;render();grid()});
 }
 
+function renderEnd(){
+  $('endWrap').innerHTML=`
+    <button class="btn btn-green" id="end">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      End Quiz
+    </button>`;
+  $('end').onclick=end;
+}
+
 function grid(){
   let h='';
   qs.forEach((x,i)=>{
@@ -175,19 +178,10 @@ function grid(){
   $('grid').querySelectorAll('.dot').forEach(d=>{
     d.onclick=()=>{cur=+d.dataset.i;render();grid();scrollTo({top:0,behavior:'smooth'})};
   });
-
-  // End Quiz button below the numbers
-  $('endWrap').innerHTML=`
-    <button class="end-btn" id="end">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-      End Quiz
-    </button>`;
-  $('end')&&($('end').onclick=end);
 }
 
 function end(){
   clearInterval(timer);
-  const done=ans.filter(a=>a!==null);
   const right=qs.filter((x,i)=>ans[i]===x.correct).length;
   const pct=Math.round((right/total)*100);
   let icon,msg;
