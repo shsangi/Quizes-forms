@@ -20,11 +20,13 @@
           padding:.28rem .6rem;border-radius:9999px;border:1px solid #7dd3fc}
     .timer{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
            font-weight:800;font-size:.62rem;padding:.28rem .6rem;border-radius:9999px}
-    .dots-btn{background:#f8fafc;border:1.5px solid #e2e8f0;width:32px;height:32px;
-              border-radius:10px;cursor:pointer;font-size:1rem;color:#475569;
-              display:flex;align-items:center;justify-content:center;transition:all .15s;
-              font-family:inherit;font-weight:800;line-height:1}
-    .dots-btn:hover{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
+    /* Chrome-style vertical 3 dots */
+    .dots-btn{background:transparent;border:none;width:32px;height:32px;
+              border-radius:50%;cursor:pointer;color:#475569;
+              display:flex;flex-direction:column;align-items:center;justify-content:center;
+              gap:3px;transition:background .15s;padding:0}
+    .dots-btn:hover{background:#f1f5f9}
+    .dots-btn span{width:4px;height:4px;border-radius:50%;background:currentColor;display:block}
     .card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;
           padding:22px;box-shadow:0 20px 40px -12px rgba(10,30,63,.18)}
     .q{font-weight:700;font-size:1.1rem;color:#0a1e3f;line-height:1.55;margin-bottom:16px}
@@ -135,10 +137,16 @@
         cursor:pointer;font-family:inherit;font-weight:700;font-size:.78rem;color:#475569;transition:all .15s}
     .cb:hover{border-color:#0ea5e9;color:#0284c7}
     .cb.on{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border-color:#0284c7}
-    .dload{width:100%;padding:.85rem;border:none;border-radius:9999px;font-family:inherit;
+    .cb.inv.on{background:linear-gradient(135deg,#f5b800,#d99e00);border-color:#d99e00;color:#0a1e3f}
+    .drow{display:flex;gap:8px;margin-top:4px}
+    .dload{flex:1;padding:.85rem;border:none;border-radius:9999px;font-family:inherit;
            font-weight:800;font-size:.9rem;color:#fff;cursor:pointer;
            background:linear-gradient(135deg,#10b981,#059669);
            box-shadow:0 4px 12px rgba(5,150,105,.3)}
+    .dreset{padding:.85rem 1rem;border:1.5px solid #e2e8f0;border-radius:9999px;
+            font-family:inherit;font-weight:800;font-size:.9rem;color:#475569;
+            background:#fff;cursor:pointer;transition:all .15s}
+    .dreset:hover{border-color:#dc2626;color:#dc2626;background:#fee2e2}
   </style>
 </head>
 <body>
@@ -148,7 +156,9 @@
     <div class="right">
       <span class="pill" id="count">0/0</span>
       <span class="timer" id="timer">00:00</span>
-      <button class="dots-btn" id="dotsBtn" title="Filters">⋯</button>
+      <button class="dots-btn" id="dotsBtn" title="Filters" aria-label="More options">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 
@@ -200,17 +210,21 @@
         <button class="cb" data-n="100">100</button>
         <button class="cb" data-n="200">200</button>
         <button class="cb" data-n="0">All</button>
+        <button class="cb inv" data-n="-1">⚠️ Invalids</button>
       </div>
     </div>
 
-    <button class="dload" id="loadBtn">🔄 Load Quiz</button>
+    <div class="drow">
+      <button class="dload" id="loadBtn">🔄 Load Quiz</button>
+      <button class="dreset" id="resetBtn" title="Reset all filters">⟲ Reset</button>
+    </div>
   </div>
 </aside>
 
 <script>
 const QUIZ_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
 let all=[],qs=[],ans=[],cur=0,time=0,timer=null,total=0,invalidSet=new Set();
-let selJobs=new Set(),selSubjs=new Set(),pickN=20,searchQ='';
+let selJobs=new Set(),selSubjs=new Set(),pickN=20,searchQ='',invalidsMode=false;
 
 const $=id=>document.getElementById(id);
 const clean=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim();
@@ -273,22 +287,30 @@ async function load(){
 }
 
 function applyAndLoad(){
-  // filter
   let list=all.slice();
-  if(selJobs.size) list=list.filter(x=>[...selJobs].some(j=>eq(j,x.job)));
-  if(selSubjs.size) list=list.filter(x=>[...selSubjs].some(s=>eq(s,x.subject)));
-  if(searchQ){
-    const q=searchQ.toLowerCase();
-    list=list.filter(x=>
-      (x.q||'').toLowerCase().includes(q) ||
-      (x.subject||'').toLowerCase().includes(q) ||
-      (x.topic||'').toLowerCase().includes(q) ||
-      (x.job||'').toLowerCase().includes(q) ||
-      x.opts.some(o=>(o||'').toLowerCase().includes(q))
-    );
+
+  // Invalids-only mode
+  if(invalidsMode){
+    list=list.filter(x=>x.correct===-1);
+  } else {
+    // normal filters
+    if(selJobs.size) list=list.filter(x=>[...selJobs].some(j=>eq(j,x.job)));
+    if(selSubjs.size) list=list.filter(x=>[...selSubjs].some(s=>eq(s,x.subject)));
+    if(searchQ){
+      const q=searchQ.toLowerCase();
+      list=list.filter(x=>
+        (x.q||'').toLowerCase().includes(q) ||
+        (x.subject||'').toLowerCase().includes(q) ||
+        (x.topic||'').toLowerCase().includes(q) ||
+        (x.job||'').toLowerCase().includes(q) ||
+        x.opts.some(o=>(o||'').toLowerCase().includes(q))
+      );
+    }
   }
+
   list=shuffleByCategory(list);
   if(pickN>0) list=list.slice(0,pickN);
+
   qs=list.map(x=>{
     const newOpts=shuffleOpts(x.opts);
     const ct=x.opts[x.correct];
@@ -298,7 +320,12 @@ function applyAndLoad(){
   invalidSet=new Set();
   qs.forEach((x,i)=>{if(x.correct===-1)invalidSet.add(i)});
   total=qs.length;ans=Array(total).fill(null);cur=0;time=total*60;
-  $('title').textContent=`${selJobs.size?[...selJobs].map(titleCase).join(', '):'All Jobs'} MCQs`;
+
+  if(invalidsMode){
+    $('title').textContent='⚠️ Invalid Questions';
+  } else {
+    $('title').textContent=`${selJobs.size?[...selJobs].map(titleCase).join(', '):'All Jobs'} MCQs`;
+  }
   $('count').textContent='0/'+total;
   closeDrawer();
   clearInterval(timer);startTimer();render();grid();renderEnd();stats();
@@ -335,12 +362,10 @@ function refreshJobMenu(){
 }
 
 function refreshSubjectMenu(){
-  // subjects limited to currently selected jobs (or all if none)
   const pool = selJobs.size===0
     ? all
     : all.filter(x=>[...selJobs].some(j=>eq(j,x.job)));
   const subs=[...new Set(pool.map(x=>clean(x.subject)).filter(Boolean))].sort();
-  // drop selected subjects no longer in pool
   [...selSubjs].forEach(s=>{if(!subs.some(x=>eq(x,s)))selSubjs.delete(s)});
   $('subjMenu').innerHTML=
     `<div class="dd-item" data-v=""><span class="chk">✓</span>All subjects</div>`+
@@ -375,7 +400,7 @@ function renderChips(containerId,set,onRemove){
   });
 }
 
-// Drawer wiring
+// Drawer
 const overlay=$('overlay'),drawer=$('drawer');
 function openDrawer(){overlay.classList.add('on');drawer.classList.add('on')}
 function closeDrawer(){overlay.classList.remove('on');drawer.classList.remove('on')}
@@ -383,14 +408,12 @@ $('dotsBtn').onclick=openDrawer;
 $('dClose').onclick=closeDrawer;
 overlay.onclick=closeDrawer;
 
-// Dropdown toggles
 $('jobBox').onclick=e=>{e.stopPropagation();$('jobDd').classList.toggle('on');$('subjDd').classList.remove('on')};
 $('subjBox').onclick=e=>{e.stopPropagation();$('subjDd').classList.toggle('on');$('jobDd').classList.remove('on')};
 document.addEventListener('click',()=>{$('jobDd').classList.remove('on');$('subjDd').classList.remove('on')});
 $('jobMenu').addEventListener('click',e=>e.stopPropagation());
 $('subjMenu').addEventListener('click',e=>e.stopPropagation());
 
-// Search
 $('searchBox').addEventListener('input',()=>{searchQ=$('searchBox').value.trim()});
 
 // Count selector
@@ -398,14 +421,23 @@ $('countRow').querySelectorAll('.cb').forEach(b=>{
   b.onclick=()=>{
     $('countRow').querySelectorAll('.cb').forEach(x=>x.classList.remove('on'));
     b.classList.add('on');
-    pickN=+b.dataset.n;
+    const n=+b.dataset.n;
+    if(n===-1){ invalidsMode=true; pickN=0; }
+    else { invalidsMode=false; pickN=n; }
   };
 });
 
-// Load button
+// Load + Reset
 $('loadBtn').onclick=applyAndLoad;
+$('resetBtn').onclick=()=>{
+  selJobs.clear();selSubjs.clear();searchQ='';invalidsMode=false;pickN=20;
+  $('searchBox').value='';
+  $('countRow').querySelectorAll('.cb').forEach(x=>x.classList.remove('on'));
+  $('countRow').querySelector('.cb[data-n="20"]').classList.add('on');
+  refreshJobMenu();refreshSubjectMenu();
+};
 
-// ===== Quiz rendering =====
+// ===== Quiz =====
 function startTimer(){
   clearInterval(timer);
   timer=setInterval(()=>{
