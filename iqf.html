@@ -19,6 +19,15 @@
           padding:.35rem .75rem;border-radius:9999px;border:1px solid #7dd3fc}
     .timer{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
            font-weight:800;font-size:.72rem;padding:.35rem .75rem;border-radius:9999px}
+    .stats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px}
+    .stat{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:800;
+          padding:.32rem .7rem;border-radius:9999px;border:1.5px solid;background:#fff}
+    .stat .n{font-weight:900;font-size:.75rem}
+    .stat.done{background:#e0f2fe;border-color:#7dd3fc;color:#0284c7}
+    .stat.ok{background:#d1fae5;border-color:#10b981;color:#059669}
+    .stat.bad{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
+    .stat.pend{background:#f8fafc;border-color:#e2e8f0;color:#475569}
+    .stat.inv{background:#fef3c7;border-color:#fcd34d;color:#92400e}
     .card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;
           padding:22px;box-shadow:0 20px 40px -12px rgba(10,30,63,.18)}
     .q{font-weight:700;font-size:1.1rem;color:#0a1e3f;line-height:1.55;margin-bottom:16px}
@@ -34,6 +43,13 @@
     .opt.bad{background:#fee2e2;border-color:#dc2626}
     .opt.bad .k{background:#dc2626;color:#fff}
     .opt:disabled{cursor:default}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:14px;
+           border-top:1px dashed #e2e8f0}
+    .chip{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;
+          padding:.3rem .7rem;border-radius:9999px}
+    .chip.subject{background:#e0f2fe;color:#0284c7;border:1px solid #7dd3fc}
+    .chip.topic{background:#fff7dd;color:#92400e;border:1px solid #fcd34d}
+    .chip.job{background:#0a1e3f;color:#f5b800}
     .bar{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
          background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border:none;
@@ -54,6 +70,7 @@
          justify-content:center;cursor:pointer;font-family:inherit}
     .dot.ok{background:#059669;color:#fff}
     .dot.bad{background:#dc2626;color:#fff}
+    .dot.inv{background:#f5b800;color:#0a1e3f}
     .dot.cur{border-color:#0284c7;transform:scale(1.15)}
     .end-wrap{display:flex;justify-content:center;margin-top:16px;padding-top:16px;
               border-top:1px solid #e2e8f0}
@@ -69,6 +86,15 @@
       <span class="timer" id="timer">00:00</span>
     </div>
   </div>
+
+  <div class="stats" id="stats">
+    <span class="stat done">✅ Done <span class="n" id="sDone">0</span></span>
+    <span class="stat ok">🎯 Correct <span class="n" id="sOk">0</span></span>
+    <span class="stat bad">❌ Wrong <span class="n" id="sBad">0</span></span>
+    <span class="stat pend">⏳ Pending <span class="n" id="sPend">0</span></span>
+    <span class="stat inv" id="sInvWrap" style="display:none">⚠️ Invalid <span class="n" id="sInv">0</span></span>
+  </div>
+
   <div class="card">
     <div id="body"><div class="load">🔄 Loading questions…</div></div>
     <div class="grid" id="grid"></div>
@@ -78,7 +104,7 @@
 
 <script>
 const QUIZ_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
-let qs=[],ans=[],cur=0,time=0,timer=null,total=0;
+let qs=[],ans=[],cur=0,time=0,timer=null,total=0,invalidSet=new Set();
 
 const $=id=>document.getElementById(id);
 const clean=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim();
@@ -91,25 +117,29 @@ const findCorrect=(raw,opts)=>{if(!raw)return -1;const r=clean(raw);
   for(let i=0;i<opts.length;i++)if(clean(opts[i])===r)return i;
   if(/^[A-Da-d]$/.test(r))return 'abcd'.indexOf(r.toLowerCase());
   if(/^[1-4]$/.test(r))return +r-1;return -1};
+const titleCase=s=>!s?'':clean(s).split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
 
 async function load(){
   try{
     const r=await fetch(QUIZ_URL+'&_t='+Date.now(),{cache:'no-store'});
     const text=await r.text();
     const lines=text.split('\n').filter(l=>l.trim());
-    qs=[];
+    qs=[];invalidSet=new Set();
     for(let i=1;i<lines.length;i++){
       const c=parseCSV(lines[i]);
       if(c.length<9||!c[1])continue;
+      const show=(c[13]||'').toLowerCase();
+      if(show==='0'||show==='false'||show==='no')continue;
       const opts=[c[2]||'',c[3]||'',c[4]||'',c[5]||''].map(clean);
       const correct=findCorrect(c[6],opts);
       qs.push({q:c[1],opts,correct,subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
     }
     qs=shuffle(qs).map(x=>{const s=shuffle(x.opts);return{...x,opts:s,correct:s.indexOf(x.opts[x.correct])}});
+    qs.forEach((x,i)=>{if(x.correct===-1)invalidSet.add(i)});
     total=qs.length;ans=Array(total).fill(null);time=total*60;cur=0;
     $('title').textContent='All Jobs MCQs';
     $('count').textContent='0/'+total;
-    startTimer();render();grid();renderEnd();
+    startTimer();render();grid();renderEnd();stats();
   }catch(e){
     $('body').innerHTML='<div class="load">❌ Failed to load</div>';
   }
@@ -124,9 +154,25 @@ function startTimer(){
   },1000);
 }
 
+function stats(){
+  let done=0,ok=0,bad=0,pend=0,inv=0;
+  for(let i=0;i<total;i++){
+    if(invalidSet.has(i)){inv++;continue}
+    if(ans[i]===null){pend++;continue}
+    done++;
+    if(ans[i]===qs[i].correct)ok++;else bad++;
+  }
+  $('sDone').textContent=done;
+  $('sOk').textContent=ok;
+  $('sBad').textContent=bad;
+  $('sPend').textContent=pend;
+  $('sInv').textContent=inv;
+  $('sInvWrap').style.display=inv>0?'inline-flex':'none';
+}
+
 function render(){
   const x=qs[cur];if(!x)return;
-  const done=ans[cur]!==null;
+  const done=ans[cur]!==null||invalidSet.has(cur);
   const letters=['A','B','C','D'];
   let h=`<div class="q">${cur+1}. ${x.q}</div>`;
   x.opts.forEach((o,i)=>{
@@ -138,6 +184,16 @@ function render(){
     h+=`<button class="${cls}" data-i="${i}" ${done?'disabled':''}>
       <span class="k">${letters[i]}</span><span>${o||'(Empty)'}</span></button>`;
   });
+
+  // Chips: subject / topic / job — only after selection
+  if(done && (x.subject||x.topic||x.job)){
+    h+='<div class="chips">';
+    if(x.subject)h+=`<span class="chip subject">📚 ${titleCase(x.subject)}</span>`;
+    if(x.topic)h+=`<span class="chip topic">🏷️ ${titleCase(x.topic)}</span>`;
+    if(x.job)h+=`<span class="chip job">💼 ${titleCase(x.job)}</span>`;
+    h+='</div>';
+  }
+
   h+=`<div class="bar">
     <button class="btn btn-outline" id="prev" ${cur===0?'disabled':''}>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -151,10 +207,14 @@ function render(){
   $('body').innerHTML=h;
 
   $('body').querySelectorAll('.opt:not([disabled])').forEach(b=>{
-    b.onclick=()=>{ans[cur]=+b.dataset.i;$('count').textContent=(ans.filter(a=>a!==null).length)+'/'+total;render();grid()};
+    b.onclick=()=>{
+      ans[cur]=+b.dataset.i;
+      $('count').textContent=(ans.filter(a=>a!==null).length)+'/'+total;
+      render();grid();stats();
+    };
   });
-  $('prev')&&($('prev').onclick=()=>{cur--;render();grid()});
-  $('next')&&($('next').onclick=()=>{cur++;render();grid()});
+  $('prev')&&($('prev').onclick=()=>{cur--;render();grid();stats()});
+  $('next')&&($('next').onclick=()=>{cur++;render();grid();stats()});
 }
 
 function renderEnd(){
@@ -170,13 +230,14 @@ function grid(){
   let h='';
   qs.forEach((x,i)=>{
     let c='dot';
-    if(ans[i]!==null)c+=(ans[i]===x.correct?' ok':' bad');
+    if(invalidSet.has(i))c+=' inv';
+    else if(ans[i]!==null)c+=(ans[i]===x.correct?' ok':' bad');
     if(i===cur)c+=' cur';
     h+=`<button class="${c}" data-i="${i}">${i+1}</button>`;
   });
   $('grid').innerHTML=h;
   $('grid').querySelectorAll('.dot').forEach(d=>{
-    d.onclick=()=>{cur=+d.dataset.i;render();grid();scrollTo({top:0,behavior:'smooth'})};
+    d.onclick=()=>{cur=+d.dataset.i;render();grid();stats();scrollTo({top:0,behavior:'smooth'})};
   });
 }
 
