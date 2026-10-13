@@ -19,15 +19,6 @@
           padding:.35rem .75rem;border-radius:9999px;border:1px solid #7dd3fc}
     .timer{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
            font-weight:800;font-size:.72rem;padding:.35rem .75rem;border-radius:9999px}
-    .stats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px}
-    .stat{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:800;
-          padding:.32rem .7rem;border-radius:9999px;border:1.5px solid;background:#fff}
-    .stat .n{font-weight:900;font-size:.75rem}
-    .stat.done{background:#e0f2fe;border-color:#7dd3fc;color:#0284c7}
-    .stat.ok{background:#d1fae5;border-color:#10b981;color:#059669}
-    .stat.bad{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
-    .stat.pend{background:#f8fafc;border-color:#e2e8f0;color:#475569}
-    .stat.inv{background:#fef3c7;border-color:#fcd34d;color:#92400e}
     .card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;
           padding:22px;box-shadow:0 20px 40px -12px rgba(10,30,63,.18)}
     .q{font-weight:700;font-size:1.1rem;color:#0a1e3f;line-height:1.55;margin-bottom:16px}
@@ -67,13 +58,22 @@
     .grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px}
     .dot{width:28px;height:28px;border-radius:50%;background:#f4f6fa;border:2px solid transparent;
          font-size:.68rem;font-weight:700;color:#94a3b8;display:flex;align-items:center;
-         justify-content:center;cursor:pointer;font-family:inherit}
+         justify-content:center;cursor:pointer;font-family:inherit;transition:transform .15s}
+    .dot:hover{transform:scale(1.12)}
     .dot.ok{background:#059669;color:#fff}
     .dot.bad{background:#dc2626;color:#fff}
     .dot.inv{background:#f5b800;color:#0a1e3f}
-    .dot.cur{border-color:#0284c7;transform:scale(1.15)}
+    .dot.cur{border-color:#0284c7;transform:scale(1.2);box-shadow:0 0 0 3px rgba(2,132,199,.2)}
     .end-wrap{display:flex;justify-content:center;margin-top:16px;padding-top:16px;
               border-top:1px solid #e2e8f0}
+    .stats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
+    .stat{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:800;
+          padding:.32rem .7rem;border-radius:9999px;border:1.5px solid;background:#fff}
+    .stat .n{font-weight:900;font-size:.75rem}
+    .stat.ok{background:#d1fae5;border-color:#10b981;color:#059669}
+    .stat.bad{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
+    .stat.pend{background:#f8fafc;border-color:#cbd5e1;color:#475569}
+    .stat.inv{background:#fef3c7;border-color:#fcd34d;color:#92400e}
     .result-icon{font-size:3rem;margin-bottom:8px}
   </style>
 </head>
@@ -87,18 +87,11 @@
     </div>
   </div>
 
-  <div class="stats" id="stats">
-    <span class="stat done">✅ Done <span class="n" id="sDone">0</span></span>
-    <span class="stat ok">🎯 Correct <span class="n" id="sOk">0</span></span>
-    <span class="stat bad">❌ Wrong <span class="n" id="sBad">0</span></span>
-    <span class="stat pend">⏳ Pending <span class="n" id="sPend">0</span></span>
-    <span class="stat inv" id="sInvWrap" style="display:none">⚠️ Invalid <span class="n" id="sInv">0</span></span>
-  </div>
-
   <div class="card">
     <div id="body"><div class="load">🔄 Loading questions…</div></div>
     <div class="grid" id="grid"></div>
     <div class="end-wrap" id="endWrap"></div>
+    <div class="stats" id="stats"></div>
   </div>
 </div>
 
@@ -155,19 +148,18 @@ function startTimer(){
 }
 
 function stats(){
-  let done=0,ok=0,bad=0,pend=0,inv=0;
+  let ok=0,bad=0,pend=0,inv=0;
   for(let i=0;i<total;i++){
     if(invalidSet.has(i)){inv++;continue}
     if(ans[i]===null){pend++;continue}
-    done++;
     if(ans[i]===qs[i].correct)ok++;else bad++;
   }
-  $('sDone').textContent=done;
-  $('sOk').textContent=ok;
-  $('sBad').textContent=bad;
-  $('sPend').textContent=pend;
-  $('sInv').textContent=inv;
-  $('sInvWrap').style.display=inv>0?'inline-flex':'none';
+  let h='';
+  h+=`<span class="stat ok">🎯 Correct <span class="n">${ok}</span></span>`;
+  h+=`<span class="stat bad">❌ Wrong <span class="n">${bad}</span></span>`;
+  h+=`<span class="stat pend">⏳ Pending <span class="n">${pend}</span></span>`;
+  if(inv>0)h+=`<span class="stat inv">⚠️ Invalid <span class="n">${inv}</span></span>`;
+  $('stats').innerHTML=h;
 }
 
 function render(){
@@ -185,7 +177,6 @@ function render(){
       <span class="k">${letters[i]}</span><span>${o||'(Empty)'}</span></button>`;
   });
 
-  // Chips: subject / topic / job — only after selection
   if(done && (x.subject||x.topic||x.job)){
     h+='<div class="chips">';
     if(x.subject)h+=`<span class="chip subject">📚 ${titleCase(x.subject)}</span>`;
@@ -263,6 +254,7 @@ function end(){
     </div>`;
   $('grid').innerHTML='';
   $('endWrap').innerHTML='';
+  $('stats').innerHTML='';
 }
 
 load();
