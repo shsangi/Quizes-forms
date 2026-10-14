@@ -10,13 +10,14 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font:15px/1.55 Inter,system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden;padding-top:env(safe-area-inset-top,0)}
 button,select,input{font:inherit;color:inherit}button{cursor:pointer}
-.chip,.ib,.cnum,.ref,.badge,.rc,.cnt,.ver,.pct,.tabs small{font-family:'JetBrains Mono',monospace}
+.chip,.ib,.cnum,.ref,.badge,.rc,.cnt,.pct,.tabs small{font-family:'JetBrains Mono',monospace}
 .w{max-width:1100px;margin:0 auto;padding:0 14px}
-.fbar{display:grid;grid-template-columns:1fr 50px;gap:8px;margin-top:12px}
+.fbar{display:grid;grid-template-columns:1fr 50px 50px;gap:8px;margin-top:14px}
 input,select{width:100%;background:var(--s);border:1.5px solid var(--b);border-radius:12px;outline:0;padding:0 14px;height:48px;font-size:.9rem}
 input:focus,select:focus{border-color:var(--br);box-shadow:0 0 0 3px var(--bs)}
-.ft{position:relative;height:48px;border-radius:14px;background:var(--s);border:1.5px solid var(--b);color:var(--t2);font-size:18px}
+.ft,.rf{position:relative;height:48px;border-radius:14px;background:var(--s);border:1.5px solid var(--b);color:var(--t2);font-size:18px}
 .ft.on{background:var(--br);border-color:var(--br);color:#fff}
+.rf.spin{animation:sp .8s linear}@keyframes sp{to{transform:rotate(360deg)}}
 #ftN{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;border-radius:99px;background:var(--br);color:#fff;font:700 .64rem 'JetBrains Mono';display:none;place-items:center;border:2px solid var(--bg)}#ftN.show{display:grid}
 .panel{display:none;margin:8px 0 10px;background:var(--s);border:1px solid var(--b);border-radius:14px;padding:12px;flex-direction:column;gap:10px}.panel.show{display:flex}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:520px){.row2{grid-template-columns:1fr}}
@@ -82,7 +83,8 @@ footer{margin:40px 0 20px;padding-top:20px;border-top:1px solid var(--b);text-al
 </style></head><body>
 <div class="w">
  <div class="fbar"><input id="q" type="search" placeholder="Search rules, sections, memory…" autocomplete="off" spellcheck="false">
-  <button class="ft" id="ft" type="button">⚙<span id="ftN">0</span></button></div>
+  <button class="rf" id="refresh" type="button" title="Refresh">⟳</button>
+  <button class="ft" id="ft" type="button" title="Filters">⚙<span id="ftN">0</span></button></div>
  <div class="panel" id="panel">
   <div class="row2"><div class="ms" data-f="category" id="ms-category"></div><div class="ms" data-f="status" id="ms-status"></div></div>
   <div class="row2"><div class="ms" data-f="reference" id="ms-reference"></div>
@@ -98,8 +100,9 @@ footer{margin:40px 0 20px;padding-top:20px;border-top:1px solid var(--b);text-al
 <div class="fabs"><button class="fab" id="bot">⌄</button><button class="fab" id="topb">⌃</button></div><div class="toast" id="toast"></div>
 
 <script>
-const CSV="https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv",PAGE=200,
-RK="mn-read-v2",XK="mn-react-v1",FK="mn-filters-v1",TK="mn-notes-tab-v1",PK="mn-fpanel-open-v1",DK="mn-cache-db-v1",SK="mn-db-synced-v1";
+const CSV="https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv",
+PAGE=200,
+RK="mn-read-v2",XK="mn-react-v1",FK="mn-filters-v1",TK="mn-notes-tab-v1",PK="mn-fpanel-open-v1",DK="mn-cache-db-v1",SK="mn-db-synced-v1",SC="mn-scroll-pos-v1";
 const $=i=>document.getElementById(i),
 esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),
 lj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
@@ -117,9 +120,6 @@ let ALL=[],VIEW=[],N=0,busy=0,NOSAVE=0,READ=lj(RK,{}),REACT=lj(XK,{}),TAB=lj(TK,
 F={q:"",status:[],category:[],reference:[],sort:"default",...lj(FK,{})};
 F.reference??=[];delete F.reaction;delete F.read;
 
-/* theme + toast */
-const setTheme=n=>{document.documentElement.dataset.theme=n;$("tc").content=n=="light"?"#f5f8fc":"#0a0b0f"};
-setTheme(document.documentElement.dataset.theme);
 let tt;const toast=(m,k="")=>{const e=$("toast");e.className="toast show "+k;e.textContent=m;clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2600)};
 
 /* PWA */
@@ -129,7 +129,9 @@ a("icon",u,"image/svg+xml");a("apple-touch-icon",u);
 a("manifest",URL.createObjectURL(new Blob([JSON.stringify({name:"My Notes",short_name:"Notes",start_url:".",scope:".",display:"standalone",background_color:"#0a0b0f",theme_color:"#0ea5e9",icons:[{src:u,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]})],{type:"application/manifest+json"})))})();
 
 /* scroll */
-let sT;addEventListener("scroll",()=>{clearTimeout(sT);sT=setTimeout(()=>{if(!NOSAVE)try{sessionStorage.setItem("mn-scroll",JSON.stringify({y:scrollY,loaded:N,ts:Date.now()}))}catch{}},200);const m=document.documentElement.scrollHeight-innerHeight;$("topb").classList.toggle("show",scrollY>300);$("bot").classList.toggle("show",scrollY<m-300&&m>300)},{passive:true});
+const ss=()=>{if(!NOSAVE)try{sessionStorage.setItem(SC,JSON.stringify({y:scrollY,loaded:N,ts:Date.now()}))}catch{}};
+let sT;addEventListener("scroll",()=>{clearTimeout(sT);sT=setTimeout(ss,200);const m=document.documentElement.scrollHeight-innerHeight;$("topb").classList.toggle("show",scrollY>300);$("bot").classList.toggle("show",scrollY<m-300&&m>300)},{passive:true});
+addEventListener("pagehide",ss);
 $("topb").onclick=()=>scrollTo({top:0,behavior:"smooth"});$("bot").onclick=()=>scrollTo({top:1e9,behavior:"smooth"});
 
 /* csv */
@@ -185,8 +187,7 @@ card=(r,i)=>{const[c,l]=sm(r.status);return`<article class="card ${c}" data-i="$
 <div class="bot"><div class="bl"><button class="ric like" data-a="like">👍</button><button class="ric dislike" data-a="dislike">👎</button></div>
 <div class="br"><span class="rc"></span><span class="st"></span><button class="ric exp" data-a="exp">▾</button></div></div><div class="det"></div></article>`};
 function upd(c){
- const i=+c.dataset.i,r=VIEW[i];if(!r)return;
- const k=key(r),x=READ[k],rx=REACT[k]?.type,rc=c.querySelector(".rc"),s=c.querySelector(".st");
+ const i=+c.dataset.i,r=VIEW[i],k=key(r),x=READ[k],rx=REACT[k]?.type,rc=c.querySelector(".rc"),s=c.querySelector(".st");
  c.classList.toggle("rd",!!x);rc.textContent="👁 "+(x?.count||0)+"×";rc.classList.toggle("h",!!x);
  s.className="st"+(x?" read":"");s.textContent=x?"● Read"+(x.lastDay==today()?" today":" · "+fmt(x.last,1)):"○ Unread";
  c.querySelector(".like").classList.toggle("on",rx=="like");c.querySelector(".dislike").classList.toggle("on",rx=="dislike");
@@ -196,27 +197,24 @@ function markRead(r){const k=key(r),n=Date.now(),d=today();let x=READ[k];
  READ[k]=x;sj(RK,READ)}
 $("out").onclick=e=>{
  const c=e.target.closest(".card");if(!c||e.target.closest(".det"))return;
- const i=+c.dataset.i,r=VIEW[i];if(!r)return;
- const k=key(r),a=e.target.closest("[data-a]")?.dataset.a;
+ const r=VIEW[+c.dataset.i],k=key(r),a=e.target.closest("[data-a]")?.dataset.a;
  markRead(r);
  if(a=="like"||a=="dislike"){
   REACT[k]?.type==a?delete REACT[k]:REACT[k]={type:a,ts:Date.now()};
   sj(XK,REACT);
   if(TAB=="liked"||TAB=="disliked"){apply();return}
  }
- else if(a=="exp")c.classList.toggle("open");
  else if(!e.target.closest(".mem"))c.classList.toggle("open");
  upd(c);meta()};
 function grow(n){
  const p=N;N=Math.min(n,VIEW.length);const d=document.createElement("div");d.style.display="contents";
- d.innerHTML=VIEW.slice(p,N).map((r,i)=>card(r,p+i)).join("");$("out").appendChild(d);
- d.querySelectorAll(".card").forEach(upd);more();meta()}
+ d.innerHTML=VIEW.slice(p,N).map((r,i)=>card(r,p+i)).join("");$("out").appendChild(d);d.querySelectorAll(".card").forEach(upd);more();meta()}
 function more(){const r=VIEW.length-N;$("more").innerHTML=!VIEW.length?"":r>0?`<div><b>${N}</b> loaded · <b>${r}</b> remaining</div><button id="lm">Load ${Math.min(PAGE,r)} more</button>`:`✓ All ${VIEW.length} loaded`}
 
 /* info, tabs, tags, badge */
 function meta(){
  const rd=VIEW.filter(r=>READ[key(r)]).length,pc=VIEW.length?Math.round(rd*100/VIEW.length):0,
- rn=Object.keys(READ).length,cr=t=>Object.values(REACT).filter(x=>x?.type==t).length,
+ rn=Object.keys(READ).length,cr=t=>Object.values(REACT).filter(x=>x.type==t).length,
  cnt={all:ALL.length,read:rn,unread:ALL.length-rn,liked:cr("like"),disliked:cr("dislike")},n=nF();
  $("ibL").innerHTML=`<b>${Math.min(N,VIEW.length)}</b>/<b>${VIEW.length}</b> of <b>${ALL.length}</b>`;
  $("ibR").innerHTML=`<b class="rdn">${rd}</b>/<b>${VIEW.length}</b><span class="pct${pc?"":" z"}">${pc}% Read</span>`;
@@ -240,28 +238,27 @@ function apply(skip){
 function setAll(rows){ALL=rows;FIELDS.forEach(f=>F[f]=F[f].filter(v=>ALL.some(r=>r[f]==v)))}
 function banner(on){$("ob")?.remove();if(on){const t=+localStorage.getItem(SK);$("out").insertAdjacentHTML("beforebegin",`<div id="ob">📡 You're offline. Showing <b>${ALL.length}</b> cards from local cache${t?" · last synced "+fmt(t):""}.</div>`)}}
 async function fetchData(show){
- if(busy)return;busy=1;
- const c=lj(DK,null);
- if(c?.rows?.length){setAll(c.rows);apply(1)}
+ if(busy)return;busy=1;const c=lj(DK,null);
+ if(c?.rows&&!ALL.length){setAll(c.rows);apply(1)}
  try{
   const res=await fetch(CSV+"&_="+Date.now(),{cache:"no-store"});if(!res.ok)throw Error("HTTP "+res.status);
   const R=parseCSV(await res.text());if(R.length<2)throw Error("Sheet is empty");
   const H=R[0].map(norm);
-  const rows=R.slice(1).map(r=>{const o={row:"",category:"",reference:"",memory:"",status:""};H.forEach((h,i)=>h in o&&(o[h]=(r[i]||"").trim()));return o}).filter(o=>o.memory||o.reference);
-  if(rows.length){setAll(rows);sj(DK,{ts:Date.now(),rows});localStorage.setItem(SK,Date.now());banner(0);apply(1);
-   show&&toast(`Refreshed — ${rows.length} cards loaded.`,"ok");}
-  else throw Error("No rows in sheet");
+  setAll(R.slice(1).map(r=>{const o={row:"",category:"",reference:"",memory:"",status:""};H.forEach((h,i)=>h in o&&(o[h]=(r[i]||"").trim()));return o}).filter(o=>o.memory||o.reference));
+  sj(DK,{ts:Date.now(),rows:ALL});localStorage.setItem(SK,Date.now());banner(0);apply(1);
+  show&&toast(`Refreshed — ${ALL.length} cards loaded & cached.`,"ok");
  }catch(err){
   if(!ALL.length)$("out").innerHTML=`<div class="state"><h3>Could not load data</h3><p>${esc(err.message)}<br><br>No local cache available either. Connect to internet once to save data locally.</p></div>`;
   else if(!$("ob"))banner(1);
-  if(show)toast("Refresh failed — using cached data","err");
+  show&&toast("Refresh failed — using cached data","err");
  }finally{busy=0}}
+$("refresh").onclick=async function(){this.classList.add("spin");try{await fetchData(1)}finally{setTimeout(()=>this.classList.remove("spin"),850)}};
 addEventListener("online",()=>{banner(0);fetchData()});
 addEventListener("offline",()=>{ALL.length&&banner(1)});
 
 /* init */
 (async()=>{
- let sv;try{sv=JSON.parse(sessionStorage.getItem("mn-scroll"));if(Date.now()-sv.ts>432e5||sv.y<=40)sv=0}catch{sv=0}
+ let sv;try{sv=JSON.parse(sessionStorage.getItem(SC));if(Date.now()-sv.ts>432e5||sv.y<=40)sv=0}catch{sv=0}
  $("q").value=F.q||"";$("sort").value=F.sort||"default";
  await fetchData();if(!sv)return;
  const need=Math.min(sv.loaded||PAGE,VIEW.length);if(need>N)grow(need);
