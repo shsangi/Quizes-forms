@@ -132,7 +132,7 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .ncard .nbadge.imp{color:#92400e;background:#fef3c7;border-color:#fcd34d}
 .ncard .nbadge.note{color:var(--d);background:#e0f2fe;border-color:#7dd3fc}
 .ncard .nbadge.other{color:#64748b;background:#e2e8f0;border-color:#cbd5e1}
-.ncard .nmem{font-size:.9rem;font-weight:600;color:var(--n);line-height:1.55;text-decoration:none;padding:7px 9px;margin:-2px -3px;border-radius:8px;word-break:break-word;cursor:pointer;width:100%}
+.ncard .nmem{font-size:.9rem;font-weight:600;color:var(--n);line-height:1.55;padding:7px 9px;margin:-2px -3px;border-radius:8px;word-break:break-word;cursor:pointer;width:100%}
 .ncard .nmem:hover{background:#e0f2fe}
 .ncard .nbot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:8px;border-top:1px dashed var(--l);min-height:32px}
 .ncard .nric{width:32px;height:32px;border-radius:8px;border:1px solid var(--l);background:#fff;color:#64748b;cursor:pointer;display:grid;place-items:center;padding:0;font-size:14px;font-family:inherit}
@@ -377,7 +377,7 @@ function nCard(r,idx,tot){
   return `<article class="ncard ${m.c} ${n?'rd':''}" data-key="${esc(k)}">
     <div class="ctop"><span class="cnum">${idx} / ${tot}</span><span class="nbadge ${m.c}">${esc(m.l)}</span></div>
     <div class="refrow"><span class="nref">${esc(r.reference||'—')}</span><span class="ncat">${esc(r.category||'Uncategorized')}</span></div>
-    <a class="nmem" href="${gs([r.reference,r.memory,r.category])}" target="_blank" rel="noopener" data-key="${esc(k)}">${esc(r.memory||'')}</a>
+    <div class="nmem" data-key="${esc(k)}">${esc(r.memory||'')}</div>
     <div class="nbot">
       <div style="display:flex;gap:6px;align-items:center">
         <button class="nric like ${lc}" data-act="like" data-key="${esc(k)}">👍</button>
@@ -409,7 +409,16 @@ function nUpd(el,k){const rec=nRead[k];if(!rec)return;el.classList.add('rd');
 }
 function nUpdR(el,k){const rx=nReact[k],t=rx?rx.type:'';el.querySelector('[data-act=like]')?.classList.toggle('on',t==='like');el.querySelector('[data-act=dislike]')?.classList.toggle('on',t==='dislike')}
 function bindNotes(scope){
-  scope.querySelectorAll('.nmem').forEach(a=>a.onclick=e=>{e.stopPropagation();const r=notes.find(x=>NK(x)===a.dataset.key);if(r){nMarkRead(r);nUpd(a.closest('.ncard'),a.dataset.key)}});
+  // Memory text click — same behaviour as MCQ question: mark read + Google search via JS (no href)
+  scope.querySelectorAll('.nmem').forEach(el=>el.onclick=e=>{
+    e.stopPropagation();
+    const r=notes.find(x=>NK(x)===el.dataset.key);
+    if(r){
+      nMarkRead(r);
+      nUpd(el.closest('.ncard'),el.dataset.key);
+      gs([r.reference,r.memory,r.category]);
+    }
+  });
   scope.querySelectorAll('.ncard').forEach(el=>el.onclick=e=>{if(e.target.closest('.nmem,.nric,.ndet,.nxh'))return;const r=notes.find(x=>NK(x)===el.dataset.key);if(r){nMarkRead(r);nUpd(el,el.dataset.key)}el.classList.toggle('open')});
   scope.querySelectorAll('.nxh').forEach(b=>b.onclick=e=>{e.stopPropagation();const c=b.closest('.ncard'),r=notes.find(x=>NK(x)===c.dataset.key);if(r){nMarkRead(r);nUpd(c,c.dataset.key)}c.classList.toggle('open')});
   ['like','dislike'].forEach(t=>scope.querySelectorAll(`[data-act=${t}]`).forEach(b=>b.onclick=e=>{e.stopPropagation();e.preventDefault();const k=b.dataset.key,c=b.closest('.ncard'),r=notes.find(x=>NK(x)===k);if(r){nMarkRead(r);nUpd(c,k)}nReactSet(k,t);nUpdR(c,k);nUpd(c,k)}));
