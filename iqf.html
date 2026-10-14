@@ -108,10 +108,8 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .li.fact{border-left-color:var(--y)}
 .li.fact .ans{margin-top:.5rem;padding-top:.5rem;border-top:1px dashed var(--l);font-size:.83rem;color:#047857;font-weight:600;line-height:1.5}
 .li.fact .ans.empty{color:#94a3b8;font-style:italic;font-weight:500}
-/* Very small verify icons (12px) */
 .vfy{position:absolute;top:6px;right:6px;width:12px;height:12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;line-height:1;box-shadow:0 0 0 1.5px #fff}
 .vfy.t{background:var(--b)}.vfy.f{background:var(--r)}.vfy.u{background:#94a3b8}
-/* MCQ question small verify badge */
 .qvfy{position:absolute;top:2px;right:0;width:12px;height:12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;line-height:1}
 .qvfy.t{background:var(--b)}.qvfy.f{background:var(--r)}.qvfy.u{background:#94a3b8}
 </style></head>
@@ -153,7 +151,6 @@ pCSV=l=>{const r=[];let c='',q=0;for(let i=0;i<l.length;i++){const h=l[i];
   else if(h=='"')q=1;else if(h==','){r.push(cl(c));c=''}else c+=h}
   r.push(cl(c));return r};
 
-/* Drawer HTML — both filter sets are always rendered; we toggle visibility by mode */
 $('dr').innerHTML=`<div class="dh"><h3>⚙️ Filters</h3><button class="dc" id="dc">✕</button></div><div class="db">
 <div><label class="fl">📖 View Mode</label><div class="modes" id="modes">
 <button class="mbtn on" data-m="mcq">📝 MCQs</button>
@@ -184,7 +181,6 @@ setPick=n=>{pick=n<0?0:n;invMode=n<0;document.querySelectorAll('#cr .cb').forEac
 setFPick=n=>{fPick=n;document.querySelectorAll('#fr .cb[data-n]').forEach(b=>b.classList.toggle('on',+b.dataset.n==n))},
 setFVerify=v=>{fVerify=v;document.querySelectorAll('#fr .cb[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v))};
 
-/* Toggle filters visible by mode */
 function syncDrawer(){
   document.querySelectorAll('.mcq-only').forEach(x=>x.style.display=mode==='facts'?'none':'');
   document.querySelectorAll('.facts-only').forEach(x=>x.style.display=mode==='facts'?'':'none');
@@ -192,8 +188,7 @@ function syncDrawer(){
   $('lb').textContent=mode==='facts'?'🔄 Load Facts':(mode==='solved'?'🔄 Load Solved':'🔄 Load Quiz');
 }
 
-/* Generic multi-select menu renderer. key = Set object, itemsMap = Map(nk → label) */
-function menuBox(prefix,set,label,itemsMap,onChange){
+function menuBox(prefix,set,label,itemsMap){
   [...set].forEach(v=>itemsMap.has(v)||set.delete(v));
   const row=(v,t)=>{const on=v?set.has(v):!set.size;return `<div class="ddi${on?' sel':''}" data-v="${v}"><span class="ck">${on?'✓':''}</span>${t}</div>`};
   $(prefix+'m').innerHTML=itemsMap.size
@@ -201,7 +196,6 @@ function menuBox(prefix,set,label,itemsMap,onChange){
     : '<div class="dde">No options</div>';
   $(prefix+'t').textContent=set.size?`${set.size} selected`:label;
   $(prefix+'c').innerHTML=[...set].map(v=>`<span class="cc">${itemsMap.get(v)||v} <button data-v="${v}">×</button></span>`).join('');
-  if(onChange)onChange();
 }
 
 function buildMcqMenus(){
@@ -258,7 +252,6 @@ async function loadFacts(){
 }
 
 function apply(){
-  tgl(0);
   if(mode==='facts'){renderFacts();return}
   const q=$('sq').value.trim().toLowerCase();
   let L=invMode?all.filter(x=>x.correct<0):all.filter(x=>
@@ -289,14 +282,11 @@ function tick(){
 }
 function go(i,s){cur=i;render();grid();stats();if(s)scrollTo({top:0,behavior:'smooth'})}
 
-/* Small verify dot HTML */
 function vfyBadge(v,cls='vfy'){
   const c=v==='t'?'t':v==='f'?'f':'u';
   const t=v==='t'?'✔':v==='f'?'✘':'?';
   return `<span class="${cls} ${c}">${t}</span>`;
 }
-
-/* In MCQs — small verify badge from mcol column (col M) */
 function mcolBadge(x){return vfyBadge(x.mcol?'t':'u','qvfy')}
 
 function render(){
@@ -324,7 +314,6 @@ function end(){
   $('gd').innerHTML=$('st').innerHTML='';
 }
 
-/* Solved — verify badge from mcol too */
 function renderSolved(){
   if(!qs.length){$('bd').innerHTML='<div class="load">No questions match filters</div>';return}
   const L=['A','B','C','D'];
@@ -368,6 +357,7 @@ document.onclick=e=>{
   const dd=c('.dd');
   document.querySelectorAll('.dd.on').forEach(x=>x!=dd&&x.classList.remove('on'));
   if(c('.ddb'))dd.classList.toggle('on');
+
   const it=c('.ddi,.cc button');
   if(it){
     const sec=c('[data-k]');
@@ -383,21 +373,33 @@ document.onclick=e=>{
       rebuild();
     }
   }
-  const cn=c('#cr .cb');
-  if(cn)setPick(+cn.dataset.n);
-  const fn=c('#fr .cb[data-n]');
-  if(fn)setFPick(+fn.dataset.n);
-  const fv=c('#fr .cb[data-v]');
-  if(fv)setFVerify(fVerify===fv.dataset.v?'all':fv.dataset.v);
-  if(c('.mbtn')){mode=c('.mbtn').dataset.m;document.querySelectorAll('.mbtn').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));syncDrawer();if(mode==='facts')loadFacts().then(()=>{buildFactMenus();renderFacts()});else apply()}
+
+  const cn=c('#cr .cb');if(cn)setPick(+cn.dataset.n);
+  const fn=c('#fr .cb[data-n]');if(fn)setFPick(+fn.dataset.n);
+  const fv=c('#fr .cb[data-v]');if(fv)setFVerify(fVerify===fv.dataset.v?'all':fv.dataset.v);
+
+  // Mode switch: does NOT close drawer
+  if(c('.mbtn')){
+    mode=c('.mbtn').dataset.m;
+    document.querySelectorAll('.mbtn').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+    syncDrawer();
+    if(mode==='facts') loadFacts().then(()=>{buildFactMenus();apply()});
+    else apply();
+  }
+
   if(c('#dotsBtn'))tgl(1);
   if(c('#dc,#ov'))tgl(0);
-  if(c('#lb'))apply();
+
+  // Load: closes drawer
+  if(c('#lb')){apply();tgl(0);}
+
+  // Reset: does NOT close drawer
   if(c('#rb')){
     S.job.clear();S.subject.clear();S.topic.clear();
     $('sq').value='';setPick(20);setFPick(20);setFVerify('all');
     buildMcqMenus();if(factsLoaded)buildFactMenus();
   }
+
   const o=c('.opt');
   if(o&&!o.disabled){ans[cur]=+o.dataset.i;$('cnt').textContent=ans.filter(a=>a!=null).length+'/'+total;go(cur);}
 
