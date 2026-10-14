@@ -2,11 +2,11 @@
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0ea5e9">
-<title>Self Learners · MCQs</title>
+<title>Self Learners</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
-:root{--b:#0ea5e9;--d:#0284c7;--n:#0a1e3f;--l:#e2e8f0;--g:#059669;--r:#dc2626;--bg:linear-gradient(135deg,#0ea5e9,#0284c7)}
+:root{--b:#0ea5e9;--d:#0284c7;--n:#0a1e3f;--l:#e2e8f0;--g:#059669;--r:#dc2626;--y:#f5b800;--bg:linear-gradient(135deg,#0ea5e9,#0284c7)}
 body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;color:#0f1419}
 .w{width:100%;max-width:920px;padding:16px}
 .top,.card{background:#fff;border:1px solid var(--l)}
@@ -43,7 +43,7 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .grid,.stats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px}
 .dot{width:28px;height:28px;border-radius:50%;background:#f4f6fa;border:2px solid transparent;font-size:.68rem;font-weight:700;color:#94a3b8;cursor:pointer;transition:.15s}
 .dot:hover{transform:scale(1.12)}
-.dot.ok{background:var(--g);color:#fff}.dot.bad{background:var(--r);color:#fff}.dot.inv{background:#f5b800;color:var(--n)}
+.dot.ok{background:var(--g);color:#fff}.dot.bad{background:var(--r);color:#fff}.dot.inv{background:var(--y);color:var(--n)}
 .dot.cur{border-color:var(--d);transform:scale(1.2);box-shadow:0 0 0 3px rgba(2,132,199,.2)}
 .stat{font-size:.68rem;font-weight:800;padding:.32rem .7rem;border-radius:9999px;border:1.5px solid;background:#f8fafc;border-color:#cbd5e1;color:#475569}
 .stat .n{font-weight:900;font-size:.75rem}
@@ -59,6 +59,10 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .dc{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-weight:800}
 .db{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
 .fl{font-size:.72rem;font-weight:800;color:var(--n);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
+.modes{display:flex;gap:6px;flex-wrap:wrap}
+.mbtn{flex:1;padding:.6rem .5rem;border:1.5px solid var(--l);border-radius:12px;background:#fff;cursor:pointer;font-weight:700;font-size:.78rem;color:#475569;transition:.15s;min-width:0}
+.mbtn:hover{border-color:var(--b);color:var(--d)}
+.mbtn.on{background:var(--bg);color:#fff;border-color:var(--d)}
 .fi{width:100%;padding:.7rem .9rem;border:1.5px solid var(--l);border-radius:12px;font-size:.85rem;outline:0;background:#f8fafc}
 .fi:focus{border-color:var(--b);background:#fff;box-shadow:0 0 0 3px rgba(14,165,233,.12)}
 .chbx,.cr{display:flex;flex-wrap:wrap;gap:6px}.chbx{margin-bottom:6px}.chbx:empty{display:none}
@@ -84,6 +88,27 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .dl{flex:1;padding:.85rem;border:0;border-radius:9999px;font-weight:800;font-size:.9rem;color:#fff;cursor:pointer}
 .drs{padding:.85rem 1rem;border:1.5px solid var(--l);border-radius:9999px;font-weight:800;font-size:.9rem;color:#475569;background:#fff;cursor:pointer}
 .drs:hover{border-color:var(--r);color:var(--r);background:#fee2e2}
+/* Solved / Facts list */
+.list{display:flex;flex-direction:column;gap:.75rem;margin-top:14px}
+.li{background:#f8fafc;border:1.5px solid var(--l);border-left:4px solid var(--b);border-radius:14px;padding:.85rem 1rem;position:relative;cursor:pointer;transition:.15s}
+.li:hover{background:#e0f2fe;border-left-color:var(--y)}
+.li .lq{font-weight:700;color:var(--n);font-size:.9rem;line-height:1.5;padding-right:1.5rem}
+.li .lq .sn{background:var(--b);color:#fff;font-weight:800;font-size:.68rem;padding:2px 8px;border-radius:9999px;margin-right:.5rem;display:inline-block}
+.li .lo{margin-top:.5rem;display:flex;flex-direction:column;gap:.3rem}
+.li .lop{display:flex;gap:.4rem;font-size:.82rem;line-height:1.5;padding:.4rem .6rem;background:#fff;border:1px solid var(--l);border-radius:8px;color:#475569}
+.li .lop .lt{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#e0f2fe;color:var(--d);font-weight:800;font-size:.68rem;display:flex;align-items:center;justify-content:center}
+.li .lop.ok{background:#d1fae5;border-color:var(--g);color:#065f46;font-weight:700}
+.li .lop.ok .lt{background:var(--g);color:#fff}
+.li .lm{margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.3rem;font-size:.64rem;font-weight:700}
+.li .lm .mc{padding:.2rem .55rem;border-radius:9999px;background:#fff;border:1px solid var(--l);color:#475569}
+.li .lm .ms{background:#e0f2fe;color:var(--d)}
+.li .lm .mt{background:#fff7dd;color:#92400e}
+.li .lm .mj{background:var(--n);color:#f5b800}
+.li.fact{border-left-color:var(--y)}
+.li.fact .ans{margin-top:.5rem;padding-top:.5rem;border-top:1px dashed var(--l);font-size:.83rem;color:#047857;font-weight:600;line-height:1.5}
+.li.fact .ans.empty{color:#94a3b8;font-style:italic;font-weight:500}
+.li .vfy{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+.li .vfy.t{background:var(--b)}.li .vfy.f{background:var(--r)}.li .vfy.u{background:#94a3b8}
 </style></head>
 <body>
 <div class="w">
@@ -94,13 +119,16 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 
 <script>
 const U='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
-let all=[],qs=[],ans=[],cur=0,time=0,tmr,total=0,pick=20,invMode=0;
+const UF='https://docs.google.com/spreadsheets/d/e/2PACX-1vTRO-FPemOqN9exgEgDyt_x1KfNgTAxf0mOeg16c7THfRaaHg0mbgwuTrObcbIwJKSx2dWtrQCNcrCV/pub?output=csv';
+let all=[],qs=[],ans=[],cur=0,time=0,tmr,total=0,pick=20,invMode=0,mode='mcq';
+let facts=[],factsLoaded=0;
 const S={job:new Set,subject:new Set},F={job:['💼 Jobs','All jobs'],subject:['📚 Subjects','All subjects']};
 const $=i=>document.getElementById(i),
 cl=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim(),
 nk=s=>cl(s).toLowerCase(),
 TC=s=>cl(s).replace(/(^|\s)\S/g,m=>m.toUpperCase()),
 shuf=a=>{a=[...a];for(let i=a.length;i>1;){let j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a},
+esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
 isSp=o=>/all\s+of\s+(the\s+)?above|none\s+of\s+(the\s+)?above|above\s+all|\bboth\b|^\s*none\s*$|all\s+of\s+these/i.test(cl(o)),
 shufOpts=(o,ci)=>{
   const idx=[...o.keys()];
@@ -121,11 +149,16 @@ pCSV=l=>{const r=[];let c='',q=0;for(let i=0;i<l.length;i++){const h=l[i];
   r.push(cl(c));return r};
 
 $('dr').innerHTML=`<div class="dh"><h3>⚙️ Filters</h3><button class="dc" id="dc">✕</button></div><div class="db">
+<div><label class="fl">📖 View Mode</label><div class="modes" id="modes">
+<button class="mbtn on" data-m="mcq">📝 MCQs</button>
+<button class="mbtn" data-m="solved">📖 Solved</button>
+<button class="mbtn" data-m="facts">💡 Facts</button>
+</div></div>
 <div><label class="fl">🔍 Search</label><input class="fi" id="sq" placeholder="Search question, topic, subject…" autocomplete="off"></div>`+
 Object.entries(F).map(([k,[l]])=>`<div data-k="${k}"><label class="fl">${l}</label><div class="chbx" id="${k}c"></div><div class="dd"><div class="ddb"><span id="${k}t"></span><span class="ar">▼</span></div><div class="ddm" id="${k}m"></div></div></div>`).join('')+
 `<div><label class="fl"># MCQs to load</label><div class="cr">`+
 [5,10,20,100,200,0,-1].map(n=>`<button class="cb${n<0?' inv':''}" data-n="${n}">${n<0?'⚠️ Invalids':n||'All'}</button>`).join('')+
-`</div></div><div class="drow"><button class="dl" id="lb">🔄 Load Quiz</button><button class="drs" id="rb">⟲ Reset</button></div></div>`;
+`</div></div><div class="drow"><button class="dl" id="lb">🔄 Load</button><button class="drs" id="rb">⟲ Reset</button></div></div>`;
 
 const tgl=o=>[$('ov'),$('dr')].forEach(x=>x.classList.toggle('on',o)),
 setPick=n=>{pick=n<0?0:n;invMode=n<0;document.querySelectorAll('.cb').forEach(b=>b.classList.toggle('on',+b.dataset.n==n))};
@@ -151,17 +184,50 @@ async function load(){
   }catch(e){console.error(e);$('bd').innerHTML='<div class="load">❌ Failed to load</div>'}
 }
 
+async function loadFacts(){
+  if(factsLoaded) return;
+  facts=[];
+  try{
+    const t=await(await fetch(UF+'&_t='+Date.now(),{cache:'no-store'})).text();
+    const lines=t.split('\n').filter(l=>l.trim());
+    if(lines.length<2){factsLoaded=1;return}
+    const H=pCSV(lines[0]).map(h=>h.toLowerCase());
+    const fi=(kw,fb)=>{for(let k=0;k<H.length;k++)if(kw.some(w=>H[k].includes(w)))return k;return fb};
+    const qi=fi(['question'],1),ai=fi(['answer'],2),ti=fi(['topic'],3),si=fi(['subject'],4),vi=fi(['verify','correct'],5),ci=fi(['created'],6);
+    for(let i=1;i<lines.length;i++){
+      const c=pCSV(lines[i]);if(!c.length)continue;
+      const q=c[qi]?c[qi].trim():'';if(!q)continue;
+      const v=(c[vi]||'').trim().toLowerCase();
+      facts.push({q,answer:c[ai]?c[ai].trim():'',topic:c[ti]?c[ti].trim():'',subject:c[si]?c[si].trim():'',verify:v==='true'||v==='yes'||v==='1'?'t':v==='false'||v==='no'||v==='0'?'f':'u',created:c[ci]?c[ci].trim():''});
+    }
+    factsLoaded=1;
+  }catch(e){console.error(e);factsLoaded=1}
+}
+
 function apply(){
+  tgl(0);
+  if(mode==='facts'){renderFacts();return}
   const q=$('sq').value.trim().toLowerCase();
   let L=invMode?all.filter(x=>x.correct<0):all.filter(x=>
     (!S.job.size||S.job.has(nk(x.job)))&&(!S.subject.size||S.subject.has(nk(x.subject)))&&
     (!q||[x.q,x.subject,x.topic,x.job,...x.opts].some(s=>s.toLowerCase().includes(q))));
   L=shufCat(L);if(pick)L=L.slice(0,pick);
   qs=L.map(x=>{const r=shufOpts(x.opts,x.correct);return{...x,opts:r.opts,correct:r.correct}});
-  total=qs.length;ans=Array(total).fill(null);time=total*60;
+  total=qs.length;ans=Array(total).fill(null);cur=0;time=total*60;
+
+  if(mode==='solved'){
+    $('tt').textContent='📖 Solved';
+    $('cnt').textContent=total+' items';$('tmr').style.display='none';
+    clearInterval(tmr);$('st').innerHTML='';$('gd').innerHTML='';
+    renderSolved();
+    return;
+  }
+
+  // mcq
+  $('tmr').style.display='';
   $('tt').textContent=invMode?'⚠️ Invalid Questions':S.job.size?`${S.job.size} Job(s) MCQs`:'All Jobs MCQs';
   $('cnt').textContent='0/'+total;
-  tgl(0);clearInterval(tmr);
+  clearInterval(tmr);
   if(total){tmr=setInterval(tick,1000);tick();}
   go(0,1);
 }
@@ -196,6 +262,44 @@ function end(){
   $('gd').innerHTML=$('st').innerHTML='';
 }
 
+/* Solved view — all questions with correct answer highlighted */
+function renderSolved(){
+  if(!qs.length){$('bd').innerHTML='<div class="load">No questions match filters</div>';return}
+  const L=['A','B','C','D'];
+  $('bd').innerHTML='<div class="list">'+qs.map((x,i)=>{
+    const meta=[['subject','📚'],['topic','🏷️'],['job','💼']].map(([k,e])=>x[k]?`<span class="mc ms">${e} ${esc(TC(x[k]))}</span>`:'').join('');
+    return `<div class="li" data-qi="${i}"><div class="lq"><span class="sn">${i+1}</span>${esc(x.q)}</div>
+      <div class="lo">${x.opts.map((o,j)=>`<div class="lop${j==x.correct?' ok':''}"><span class="lt">${L[j]}</span><span>${esc(o)||'(Empty)'}</span></div>`).join('')}</div>
+      ${meta?`<div class="lm">${meta}</div>`:''}</div>`;
+  }).join('')+'</div>';
+}
+
+/* Facts view */
+function renderFacts(){
+  $('tmr').style.display='none';clearInterval(tmr);$('gd').innerHTML='';$('st').innerHTML='';
+  $('tt').textContent='💡 Facts';
+  $('cnt').textContent=facts.length+' facts';
+  if(!factsLoaded){$('bd').innerHTML='<div class="load">🔄 Loading facts…</div>';loadFacts().then(renderFacts);return}
+  const q=$('sq').value.trim().toLowerCase();
+  const L=facts.filter(f=>!q||[f.q,f.answer,f.subject,f.topic].some(s=>s.toLowerCase().includes(q)));
+  $('cnt').textContent=L.length+' facts';
+  if(!L.length){$('bd').innerHTML='<div class="load">No facts found</div>';return}
+  $('bd').innerHTML='<div class="list">'+L.map((f,i)=>{
+    const meta=[f.subject&&`<span class="mc ms">📚 ${esc(TC(f.subject))}</span>`,f.topic&&f.topic!==f.subject&&`<span class="mc mt">🏷️ ${esc(TC(f.topic))}</span>`].filter(Boolean).join('');
+    const vc=f.verify==='t'?'t':f.verify==='f'?'f':'u';
+    const vt=f.verify==='t'?'✔':f.verify==='f'?'✘':'?';
+    return `<div class="li fact" data-fi="${i}"><div class="vfy ${vc}">${vt}</div>
+      <div class="lq"><span class="sn">${i+1}</span>${esc(f.q)}</div>
+      <div class="ans${f.answer?'':' empty'}"><strong>Answer:</strong> ${esc(f.answer)||'—'}</div>
+      ${meta?`<div class="lm">${meta}</div>`:''}</div>`;
+  }).join('')+'</div>';
+}
+
+/* Google search helper */
+function gsearch(parts){
+  window.open('https://www.google.com/search?q='+encodeURIComponent(parts.filter(Boolean).join(' ')),'_blank');
+}
+
 document.onclick=e=>{
   const t=e.target,c=s=>t.closest(s);
   const dd=c('.dd');
@@ -204,16 +308,28 @@ document.onclick=e=>{
   const it=c('.ddi,.cc button');
   if(it){const sec=c('[data-k]');if(sec){const s=S[sec.dataset.k],v=it.dataset.v;!v?s.clear():s.has(v)?s.delete(v):s.add(v);menus();}}
   if(c('.cb'))setPick(+c('.cb').dataset.n);
+  if(c('.mbtn')){mode=c('.mbtn').dataset.m;document.querySelectorAll('.mbtn').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));if(mode==='facts'){renderFacts()}else{apply()}}
   if(c('#dotsBtn'))tgl(1);
   if(c('#dc,#ov'))tgl(0);
   if(c('#lb'))apply();
   if(c('#rb')){S.job.clear();S.subject.clear();$('sq').value='';setPick(20);menus();}
   const o=c('.opt');
   if(o&&!o.disabled){ans[cur]=+o.dataset.i;$('cnt').textContent=ans.filter(a=>a!=null).length+'/'+total;go(cur);}
+
+  // Click question text → Google search with all details
   if(c('.q')){const x=qs[+c('.q').dataset.qi];
     const opts=x.opts.map((o,i)=>`${'ABCD'[i]}) ${o}`).join(' ');
-    const parts=[x.q,opts,x.topic&&`Topic: ${x.topic}`,x.subject&&`Subject: ${x.subject}`,x.job&&`Job: ${x.job}`].filter(Boolean);
-    window.open('https://www.google.com/search?q='+encodeURIComponent(parts.join(' ')),'_blank');return;}
+    gsearch([x.q,opts,x.topic&&`Topic: ${x.topic}`,x.subject&&`Subject: ${x.subject}`,x.job&&`Job: ${x.job}`]);return;}
+
+  // Click a Solved list item → Google search
+  if(c('.li')&&mode==='solved'){const x=qs[+c('.li').dataset.qi];
+    const opts=x.opts.map((o,i)=>`${'ABCD'[i]}) ${o}`).join(' ');
+    gsearch([x.q,opts,x.topic&&`Topic: ${x.topic}`,x.subject&&`Subject: ${x.subject}`,x.job&&`Job: ${x.job}`]);return;}
+
+  // Click a Fact card → Google search
+  if(c('.li')&&mode==='facts'){const f=facts[+c('.li').dataset.fi];
+    gsearch([f.q,f.subject&&`Subject: ${f.subject}`,f.topic&&`Topic: ${f.topic}`]);return;}
+
   if(c('#pv'))go(cur-1);
   if(c('#nx'))cur==total-1?end():go(cur+1);
   if(c('.dot'))go(+c('.dot').dataset.i,1);
