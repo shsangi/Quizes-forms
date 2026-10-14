@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0ea5e9">
-<title>Self Learners</title>
+
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0ea5e9"><title>Self Learners</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
@@ -74,8 +69,6 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .cb:hover{border-color:var(--b);color:var(--d)}
 .cb.inv.on{background:linear-gradient(135deg,#f5b800,#d99e00);border-color:#d99e00;color:var(--n)}
 .cb.vf.on{background:#059669;border-color:#047857}.cb.nvf.on{background:#dc2626;border-color:#991b1b}
-.mcq-mode .cb[data-v="exam"].on{background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;color:#fff}
-.mcq-mode .cb[data-v="read"].on{background:linear-gradient(135deg,#0ea5e9,#0284c7);border-color:#0284c7;color:#fff}
 .drow{display:flex;gap:8px;margin-top:4px}
 .dl{flex:1;padding:.85rem;border:0;border-radius:9999px;font-weight:800;font-size:.9rem;color:#fff;cursor:pointer}
 .drs{padding:.85rem 1rem;border:1.5px solid var(--l);border-radius:9999px;font-weight:800;font-size:.9rem;color:#475569;background:#fff;cursor:pointer}
@@ -122,662 +115,224 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .nmore{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 0 8px;font-size:.72rem;color:#64748b;text-align:center;font-weight:600}
 .nmore button{padding:11px 22px;background:var(--bg);border:0;color:#fff;border-radius:10px;font-size:.84rem;font-weight:700;cursor:pointer}
 [hidden]{display:none!important}
-</style>
-</head>
+</style></head>
 <body>
-<div class="w">
-  <div class="top">
-    <div class="tt" id="tt">Loading…</div>
-    <div class="rt">
-      <span class="pill" id="cnt">0/0</span>
-      <span class="tmr" id="tmr">00:00</span>
-      <button class="dots" id="dotsBtn"><span></span><span></span><span></span></button>
-    </div>
-  </div>
-  <div class="card">
-    <div id="bd"><div class="load">🔄 Loading…</div></div>
-    <div class="grid" id="gd"></div>
-    <div class="stats" id="st"></div>
-  </div>
-</div>
-<div class="ov" id="ov"></div>
-<aside class="dr" id="dr"></aside>
-
+<div class="w"><div class="top"><div class="tt" id="tt">Loading…</div><div class="rt"><span class="pill" id="cnt">0/0</span><span class="tmr" id="tmr">00:00</span><button class="dots" id="dotsBtn"><span></span><span></span><span></span></button></div></div>
+<div class="card"><div id="bd"><div class="load">🔄 Loading…</div></div><div class="grid" id="gd"></div><div class="stats" id="st"></div></div></div>
+<div class="ov" id="ov"></div><aside class="dr" id="dr"></aside>
 <script>
-/* ============================================================
-   1. CONFIG
-   ============================================================ */
-const V = 'v5.0', PG = 200;
-const U = {
-  q:'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv',
-  f:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRO-FPemOqN9exgEgDyt_x1KfNgTAxf0mOeg16c7THfRaaHg0mbgwuTrObcbIwJKSx2dWtrQCNcrCV/pub?output=csv',
-  n:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv'
-};
-const P0 = { n:20, fn:20, fv:'all', tab:'all', sort:'def', lim:20, mcqMode:'exam' };
+const V='v4.5',PG=200,
+U={q:'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv',
+f:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRO-FPemOqN9exgEgDyt_x1KfNgTAxf0mOeg16c7THfRaaHg0mbgwuTrObcbIwJKSx2dWtrQCNcrCV/pub?output=csv',
+n:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv'},
+P0={n:20,fn:20,fv:'all',tab:'all',sort:'def',lim:20};
 
-/* Column indices — one place to change when sheet changes */
-const COL = {
-  mcq:  { q:1, a:2, b:3, c:4, d:5, correct:6, topic:7, subject:8, job:10, mcol:12, off:13 },
-  note: { row:0, category:1, reference:2, memory:3, status:4 }
-};
+// ---- helpers ----
+const $=i=>document.getElementById(i),$$=s=>document.querySelectorAll(s),
+cl=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim(),
+nk=s=>cl(s).toLowerCase(),TC=s=>cl(s).replace(/(^|\s)\S/g,m=>m.toUpperCase()),
+esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
+shuf=a=>{a=[...a];for(let i=a.length;i>1;){let j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a},
+isSp=o=>/all\s+of\s+(the\s+)?above|none\s+of\s+(the\s+)?above|above\s+all|\bboth\b|^\s*none\s*$|all\s+of\s+these/i.test(cl(o)),
+shufOpts=(o,ci)=>{
+  // Preserve special options at their original index; only shuffle non-specials among non-special slots
+  const free=shuf([...o.keys()].filter(i=>!isSp(o[i]))),
+  ord=o.map((x,i)=>isSp(x)?i:free.pop());
+  return{opts:ord.map(i=>o[i]),correct:ci<0?-1:ord.indexOf(ci)}},
+shufCat=l=>{const b={};l.forEach(x=>(b[[x.job,x.subject,x.topic].map(nk).join('|')]??=[]).push(x));return shuf(Object.values(b)).flatMap(shuf)},
+findC=(raw,o)=>{const r=cl(raw);if(!r)return-1;const i=o.findIndex(x=>cl(x)===r);return i>=0?i:/^[A-Da-d]$/.test(r)?'abcd'.indexOf(r.toLowerCase()):/^[1-4]$/.test(r)?+r-1:-1},
+pCSV=l=>{const r=[];let c='',q=0;for(let i=0;i<l.length;i++){const h=l[i];if(q){if(h=='"'){l[i+1]=='"'?(c+='"',i++):q=0}else c+=h}else if(h=='"')q=1;else if(h==','){r.push(cl(c));c=''}else c+=h}r.push(cl(c));return r},
+csv=async u=>(await(await fetch(u+'&_t='+Date.now(),{cache:'no-store'})).text()).split('\n').filter(l=>l.trim()).map(pCSV),
+vfy=(v,c='vfy')=>`<span class="${c}" style="background:${{t:'var(--b)',f:'var(--r)'}[v]||'#94a3b8'}">${{t:'✔',f:'✘'}[v]||'?'}</span>`,
+meta=(o,x)=>o.map(([k,e,c])=>x[k]?`<span class="mc ${c}">${e} ${esc(TC(x[k]))}</span>`:'').join(''),
+gs=a=>open('https://www.google.com/search?q='+encodeURIComponent(a.filter(Boolean).join(' ')),'_blank'),
+qSearch=x=>gs([x.q,x.opts.map((o,i)=>`${'ABCD'[i]}) ${o}`).join(' '),...[['topic','Topic'],['subject','Subject'],['job','Job']].map(([k,l])=>x[k]&&`${l}: ${x[k]}`)]),
+MQ=[['subject','📚','ms'],['topic','🏷️','mt'],['job','💼','mj']],MF=MQ.slice(0,2),
+MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],DY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+p2=n=>String(n).padStart(2,'0'),D=t=>new Date(t+(300+new Date().getTimezoneOffset())*6e4),
+dk=t=>{const d=D(t);return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`},today=()=>dk(Date.now()),
+hm=d=>`${p2(d.getHours()%12||12)}:${p2(d.getMinutes())}`,ap=d=>d.getHours()>=12?'PM':'AM',
+fT=t=>{if(!t)return'';const d=D(t);return`${DY[d.getDay()]}, ${MN[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}, ${hm(d)}:${p2(d.getSeconds())} ${ap(d)}`},
+fS=t=>{if(!t)return'';const d=D(t);return`${d.getDate()} ${MN[d.getMonth()]}, ${hm(d)} ${ap(d)}`},
+sm=raw=>{const l=nk(raw).replace(/ /g,'');return['v.imp','vimp','veryimportant','v.important'].includes(l)?{c:'vimp',l:'Very Imp',r:0}:['imp','important'].includes(l)?{c:'imp',l:'Important',r:1}:['note','notes'].includes(l)?{c:'note',l:'Note',r:2}:{c:'other',l:cl(raw)||'—',r:3}};
 
-/* ============================================================
-   2. HELPERS
-   ============================================================ */
-const $   = id => document.getElementById(id);
-const $$  = sel => document.querySelectorAll(sel);
-const clean = s => String(s ?? '').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim();
-const normKey = s => clean(s).toLowerCase();
-const titleCase = s => clean(s).replace(/(^|\s)\S/g, m => m.toUpperCase());
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const shuffle = a => { a = [...a]; for (let i=a.length;i>1;){ const j = Math.random()*i--|0; [a[i],a[j]]=[a[j],a[i]]; } return a; };
-const isSpecial = o => /all\s+of\s+(the\s+)?above|none\s+of\s+(the\s+)?above|above\s+all|\bboth\b|^\s*none\s*$|all\s+of\s+these/i.test(clean(o));
+// ---- state ----
+let all=[],qs=[],ans=[],cur=0,time=0,tmr,mode='mcq',facts=[],notes=[],fl=[],nv=[],nRead={},nR={},nBy={},ld={};
+const P={...P0},S={job:new Set,subject:new Set,fs:new Set,ft:new Set,cat:new Set,st:new Set},Q={};
 
-const shuffleOptions = (opts, correctIdx) => {
-  const free = shuffle([...opts.keys()].filter(i => !isSpecial(opts[i])));
-  const order = opts.map((x,i) => isSpecial(x) ? i : free.pop());
-  return { opts: order.map(i => opts[i]), correct: correctIdx < 0 ? -1 : order.indexOf(correctIdx) };
-};
-const shuffleByCategory = list => {
-  const buckets = {};
-  list.forEach(x => (buckets[[x.job,x.subject,x.topic].map(normKey).join('|')] ??= []).push(x));
-  return shuffle(Object.values(buckets)).flatMap(shuffle);
-};
-const findCorrect = (raw, opts) => {
-  const r = clean(raw); if (!r) return -1;
-  const i = opts.findIndex(x => clean(x) === r);
-  return i >= 0 ? i : /^[A-Da-d]$/.test(r) ? 'abcd'.indexOf(r.toLowerCase()) : /^[1-4]$/.test(r) ? +r-1 : -1;
-};
+// ---- drawer ----
+const FD={job:['💼 Jobs','mcq solved','All jobs'],subject:['📚 Subjects','mcq solved','All subjects'],fs:['📚 Subjects','facts','All subjects'],ft:['🏷️ Topics','facts','All topics'],cat:['📚 Category','notes','All Categories'],st:['🏷️ Status','notes','All Status']},
+field=k=>`<div data-k="${k}" data-g="${FD[k][1]}"><label class="fl">${FD[k][0]}</label><div class="cr" id="${k}c"></div><div class="dd"><div class="ddb"><span id="${k}t"></span><span class="ar">▼</span></div><div class="ddm"><div class="ds"><input id="${k}s" placeholder="Search…" autocomplete="off"></div><div class="ddl" id="${k}m"></div></div></div></div>`,
+grp=(p,g,l,o)=>`<div data-g="${g}"><label class="fl">${l}</label><div class="cr">${o.map(([v,t,c,q])=>`<button class="cb ${c||''}" data-p="${q||p}" data-v="${v}">${t}</button>`).join('')}</div></div>`,
+nums=a=>a.map(n=>[n,n||'All']);
+const dr=$('dr'),ov=$('ov'),bd=$('bd');
+dr.innerHTML=`<div class="dh"><h3>⚙️ Filters <span class="ver">${V}</span></h3><button class="dc" id="dc">✕</button></div><div class="db">
+<div><label class="fl">📖 View</label><div class="modes">${[['mcq','📝 MCQs'],['solved','📖 Solved'],['facts','💡 Facts'],['notes','📔 Notes']].map(([m,t])=>`<button class="mbtn" data-m="${m}">${t}</button>`).join('')}</div></div>
+<div><label class="fl">🔍 Search</label><input class="fi" id="sq" autocomplete="off"></div>
+${Object.keys(FD).map(field).join('')}
+${grp('tab','notes','📌 Tab',[['all','All'],['read','Read'],['unread','Unread'],['liked','Liked'],['disliked','Disliked']])}
+${grp('sort','notes','⇅ Sort',[['def','Default'],['prio','Priority'],['unread','Unread first'],['most','Most read']])}
+${grp('lim','notes','# Notes',nums([10,20,100,1000,0]))}
+${grp('n','mcq solved','# MCQs',[...nums([5,10,20,100,200,0]),[-1,'⚠️ Invalids','inv']])}
+${grp('fn','facts','# Facts',[...nums([10,20,100,200,0]),['t','✔️ Verified','vf','fv'],['f','✘️ Not Verified','nvf','fv']])}
+<div class="drow"><button class="dl" id="lb">🔄 Load</button><button class="drs" id="rb">⟲ Reset</button></div></div>`;
+const tgl=o=>{ov.classList.toggle('on',o);dr.classList.toggle('on',o)},
+mark=()=>{$$('.cb').forEach(b=>b.classList.toggle('on',String(P[b.dataset.p])==b.dataset.v));$$('.mbtn').forEach(b=>b.classList.toggle('on',b.dataset.m==mode))},
+sync=()=>{$$('[data-g]').forEach(x=>x.hidden=!x.dataset.g.split(' ').includes(mode));$('lb').textContent='🔄 Load '+{mcq:'Quiz',solved:'Solved',facts:'Facts',notes:'Notes'}[mode];$('sq').placeholder='Search…';mark()};
 
-/* CSV */
-const parseCSVLine = line => {
-  const out = []; let cell = '', q = 0;
-  for (let i=0;i<line.length;i++){
-    const ch = line[i];
-    if (q) { if (ch === '"') { line[i+1] === '"' ? (cell += '"', i++) : q = 0; } else cell += ch; }
-    else if (ch === '"') q = 1;
-    else if (ch === ',') { out.push(clean(cell)); cell = ''; }
-    else cell += ch;
-  }
-  out.push(clean(cell));
-  return out;
-};
-const loadCSV = async (url, mapper) => {
-  const text = await (await fetch(url + '&_t=' + Date.now(), { cache:'no-store' })).text();
-  return text.split('\n').filter(l => l.trim()).slice(1).map(parseCSVLine).map(mapper).filter(Boolean);
-};
-
-/* Row parsers */
-const parseMcq = c => {
-  if (!c || !c[COL.mcq.q]) return null;
-  if (['0','false','no'].includes((c[COL.mcq.off] || '').toLowerCase())) return null;
-  const opts = [COL.mcq.a, COL.mcq.b, COL.mcq.c, COL.mcq.d].map(i => c[i] || '');
-  return { q:c[COL.mcq.q], opts, correct:findCorrect(c[COL.mcq.correct], opts),
-           topic:c[COL.mcq.topic] || '', subject:c[COL.mcq.subject] || '',
-           job:c[COL.mcq.job] || '', mcol:c[COL.mcq.mcol] || '' };
-};
-const parseFact = c => {
-  if (!c[0]) return null;
-  const v = (c[4] || '').toLowerCase();
-  return { q:c[0], answer:c[1] || '', topic:c[2] || '', subject:c[3] || '',
-           verify:['true','yes','1'].includes(v) ? 't' : ['false','no','0'].includes(v) ? 'f' : 'u' };
-};
-const parseNote = r => {
-  if (!r[3] && !r[2]) return null;
-  return { row:r[0] || '', category:r[1] || '', reference:r[2] || '', memory:r[3] || '', status:r[4] || '' };
-};
-
-/* Verify marker */
-const vmark = (v, cls='vfy') => `<span class="${cls}" style="background:${{t:'var(--b)',f:'var(--r)'}[v] || '#94a3b8'}">${{t:'✔',f:'✘'}[v] || '?'}</span>`;
-
-/* Meta chips */
-const MQ = [['subject','📚','ms'],['topic','🏷️','mt'],['job','💼','mj']];
-const MF = MQ.slice(0,2);
-const meta = (defs, x) => defs.map(([k,e,c]) => x[k] ? `<span class="mc ${c}">${e} ${esc(titleCase(x[k]))}</span>` : '').join('');
-
-/* Date helpers */
-const pad = n => String(n).padStart(2,'0');
-const dateOf = t => new Date(t + (300 + new Date().getTimezoneOffset()) * 6e4);
-const dayKey = t => { const d = dateOf(t); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
-const today = () => dayKey(Date.now());
-const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const fmtFull = t => { if (!t) return ''; const d = dateOf(t);
-  return `${DY[d.getDay()]}, ${MN[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}, ${pad(d.getHours()%12||12)}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${d.getHours()>=12?'PM':'AM'}`; };
-const fmtShort = t => { if (!t) return ''; const d = dateOf(t);
-  return `${d.getDate()} ${MN[d.getMonth()]}, ${pad(d.getHours()%12||12)}:${pad(d.getMinutes())} ${d.getHours()>=12?'PM':'AM'}`; };
-
-/* Status meta */
-const statusMeta = raw => {
-  const l = normKey(raw).replace(/ /g,'');
-  if (['v.imp','vimp','veryimportant','v.important'].includes(l)) return { c:'vimp', l:'Very Imp', r:0 };
-  if (['imp','important'].includes(l))                       return { c:'imp',  l:'Important', r:1 };
-  if (['note','notes'].includes(l))                          return { c:'note', l:'Note', r:2 };
-  return { c:'other', l:clean(raw) || '—', r:3 };
-};
-
-/* Google search */
-const gSearch = terms => open('https://www.google.com/search?q=' + encodeURIComponent(terms.filter(Boolean).join(' ')), '_blank');
-const searchMcq = x => gSearch([x.q, x.opts.map((o,i) => `${'ABCD'[i]}) ${o}`).join(' '),
-  ...[['topic','Topic'],['subject','Subject'],['job','Job']].map(([k,l]) => x[k] && `${l}: ${x[k]}`)]);
-
-/* ============================================================
-   3. STATE
-   ============================================================ */
-let mode = 'mcq', data = [], qs = [], answers = [], cur = 0, time = 0, timer;
-let allMcq = null, allFacts = null, allNotes = null;
-const facts = { list:[], filtered:[] };
-const notes = { list:[], filtered:[], byKey:{}, read:{}, react:{} };
-const loaded = { notes:false };
-const P = { ...P0 };
-const S = { job:new Set(), subject:new Set(), fs:new Set(), ft:new Set(), cat:new Set(), st:new Set() };
-const Q = {};
-
-/* ============================================================
-   4. FILTER FIELD METADATA
-   ============================================================ */
-const FIELD_DEFS = {
-  job:     { label:'💼 Jobs',     group:'mcq solved',  all:'All jobs' },
-  subject: { label:'📚 Subjects', group:'mcq solved',  all:'All subjects' },
-  fs:      { label:'📚 Subjects', group:'facts',       all:'All subjects' },
-  ft:      { label:'🏷️ Topics',   group:'facts',       all:'All topics' },
-  cat:     { label:'📚 Category', group:'notes',       all:'All Categories' },
-  st:      { label:'🏷️ Status',   group:'notes',       all:'All Status' }
-};
-
-/* ============================================================
-   5. VIEW CONFIG  — drives everything
-   ============================================================ */
-const VIEWS = {
-  mcq: {
-    label: '📝 MCQs',
-    short: 'Quiz',
-    fields: ['job','subject'],
-    load: () => allMcq ??= loadCSV(U.q, parseMcq),
-    title: () => P.mcqMode === 'exam'
-      ? (S.job.size ? `${S.job.size} Job(s) MCQs` : 'All Jobs MCQs')
-      : '📖 MCQs — Read Mode',
-    filter: (x, q) => setMatch(x, { job:S.job, subject:S.subject }, { job:'job', subject:'subject' })
-      && textMatch([x.q, x.subject, x.topic, x.job, ...x.opts], q),
-    render: () => P.mcqMode === 'exam' ? renderExam() : renderMcqList()
-  },
-  facts: {
-    label: '💡 Facts',
-    short: 'Facts',
-    fields: ['fs','ft'],
-    load: () => allFacts ??= loadCSV(U.f, parseFact),
-    title: () => '💡 Facts',
-    filter: (f, q) => setMatch(f, { fs:S.fs, ft:S.ft }, { fs:'subject', ft:'topic' })
-      && textMatch([f.q, f.answer, f.subject, f.topic], q)
-      && (P.fv === 't' ? f.verify === 't' : P.fv === 'f' ? f.verify !== 't' : true),
-    render: renderFacts,
-    limitKey: 'fn'
-  },
-  notes: {
-    label: '📔 Notes',
-    short: 'Notes',
-    fields: ['cat','st'],
-    load: async () => {
-      if (allNotes) return allNotes;
-      const rows = await loadCSV(U.n, parseNote);
-      rows.forEach((r,i) => notes.byKey[r._k = `${r.category}||${r.reference}|${i}`] = r);
-      loaded.notes = true;
-      return allNotes = rows;
-    },
-    title: () => '📔 Notes',
-    filter: (r, q) => setMatch(r, { cat:S.cat, st:S.st }, { cat:'category', st:'status' })
-      && textMatch([r.reference, r.memory, r.category], q)
-      && tabMatch(r),
-    render: renderNotes
-  }
-};
-
-const setMatch = (row, sets, map) => {
-  for (const [k, field] of Object.entries(map)) {
-    if (sets[k].size && !sets[k].has(normKey(row[field]))) return false;
-  }
-  return true;
-};
-const textMatch = (fields, q) => !q || fields.some(f => String(f).toLowerCase().includes(q));
-const tabMatch = r => {
-  const rd = notes.read[r._k], rx = notes.react[r._k];
-  return P.tab === 'all'
-    || (P.tab === 'read' && rd)
-    || (P.tab === 'unread' && !rd)
-    || (P.tab === 'liked' && rx?.type === 'like')
-    || (P.tab === 'disliked' && rx?.type === 'dislike');
-};
-
-/* ============================================================
-   6. DRAWER
-   ============================================================ */
-const dr = $('dr'), ov = $('ov'), bd = $('bd');
-
-const fieldHTML = k => `
-  <div data-g="${FIELD_DEFS[k].group}" data-k="${k}">
-    <label class="fl">${FIELD_DEFS[k].label}</label>
-    <div class="cr" id="${k}c"></div>
-    <div class="dd">
-      <div class="ddb"><span id="${k}t"></span><span class="ar">▼</span></div>
-      <div class="ddm">
-        <div class="ds"><input id="${k}s" placeholder="Search…" autocomplete="off"></div>
-        <div class="ddl" id="${k}m"></div>
-      </div>
-    </div>
-  </div>`;
-
-const chipGroup = (p, g, label, options) => `
-  <div data-g="${g}">
-    <label class="fl">${label}</label>
-    <div class="cr">
-      ${options.map(([v,t,c,q]) => `<button class="cb ${c||''}" data-p="${q||p}" data-v="${v}">${t}</button>`).join('')}
-    </div>
-  </div>`;
-
-dr.innerHTML = `
-<div class="dh"><h3>⚙️ Filters <span class="ver">${V}</span></h3><button class="dc" id="dc">✕</button></div>
-<div class="db">
-  <div><label class="fl">📖 View</label>
-    <div class="modes">
-      ${Object.entries(VIEWS).map(([m,v]) => `<button class="mbtn" data-m="${m}">${v.label}</button>`).join('')}
-    </div>
-  </div>
-
-  <div><label class="fl">🔍 Search</label><input class="fi" id="sq" autocomplete="off"></div>
-
-  <!-- MCQ mode toggle (Exam / Read) — only shown in mcq mode -->
-  <div data-g="mcq" class="mcq-mode">
-    <label class="fl">🎯 MCQ Mode</label>
-    <div class="modes">
-      <button class="cb" data-p="mcqMode" data-v="exam">✍️ Exam</button>
-      <button class="cb" data-p="mcqMode" data-v="read">📖 Read</button>
-    </div>
-  </div>
-
-  ${Object.keys(FIELD_DEFS).map(fieldHTML).join('')}
-
-  ${chipGroup('tab','notes','📌 Tab',[['all','All'],['read','Read'],['unread','Unread'],['liked','Liked'],['disliked','Disliked']])}
-  ${chipGroup('sort','notes','⇅ Sort',[['def','Default'],['prio','Priority'],['unread','Unread first'],['most','Most read']])}
-  ${chipGroup('lim','notes','# Notes',[[10,'10'],[20,'20'],[100,'100'],[1000,'1000'],[0,'All']])}
-
-  ${chipGroup('n','mcq','# MCQs',[[5,'5'],[10,'10'],[20,'20'],[100,'100'],[200,'200'],[0,'All'],[-1,'⚠️ Invalids','inv']])}
-
-  ${chipGroup('fn','facts','# Facts',[[10,'10'],[20,'20'],[100,'100'],[200,'200'],[0,'All'],['t','✔️ Verified','vf','fv'],['f','✘️ Not Verified','nvf','fv']])}
-
-  <div class="drow">
-    <button class="dl" id="lb">🔄 Load</button>
-    <button class="drs" id="rb">⟲ Reset</button>
-  </div>
-</div>`;
-
-const toggleDrawer = on => { ov.classList.toggle('on', on); dr.classList.toggle('on', on); };
-const markActive = () => {
-  $$('.cb').forEach(b => b.classList.toggle('on', String(P[b.dataset.p]) === b.dataset.v));
-  $$('.mbtn').forEach(b => b.classList.toggle('on', b.dataset.m === mode));
-};
-const syncDrawer = () => {
-  $$('[data-g]').forEach(x => x.hidden = !x.dataset.g.split(' ').includes(mode));
-  $('lb').textContent = '🔄 Load ' + VIEWS[mode].short;
-  $('sq').placeholder = 'Search…';
-  markActive();
-};
-
-/* ============================================================
-   7. FILTER MENUS
-   ============================================================ */
-const distinctValues = (rows, field) => {
-  const m = new Map();
-  rows.forEach(r => { const v = clean(r[field]); if (v && !m.has(normKey(v))) m.set(normKey(v), titleCase(v)); });
-  return m;
-};
-const countValues = (field, def) => {
-  const m = new Map();
-  notes.list.forEach(r => { const c = clean(r[field]) || def; m.set(c, (m.get(c) || 0) + 1); });
-  return m;
-};
-const labeledMap = m => new Map([...m].map(([v,c]) => [v, `${v} (${c})`]));
-
-const MENU_SOURCES = {
-  job:     () => distinctValues(S.job.size ? allMcq.filter(x => S.job.has(normKey(x.job))) : allMcq, 'subject') && distinctValues(allMcq, 'job'),
-  subject: () => distinctValues(S.job.size ? allMcq.filter(x => S.job.has(normKey(x.job))) : allMcq, 'subject'),
-  fs:      () => distinctValues(facts.list, 'subject'),
-  ft:      () => distinctValues(facts.list, 'topic'),
-  cat:     () => labeledMap(countValues('category','Uncategorized')),
-  st:      () => labeledMap(new Map([...countValues('status','—')].sort((a,b) => statusMeta(a[0]).r - statusMeta(b[0]).r || a[0].localeCompare(b[0]))))
-};
-
-function renderMenu(k) {
-  const map = MENU_SOURCES[k](), set = S[k], q = normKey(Q[k] || '');
-  [...set].forEach(v => map.has(v) || set.delete(v));
-  const def = FIELD_DEFS[k];
-  const items = [...map].sort((a,b) => k === 'st' ? 0 : a[1].localeCompare(b[1]))
-    .filter(([,v]) => !q || normKey(v).includes(q));
-  const row = (v, label) => {
-    const on = v ? set.has(v) : !set.size;
-    return `<div class="ddi${on ? ' sel' : ''}" data-v="${esc(v)}"><span class="ck">${on ? '✓' : ''}</span>${esc(label)}</div>`;
-  };
-  $(k + 'm').innerHTML = items.length
-    ? row('', def.all) + items.map(e => row(...e)).join('')
-    : `<div class="dde">${q ? 'No matches' : 'No options'}</div>`;
-  $(k + 't').textContent = set.size ? `${set.size} selected` : def.all;
-  $(k + 'c').innerHTML = [...set].map(v => `<span class="cc">${esc(map.get(v) || v)} <button data-v="${esc(v)}">×</button></span>`).join('');
+// ---- filter menus ----
+const mapOf=(a,f)=>{const m=new Map;a.forEach(x=>{const r=cl(x[f]);r&&!m.has(nk(r))&&m.set(nk(r),TC(r))});return m},
+cm=(f,d)=>{const m=new Map;notes.forEach(r=>{const c=cl(r[f])||d;m.set(c,(m.get(c)||0)+1)});return m},
+lab=m=>new Map([...m].map(([v,c])=>[v,`${v} (${c})`])),
+M={job:()=>mapOf(all,'job'),subject:()=>mapOf(S.job.size?all.filter(x=>S.job.has(nk(x.job))):all,'subject'),fs:()=>mapOf(facts,'subject'),ft:()=>mapOf(facts,'topic'),
+cat:()=>lab(cm('category','Uncategorized')),st:()=>lab(new Map([...cm('status','—')].sort((a,b)=>sm(a[0]).r-sm(b[0]).r||a[0].localeCompare(b[0]))))};
+function menu(k){
+  const m=M[k](),s=S[k],q=nk(Q[k]||''),L=FD[k][2];[...s].forEach(v=>m.has(v)||s.delete(v));
+  const items=[...m].sort((a,b)=>k=='st'?0:a[1].localeCompare(b[1])).filter(([,v])=>!q||nk(v).includes(q)),
+  row=(v,t)=>{const on=v?s.has(v):!s.size;return`<div class="ddi${on?' sel':''}" data-v="${esc(v)}"><span class="ck">${on?'✓':''}</span>${esc(t)}</div>`};
+  $(k+'m').innerHTML=items.length?row('',L)+items.map(e=>row(...e)).join(''):`<div class="dde">${q?'No matches':'No options'}</div>`;
+  $(k+'t').textContent=s.size?`${s.size} selected`:L;
+  $(k+'c').innerHTML=[...s].map(v=>`<span class="cc">${esc(m.get(v)||v)} <button data-v="${esc(v)}">×</button></span>`).join('');
 }
-const renderMenus = () => Object.keys(FIELD_DEFS).filter(k => FIELD_DEFS[k].group.includes(mode)).forEach(renderMenu);
+const menus=()=>Object.keys(FD).filter(k=>FD[k][1].includes(mode)).forEach(menu);
 
-/* ============================================================
-   8. MAIN APPLY
-   ============================================================ */
-async function apply() {
-  clearInterval(timer);
-  $('gd').innerHTML = $('st').innerHTML = '';
-  const v = VIEWS[mode];
-  if (mode === 'mcq' && !allMcq || mode === 'facts' && !allFacts || mode === 'notes' && !allNotes) {
-    bd.innerHTML = '<div class="load">🔄 Loading…</div>';
-    await v.load();
-    if (VIEWS[mode] !== v) return; // mode switched while loading
-  }
-  renderMenus();
+// ---- data ----
+async function load(){try{
+  all=(await csv(U.q)).slice(1).filter(c=>c.length>=9&&c[1]&&!['0','false','no'].includes((c[13]||'').toLowerCase())).map(c=>{const o=[2,3,4,5].map(i=>c[i]||'');return{q:c[1],opts:o,correct:findC(c[6],o),topic:c[7]||'',subject:c[8]||'',job:c[10]||'',mcol:c[12]||''}});
+  apply()}catch(e){console.error(e);bd.innerHTML='<div class="load">❌ Failed to load</div>'}}
+const loadF=()=>ld.f??=csv(U.f).then(L=>{
+  const H=L[0].map(h=>h.toLowerCase()),fi=(kw,fb)=>{const k=H.findIndex(h=>kw.some(w=>h.includes(w)));return k<0?fb:k},
+  [qi,ai,ti,si,vi]=[fi(['question'],1),fi(['answer'],2),fi(['topic'],3),fi(['subject'],4),fi(['verify','correct'],5)];
+  facts=L.slice(1).filter(c=>c[qi]).map(c=>{const v=(c[vi]||'').toLowerCase();return{q:c[qi],answer:c[ai]||'',topic:c[ti]||'',subject:c[si]||'',verify:['true','yes','1'].includes(v)?'t':['false','no','0'].includes(v)?'f':'u'}})}).catch(console.error);
+const loadN=()=>ld.n??=csv(U.n).then(L=>{
+  const HM={'s no':'row','sr no':'row',sno:'row',cat:'category',ref:'reference','one-line memory':'memory','one line memory':'memory','one-liner':'memory',oneliner:'memory','mcq status':'status',mcqstatus:'status',mcq_status:'status'},
+  H=L[0].map(h=>{h=h.toLowerCase().trim().replace(/\s+/g,' ').replace(/\.$/,'');return HM[h]||h}),ix=(k,d)=>{const i=H.indexOf(k);return i<0?d:i},
+  [ri,ci,rf,mi,si]=[ix('row',0),ix('category',1),ix('reference',2),ix('memory',3),ix('status',4)];
+  notes=L.slice(1).filter(r=>r.some(c=>c)).map(r=>({row:r[ri]||'',category:r[ci]||'',reference:r[rf]||'',memory:r[mi]||'',status:r[si]||''})).filter(o=>o.memory||o.reference);
+  notes.forEach((r,i)=>nBy[r._k=r.category+'||'+r.reference+'|'+i]=r)}).catch(e=>{console.error(e);notes=[]});
 
-  const q = $('sq').value.trim().toLowerCase();
-  data = v.load().then
-    ? (await v.load()).filter(x => v.filter(x, q))
-    : (v.load() || []).filter(x => v.filter(x, q));
+// ---- main render ----
+async function apply(){
+  clearInterval(tmr);$('gd').innerHTML=$('st').innerHTML='';$('tmr').style.display=mode=='mcq'?'':'none';
+  const m=mode;
+  if(m=='facts'&&!ld.f||m=='notes'&&!ld.n){bd.innerHTML='<div class="load">🔄 Loading…</div>';await(m=='facts'?loadF():loadN());if(mode!=m)return}
+  menus();
+  const q=$('sq').value.trim().toLowerCase();
+  if(m=='facts')return rFacts(q);
+  if(m=='notes')return rNotes(q);
+  const inv=P.n<0;
+  let L=inv?all.filter(x=>x.correct<0):all.filter(x=>(!S.job.size||S.job.has(nk(x.job)))&&(!S.subject.size||S.subject.has(nk(x.subject)))&&(!q||[x.q,x.subject,x.topic,x.job,...x.opts].some(s=>s.toLowerCase().includes(q))));
+  L=shufCat(L);if(P.n>0)L=L.slice(0,P.n);
+  qs=L.map(x=>({...x,...shufOpts(x.opts,x.correct)}));ans=Array(qs.length).fill(null);cur=0;time=qs.length*60;
+  if(m=='solved'){$('tt').textContent='📖 Solved';$('cnt').textContent=qs.length+' items';return rSolved()}
+  $('tt').textContent=inv?'⚠️ Invalid Questions':S.job.size?`${S.job.size} Job(s) MCQs`:'All Jobs MCQs';
+  $('cnt').textContent='0/'+qs.length;
+  if(qs.length){tmr=setInterval(tick,1000);tick()}
+  go(0,1);
+}
+function tick(){$('tmr').textContent=`${p2(time/60|0)}:${p2(time%60)}`;if(time<=0)return end();time--}
+function go(i,s){cur=i;render();grid();stats();s&&scrollTo({top:0,behavior:'smooth'})}
+function render(){
+  const x=qs[cur];if(!x)return bd.innerHTML='<div class="load">No questions match filters</div>';
+  const I=x.correct<0,d=ans[cur]!=null||I,last=cur==qs.length-1,mt=meta(MQ,x);
+  bd.innerHTML=`<div class="q" data-qi="${cur}">${vfy(x.mcol?'t':'u','qvfy')}${cur+1}. ${x.q}</div>`+
+  x.opts.map((o,i)=>`<button class="opt${d&&!I?(i==x.correct?' ok':i==ans[cur]?' bad':''):''}" data-i="${i}" ${d?'disabled':''}><span class="k">${'ABCD'[i]}</span><span>${esc(o)||'(Empty)'}</span></button>`).join('')+
+  (d&&mt?`<div class="lm chips">${mt}</div>`:'')+(I?'<div class="inv-msg">⚠️ Invalid — correct answer not in options</div>':'')+
+  `<div class="bar"><button class="btn btn-o" id="pv" ${cur?'':'disabled'}>◀ Back</button><button class="btn${last?' btn-g':''}" id="nx">${last?'🏁 Finish':'Next ▶'}</button></div>`}
+function grid(){$('gd').innerHTML=qs.map((x,i)=>`<button class="dot${x.correct<0?' inv':ans[i]!=null?(ans[i]==x.correct?' ok':' bad'):''}${i==cur?' cur':''}" data-i="${i}">${i+1}</button>`).join('')}
+function stats(){let k=0,w=0,p=0,v=0;qs.forEach((x,i)=>x.correct<0?v++:ans[i]==null?p++:ans[i]==x.correct?k++:w++);
+  $('st').innerHTML=[['ok','🎯 Correct',k],['bad','❌ Wrong',w],['','⏳ Pending',p],...(v?[['inv','⚠️ Invalid',v]]:[])].map(([c,l,n])=>`<span class="stat ${c}">${l} <span>${n}</span></span>`).join('')}
+function end(){clearInterval(tmr);const T=qs.length,r=qs.filter((x,i)=>ans[i]===x.correct).length,p=T?Math.round(r/T*100):0;
+  bd.innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:3rem;margin-bottom:8px">${r==T?'🌟':p>=70?'👏':'💪'}</div><div style="font-size:2.6rem;font-weight:900;color:#0284c7">${r} / ${T}</div><div style="color:#475569;margin:10px 0 20px;font-weight:600">${r==T?'Perfect score!':p>=70?'Great job!':'Keep practicing!'} — ${p}%</div><button class="btn" onclick="location.reload()">⟳ Try again</button></div>`;
+  $('gd').innerHTML=$('st').innerHTML=''}
+function rSolved(){
+  bd.innerHTML=qs.length?'<div class="list">'+qs.map((x,i)=>`<div class="li" data-qi="${i}">${vfy(x.mcol?'t':'u')}<div class="lq"><span class="sn">${i+1}</span>${esc(x.q)}</div><div class="lo">${x.opts.map((o,j)=>`<div class="lop${j==x.correct?' ok':''}"><span class="lt">${'ABCD'[j]}</span><span>${esc(o)||'(Empty)'}</span></div>`).join('')}</div>${meta(MQ,x)?`<div class="lm">${meta(MQ,x)}</div>`:''}</div>`).join('')+'</div>':'<div class="load">No questions match filters</div>'}
+function rFacts(q){
+  $('tt').textContent='💡 Facts';
+  fl=facts.filter(f=>(!S.fs.size||S.fs.has(nk(f.subject)))&&(!S.ft.size||S.ft.has(nk(f.topic)))&&(!q||[f.q,f.answer,f.subject,f.topic].some(s=>s.toLowerCase().includes(q)))&&(P.fv=='t'?f.verify=='t':P.fv=='f'?f.verify!='t':1));
+  if(P.fn)fl=fl.slice(0,P.fn);
+  $('cnt').textContent=fl.length+' facts';
+  bd.innerHTML=fl.length?'<div class="list">'+fl.map((f,i)=>{const m=meta(MF,{...f,topic:f.topic!=f.subject?f.topic:''});return`<div class="li fact" data-fi="${i}">${vfy(f.verify)}<div class="lq"><span class="sn">${i+1}</span>${esc(f.q)}</div><div class="ans"><strong>Answer:</strong> ${esc(f.answer)||'—'}</div>${m?`<div class="lm">${m}</div>`:''}</div>`}).join('')+'</div>':'<div class="load">No facts match</div>'}
 
-  // handle async loaders (notes)
-  if (data instanceof Promise) data = (await data).filter(x => v.filter(x, q));
-  if (v.limitKey && P[v.limitKey]) data = data.slice(0, P[v.limitKey]);
-  if (mode === 'mcq' && P.n > 0 && P.mcqMode === 'exam') data = data.slice(0, P.n);
+// ---- notes ----
+function rNotes(q){
+  $('tt').textContent='📔 Notes';
+  if(!notes.length){$('cnt').textContent='0 notes';return bd.innerHTML='<div class="load">⚠️ No notes loaded</div>'}
+  nv=notes.filter(r=>{
+    if((S.cat.size&&!S.cat.has(cl(r.category)||'Uncategorized'))||(S.st.size&&!S.st.has(cl(r.status)||'—')))return false;
+    if(q&&![r.reference,r.memory,r.category].some(s=>s.toLowerCase().includes(q)))return false;
+    const rd=nRead[r._k],rx=nR[r._k];
+    return P.tab=='all'||P.tab=='read'&&rd||P.tab=='unread'&&!rd||P.tab=='liked'&&rx?.type=='like'||P.tab=='disliked'&&rx?.type=='dislike'});
+  const c=r=>nRead[r._k]?.count||0,rk=r=>sm(r.status).r;
+  P.sort=='prio'?nv.sort((a,b)=>rk(a)-rk(b)):P.sort=='unread'?nv.sort((a,b)=>(c(a)>0)-(c(b)>0)):P.sort=='most'&&nv.sort((a,b)=>c(b)-c(a));
+  const rd=nv.filter(r=>nRead[r._k]).length;
+  $('cnt').textContent=nv.length+' notes';
+  bd.innerHTML=`<div class="ninfo"><div><b id="ns"></b>/<b>${nv.length}</b> of <b>${notes.length}</b></div><div><b>${rd}</b>/<b>${nv.length}</b><span class="pct">${nv.length?Math.round(rd*100/nv.length):0}% Read</span></div></div><div class="list" id="nl"></div><div class="nmore" id="nm"></div>`;
+  more(0)}
+function more(from){
+  const to=Math.min(from+(P.lim||PG),nv.length);
+  $('nl').insertAdjacentHTML('beforeend',nv.slice(from,to).map((r,i)=>nCard(r,from+i+1,nv.length)).join(''));
+  const ns=$('ns');if(ns)ns.textContent=to;
+  const nm=$('nm');if(!nm)return;
+  nm.innerHTML=to>=nv.length?`✓ All ${nv.length} loaded`:`<div><b>${to}</b> loaded · <b>${nv.length-to}</b> remaining</div><button id="mb" data-from="${to}">Load more</button>`}
+function nCard(r,i,tot,open){
+  const m=sm(r.status),k=r._k,rec=nRead[k],n=rec?rec.count:0,rx=nR[k],
+  sh=rec?`<span class="nst read">${rec.lastDay==today()?'● Read today':'● Read · '+esc(fS(rec.last))}</span>`:'<span class="nst">○ Unread</span>',
+  rows=[['Position',`${i} of ${tot}`],['Row',r.row],['Category',r.category],['Reference',r.reference],['Memory',r.memory,1],['Status',r.status],['Read count',rec?`${n} day${n==1?'':'s'}`:'0'],['First read',fT(rec?.first)||'—'],['Last read',fT(rec?.last)||'—'],['Reaction',rx?rx.type=='like'?'👍 Liked':'👎 Disliked':'—'],['Reacted at',fT(rx?.ts)||'—']],
+  e=esc(k);
+  return`<article class="ncard ${m.c}${n?' rd':''}${open?' open':''}" data-key="${e}" data-i="${i}">
+<div class="ctop"><span class="cnum">${i} / ${tot}</span><span class="nbadge ${m.c}">${esc(m.l)}</span></div>
+<div class="refrow"><span class="nref">${esc(r.reference||'—')}</span><span class="ncat">${esc(r.category||'Uncategorized')}</span></div>
+<div class="nmem">${esc(r.memory)}</div>
+<div class="nbot"><div><button class="nric like ${rx?.type=='like'?'on':''}" data-act="like">👍</button><button class="nric dislike ${rx?.type=='dislike'?'on':''}" data-act="dislike">👎</button></div><div><span class="nrc ${n?'h':''}">👁 ${n}×</span>${sh}<button class="nxh" data-act="expand">▾</button></div></div>
+<div class="ndet">${rows.map(([l,v,p])=>`<div class="ndr"><small>${l}</small><div>${p?esc(v):`<strong>${esc(v||'—')}</strong>`}</div></div>`).join('')}</div></article>`}
+function noteClick(t,c){
+  const k=c.dataset.key,r=nBy[k],a=t.closest('[data-act]')?.dataset.act,mem=t.closest('.nmem'),rx=a=='like'||a=='dislike',now=Date.now(),dn=dk(now);
+  // Mark as read (memory click or card click)
+  let rec=nRead[k];if(!rec)rec={count:1,first:now,last:now,lastDay:dn};else{if(rec.lastDay!=dn)rec.count++;rec.last=now;rec.lastDay=dn}nRead[k]=rec;
+  // Toggle reaction if like/dislike
+  if(rx){if(nR[k]?.type===a)delete nR[k];else nR[k]={type:a,ts:now}}
+  // Memory click → Google search (same as MCQ question behaviour)
+  if(mem)gs([r.reference,r.memory,r.category]);
+  // Preserve open state unless it's a plain card click or expand button
+  const wasOpen=c.classList.contains('open');
+  const shouldToggle=!mem&&!rx;
+  c.outerHTML=nCard(r,+c.dataset.i,nv.length,shouldToggle?!wasOpen:wasOpen)}
 
-  $('tt').textContent = v.title();
-  $('cnt').textContent = `${data.length} ${mode === 'mcq' ? 'items' : mode}`;
-  $('tmr').style.display = (mode === 'mcq' && P.mcqMode === 'exam') ? '' : 'none';
-
-  v.render();
-}
-
-/* ============================================================
-   9. MCQ — Exam mode
-   ============================================================ */
-function renderExam() {
-  const invalidsOnly = P.n < 0;
-  let list = invalidsOnly ? (allMcq || []).filter(x => x.correct < 0) : data.filter(x => x.correct >= 0 || true);
-  if (S.job.size || S.subject.size || $('sq').value) list = data;
-  list = shuffleByCategory(list);
-  qs = list.map(x => ({ ...x, ...shuffleOptions(x.opts, x.correct) }));
-  answers = Array(qs.length).fill(null);
-  cur = 0; time = qs.length * 60;
-  if (qs.length) timer = setInterval(tick, 1000);
-  $('cnt').textContent = '0/' + qs.length;
-  tick(); go(0, 1);
-}
-function tick() {
-  $('tmr').textContent = `${pad(time / 60 | 0)}:${pad(time % 60)}`;
-  if (time <= 0) return endExam();
-  time--;
-}
-function go(i, scroll) {
-  cur = i; renderQuestion(); renderGrid(); renderStats();
-  scroll && window.scrollTo({ top:0, behavior:'smooth' });
-}
-function renderQuestion() {
-  const x = qs[cur];
-  if (!x) return bd.innerHTML = '<div class="load">No questions match filters</div>';
-  const invalid = x.correct < 0, done = answers[cur] != null || invalid, last = cur === qs.length - 1;
-  const chips = meta(MQ, x);
-  bd.innerHTML = `
-    <div class="q" data-qi="${cur}">${vmark(x.mcol ? 't' : 'u', 'qvfy')}${cur+1}. ${x.q}</div>
-    ${x.opts.map((o,i) => {
-      const cls = done && !invalid ? (i === x.correct ? ' ok' : i === answers[cur] ? ' bad' : '') : '';
-      return `<button class="opt${cls}" data-i="${i}" ${done ? 'disabled' : ''}><span class="k">${'ABCD'[i]}</span><span>${esc(o) || '(Empty)'}</span></button>`;
-    }).join('')}
-    ${done && chips ? `<div class="lm chips">${chips}</div>` : ''}
-    ${invalid ? '<div class="inv-msg">⚠️ Invalid — correct answer not in options</div>' : ''}
-    <div class="bar">
-      <button class="btn btn-o" id="pv" ${cur ? '' : 'disabled'}>◀ Back</button>
-      <button class="btn${last ? ' btn-g' : ''}" id="nx">${last ? '🏁 Finish' : 'Next ▶'}</button>
-    </div>`;
-}
-function renderGrid() {
-  $('gd').innerHTML = qs.map((x,i) => {
-    const cls = x.correct < 0 ? ' inv' : answers[i] != null ? (answers[i] === x.correct ? ' ok' : ' bad') : '';
-    return `<button class="dot${cls}${i === cur ? ' cur' : ''}" data-i="${i}">${i+1}</button>`;
-  }).join('');
-}
-function renderStats() {
-  let ok = 0, bad = 0, pending = 0, inv = 0;
-  qs.forEach((x,i) => x.correct < 0 ? inv++ : answers[i] == null ? pending++ : answers[i] === x.correct ? ok++ : bad++);
-  $('st').innerHTML = [
-    ['ok','🎯 Correct',ok], ['bad','❌ Wrong',bad], ['','⏳ Pending',pending],
-    ...(inv ? [['inv','⚠️ Invalid',inv]] : [])
-  ].map(([c,l,n]) => `<span class="stat ${c}">${l} <span>${n}</span></span>`).join('');
-}
-function endExam() {
-  clearInterval(timer);
-  const total = qs.length;
-  const right = qs.filter((x,i) => answers[i] === x.correct).length;
-  const pct = total ? Math.round(right / total * 100) : 0;
-  const icon = right === total ? '🌟' : pct >= 70 ? '👏' : '💪';
-  const msg = right === total ? 'Perfect score!' : pct >= 70 ? 'Great job!' : 'Keep practicing!';
-  bd.innerHTML = `
-    <div style="text-align:center;padding:20px">
-      <div style="font-size:3rem;margin-bottom:8px">${icon}</div>
-      <div style="font-size:2.6rem;font-weight:900;color:#0284c7">${right} / ${total}</div>
-      <div style="color:#475569;margin:10px 0 20px;font-weight:600">${msg} — ${pct}%</div>
-      <button class="btn" onclick="location.reload()">⟳ Try again</button>
-    </div>`;
-  $('gd').innerHTML = $('st').innerHTML = '';
-}
-
-/* ============================================================
-   10. MCQ — Read mode (was "Solved")
-   ============================================================ */
-function renderMcqList() {
-  bd.innerHTML = data.length
-    ? '<div class="list">' + data.map((x,i) => `
-        <div class="li" data-qi="${i}">
-          ${vmark(x.mcol ? 't' : 'u')}
-          <div class="lq"><span class="sn">${i+1}</span>${esc(x.q)}</div>
-          <div class="lo">
-            ${x.opts.map((o,j) => `<div class="lop${j === x.correct ? ' ok' : ''}"><span class="lt">${'ABCD'[j]}</span><span>${esc(o) || '(Empty)'}</span></div>`).join('')}
-          </div>
-          ${meta(MQ, x) ? `<div class="lm">${meta(MQ, x)}</div>` : ''}
-        </div>`).join('') + '</div>'
-    : '<div class="load">No questions match filters</div>';
-}
-
-/* ============================================================
-   11. Facts
-   ============================================================ */
-function renderFacts() {
-  facts.filtered = data;
-  $('cnt').textContent = data.length + ' facts';
-  bd.innerHTML = data.length
-    ? '<div class="list">' + data.map((f,i) => {
-        const m = meta(MF, { ...f, topic: f.topic !== f.subject ? f.topic : '' });
-        return `<div class="li fact" data-fi="${i}">
-          ${vmark(f.verify)}
-          <div class="lq"><span class="sn">${i+1}</span>${esc(f.q)}</div>
-          <div class="ans"><strong>Answer:</strong> ${esc(f.answer) || '—'}</div>
-          ${m ? `<div class="lm">${m}</div>` : ''}
-        </div>`;
-      }).join('') + '</div>'
-    : '<div class="load">No facts match</div>';
-}
-
-/* ============================================================
-   12. Notes
-   ============================================================ */
-function renderNotes() {
-  if (!notes.list.length) { $('cnt').textContent = '0 notes'; return bd.innerHTML = '<div class="load">⚠️ No notes loaded</div>'; }
-  let list = data;
-  const countRead = r => notes.read[r._k]?.count || 0;
-  const rank = r => statusMeta(r.status).r;
-  if (P.sort === 'prio') list.sort((a,b) => rank(a) - rank(b));
-  else if (P.sort === 'unread') list.sort((a,b) => (countRead(a) > 0) - (countRead(b) > 0));
-  else if (P.sort === 'most') list.sort((a,b) => countRead(b) - countRead(a));
-  const readCount = list.filter(r => notes.read[r._k]).length;
-  $('cnt').textContent = list.length + ' notes';
-  bd.innerHTML = `
-    <div class="ninfo">
-      <div><b id="ns"></b>/<b>${list.length}</b> of <b>${notes.list.length}</b></div>
-      <div><b>${readCount}</b>/<b>${list.length}</b><span class="pct">${list.length ? Math.round(readCount * 100 / list.length) : 0}% Read</span></div>
-    </div>
-    <div class="list" id="nl"></div>
-    <div class="nmore" id="nm"></div>`;
-  notes.filtered = list;
-  moreNotes(0);
-}
-function moreNotes(from) {
-  const list = notes.filtered;
-  const to = Math.min(from + (P.lim || PG), list.length);
-  $('nl').insertAdjacentHTML('beforeend', list.slice(from, to).map((r,i) => noteCard(r, from + i + 1, list.length)).join(''));
-  const ns = $('ns'); if (ns) ns.textContent = to;
-  const nm = $('nm'); if (!nm) return;
-  nm.innerHTML = to >= list.length
-    ? `✓ All ${list.length} loaded`
-    : `<div><b>${to}</b> loaded · <b>${list.length - to}</b> remaining</div><button id="mb" data-from="${to}">Load more</button>`;
-}
-function noteCard(r, i, total, open) {
-  const st = statusMeta(r.status), k = r._k;
-  const rec = notes.read[k], count = rec ? rec.count : 0, rx = notes.react[k];
-  const readBadge = rec
-    ? `<span class="nst read">${rec.lastDay === today() ? '● Read today' : '● Read · ' + esc(fmtShort(rec.last))}</span>`
-    : '<span class="nst">○ Unread</span>';
-  const rows = [
-    ['Position', `${i} of ${total}`], ['Row', r.row], ['Category', r.category],
-    ['Reference', r.reference], ['Memory', r.memory, 1], ['Status', r.status],
-    ['Read count', rec ? `${count} day${count === 1 ? '' : 's'}` : '0'],
-    ['First read', fmtFull(rec?.first) || '—'], ['Last read', fmtFull(rec?.last) || '—'],
-    ['Reaction', rx ? (rx.type === 'like' ? '👍 Liked' : '👎 Disliked') : '—'],
-    ['Reacted at', fmtFull(rx?.ts) || '—']
-  ];
-  return `<article class="ncard ${st.c}${count ? ' rd' : ''}${open ? ' open' : ''}" data-key="${esc(k)}" data-i="${i}">
-    <div class="ctop"><span class="cnum">${i} / ${total}</span><span class="nbadge ${st.c}">${esc(st.l)}</span></div>
-    <div class="refrow"><span class="nref">${esc(r.reference || '—')}</span><span class="ncat">${esc(r.category || 'Uncategorized')}</span></div>
-    <div class="nmem">${esc(r.memory)}</div>
-    <div class="nbot">
-      <div>
-        <button class="nric like ${rx?.type === 'like' ? 'on' : ''}" data-act="like">👍</button>
-        <button class="nric dislike ${rx?.type === 'dislike' ? 'on' : ''}" data-act="dislike">👎</button>
-      </div>
-      <div>
-        <span class="nrc ${count ? 'h' : ''}">👁 ${count}×</span>
-        ${readBadge}
-        <button class="nxh" data-act="expand">▾</button>
-      </div>
-    </div>
-    <div class="ndet">
-      ${rows.map(([l,v,p]) => `<div class="ndr"><small>${l}</small><div>${p ? esc(v) : `<strong>${esc(v || '—')}</strong>`}</div></div>`).join('')}
-    </div>
-  </article>`;
-}
-function handleNoteClick(target, card) {
-  const k = card.dataset.key, r = notes.byKey[k];
-  const act = target.closest('[data-act]')?.dataset.act;
-  const onMemory = !!target.closest('.nmem');
-  const isReaction = act === 'like' || act === 'dislike';
-  const now = Date.now(), day = today();
-  let rec = notes.read[k];
-  if (!rec) rec = { count:1, first:now, last:now, lastDay:day };
-  else { if (rec.lastDay !== day) rec.count++; rec.last = now; rec.lastDay = day; }
-  notes.read[k] = rec;
-  if (isReaction) {
-    if (notes.react[k]?.type === act) delete notes.react[k];
-    else notes.react[k] = { type:act, ts:now };
-  }
-  if (onMemory) gSearch([r.reference, r.memory, r.category]);
-  const wasOpen = card.classList.contains('open');
-  const shouldToggle = !onMemory && !isReaction;
-  card.outerHTML = noteCard(r, +card.dataset.i, notes.filtered.length, shouldToggle ? !wasOpen : wasOpen);
-}
-
-/* ============================================================
-   13. EVENT HANDLERS (unified action map)
-   ============================================================ */
-const coerce = v => /^-?\d+$/.test(v) ? +v : v;
-
-const ACTIONS = {
-  ddb:   el => { const dd = el.closest('.dd'); $$('.dd.on').forEach(x => x !== dd && x.classList.remove('on')); dd.classList.toggle('on'); },
-  ddi:   el => toggleSetFilter(el.closest('[data-k]').dataset.k, el.dataset.v),
-  'cc-remove': el => toggleSetFilter(el.closest('[data-k]').dataset.k, el.dataset.v),
-  cb:    el => setPref(el.dataset.p, el.dataset.v),
-  mbtn:  el => { mode = el.dataset.m; syncDrawer(); apply(); toggleDrawer(false); },
-  dotsBtn: () => toggleDrawer(true),
-  dc:    () => toggleDrawer(false),
-  lb:    () => { apply(); toggleDrawer(false); },
-  rb:    resetAll,
-  ov:    () => toggleDrawer(false),
-  dot:   el => go(+el.dataset.i, 1),
-  opt:   el => { answers[cur] = +el.dataset.i; $('cnt').textContent = answers.filter(a => a != null).length + '/' + qs.length; go(cur); },
-  pv:    () => go(cur - 1),
-  nx:    () => cur === qs.length - 1 ? endExam() : go(cur + 1),
-  mb:    el => moreNotes(+el.dataset.from)
+// ---- events ----
+dr.onclick=e=>{
+  const t=e.target,c=s=>t.closest(s),dd=c('.dd');
+  $$('.dd.on').forEach(x=>x!=dd&&x.classList.remove('on'));
+  if(c('.ddb'))dd.classList.toggle('on');
+  const it=c('.ddi,.cc button');
+  if(it){const k=c('[data-k]').dataset.k,s=S[k],v=it.dataset.v;!v?s.clear():s.has(v)?s.delete(v):s.add(v);menu(k);if(mode=='notes')apply();return}
+  const b=c('.cb');
+  if(b){const{p,v}=b.dataset,x=/^-?\d+$/.test(v)?+v:v;P[p]=p=='fv'&&P.fv==x?'all':x;mark();if(['tab','sort','lim'].includes(p)&&mode=='notes')apply();return}
+  const m=c('.mbtn');if(m){mode=m.dataset.m;sync();apply();return}
+  if(c('#dc'))return tgl(0);
+  if(c('#lb')){apply();return tgl(0)}
+  if(c('#rb')){Object.values(S).forEach(s=>s.clear());for(const k in Q)Q[k]='';dr.querySelectorAll('.ds input').forEach(i=>i.value='');$('sq').value='';Object.assign(P,P0);mark();menus()}
 };
-
-function toggleSetFilter(k, v) {
-  const set = S[k];
-  !v ? set.clear() : set.has(v) ? set.delete(v) : set.add(v);
-  renderMenu(k);
-  if (mode === 'notes') apply();
-}
-function setPref(p, v) {
-  const val = p === 'fv' && P.fv === v ? 'all' : v;
-  P[p] = coerce(val);
-  markActive();
-  if (['tab','sort','lim','mcqMode','n','fn','fv'].includes(p)) apply();
-}
-function resetAll() {
-  Object.values(S).forEach(s => s.clear());
-  Object.keys(Q).forEach(k => Q[k] = '');
-  dr.querySelectorAll('.ds input').forEach(i => i.value = '');
-  $('sq').value = '';
-  Object.assign(P, P0);
-  markActive();
-  renderMenus();
-}
-
-/* ============================================================
-   14. GLOBAL CLICK ROUTER
-   ============================================================ */
-document.addEventListener('click', e => {
-  const t = e.target;
-  // Card-internal actions first (notes like/dislike/expand)
-  if (mode === 'notes' && bd.contains(t)) {
-    const card = t.closest('.ncard');
-    if (card && !t.closest('.ndet')) return handleNoteClick(t, card);
-  }
-  // Route by class
-  const el = t.closest('[class]');
-  if (!el) return;
-  for (const cls of el.classList) {
-    if (ACTIONS[cls]) { e.preventDefault(); return ACTIONS[cls](el, e); }
-  }
-  // Content area (question / fact / option in read-list)
-  if (bd.contains(t)) {
-    if (mode === 'mcq' && P.mcqMode === 'read') {
-      const li = t.closest('[data-qi]'); if (li) return searchMcq(data[+li.dataset.qi]);
-    }
-    if (mode === 'mcq' && P.mcqMode === 'exam') {
-      const q = t.closest('[data-qi]'); if (q) return searchMcq(qs[+q.dataset.qi]);
-    }
-    if (mode === 'facts') {
-      const f = t.closest('[data-fi]');
-      if (f) { const x = data[+f.dataset.fi]; return gSearch([x.q, x.subject && `Subject: ${x.subject}`, x.topic && `Topic: ${x.topic}`]); }
-    }
-  }
+document.onclick=e=>{
+  const t=e.target,c=s=>t.closest(s);
+  if(t==ov)return tgl(0);
+  if(c('#dotsBtn'))return tgl(1);
+  if(dr.contains(t))return;
+  const d=c('.dot');if(d)return go(+d.dataset.i,1);
+  if(!bd.contains(t))return;
+  const o=c('.opt');
+  if(o&&!o.disabled){ans[cur]=+o.dataset.i;$('cnt').textContent=ans.filter(a=>a!=null).length+'/'+qs.length;return go(cur)}
+  if(c('#pv'))return go(cur-1);
+  if(c('#nx'))return cur==qs.length-1?end():go(cur+1);
+  if(c('#mb'))return more(+c('#mb').dataset.from);
+  if(mode=='notes'){const n=c('.ncard');if(n&&!c('.ndet'))noteClick(t,n)}
+  else if(mode=='facts'){const f=c('[data-fi]');if(f){const x=fl[+f.dataset.fi];gs([x.q,x.subject&&`Subject: ${x.subject}`,x.topic&&`Topic: ${x.topic}`])}}
+  else{const q=c('[data-qi]');if(q)qSearch(qs[+q.dataset.qi])}
+};
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.matches('.ds input')){const k=t.id.slice(0,-1);Q[k]=t.value;menu(k)}
+  else if(t.id=='sq')apply();
 });
-
-document.addEventListener('input', e => {
-  const t = e.target;
-  if (t.matches('.ds input')) { const k = t.id.slice(0, -1); Q[k] = t.value; renderMenu(k); }
-  else if (t.id === 'sq') apply();
-});
-
-/* ============================================================
-   15. BOOT
-   ============================================================ */
-syncDrawer();
-apply();
-</script>
-</body>
-</html>
+sync();load();
+</script></body></html>
