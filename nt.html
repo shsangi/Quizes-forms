@@ -8,20 +8,11 @@
 [data-theme=light]{--bg:#f5f8fc;--el:#fff;--s:#fff;--s2:#eef4fb;--b:#dde6f1;--b2:#c3d2e3;--t:#0a1520;--t2:#4a5b6e;--t3:#7a8b9e;--br:#0284c7;--bt:#0284c7;--ok:#16a34a;--er:#dc2626;--wa:#d97706;--in:#0284c7;--sh:0 20px 40px -12px rgba(15,23,42,.25)}
 :root{--bs:color-mix(in srgb,var(--br) 12%,transparent);--bb:color-mix(in srgb,var(--br) 30%,transparent)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font:15px/1.55 Inter,system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
+body{font:15px/1.55 Inter,system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden;padding-top:env(safe-area-inset-top,0)}
 button,select,input{font:inherit;color:inherit}button{cursor:pointer}
 .chip,.ib,.cnum,.ref,.badge,.rc,.cnt,.ver,.pct,.tabs small{font-family:'JetBrains Mono',monospace}
 .w{max-width:1100px;margin:0 auto;padding:0 14px}
-.top{position:sticky;top:0;z-index:40;backdrop-filter:blur(22px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--b);padding-top:env(safe-area-inset-top,0)}
-.top .w{display:flex;align-items:center;gap:6px;padding-top:10px;padding-bottom:10px}
-.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.9rem;flex:1;min-width:0;white-space:nowrap}
-.mark{width:32px;height:32px;border-radius:9px;background:#0a0a0a;color:#fff;display:grid;place-items:center}
-.ver{padding:1px 5px;border-radius:5px;background:var(--bs);border:1px solid var(--bb);color:var(--bt);font-size:.56rem;margin-left:4px}
-.chip{padding:5px 9px;border-radius:8px;background:var(--s);border:1px solid var(--b);color:var(--t2);font-size:.66rem;font-weight:600;white-space:nowrap}
-.net.on{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 32%,transparent)}.net.off{color:var(--er);border-color:color-mix(in srgb,var(--er) 32%,transparent)}
-.ibtn{width:34px;height:34px;border-radius:9px;background:var(--s);border:1px solid var(--b);color:var(--t2);display:grid;place-items:center;text-decoration:none;flex-shrink:0;font-size:15px}
-.ibtn:hover{color:var(--t);border-color:var(--b2)}.ibtn:active{transform:scale(.94)}.spin{animation:sp .8s linear}@keyframes sp{to{transform:rotate(360deg)}}
-.fbar{display:grid;grid-template-columns:1fr 50px;gap:8px;margin-top:14px}
+.fbar{display:grid;grid-template-columns:1fr 50px;gap:8px;margin-top:12px}
 input,select{width:100%;background:var(--s);border:1.5px solid var(--b);border-radius:12px;outline:0;padding:0 14px;height:48px;font-size:.9rem}
 input:focus,select:focus{border-color:var(--br);box-shadow:0 0 0 3px var(--bs)}
 .ft{position:relative;height:48px;border-radius:14px;background:var(--s);border:1.5px solid var(--b);color:var(--t2);font-size:18px}
@@ -87,14 +78,8 @@ footer{margin:40px 0 20px;padding-top:20px;border-top:1px solid var(--b);text-al
 .fab{width:42px;height:42px;border-radius:12px;border:1px solid var(--b2);background:var(--el);color:var(--t2);box-shadow:var(--sh);font-size:18px;display:none;place-items:center}.fab.show{display:grid}
 .toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%);background:var(--el);border:1px solid var(--b2);padding:11px 18px;border-radius:10px;font-size:.82rem;box-shadow:var(--sh);opacity:0;pointer-events:none;transition:.25s;z-index:500;max-width:calc(100vw - 32px)}
 .toast.show{opacity:1}.toast.ok{border-color:var(--ok)}.toast.err{border-color:var(--er)}
-@media(max-width:640px){.w{padding:0 12px}.mem{font-size:.85rem}.chip.clock{display:none}}
+@media(max-width:640px){.w{padding:0 12px}.mem{font-size:.85rem}}
 </style></head><body>
-<div class="top"><div class="w">
- <div class="brand"><div class="mark">✎</div><span>My Notes<span class="ver">v6.0</span></span></div>
- <div class="chip net on" id="net">Online</div><div class="chip clock" id="clock" title="Pakistan Standard Time">--:--</div>
- <a class="ibtn" id="sheet" target="_blank" rel="noopener" title="Open sheet">📄</a>
- <button class="ibtn" id="refresh" title="Refresh">⟳</button><button class="ibtn" id="theme" title="Theme"></button>
-</div></div>
 <div class="w">
  <div class="fbar"><input id="q" type="search" placeholder="Search rules, sections, memory…" autocomplete="off" spellcheck="false">
   <button class="ft" id="ft" type="button">⚙<span id="ftN">0</span></button></div>
@@ -113,9 +98,8 @@ footer{margin:40px 0 20px;padding-top:20px;border-top:1px solid var(--b);text-al
 <div class="fabs"><button class="fab" id="bot">⌄</button><button class="fab" id="topb">⌃</button></div><div class="toast" id="toast"></div>
 
 <script>
-const CSV="https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv",
-SHEET="https://docs.google.com/spreadsheets/d/1BLOOydCf9vAAWuqM4J3LR0PGcIosijzw5o_JhbsT3gM/edit",PAGE=200,
-RK="mn-read-v2",XK="mn-react-v1",FK="mn-filters-v1",TK="mn-notes-tab-v1",PK="mn-fpanel-open-v1",DK="mn-cache-db-v1",SK="mn-db-synced-v1",SC="mn-scroll-pos-v1";
+const CSV="https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv",PAGE=200,
+RK="mn-read-v2",XK="mn-react-v1",FK="mn-filters-v1",TK="mn-notes-tab-v1",PK="mn-fpanel-open-v1",DK="mn-cache-db-v1",SK="mn-db-synced-v1";
 const $=i=>document.getElementById(i),
 esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),
 lj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
@@ -133,14 +117,10 @@ let ALL=[],VIEW=[],N=0,busy=0,NOSAVE=0,READ=lj(RK,{}),REACT=lj(XK,{}),TAB=lj(TK,
 F={q:"",status:[],category:[],reference:[],sort:"default",...lj(FK,{})};
 F.reference??=[];delete F.reaction;delete F.read;
 
-/* theme, toast, clock, net */
-const setTheme=n=>{document.documentElement.dataset.theme=n;$("tc").content=n=="light"?"#f5f8fc":"#0a0b0f";$("theme").textContent=n=="light"?"☀":"🌙"};
+/* theme + toast */
+const setTheme=n=>{document.documentElement.dataset.theme=n;$("tc").content=n=="light"?"#f5f8fc":"#0a0b0f"};
 setTheme(document.documentElement.dataset.theme);
-$("theme").onclick=()=>{const n=document.documentElement.dataset.theme=="dark"?"light":"dark";localStorage.setItem("mn-theme",n);setTheme(n)};
 let tt;const toast=(m,k="")=>{const e=$("toast");e.className="toast show "+k;e.textContent=m;clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2600)};
-const clock=()=>$("clock").textContent="🕒 "+new Date().toLocaleTimeString("en-US",{...TZ,hour:"2-digit",minute:"2-digit"});clock();setInterval(clock,15e3);
-$("sheet").href=SHEET;
-const net=()=>{const o=navigator.onLine;$("net").className="chip net "+(o?"on":"off");$("net").textContent=o?"● Online":"● Offline"};net();
 
 /* PWA */
 (()=>{const u="data:image/svg+xml;base64,"+btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0ea5e9"/><text x="256" y="350" font-size="300" text-anchor="middle" fill="#fff">✎</text></svg>'),
@@ -149,9 +129,7 @@ a("icon",u,"image/svg+xml");a("apple-touch-icon",u);
 a("manifest",URL.createObjectURL(new Blob([JSON.stringify({name:"My Notes",short_name:"Notes",start_url:".",scope:".",display:"standalone",background_color:"#0a0b0f",theme_color:"#0ea5e9",icons:[{src:u,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]})],{type:"application/manifest+json"})))})();
 
 /* scroll */
-const ss=()=>{if(!NOSAVE)try{sessionStorage.setItem(SC,JSON.stringify({y:scrollY,loaded:N,ts:Date.now()}))}catch{}};
-let sT;addEventListener("scroll",()=>{clearTimeout(sT);sT=setTimeout(ss,200);const m=document.documentElement.scrollHeight-innerHeight;$("topb").classList.toggle("show",scrollY>300);$("bot").classList.toggle("show",scrollY<m-300&&m>300)},{passive:true});
-addEventListener("pagehide",ss);
+let sT;addEventListener("scroll",()=>{clearTimeout(sT);sT=setTimeout(()=>{if(!NOSAVE)try{sessionStorage.setItem("mn-scroll",JSON.stringify({y:scrollY,loaded:N,ts:Date.now()}))}catch{}},200);const m=document.documentElement.scrollHeight-innerHeight;$("topb").classList.toggle("show",scrollY>300);$("bot").classList.toggle("show",scrollY<m-300&&m>300)},{passive:true});
 $("topb").onclick=()=>scrollTo({top:0,behavior:"smooth"});$("bot").onclick=()=>scrollTo({top:1e9,behavior:"smooth"});
 
 /* csv */
@@ -262,27 +240,28 @@ function apply(skip){
 function setAll(rows){ALL=rows;FIELDS.forEach(f=>F[f]=F[f].filter(v=>ALL.some(r=>r[f]==v)))}
 function banner(on){$("ob")?.remove();if(on){const t=+localStorage.getItem(SK);$("out").insertAdjacentHTML("beforebegin",`<div id="ob">📡 You're offline. Showing <b>${ALL.length}</b> cards from local cache${t?" · last synced "+fmt(t):""}.</div>`)}}
 async function fetchData(show){
- if(busy)return;busy=1;const c=lj(DK,null);
- if(c?.rows&&!ALL.length){setAll(c.rows);apply(1)}
+ if(busy)return;busy=1;
+ const c=lj(DK,null);
+ if(c?.rows?.length){setAll(c.rows);apply(1)}
  try{
   const res=await fetch(CSV+"&_="+Date.now(),{cache:"no-store"});if(!res.ok)throw Error("HTTP "+res.status);
   const R=parseCSV(await res.text());if(R.length<2)throw Error("Sheet is empty");
   const H=R[0].map(norm);
-  setAll(R.slice(1).map(r=>{const o={row:"",category:"",reference:"",memory:"",status:""};H.forEach((h,i)=>h in o&&(o[h]=(r[i]||"").trim()));return o}).filter(o=>o.memory||o.reference));
-  sj(DK,{ts:Date.now(),rows:ALL});localStorage.setItem(SK,Date.now());banner(0);apply(1);
-  show&&toast(`Refreshed — ${ALL.length} cards loaded & cached.`,"ok");
+  const rows=R.slice(1).map(r=>{const o={row:"",category:"",reference:"",memory:"",status:""};H.forEach((h,i)=>h in o&&(o[h]=(r[i]||"").trim()));return o}).filter(o=>o.memory||o.reference);
+  if(rows.length){setAll(rows);sj(DK,{ts:Date.now(),rows});localStorage.setItem(SK,Date.now());banner(0);apply(1);
+   show&&toast(`Refreshed — ${rows.length} cards loaded.`,"ok");}
+  else throw Error("No rows in sheet");
  }catch(err){
   if(!ALL.length)$("out").innerHTML=`<div class="state"><h3>Could not load data</h3><p>${esc(err.message)}<br><br>No local cache available either. Connect to internet once to save data locally.</p></div>`;
   else if(!$("ob"))banner(1);
-  show&&toast("Refresh failed — using cached data","err");
+  if(show)toast("Refresh failed — using cached data","err");
  }finally{busy=0}}
-$("refresh").onclick=async function(){this.classList.add("spin");try{await fetchData(1)}finally{setTimeout(()=>this.classList.remove("spin"),850)}};
-addEventListener("online",()=>{net();banner(0);fetchData()});
-addEventListener("offline",()=>{net();ALL.length&&banner(1)});
+addEventListener("online",()=>{banner(0);fetchData()});
+addEventListener("offline",()=>{ALL.length&&banner(1)});
 
 /* init */
 (async()=>{
- let sv;try{sv=JSON.parse(sessionStorage.getItem(SC));if(Date.now()-sv.ts>432e5||sv.y<=40)sv=0}catch{sv=0}
+ let sv;try{sv=JSON.parse(sessionStorage.getItem("mn-scroll"));if(Date.now()-sv.ts>432e5||sv.y<=40)sv=0}catch{sv=0}
  $("q").value=F.q||"";$("sort").value=F.sort||"default";
  await fetchData();if(!sv)return;
  const need=Math.min(sv.loaded||PAGE,VIEW.length);if(need>N)grow(need);
