@@ -20,7 +20,8 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .dots{background:0;border:0;width:32px;height:32px;border-radius:50%;cursor:pointer;color:#475569;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .dots:hover{background:#f1f5f9}
 .dots span{width:4px;height:4px;border-radius:50%;background:currentColor}
-.q{font-weight:700;font-size:1.1rem;color:var(--n);line-height:1.55;margin-bottom:16px}
+.q{font-weight:700;font-size:1.1rem;color:var(--n);line-height:1.55;margin-bottom:16px;cursor:pointer}
+.q:hover{color:var(--d);text-decoration:underline;text-underline-offset:3px}
 .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--l);border-radius:9999px;padding:14px 18px;font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:10px;transition:.15s;color:#0f1419}
 .opt:hover:not(:disabled){background:#e0f2fe;border-color:var(--b)}
 .opt:disabled{cursor:default}
@@ -101,7 +102,6 @@ nk=s=>cl(s).toLowerCase(),
 TC=s=>cl(s).replace(/(^|\s)\S/g,m=>m.toUpperCase()),
 shuf=a=>{a=[...a];for(let i=a.length;i>1;){let j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a},
 isSp=o=>/all\s+of\s+(the\s+)?above|none\s+of\s+(the\s+)?above|above\s+all|\bboth\b|^\s*none\s*$|all\s+of\s+these/i.test(cl(o)),
-// Index-based option shuffle: correct stays mapped by index, specials stay pinned
 shufOpts=(o,ci)=>{
   const idx=[...o.keys()];
   const fixed=idx.filter(i=>isSp(o[i]));
@@ -110,9 +110,7 @@ shufOpts=(o,ci)=>{
   fixed.forEach(i=>order[i]=i);
   let p=0;
   for(let i=0;i<order.length;i++) if(order[i]===undefined) order[i]=free[p++];
-  const newOpts=order.map(i=>o[i]);
-  const newCorrect=ci<0?-1:order.indexOf(ci);
-  return{opts:newOpts,correct:newCorrect};
+  return{opts:order.map(i=>o[i]),correct:ci<0?-1:order.indexOf(ci)};
 },
 shufCat=l=>{const b={};l.forEach(x=>(b[[x.job,x.subject,x.topic].map(nk).join('|')]??=[]).push(x));return shuf(Object.values(b)).flatMap(g=>shuf(g))},
 findC=(raw,o)=>{const r=cl(raw);if(!r)return -1;const i=o.findIndex(x=>cl(x)===r);
@@ -177,7 +175,7 @@ function go(i,s){cur=i;render();grid();stats();if(s)scrollTo({top:0,behavior:'sm
 function render(){
   const x=qs[cur];if(!x){$('bd').innerHTML='<div class="load">No questions match filters</div>';return;}
   const I=x.correct<0,d=ans[cur]!=null||I,last=cur==total-1;
-  $('bd').innerHTML=`<div class="q">${cur+1}. ${x.q}</div>`+
+  $('bd').innerHTML=`<div class="q" data-qi="${cur}">${cur+1}. ${x.q}</div>`+
     x.opts.map((o,i)=>`<button class="opt${d&&!I?(i==x.correct?' ok':i==ans[cur]?' bad':''):''}" data-i="${i}" ${d?'disabled':''}><span class="k">${'ABCD'[i]}</span><span>${o||'(Empty)'}</span></button>`).join('')+
     (d&&(x.subject||x.topic||x.job)?`<div class="chips">${[['subject','📚'],['topic','🏷️'],['job','💼']].map(([k,e])=>x[k]?`<span class="chip ${k}">${e} ${TC(x[k])}</span>`:'').join('')}</div>`:'')+
     (I?'<div class="inv-msg">⚠️ Invalid question — correct answer not found in options</div>':'')+
@@ -212,6 +210,10 @@ document.onclick=e=>{
   if(c('#rb')){S.job.clear();S.subject.clear();$('sq').value='';setPick(20);menus();}
   const o=c('.opt');
   if(o&&!o.disabled){ans[cur]=+o.dataset.i;$('cnt').textContent=ans.filter(a=>a!=null).length+'/'+total;go(cur);}
+  if(c('.q')){const x=qs[+c('.q').dataset.qi];
+    const opts=x.opts.map((o,i)=>`${'ABCD'[i]}) ${o}`).join(' ');
+    const parts=[x.q,opts,x.topic&&`Topic: ${x.topic}`,x.subject&&`Subject: ${x.subject}`,x.job&&`Job: ${x.job}`].filter(Boolean);
+    window.open('https://www.google.com/search?q='+encodeURIComponent(parts.join(' ')),'_blank');return;}
   if(c('#pv'))go(cur-1);
   if(c('#nx'))cur==total-1?end():go(cur+1);
   if(c('.dot'))go(+c('.dot').dataset.i,1);
