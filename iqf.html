@@ -111,16 +111,7 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .ans.empty{color:#94a3b8;font-style:italic;font-weight:500}
 .vfy,.qvfy{position:absolute;width:12px;height:12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;line-height:1}
 .vfy{top:6px;right:6px;box-shadow:0 0 0 1.5px #fff}.qvfy{top:2px;right:0}
-/* Notes view */
-.ntabs{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:3px;background:#f8fafc;border:1px solid var(--l);border-radius:11px;margin-bottom:12px}
-.ntabs button{padding:8px 4px;background:0;border:0;border-radius:8px;color:#475569;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit}
-.ntabs button small{font:.58rem monospace;color:#94a3b8;font-weight:700;line-height:1}
-.ntabs button:hover{color:var(--n);background:#e0f2fe}
-.ntabs button.on{background:var(--bg);color:#fff}
-.ntabs button.on small{color:rgba(255,255,255,.72)}
-.ninfo{display:flex;justify-content:space-between;gap:8px;padding:8px 4px 12px;color:#475569;font-size:.7rem;flex-wrap:wrap;font-weight:600}
-.ninfo b{color:var(--n);font-weight:800}
-.ninfo .pct{padding:2px 8px;margin-left:6px;border-radius:99px;background:#e0f2fe;border:1px solid #7dd3fc;color:var(--d);font-weight:800;font-size:.66rem}
+/* Notes cards */
 .ncard{background:#f8fafc;border:1.5px solid var(--l);border-radius:14px;padding:12px 14px 10px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:7px;cursor:pointer;transition:.15s}
 .ncard:hover{border-color:var(--b)}
 .ncard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#94a3b8}
@@ -144,7 +135,7 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .ncard .nmem{font-size:.9rem;font-weight:600;color:var(--n);line-height:1.55;text-decoration:none;padding:7px 9px;margin:-2px -3px;border-radius:8px;word-break:break-word;cursor:pointer}
 .ncard .nmem:hover{background:#e0f2fe}
 .ncard .nbot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:8px;border-top:1px dashed var(--l);min-height:32px}
-.ncard .nric{width:32px;height:32px;border-radius:8px;border:1px solid var(--l);background:#fff;color:#64748b;cursor:pointer;display:grid;place-items:center;padding:0;font-size:14px}
+.ncard .nric{width:32px;height:32px;border-radius:8px;border:1px solid var(--l);background:#fff;color:#64748b;cursor:pointer;display:grid;place-items:center;padding:0;font-size:14px;font-family:inherit}
 .ncard .nric:hover{border-color:var(--b);color:var(--n)}
 .ncard .nric.like.on{background:#d1fae5;border-color:var(--g);color:var(--g)}
 .ncard .nric.dislike.on{background:#fee2e2;border-color:var(--r);color:var(--r)}
@@ -152,16 +143,25 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 .ncard .nst.read{color:var(--g)}
 .ncard .nrc{padding:2px 8px;border-radius:99px;background:#e2e8f0;font-size:.62rem;display:inline-flex;align-items:center;gap:4px;color:#64748b;font-weight:800}
 .ncard .nrc.h{background:#d1fae5;color:var(--g);border:1px solid #10b981}
-.ncard .nxh{width:32px;height:32px;border-radius:8px;background:0;border:0;color:#94a3b8;cursor:pointer;display:grid;place-items:center;padding:0;font-size:14px}
+.ncard .nxh{width:32px;height:32px;border-radius:8px;background:0;border:0;color:#94a3b8;cursor:pointer;display:grid;place-items:center;padding:0;font-size:14px;font-family:inherit;transition:transform .25s}
 .ncard .nxh:hover{color:var(--b);background:#e0f2fe}
-.ncard.open .nxh{color:var(--b);background:#e0f2fe}
-.ncard.open .nxh{transform:rotate(180deg)}
+.ncard.open .nxh{color:var(--b);background:#e0f2fe;transform:rotate(180deg)}
 .ncard .ndet{display:none;padding-top:10px;border-top:1px solid var(--l);margin-top:8px}
 .ncard.open .ndet{display:block}
 .ncard .ndr{display:grid;grid-template-columns:100px 1fr;gap:12px;padding:6px 0;font-size:.8rem;color:#475569;line-height:1.6}
 .ncard .ndr+.ndr{border-top:1px solid var(--l)}
 .ncard .ndr small{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;padding-top:3px}
 .ncard .ndr strong{color:var(--n);font-weight:700}
+/* Notes tabs & info */
+.ntabs{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:3px;background:#f8fafc;border:1px solid var(--l);border-radius:11px;margin-bottom:12px}
+.ntabs button{padding:8px 4px;background:0;border:0;border-radius:8px;color:#475569;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit}
+.ntabs button small{font:.58rem monospace;color:#94a3b8;font-weight:700;line-height:1}
+.ntabs button:hover{color:var(--n);background:#e0f2fe}
+.ntabs button.on{background:var(--bg);color:#fff}
+.ntabs button.on small{color:rgba(255,255,255,.72)}
+.ninfo{display:flex;justify-content:space-between;gap:8px;padding:8px 4px 12px;color:#475569;font-size:.7rem;flex-wrap:wrap;font-weight:600}
+.ninfo b{color:var(--n);font-weight:800}
+.ninfo .pct{padding:2px 8px;margin-left:6px;border-radius:99px;background:#e0f2fe;border:1px solid #7dd3fc;color:var(--d);font-weight:800;font-size:.66rem}
 .nmore{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 0 8px;font-size:.72rem;color:#64748b;text-align:center;font-weight:600}
 .nmore button{padding:11px 22px;background:var(--bg);border:0;color:#fff;border-radius:10px;font-size:.84rem;font-weight:700;cursor:pointer;font-family:inherit}
 </style></head>
@@ -176,10 +176,10 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 const U='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv',
 UF='https://docs.google.com/spreadsheets/d/e/2PACX-1vTRO-FPemOqN9exgEgDyt_x1KfNgTAxf0mOeg16c7THfRaaHg0mbgwuTrObcbIwJKSx2dWtrQCNcrCV/pub?output=csv',
 UN='https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv';
-const PAGE=200,TZ='Asia/Karachi';
+const PAGE=200;
 let all=[],qs=[],ans=[],cur=0,time=0,tmr,total=0,pick=20,invMode=0,mode='mcq',facts=[],fl=[],fp,fOK=0,fPick=20,fV='all';
 let notes=[],notesLoaded=0,np,nView=[],nLoaded=0,nRead={},nReact={},nTab='all',nSort='default',nF={cat:[],status:[]};
-const S={job:new Set,subject:new Set,topic:new Set},Q={job:'',subject:'',fsubject:'',ftopic:''},
+const S={job:new Set,subject:new Set,topic:new Set},Q={job:'',subject:'',fsubject:'',ftopic:''},NQ={cat:'',status:''},
 K={job:[S.job,'All jobs'],subject:[S.subject,'All subjects'],fsubject:[S.subject,'All subjects'],ftopic:[S.topic,'All topics']},
 MQ=[['subject','📚','ms'],['topic','🏷️','mt'],['job','💼','mj']],
 MF=[['subject','📚','ms'],['topic','🏷️','mt']];
@@ -207,9 +207,8 @@ gs=a=>open('https://www.google.com/search?q='+encodeURIComponent(a.filter(Boolea
 qSearch=x=>gs([x.q,x.opts.map((o,i)=>`${'ABCD'[i]}) ${o}`).join(' '),...[['topic','Topic'],['subject','Subject'],['job','Job']].map(([k,l])=>x[k]&&`${l}: ${x[k]}`)]),
 field=(k,l)=>`<div data-k="${k}"><label class="fl">${l}</label><div class="chbx" id="${k}c"></div><div class="dd" id="${k}d"><div class="ddb"><span id="${k}t"></span><span class="ar">▼</span></div><div class="ddm"><div class="ds"><input type="text" id="${k}s" placeholder="Search…" autocomplete="off"></div><div class="ddl" id="${k}m"></div></div></div></div>`;
 
-// Notes helpers
-const NK=r=>r._k,
-p2=n=>String(n).padStart(2,'0'),PKT=300,
+// Notes time helpers
+const NK=r=>r._k,p2=n=>String(n).padStart(2,'0'),PKT=300,
 off=()=>(PKT+new Date().getTimezoneOffset())*6e4,
 dk=t=>{const d=new Date(t+off());return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`},
 today=()=>dk(Date.now()),
@@ -230,6 +229,10 @@ $('dr').innerHTML=`<div class="dh"><h3>⚙️ Filters</h3><button class="dc" id=
   <div style="height:10px"></div>
   <label class="fl">🏷️ Status</label><div class="chbx" id="nstC"></div>
   <div class="dd" id="nstD"><div class="ddb"><span id="nstT"></span><span class="ar">▼</span></div><div class="ddm"><div class="ds"><input type="text" id="nstS" placeholder="Search…" autocomplete="off"></div><div class="ddl" id="nstM"></div></div></div>
+  <div style="height:10px"></div>
+  <label class="fl">📌 Tab</label><div class="cr" id="nTabC">${[['all','All'],['read','Read'],['unread','Unread'],['liked','Liked'],['disliked','Disliked']].map(([v,l])=>`<button class="cb${v==='all'?' on':''}" data-tab="${v}">${l}</button>`).join('')}</div>
+  <div style="height:10px"></div>
+  <label class="fl">⇅ Sort</label><div class="cr" id="nSortC">${[['default','Default'],['priority','Priority'],['unread','Unread first'],['most','Most read']].map(([v,l])=>`<button class="cb${v==='default'?' on':''}" data-sort="${v}">${l}</button>`).join('')}</div>
 </div>
 <div class="mo"><label class="fl"># MCQs to load</label><div class="cr" id="cr">${[5,10,20,100,200,0,-1].map(n=>`<button class="cb${n<0?' inv':''}" data-n="${n}">${n<0?'⚠️ Invalids':n||'All'}</button>`).join('')}</div></div>
 <div class="fo" hidden><label class="fl"># Facts to load</label><div class="cr" id="fr">${[10,20,100,200,0].map(n=>`<button class="cb" data-n="${n}">${n||'All'}</button>`).join('')}<button class="cb vf" data-v="t">✔️ Verified</button><button class="cb nvf" data-v="f">✘️ Not Verified</button></div></div>
@@ -239,6 +242,8 @@ const tgl=o=>[$('ov'),$('dr')].forEach(x=>x.classList.toggle('on',o)),
 setPick=n=>{pick=n<0?0:n;invMode=n<0;mark('#cr .cb',b=>+b.dataset.n==n)},
 setFPick=n=>{fPick=n;mark('#fr [data-n]',b=>+b.dataset.n==n)},
 setFV=v=>{fV=v;mark('#fr [data-v]',b=>b.dataset.v==v)},
+setNTab=v=>{nTab=v;mark('#nTabC .cb',b=>b.dataset.tab===v)},
+setNSort=v=>{nSort=v;mark('#nSortC .cb',b=>b.dataset.sort===v)},
 sync=()=>{const f=mode=='facts',n=mode=='notes';
   document.querySelectorAll('.mo').forEach(x=>x.hidden=f||n);
   document.querySelectorAll('.fo').forEach(x=>x.hidden=!f);
@@ -319,7 +324,7 @@ const loadNotes=()=>np??=(async()=>{
   notesLoaded=1;
 })();
 
-// Notes rendering
+// Notes filter + render
 function nPass(r){
   if(nF.cat.length&&!nF.cat.includes(cl(r.category)||'Uncategorized'))return false;
   if(nF.status.length&&!nF.status.includes(cl(r.status)||'—'))return false;
@@ -338,22 +343,18 @@ function nApply(){
   if(nSort==='priority')nView.sort((a,b)=>sm(a.status).r-sm(b.status).r);
   else if(nSort==='unread')nView.sort((a,b)=>(cnt(a)>0)-(cnt(b)>0));
   else if(nSort==='most')nView.sort((a,b)=>cnt(b)-cnt(a));
-  nLoaded=PAGE;
-  renderNotes();
+  nLoaded=PAGE;renderNotes();
 }
 function renderNotes(){
   clearInterval(tmr);$('gd').innerHTML=$('st').innerHTML='';$('tmr').style.display='none';
   $('tt').textContent='📔 Notes';
   if(!notesLoaded){$('bd').innerHTML='<div class="load">🔄 Loading notes…</div>';return loadNotes().then(()=>{if(mode=='notes'){buildNoteMenus();nApply()}})}
   const shown=Math.min(nLoaded,nView.length),rd=nView.filter(r=>nRead[NK(r)]).length,pc=nView.length?Math.round(rd*100/nView.length):0;
-  const N={all:notes.length,read:Object.keys(nRead).length,unread:notes.length-Object.keys(nRead).length,liked:Object.values(nReact).filter(r=>r&&r.type==='like').length,disliked:Object.values(nReact).filter(r=>r&&r.type==='dislike').length};
   $('cnt').textContent=nView.length+' notes';
   $('bd').innerHTML=`
-  <div class="ntabs" id="nTabs">${[['all','All'],['read','Read'],['unread','Unread'],['liked','Liked'],['disliked','Disliked']].map(([v,l])=>`<button class="${nTab===v?'on':''}" data-v="${v}"><span>${l}</span><small>${N[v]}</small></button>`).join('')}</div>
   <div class="ninfo"><div><b>${shown}</b>/<b>${nView.length}</b>&nbsp;of&nbsp;<b>${notes.length}</b></div><div><b>${rd}</b>/<b>${nView.length}</b><span class="pct">${pc}% Read</span></div></div>
   <div class="list" id="nList"></div>
   <div class="nmore" id="nMore"></div>`;
-  $('nTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{nTab=b.dataset.v;$('nTabs').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.v===nTab));nLoaded=0;nApply()});
   renderNoteList(0);
 }
 function renderNoteList(from){
@@ -375,8 +376,8 @@ function nCard(r,idx,tot){
     <a class="nmem" href="${gs([r.reference,r.memory,r.category])}" target="_blank" rel="noopener" data-key="${esc(k)}">${esc(r.memory||'')}</a>
     <div class="nbot">
       <div style="display:flex;gap:6px;align-items:center">
-        <button class="nric like ${lc}" data-act="like">👍</button>
-        <button class="nric dislike ${dc}" data-act="dislike">👎</button>
+        <button class="nric like ${lc}" data-act="like" data-key="${esc(k)}">👍</button>
+        <button class="nric dislike ${dc}" data-act="dislike" data-key="${esc(k)}">👎</button>
       </div>
       <div style="display:flex;gap:6px;align-items:center">
         <span class="nrc ${n?'h':''}">👁 ${n}×</span>${sh}
@@ -407,14 +408,14 @@ function bindNotes(scope){
   scope.querySelectorAll('.nmem').forEach(a=>a.onclick=e=>{e.stopPropagation();const r=notes.find(x=>NK(x)===a.dataset.key);if(r){nMarkRead(r);nUpd(a.closest('.ncard'),a.dataset.key)}});
   scope.querySelectorAll('.ncard').forEach(el=>el.onclick=e=>{if(e.target.closest('.nmem,.nric,.ndet,.nxh'))return;const r=notes.find(x=>NK(x)===el.dataset.key);if(r){nMarkRead(r);nUpd(el,el.dataset.key)}el.classList.toggle('open')});
   scope.querySelectorAll('.nxh').forEach(b=>b.onclick=e=>{e.stopPropagation();const c=b.closest('.ncard'),r=notes.find(x=>NK(x)===c.dataset.key);if(r){nMarkRead(r);nUpd(c,c.dataset.key)}c.classList.toggle('open')});
-  ['like','dislike'].forEach(t=>scope.querySelectorAll(`[data-act=${t}]`).forEach(b=>b.onclick=e=>{e.stopPropagation();e.preventDefault();const k=b.dataset.key||b.closest('.ncard').dataset.key,c=b.closest('.ncard'),r=notes.find(x=>NK(x)===k);if(r){nMarkRead(r);nUpd(c,k)}nReactSet(k,t);nUpdR(c,k);nUpd(c,k)}));
+  ['like','dislike'].forEach(t=>scope.querySelectorAll(`[data-act=${t}]`).forEach(b=>b.onclick=e=>{e.stopPropagation();e.preventDefault();const k=b.dataset.key,c=b.closest('.ncard'),r=notes.find(x=>NK(x)===k);if(r){nMarkRead(r);nUpd(c,k)}nReactSet(k,t);nUpdR(c,k);nUpd(c,k)}));
   scope.querySelectorAll('.ndet').forEach(d=>d.onclick=e=>e.stopPropagation());
 }
 
 function apply(){
   $('tmr').style.display=mode=='mcq'?'':'none';
   if(mode=='facts')return renderFacts();
-  if(mode=='notes')return renderNotes();
+  if(mode=='notes')return nApply();
   const q=$('sq').value.trim().toLowerCase();
   let L=invMode?all.filter(x=>x.correct<0):all.filter(x=>
     (!S.job.size||S.job.has(nk(x.job)))&&(!S.subject.size||S.subject.has(nk(x.subject)))&&
@@ -431,7 +432,7 @@ function apply(){
   if(total){tmr=setInterval(tick,1000);tick()}
   go(0,1);
 }
-function tick(){$('tmr').textContent=`${String(time/60|0).padStart(2,0)}:${String(time%60).padStart(2,0)}`;if(time<=0)return end();time--}
+function tick(){$('tmr').textContent=`${String(time/60|0).padStart(2,'0')}:${String(time%60).padStart(2,'0')}`;if(time<=0)return end();time--}
 function go(i,s){cur=i;render();grid();stats();s&&scrollTo({top:0,behavior:'smooth'})}
 
 function render(){
@@ -489,6 +490,8 @@ document.onclick=e=>{
   if(c('#cr .cb'))setPick(+c('#cr .cb').dataset.n);
   if(c('#fr [data-n]'))setFPick(+c('#fr [data-n]').dataset.n);
   if(c('#fr [data-v]')){const v=c('#fr [data-v]').dataset.v;setFV(fV==v?'all':v)}
+  if(c('#nTabC .cb')){setNTab(c('#nTabC .cb').dataset.tab);if(mode==='notes')nApply()}
+  if(c('#nSortC .cb')){setNSort(c('#nSortC .cb').dataset.sort);if(mode==='notes')nApply()}
   const m=c('.mbtn');
   if(m){mode=m.dataset.m;mark('.mbtn',b=>b.dataset.m==mode);sync();
     if(mode=='facts')loadFacts().then(()=>{menus();apply()});
@@ -498,7 +501,7 @@ document.onclick=e=>{
   if(c('#dc,#ov'))tgl(0);
   if(c('#lb')){apply();tgl(0)}
   if(c('#rb')){Object.values(S).forEach(s=>s.clear());Object.keys(Q).forEach(k=>Q[k]='');document.querySelectorAll('.ds input').forEach(i=>i.value='');
-    nF={cat:[],status:[]};nTab='all';nSort='default';
+    nF={cat:[],status:[]};setNTab('all');setNSort('default');Object.keys(NQ).forEach(k=>NQ[k]='');
     $('sq').value='';setPick(20);setFPick(20);setFV('all');buildNoteMenus();menus()}
   const o=c('.opt');
   if(o&&!o.disabled){ans[cur]=+o.dataset.i;$('cnt').textContent=ans.filter(a=>a!=null).length+'/'+total;go(cur)}
@@ -517,8 +520,9 @@ document.addEventListener('input',e=>{
     if(k==='ncat'||k==='nst'){buildNoteMenus()}
     else{Q[k]=ds.value;menu(k)}
     return}
+  if(t.id==='sq'&&mode==='notes'){nApply()}
 });
 
-setPick(20);setFPick(20);setFV('all');sync();load();
+setPick(20);setFPick(20);setFV('all');setNTab('all');setNSort('default');sync();load();
 </script>
 </body></html>
