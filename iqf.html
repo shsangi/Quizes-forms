@@ -168,7 +168,7 @@ body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;col
 <div class="ov" id="ov"></div><aside class="dr" id="dr"></aside>
 
 <script>
-const VERSION='v4.3';
+const VERSION='v4.4';
 const U='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv',
 UF='https://docs.google.com/spreadsheets/d/e/2PACX-1vTRO-FPemOqN9exgEgDyt_x1KfNgTAxf0mOeg16c7THfRaaHg0mbgwuTrObcbIwJKSx2dWtrQCNcrCV/pub?output=csv',
 UN='https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv';
@@ -234,7 +234,9 @@ $('dr').innerHTML=`<div class="dh"><h3>⚙️ Filters <span class="ver">${VERSIO
 <div class="fo" hidden><label class="fl"># Facts to load</label><div class="cr" id="fr">${[10,20,100,200,0].map(n=>`<button class="cb" data-n="${n}">${n||'All'}</button>`).join('')}<button class="cb vf" data-v="t">✔️ Verified</button><button class="cb nvf" data-v="f">✘️ Not Verified</button></div></div>
 <div class="drow"><button class="dl" id="lb">🔄 Load</button><button class="drs" id="rb">⟲ Reset</button></div></div>`;
 
-const tgl=o=>[$('ov'),$('dr')].forEach(x=>x.classList.toggle('on',o)),
+const dr=$('dr'),ov=$('ov'),bd=$('bd');
+
+const tgl=o=>{ov.classList.toggle('on',o);dr.classList.toggle('on',o)},
 setPick=n=>{pick=n<0?0:n;invMode=n<0;mark('#cr .cb',b=>+b.dataset.n==n)},
 setFPick=n=>{fPick=n;mark('#fr [data-n]',b=>+b.dataset.n==n)},
 setFV=v=>{fV=v;mark('#fr [data-v]',b=>b.dataset.v==v)},
@@ -294,7 +296,7 @@ async function load(){
       .filter(c=>c.length>=9&&c[1]&&!['0','false','no'].includes((c[13]||'').toLowerCase()))
       .map(c=>{const o=[2,3,4,5].map(i=>c[i]||'');return{q:c[1],opts:o,correct:findC(c[6],o),topic:c[7]||'',subject:c[8]||'',job:c[10]||'',mcol:c[12]||''}});
     menus();apply();
-  }catch(e){console.error(e);$('bd').innerHTML='<div class="load">❌ Failed to load</div>'}
+  }catch(e){console.error(e);bd.innerHTML='<div class="load">❌ Failed to load</div>'}
 }
 const loadFacts=()=>fp??=(async()=>{
   try{
@@ -349,11 +351,11 @@ function nApply(){
 function renderNotes(){
   clearInterval(tmr);$('gd').innerHTML=$('st').innerHTML='';$('tmr').style.display='none';
   $('tt').textContent='📔 Notes';
-  if(!notesLoaded){$('bd').innerHTML='<div class="load">🔄 Loading notes…</div>';return loadNotes().then(()=>{if(mode=='notes'){buildNoteMenus();nApply()}})}
-  if(!notes.length){$('bd').innerHTML='<div class="load">⚠️ No notes loaded — check the Notes sheet</div>';$('cnt').textContent='0 notes';return}
+  if(!notesLoaded){bd.innerHTML='<div class="load">🔄 Loading notes…</div>';return loadNotes().then(()=>{if(mode=='notes'){buildNoteMenus();nApply()}})}
+  if(!notes.length){bd.innerHTML='<div class="load">⚠️ No notes loaded — check the Notes sheet</div>';$('cnt').textContent='0 notes';return}
   const shown=Math.min(nLoaded,nView.length),rd=nView.filter(r=>nRead[NK(r)]).length,pc=nView.length?Math.round(rd*100/nView.length):0;
   $('cnt').textContent=nView.length+' notes';
-  $('bd').innerHTML=`
+  bd.innerHTML=`
   <div class="ninfo"><div><b>${shown}</b>/<b>${nView.length}</b>&nbsp;of&nbsp;<b>${notes.length}</b></div><div><b>${rd}</b>/<b>${nView.length}</b><span class="pct">${pc}% Read</span></div></div>
   <div class="list" id="nList"></div>
   <div class="nmore" id="nMore"></div>`;
@@ -438,9 +440,9 @@ function tick(){$('tmr').textContent=`${String(time/60|0).padStart(2,'0')}:${Str
 function go(i,s){cur=i;render();grid();stats();s&&scrollTo({top:0,behavior:'smooth'})}
 
 function render(){
-  const x=qs[cur];if(!x)return $('bd').innerHTML='<div class="load">No questions match filters</div>';
+  const x=qs[cur];if(!x)return bd.innerHTML='<div class="load">No questions match filters</div>';
   const I=x.correct<0,d=ans[cur]!=null||I,last=cur==total-1;
-  $('bd').innerHTML=`<div class="q" data-qi="${cur}">${vfy(x.mcol?'t':'u','qvfy')}${cur+1}. ${x.q}</div>`+
+  bd.innerHTML=`<div class="q" data-qi="${cur}">${vfy(x.mcol?'t':'u','qvfy')}${cur+1}. ${x.q}</div>`+
     x.opts.map((o,i)=>`<button class="opt${d&&!I?(i==x.correct?' ok':i==ans[cur]?' bad':''):''}" data-i="${i}" ${d?'disabled':''}><span class="k">${'ABCD'[i]}</span><span>${esc(o)||'(Empty)'}</span></button>`).join('')+
     (d&&(x.subject||x.topic||x.job)?`<div class="chips">${[['subject','📚'],['topic','🏷️'],['job','💼']].map(([k,e])=>x[k]?`<span class="chip ${k}">${e} ${TC(x[k])}</span>`:'').join('')}</div>`:'')+
     (I?'<div class="inv-msg">⚠️ Invalid question — correct answer not found in options</div>':'')+
@@ -450,115 +452,133 @@ function grid(){$('gd').innerHTML=qs.map((x,i)=>`<button class="dot${x.correct<0
 function stats(){let k=0,w=0,p=0,v=0;qs.forEach((x,i)=>x.correct<0?v++:ans[i]==null?p++:ans[i]==x.correct?k++:w++);
   $('st').innerHTML=`<span class="stat ok">🎯 Correct <span class="n">${k}</span></span><span class="stat bad">❌ Wrong <span class="n">${w}</span></span><span class="stat">⏳ Pending <span class="n">${p}</span></span>`+(v?`<span class="stat inv">⚠️ Invalid <span class="n">${v}</span></span>`:'')}
 function end(){clearInterval(tmr);const r=qs.filter((x,i)=>ans[i]===x.correct).length,p=total?Math.round(r/total*100):0;
-  $('bd').innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:3rem;margin-bottom:8px">${r==total?'🌟':p>=70?'👏':'💪'}</div><div style="font-size:2.6rem;font-weight:900;color:#0284c7">${r} / ${total}</div><div style="color:#475569;margin:10px 0 20px;font-weight:600">${r==total?'Perfect score!':p>=70?'Great job!':'Keep practicing!'} — ${p}% correct</div><button class="btn" onclick="location.reload()">⟳ Try again</button></div>`;
+  bd.innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:3rem;margin-bottom:8px">${r==total?'🌟':p>=70?'👏':'💪'}</div><div style="font-size:2.6rem;font-weight:900;color:#0284c7">${r} / ${total}</div><div style="color:#475569;margin:10px 0 20px;font-weight:600">${r==total?'Perfect score!':p>=70?'Great job!':'Keep practicing!'} — ${p}% correct</div><button class="btn" onclick="location.reload()">⟳ Try again</button></div>`;
   $('gd').innerHTML=$('st').innerHTML=''}
 function renderSolved(){
-  if(!qs.length)return $('bd').innerHTML='<div class="load">No questions match filters</div>';
-  $('bd').innerHTML='<div class="list">'+qs.map((x,i)=>
+  if(!qs.length)return bd.innerHTML='<div class="load">No questions match filters</div>';
+  bd.innerHTML='<div class="list">'+qs.map((x,i)=>
     `<div class="li" data-qi="${i}">${vfy(x.mcol?'t':'u')}<div class="lq"><span class="sn">${i+1}</span>${esc(x.q)}</div>
     <div class="lo">${x.opts.map((o,j)=>`<div class="lop${j==x.correct?' ok':''}"><span class="lt">${'ABCD'[j]}</span><span>${esc(o)||'(Empty)'}</span></div>`).join('')}</div>${meta(MQ,x)?`<div class="lm">${meta(MQ,x)}</div>`:''}</div>`
   ).join('')+'</div>'}
 function renderFacts(){
   clearInterval(tmr);$('gd').innerHTML=$('st').innerHTML='';$('tt').textContent='💡 Facts';
-  if(!fOK){$('bd').innerHTML='<div class="load">🔄 Loading facts…</div>';return loadFacts().then(()=>{if(mode=='facts'){menus();renderFacts()}})}
+  if(!fOK){bd.innerHTML='<div class="load">🔄 Loading facts…</div>';return loadFacts().then(()=>{if(mode=='facts'){menus();renderFacts()}})}
   const q=$('sq').value.trim().toLowerCase();
   fl=facts.filter(f=>(!S.subject.size||S.subject.has(nk(f.subject)))&&(!S.topic.size||S.topic.has(nk(f.topic)))&&
     (!q||[f.q,f.answer,f.subject,f.topic].some(s=>s.toLowerCase().includes(q)))&&
     (fV=='t'?f.verify=='t':fV=='f'?f.verify!='t':1));
   if(fPick)fl=fl.slice(0,fPick);
   $('cnt').textContent=fl.length+' facts';
-  if(!fl.length)return $('bd').innerHTML='<div class="load">No facts match</div>';
-  $('bd').innerHTML='<div class="list">'+fl.map((f,i)=>
+  if(!fl.length)return bd.innerHTML='<div class="load">No facts match</div>';
+  bd.innerHTML='<div class="list">'+fl.map((f,i)=>
     `<div class="li fact" data-fi="${i}">${vfy(f.verify)}<div class="lq"><span class="sn">${i+1}</span>${esc(f.q)}</div>
     <div class="ans${f.answer?'':' empty'}"><strong>Answer:</strong> ${esc(f.answer)||'—'}</div>${meta(MF,{...f,topic:f.topic!==f.subject?f.topic:''})?`<div class="lm">${meta(MF,{...f,topic:f.topic!==f.subject?f.topic:''})}</div>`:''}</div>`
   ).join('')+'</div>'}
 
-// ============ CLICK ROUTING ============
-const dr=$('dr'),ov=$('ov'),bd=$('bd');
+// ====================================================================
+//  DRAWER — its own isolated click handler, no bubbling to document
+// ====================================================================
+dr.addEventListener('click',e=>{
+  e.stopPropagation();
+  const t=e.target,c=s=>t.closest(s);
 
-document.onclick=e=>{
-  const t=e.target;
-  const inDrawer = dr.contains(t);
-  const inContent = bd.contains(t);
+  const dd=c('.dd');
+  dr.querySelectorAll('.dd.on').forEach(x=>x!=dd&&x.classList.remove('on'));
+  if(c('.ddb'))dd?.classList.toggle('on');
 
-  // Toggle any open dropdown
-  const dd = t.closest('.dd');
-  document.querySelectorAll('.dd.on').forEach(x=>x!=dd&&x.classList.remove('on'));
-  if(t.closest('.ddb'))dd?.classList.toggle('on');
-
-  // ---------- DRAWER ZONE ----------
-  if(inDrawer){
-    const c=s=>t.closest(s);
-
-    const it=c('.ddi,.cc button');
-    if(it){
-      const sec=c('[data-k]'),no=c('.no .ddi'),nc=c('.no .cc button');
-      if(sec){const s=K[sec.dataset.k][0],v=it.dataset.v;!v?s.clear():s.has(v)?s.delete(v):s.add(v);menus()}
-      if(no||nc){
-        const v=(no||nc).dataset.v,parent=(no||nc).closest('.dd');
-        const key=parent&&parent.id==='ncatD'?'cat':'status';
-        const set=nF[key];
-        set.includes(v)?set.splice(set.indexOf(v),1):set.push(v);
-        buildNoteMenus();if(mode==='notes')nApply();
-      }
-      return;
+  const it=c('.ddi,.cc button');
+  if(it){
+    const sec=c('[data-k]'),no=c('.no .ddi'),nc=c('.no .cc button');
+    if(sec){const s=K[sec.dataset.k][0],v=it.dataset.v;!v?s.clear():s.has(v)?s.delete(v):s.add(v);menus()}
+    if(no||nc){
+      const v=(no||nc).dataset.v,parent=(no||nc).closest('.dd');
+      const key=parent&&parent.id==='ncatD'?'cat':'status';
+      const set=nF[key];
+      set.includes(v)?set.splice(set.indexOf(v),1):set.push(v);
+      buildNoteMenus();if(mode==='notes')nApply();
     }
-    if(c('#cr .cb')){setPick(+c('#cr .cb').dataset.n);return}
-    if(c('#fr [data-n]')){setFPick(+c('#fr [data-n]').dataset.n);return}
-    if(c('#fr [data-v]')){const v=c('#fr [data-v]').dataset.v;setFV(fV==v?'all':v);return}
-    if(c('#nTabC .cb')){setNTab(c('#nTabC .cb').dataset.tab);if(mode==='notes')nApply();return}
-    if(c('#nSortC .cb')){setNSort(c('#nSortC .cb').dataset.sort);if(mode==='notes')nApply();return}
-    if(c('#nLimC .cb')){setNLim(+c('#nLimC .cb').dataset.lim);if(mode==='notes')nApply();return}
+    return;
+  }
+  if(c('#cr .cb')){setPick(+c('#cr .cb').dataset.n);return}
+  if(c('#fr [data-n]')){setFPick(+c('#fr [data-n]').dataset.n);return}
+  if(c('#fr [data-v]')){const v=c('#fr [data-v]').dataset.v;setFV(fV==v?'all':v);return}
+  if(c('#nTabC .cb')){setNTab(c('#nTabC .cb').dataset.tab);if(mode==='notes')nApply();return}
+  if(c('#nSortC .cb')){setNSort(c('#nSortC .cb').dataset.sort);if(mode==='notes')nApply();return}
+  if(c('#nLimC .cb')){setNLim(+c('#nLimC .cb').dataset.lim);if(mode==='notes')nApply();return}
 
-    const m=c('.mbtn');
-    if(m){mode=m.dataset.m;mark('.mbtn',b=>b.dataset.m==mode);sync();
-      if(mode=='facts')loadFacts().then(()=>{menus();apply()});
-      else if(mode=='notes')loadNotes().then(()=>{buildNoteMenus();apply()});
-      else{menus();apply()}
-      return}
-
-    if(c('#dc')){tgl(0);return}
-    if(c('#lb')){apply();tgl(0);return}
-    if(c('#rb')){Object.values(S).forEach(s=>s.clear());Object.keys(Q).forEach(k=>Q[k]='');document.querySelectorAll('.ds input').forEach(i=>i.value='');
-      nF={cat:[],status:[]};setNTab('all');setNSort('default');setNLim(20);
-      $('sq').value='';setPick(20);setFPick(20);setFV('all');buildNoteMenus();menus();return}
-    // Any other click inside drawer → do nothing else
+  const m=c('.mbtn');
+  if(m){
+    mode=m.dataset.m;
+    mark('.mbtn',b=>b.dataset.m==mode);
+    sync();
+    if(mode=='facts')loadFacts().then(()=>{menus();apply()});
+    else if(mode=='notes')loadNotes().then(()=>{buildNoteMenus();apply()});
+    else{menus();apply()}
     return;
   }
 
-  // ---------- OVERLAY ----------
+  if(c('#dc')){tgl(0);return}
+  if(c('#lb')){apply();tgl(0);return}
+  if(c('#rb')){
+    Object.values(S).forEach(s=>s.clear());
+    Object.keys(Q).forEach(k=>Q[k]='');
+    dr.querySelectorAll('.ds input').forEach(i=>i.value='');
+    nF={cat:[],status:[]};
+    setNTab('all');setNSort('default');setNLim(20);
+    $('sq').value='';
+    setPick(20);setFPick(20);setFV('all');
+    buildNoteMenus();menus();
+    return;
+  }
+});
+
+// ====================================================================
+//  DOCUMENT — content-area handlers + overlay + dots button only
+// ====================================================================
+document.addEventListener('click',e=>{
+  const t=e.target;
+
+  // Overlay — close drawer
   if(t===ov){tgl(0);return}
-
-  // ---------- DOTS BUTTON ----------
+  // Dots button — open drawer
   if(t.closest('#dotsBtn')){tgl(1);return}
-
-  // ---------- CONTENT ZONE ----------
-  if(!inContent)return;
+  // Anywhere inside drawer — the drawer's own listener handles it, ignore here
+  if(dr.contains(t))return;
+  // Outside content area — ignore
+  if(!bd.contains(t))return;
 
   const c=s=>t.closest(s);
-  const o=c('#bd .opt');
-  if(o&&!o.disabled){ans[cur]=+o.dataset.i;$('cnt').textContent=ans.filter(a=>a!=null).length+'/'+total;go(cur);return}
 
+  const o=c('.opt');
+  if(o&&!o.disabled){
+    ans[cur]=+o.dataset.i;
+    $('cnt').textContent=ans.filter(a=>a!=null).length+'/'+total;
+    go(cur);
+    return;
+  }
   if(mode==='mcq'||mode==='solved'){
-    const q=c('#bd .q,#bd .li[data-qi]');
+    const q=c('.q,.li[data-qi]');
     if(q)qSearch(qs[+q.dataset.qi]);
   }
   if(mode==='facts'){
-    const f=c('#bd .li[data-fi]');
+    const f=c('.li[data-fi]');
     if(f){const x=fl[+f.dataset.fi];gs([x.q,x.subject&&`Subject: ${x.subject}`,x.topic&&`Topic: ${x.topic}`])}
   }
-  if(c('#bd #pv'))go(cur-1);
-  if(c('#bd #nx'))cur==total-1?end():go(cur+1);
-  if(c('#bd .dot'))go(+c('#bd .dot').dataset.i,1);
-};
+  if(c('#pv'))go(cur-1);
+  if(c('#nx'))cur==total-1?end():go(cur+1);
+  if(c('.dot'))go(+c('.dot').dataset.i,1);
+});
 
+// Search input — routed by mode
 document.addEventListener('input',e=>{
   const t=e.target,c=s=>t.closest(s);
   const ds=c('.ds input');
-  if(ds){const k=ds.id.replace(/s$/,'');
-    if(k==='ncat'||k==='nst'){buildNoteMenus()}
+  if(ds){
+    const k=ds.id.replace(/s$/,'');
+    if(k==='ncat'||k==='nst')buildNoteMenus();
     else{Q[k]=ds.value;menu(k)}
-    return}
+    return;
+  }
   if(t.id==='sq'){
     if(mode==='notes')nApply();
     else if(mode==='facts')renderFacts();
