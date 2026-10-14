@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes · Home</title>
+  <style>
+    /* minimal reset + design tokens – just enough for a clean notes home */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #f4f7fc;
+      min-height: 100vh;
+      padding: 1.5rem 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* home container – no header, no top bar */
+    .home {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* search bar – only interactive element */
+    .search-box {
+      width: 100%;
+      background: white;
+      border: 1px solid #d9e2ef;
+      border-radius: 18px;
+      padding: 0.75rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+      transition: border 0.15s, box-shadow 0.15s;
+    }
+    .search-box:focus-within {
+      border-color: #0a7cff;
+      box-shadow: 0 6px 16px rgba(10, 124, 255, 0.08);
+    }
+    .search-box span {
+      font-size: 1.2rem;
+      color: #7c8b9c;
+      line-height: 1;
+    }
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: transparent;
+      color: #0b1a2b;
+    }
+    .search-box input::placeholder {
+      color: #9aabbe;
+      font-weight: 400;
+    }
+
+    /* notes list – simple, clean cards */
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .note-card {
+      background: white;
+      border-radius: 18px;
+      padding: 1.1rem 1.3rem;
+      border: 1px solid #e2eaf3;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+      transition: border 0.1s, box-shadow 0.1s;
+      cursor: default;
+    }
+    .note-card:hover {
+      border-color: #cbdae9;
+      box-shadow: 0 6px 16px rgba(0, 20, 40, 0.04);
+    }
+
+    /* meta row: reference + category */
+    .note-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .ref {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: #eef3fe;
+      color: #0a5cbf;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      letter-spacing: 0.01em;
+    }
+
+    .cat {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      color: #5e6e82;
+      background: #f0f4fa;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+    }
+
+    /* the actual memory / note text */
+    .memory {
+      font-size: 0.98rem;
+      line-height: 1.5;
+      color: #0b1e2f;
+      font-weight: 450;
+      word-break: break-word;
+      margin: 0.2rem 0 0.1rem;
+    }
+
+    /* priority badge (small indicator on the right) */
+    .priority {
+      float: right;
+      margin-left: 0.6rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      padding: 0.15rem 0.6rem;
+      border-radius: 40px;
+      background: #eef2f7;
+      color: #3f5468;
+      text-transform: uppercase;
+    }
+    .priority.vimp { background: #fee9e7; color: #b91c1c; }
+    .priority.imp  { background: #fef4e6; color: #b45309; }
+    .priority.note { background: #e4f0fe; color: #0369a1; }
+
+    /* no-results state – minimal */
+    .empty {
+      background: white;
+      border-radius: 18px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: #617388;
+      font-size: 0.95rem;
+      border: 1px dashed #c9d8e9;
+    }
+
+    /* tiny footer hint (optional, very light) */
+    .footnote {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #a0b2c6;
+      margin-top: 1rem;
+      letter-spacing: 0.01em;
+    }
+  </style>
+</head>
+<body>
+  <div class="home">
+    <!-- search input – only interactive filter, no header, no buttons -->
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="search" id="searchInput" placeholder="Search notes, categories, references…" autocomplete="off" autofocus>
+    </div>
+
+    <!-- notes list will be rendered by JavaScript -->
+    <div class="notes-list" id="notesList"></div>
+    <div class="footnote">— your notes, simplified —</div>
+  </div>
+
+  <script>
+    (function() {
+      // ----- sample notes data (exactly what you'd see on a home screen) -----
+      const notes = [
+        { reference: 'R-101', category: 'General', memory: 'Always double-check the invoice number before sending.', status: 'V.Imp' },
+        { reference: 'R-205', category: 'Billing', memory: 'Client prefers PDF invoices, not links.', status: 'Imp' },
+        { reference: 'R-309', category: 'Support', memory: 'Reset password link expires in 30 minutes.', status: 'Note' },
+        { reference: 'R-412', category: 'General', memory: 'Use “reply all” only when necessary.', status: 'Imp' },
+        { reference: 'R-555', category: 'Onboarding', memory: 'Send welcome packet within 2 hours of sign-up.', status: 'V.Imp' },
+        { reference: 'R-678', category: 'Billing', memory: 'Refund requests must be approved by manager.', status: 'Note' },
+        { reference: 'R-722', category: 'Technical', memory: 'API rate limit: 100 requests per minute.', status: 'V.Imp' },
+        { reference: 'R-810', category: 'Support', memory: 'Always ask for the ticket ID first.', status: 'Imp' },
+        { reference: 'R-923', category: 'General', memory: 'Meeting notes should be shared within 24h.', status: 'Note' },
+        { reference: 'R-1050', category: 'Onboarding', memory: 'Schedule a 30-min intro call with new team members.', status: 'Imp' }
+      ];
+
+      // ----- render notes -----
+      const listEl = document.getElementById('notesList');
+      const searchInput = document.getElementById('searchInput');
+
+      // helper: priority class
+      function getPriorityClass(status) {
+        const s = (status || '').toLowerCase();
+        if (s.includes('v.imp') || s.includes('vimp')) return 'vimp';
+        if (s.includes('imp')) return 'imp';
+        if (s.includes('note')) return 'note';
+        return '';
+      }
+
+      // escape html (very basic)
+      function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      // render notes based on search term
+      function renderNotes(searchTerm = '') {
+        const term = searchTerm.trim().toLowerCase();
+        const filtered = notes.filter(n => {
+          if (!term) return true;
+          return (
+            (n.reference && n.reference.toLowerCase().includes(term)) ||
+            (n.category && n.category.toLowerCase().includes(term)) ||
+            (n.memory && n.memory.toLowerCase().includes(term)) ||
+            (n.status && n.status.toLowerCase().includes(term))
+          );
+        });
+
+        if (filtered.length === 0) {
+          listEl.innerHTML = `<div class="empty">No notes match “${escapeHtml(searchTerm)}”</div>`;
+          return;
+        }
+
+        listEl.innerHTML = filtered.map(note => {
+          const priorityClass = getPriorityClass(note.status);
+          const statusLabel = note.status ? escapeHtml(note.status) : '—';
+          return `
+            <div class="note-card">
+              <div class="note-meta">
+                <span class="ref">${escapeHtml(note.reference || '—')}</span>
+                <span class="cat">${escapeHtml(note.category || 'Uncategorized')}</span>
+                <span class="priority ${priorityClass}">${statusLabel}</span>
+              </div>
+              <div class="memory">${escapeHtml(note.memory || '')}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // initial render
+      renderNotes('');
+
+      // live search (no debounce needed for small list, but keep it smooth)
+      searchInput.addEventListener('input', (e) => {
+        renderNotes(e.target.value);
+      });
+    })();
+  </script>
+</body>
+</html>
