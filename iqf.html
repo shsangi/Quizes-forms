@@ -1,470 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0ea5e9">
-<title>Self Learners · MCQs</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
-body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;color:#0f1419}
-.w{width:100%;max-width:920px;padding:16px}
-.top{position:sticky;top:0;z-index:10;background:#fff;border:1px solid #e2e8f0;border-radius:16px;
-     padding:10px 14px;margin-bottom:12px;box-shadow:0 8px 20px -6px rgba(10,30,63,.12);
-     display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.tt{font-weight:800;color:#0a1e3f;font-size:.95rem;flex:1;min-width:120px}
-.rt{display:flex;gap:6px;align-items:center}
-.pill{background:#e0f2fe;color:#0284c7;font-weight:800;font-size:.62rem;padding:.28rem .6rem;
-      border-radius:9999px;border:1px solid #7dd3fc}
-.tmr{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-weight:800;font-size:.62rem;
-     padding:.28rem .6rem;border-radius:9999px}
-.dots{background:transparent;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;
-      color:#475569;display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:3px;padding:0;transition:background .15s}
-.dots:hover{background:#f1f5f9}
-.dots span{width:4px;height:4px;border-radius:50%;background:currentColor}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:22px;
-      box-shadow:0 20px 40px -12px rgba(10,30,63,.18)}
-.q{font-weight:700;font-size:1.1rem;color:#0a1e3f;line-height:1.55;margin-bottom:16px}
-.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;
-     border:1.5px solid #e2e8f0;border-radius:9999px;padding:14px 18px;font-size:.95rem;
-     font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit;transition:.15s;color:#0f1419}
-.opt:hover:not(:disabled){background:#e0f2fe;border-color:#0ea5e9}
-.opt .k{background:#e0f2fe;color:#0284c7;font-weight:800;width:28px;height:28px;border-radius:50%;
-        display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.opt.ok{background:#d1fae5;border-color:#059669}.opt.ok .k{background:#059669;color:#fff}
-.opt.bad{background:#fee2e2;border-color:#dc2626}.opt.bad .k{background:#dc2626;color:#fff}
-.opt:disabled{cursor:default}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:14px;border-top:1px dashed #e2e8f0}
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;
-      padding:.3rem .7rem;border-radius:9999px}
-.chip.subject{background:#e0f2fe;color:#0284c7;border:1px solid #7dd3fc}
-.chip.topic{background:#fff7dd;color:#92400e;border:1px solid #fcd34d}
-.chip.job{background:#0a1e3f;color:#f5b800}
-.inv-msg{margin-top:10px;padding:10px 14px;background:#fee2e2;border:1.5px solid #dc2626;
-         border-left:5px solid #dc2626;border-radius:12px;color:#dc2626;font-weight:800;
-         font-size:.85rem;display:flex;align-items:center;gap:8px}
-.bar{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
-     background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border:none;font-weight:700;
-     font-size:.9rem;padding:.7rem 1.4rem;border-radius:9999px;cursor:pointer;font-family:inherit;
-     transition:.15s;box-shadow:0 4px 12px rgba(2,132,199,.25)}
-.btn:active{transform:scale(.96)}.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
-.btn-o{background:#fff;color:#0284c7;border:1.5px solid #bae6fd}
-.btn-o:hover:not(:disabled){background:#f0f9ff}
-.btn-g{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 4px 12px rgba(5,150,105,.3)}
-.load{padding:60px;text-align:center;color:#475569;font-weight:600}
-.grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px}
-.dot{width:28px;height:28px;border-radius:50%;background:#f4f6fa;border:2px solid transparent;
-     font-size:.68rem;font-weight:700;color:#94a3b8;display:flex;align-items:center;
-     justify-content:center;cursor:pointer;font-family:inherit;transition:.15s}
-.dot:hover{transform:scale(1.12)}
-.dot.ok{background:#059669;color:#fff}.dot.bad{background:#dc2626;color:#fff}
-.dot.inv{background:#f5b800;color:#0a1e3f}
-.dot.cur{border-color:#0284c7;transform:scale(1.2);box-shadow:0 0 0 3px rgba(2,132,199,.2)}
-.end{display:flex;justify-content:center;margin-top:16px;padding-top:16px;border-top:1px solid #e2e8f0}
-.stats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
-.stat{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:800;
-      padding:.32rem .7rem;border-radius:9999px;border:1.5px solid;background:#fff}
-.stat .n{font-weight:900;font-size:.75rem}
-.stat.ok{background:#d1fae5;border-color:#10b981;color:#059669}
-.stat.bad{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
-.stat.pend{background:#f8fafc;border-color:#cbd5e1;color:#475569}
-.stat.inv{background:#fef3c7;border-color:#fcd34d;color:#92400e}
-.ric{font-size:3rem;margin-bottom:8px}
-.ov{position:fixed;inset:0;background:rgba(10,30,63,.55);backdrop-filter:blur(6px);z-index:900;
-    opacity:0;pointer-events:none;transition:.25s}
-.ov.on{opacity:1;pointer-events:auto}
-.dr{position:fixed;top:0;right:0;bottom:0;width:min(92vw,400px);background:#fff;z-index:901;
-    transform:translateX(105%);transition:transform .35s cubic-bezier(.16,1,.3,1);
-    display:flex;flex-direction:column;box-shadow:-20px 0 60px -12px rgba(10,30,63,.35)}
-.dr.on{transform:translateX(0)}
-.dh{padding:14px 18px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
-    display:flex;justify-content:space-between;align-items:center}
-.dh h3{font-size:1rem;font-weight:800}
-.dc{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;
-    width:30px;height:30px;border-radius:50%;cursor:pointer;font-weight:800;font-size:.9rem;font-family:inherit}
-.db{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
-.fl{font-size:.72rem;font-weight:800;color:#0a1e3f;text-transform:uppercase;
-    letter-spacing:.06em;margin-bottom:6px;display:block}
-.fi{width:100%;padding:.7rem .9rem;border:1.5px solid #e2e8f0;border-radius:12px;
-    font-family:inherit;font-size:.85rem;outline:none;background:#f8fafc}
-.fi:focus{border-color:#0ea5e9;background:#fff;box-shadow:0 0 0 3px rgba(14,165,233,.12)}
-.chbx{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}.chbx:empty{display:none}
-.cc{display:inline-flex;align-items:center;gap:4px;background:#0ea5e9;color:#fff;
-    font-size:.68rem;font-weight:700;padding:.25rem .55rem;border-radius:9999px}
-.cc button{background:0 0;border:none;color:#fff;font-size:.85rem;cursor:pointer;
-           font-weight:800;padding:0;line-height:1;font-family:inherit}
-.dd{position:relative}
-.ddb{border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;padding:.55rem .7rem;
-     min-height:42px;cursor:pointer;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-     font-size:.82rem;font-weight:600;color:#475569}
-.ddb:hover{border-color:#0ea5e9}
-.ddb .ar{margin-left:auto;font-size:.6rem;color:#94a3b8;transition:.2s}
-.dd.on .ar{transform:rotate(180deg)}
-.ddm{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;
-     border:1.5px solid #e2e8f0;border-radius:12px;
-     box-shadow:0 16px 40px -10px rgba(10,30,63,.25);max-height:240px;overflow-y:auto;
-     padding:.35rem;z-index:10;display:none}
-.dd.on .ddm{display:block}
-.ddi{padding:.5rem .7rem;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;
-     display:flex;align-items:center;gap:.5rem;color:#0f1419}
-.ddi:hover{background:#e0f2fe;color:#0284c7}
-.ddi.sel{background:#0ea5e9;color:#fff}
-.ddi .ck{width:16px;height:16px;border:1.5px solid #cbd5e1;border-radius:4px;
-         display:flex;align-items:center;justify-content:center;font-size:.7rem;
-         color:#fff;flex-shrink:0}
-.ddi.sel .ck{background:#fff;color:#0284c7;border-color:#fff}
-.dde{padding:.8rem;text-align:center;font-size:.78rem;color:#94a3b8;font-style:italic}
-.cr{display:flex;gap:6px;flex-wrap:wrap}
-.cb{padding:.5rem .85rem;border:1.5px solid #e2e8f0;border-radius:9999px;background:#fff;
-    cursor:pointer;font-family:inherit;font-weight:700;font-size:.78rem;color:#475569;transition:.15s}
-.cb:hover{border-color:#0ea5e9;color:#0284c7}
-.cb.on{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border-color:#0284c7}
-.cb.inv.on{background:linear-gradient(135deg,#f5b800,#d99e00);border-color:#d99e00;color:#0a1e3f}
-.drow{display:flex;gap:8px;margin-top:4px}
-.dl{flex:1;padding:.85rem;border:none;border-radius:9999px;font-family:inherit;
-    font-weight:800;font-size:.9rem;color:#fff;cursor:pointer;
-    background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 4px 12px rgba(5,150,105,.3)}
-.drs{padding:.85rem 1rem;border:1.5px solid #e2e8f0;border-radius:9999px;font-family:inherit;
-     font-weight:800;font-size:.9rem;color:#475569;background:#fff;cursor:pointer;transition:.15s}
-.drs:hover{border-color:#dc2626;color:#dc2626;background:#fee2e2}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0ea5e9">
+  <title>Self Learners · MCQs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+    body{background:#f4f6fa;display:flex;justify-content:center;min-height:100vh;color:#0f1419}
+    .wrap{width:100%;max-width:920px;padding:16px}
+    .top{position:sticky;top:0;z-index:10;background:#fff;border:1px solid #e2e8f0;
+         border-radius:16px;padding:12px 16px;margin-bottom:12px;
+         box-shadow:0 8px 20px -6px rgba(10,30,63,.12);display:flex;
+         justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .title{font-weight:800;color:#0a1e3f;font-size:1rem}
+    .pill{background:#e0f2fe;color:#0284c7;font-weight:800;font-size:.72rem;
+          padding:.35rem .75rem;border-radius:9999px;border:1px solid #7dd3fc}
+    .timer{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
+           font-weight:800;font-size:.72rem;padding:.35rem .75rem;border-radius:9999px}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;
+          padding:22px;box-shadow:0 20px 40px -12px rgba(10,30,63,.18)}
+    .q{font-weight:700;font-size:1.1rem;color:#0a1e3f;line-height:1.55;margin-bottom:16px}
+    .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+         background:#fff;border:1.5px solid #e2e8f0;border-radius:9999px;
+         padding:14px 18px;font-size:.95rem;font-weight:600;cursor:pointer;
+         margin-bottom:10px;font-family:inherit;transition:all .15s;color:#0f1419}
+    .opt:hover:not(:disabled){background:#e0f2fe;border-color:#0ea5e9}
+    .opt .k{background:#e0f2fe;color:#0284c7;font-weight:800;width:28px;height:28px;
+            border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .opt.ok{background:#d1fae5;border-color:#059669}
+    .opt.ok .k{background:#059669;color:#fff}
+    .opt.bad{background:#fee2e2;border-color:#dc2626}
+    .opt.bad .k{background:#dc2626;color:#fff}
+    .opt:disabled{cursor:default}
+    .bar{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+         background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border:none;
+         font-weight:700;font-size:.9rem;padding:.7rem 1.4rem;border-radius:9999px;
+         cursor:pointer;font-family:inherit;transition:all .15s;
+         box-shadow:0 4px 12px rgba(2,132,199,.25)}
+    .btn:active{transform:scale(.96)}
+    .btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+    .btn-outline{background:#fff;color:#0284c7;border:1.5px solid #bae6fd;
+                 box-shadow:0 2px 8px rgba(2,132,199,.08)}
+    .btn-outline:hover:not(:disabled){background:#f0f9ff}
+    .btn-finish{background:linear-gradient(135deg,#f59e0b,#d97706);
+                box-shadow:0 4px 12px rgba(217,119,6,.35)}
+    .btn svg{width:18px;height:18px;flex-shrink:0}
+    .load{padding:60px;text-align:center;color:#475569;font-weight:600}
+    .grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px}
+    .dot{width:28px;height:28px;border-radius:50%;background:#f4f6fa;border:2px solid transparent;
+         font-size:.68rem;font-weight:700;color:#94a3b8;display:flex;align-items:center;
+         justify-content:center;cursor:pointer;font-family:inherit}
+    .dot.ok{background:#059669;color:#fff}
+    .dot.bad{background:#dc2626;color:#fff}
+    .dot.cur{border-color:#0284c7;transform:scale(1.15)}
+    .result-icon{font-size:3rem;margin-bottom:8px}
+  </style>
 </head>
 <body>
-<div class="w">
+<div class="wrap">
   <div class="top">
-    <div class="tt" id="tt">Loading…</div>
-    <div class="rt">
-      <span class="pill" id="cnt">0/0</span>
-      <span class="tmr" id="tmr">00:00</span>
-      <button class="dots" id="dotsBtn"><span></span><span></span><span></span></button>
+    <div class="title" id="title">Loading…</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="pill" id="count">0/0</span>
+      <span class="timer" id="timer">00:00</span>
     </div>
   </div>
   <div class="card">
-    <div id="bd"><div class="load">🔄 Loading…</div></div>
-    <div class="grid" id="gd"></div>
-    <div class="end" id="endW"></div>
-    <div class="stats" id="st"></div>
+    <div id="body"><div class="load">🔄 Loading questions…</div></div>
+    <div class="grid" id="grid"></div>
   </div>
 </div>
 
-<div class="ov" id="ov"></div>
-<aside class="dr" id="dr">
-  <div class="dh"><h3>⚙️ Filters</h3><button class="dc" id="dc">✕</button></div>
-  <div class="db">
-    <div>
-      <label class="fl">🔍 Search</label>
-      <input class="fi" id="sq" placeholder="Search question, topic, subject…" autocomplete="off">
-    </div>
-    <div>
-      <label class="fl">💼 Jobs</label>
-      <div class="chbx" id="jc"></div>
-      <div class="dd" id="jd">
-        <div class="ddb" id="jb"><span id="jt">All jobs</span><span class="ar">▼</span></div>
-        <div class="ddm" id="jm"></div>
-      </div>
-    </div>
-    <div>
-      <label class="fl">📚 Subjects</label>
-      <div class="chbx" id="sc"></div>
-      <div class="dd" id="sd">
-        <div class="ddb" id="sb"><span id="stt">All subjects</span><span class="ar">▼</span></div>
-        <div class="ddm" id="sm"></div>
-      </div>
-    </div>
-    <div>
-      <label class="fl"># MCQs to load</label>
-      <div class="cr" id="cr">
-        <button class="cb" data-n="5">5</button>
-        <button class="cb" data-n="10">10</button>
-        <button class="cb on" data-n="20">20</button>
-        <button class="cb" data-n="100">100</button>
-        <button class="cb" data-n="200">200</button>
-        <button class="cb" data-n="0">All</button>
-        <button class="cb inv" data-n="-1">⚠️ Invalids</button>
-      </div>
-    </div>
-    <div class="drow">
-      <button class="dl" id="lb">🔄 Load Quiz</button>
-      <button class="drs" id="rb">⟲ Reset</button>
-    </div>
-  </div>
-</aside>
-
 <script>
-const URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
-let all=[],qs=[],ans=[],cur=0,time=0,tmr=null,total=0,inv=new Set();
-let sJ=new Set(),sS=new Set(),pick=20,searchQ='',invMode=false;
+const QUIZ_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQyB_I39SsLmQC5C8O1KkzZEUgFPAIJQ95k0vFj9M-HX8vI9hsdLh0GFYYO8O1QFnvP4vWkAh3nmbd3/pub?output=csv';
+let qs=[],ans=[],cur=0,time=0,timer=null,total=0;
 
 const $=id=>document.getElementById(id);
-const cl=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim();
-const nk=s=>cl(s).toLowerCase();
-const TC=s=>!s?'':cl(s).split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
-const eq=(a,b)=>nk(a)===nk(b);
-
-const pCSV=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];
+const clean=s=>String(s??'').replace(/[\u200B-\u200D\uFEFF\u00A0]/g,' ').replace(/\s+/g,' ').trim();
+const parseCSV=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];
   if(q){if(ch==='"'&&l[i+1]==='"'){c+='"';i++}else if(ch==='"')q=false;else c+=ch}
-  else{if(ch==='"')q=true;else if(ch===','){r.push(cl(c));c=''}else c+=ch}}
-  r.push(cl(c));return r};
-const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const findC=(raw,opts)=>{if(!raw)return -1;const r=cl(raw);
-  for(let i=0;i<opts.length;i++)if(cl(opts[i])===r)return i;
+  else{if(ch==='"')q=true;else if(ch===','){r.push(clean(c));c=''}else c+=ch}}
+  r.push(clean(c));return r};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const findCorrect=(raw,opts)=>{if(!raw)return -1;const r=clean(raw);
+  for(let i=0;i<opts.length;i++)if(clean(opts[i])===r)return i;
   if(/^[A-Da-d]$/.test(r))return 'abcd'.indexOf(r.toLowerCase());
   if(/^[1-4]$/.test(r))return +r-1;return -1};
 
-const SP=[/all\s+of\s+(the\s+)?above/i,/none\s+of\s+(the\s+)?above/i,/above\s+all/i,/\bboth\b/i,/^\s*none\s*$/i,/all\s+of\s+these/i];
-const isSp=o=>{const t=cl(o);return t&&SP.some(p=>p.test(t))};
-
-function shufOpts(opts){
-  const f={},fr=[];
-  opts.forEach((o,i)=>{isSp(o)?f[i]=o:fr.push(o)});
-  const sh=shuf(fr),out=new Array(opts.length);
-  Object.keys(f).forEach(k=>out[+k]=f[k]);
-  let p=0;for(let i=0;i<out.length;i++) if(out[i]===undefined) out[i]=sh[p++];
-  return out;
-}
-
-function shufCat(list){
-  const b=new Map();
-  list.forEach(it=>{
-    const k=[it.job,it.subject,it.topic].map(nk).join('|');
-    if(!b.has(k))b.set(k,[]);
-    b.get(k).push(it);
-  });
-  const out=[];shuf([...b.keys()]).forEach(k=>out.push(...shuf(b.get(k))));
-  return out;
-}
-
 async function load(){
   try{
-    const r=await fetch(URL+'&_t='+Date.now(),{cache:'no-store'});
+    const r=await fetch(QUIZ_URL+'&_t='+Date.now(),{cache:'no-store'});
     const text=await r.text();
-    all=[];
-    for(const line of text.split('\n').filter(l=>l.trim()).slice(1)){
-      const c=pCSV(line);
+    const lines=text.split('\n').filter(l=>l.trim());
+    qs=[];
+    for(let i=1;i<lines.length;i++){
+      const c=parseCSV(lines[i]);
       if(c.length<9||!c[1])continue;
-      const show=(c[13]||'').toLowerCase();
-      if(show==='0'||show==='false'||show==='no')continue;
-      const opts=[c[2]||'',c[3]||'',c[4]||'',c[5]||''].map(cl);
-      all.push({q:c[1],opts,correct:findC(c[6],opts),subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
+      const opts=[c[2]||'',c[3]||'',c[4]||'',c[5]||''].map(clean);
+      const correct=findCorrect(c[6],opts);
+      qs.push({q:c[1],opts,correct,subject:c[8]||'',topic:c[7]||'',job:c[10]||''});
     }
-    buildMenus();applyLoad();
-  }catch(e){console.error(e);$('bd').innerHTML='<div class="load">❌ Failed to load</div>'}
-}
-
-function applyLoad(){
-  let L=all.slice();
-  if(invMode){
-    L=L.filter(x=>x.correct===-1);
-  } else {
-    if(sJ.size) L=L.filter(x=>sJ.has(nk(x.job)));
-    if(sS.size) L=L.filter(x=>sS.has(nk(x.subject)));
-    if(searchQ){
-      const q=searchQ.toLowerCase();
-      L=L.filter(x=>
-        (x.q||'').toLowerCase().includes(q)||
-        (x.subject||'').toLowerCase().includes(q)||
-        (x.topic||'').toLowerCase().includes(q)||
-        (x.job||'').toLowerCase().includes(q)||
-        x.opts.some(o=>(o||'').toLowerCase().includes(q)));
-    }
+    qs=shuffle(qs).map(x=>{const s=shuffle(x.opts);return{...x,opts:s,correct:s.indexOf(x.opts[x.correct])}});
+    total=qs.length;ans=Array(total).fill(null);time=total*60;cur=0;
+    $('title').textContent='All Jobs MCQs';
+    $('count').textContent='0/'+total;
+    startTimer();render();grid();
+  }catch(e){
+    $('body').innerHTML='<div class="load">❌ Failed to load</div>';
   }
-  L=shufCat(L);
-  if(pick>0) L=L.slice(0,pick);
-  qs=L.map(x=>{
-    const no=shufOpts(x.opts);
-    const ct=x.opts[x.correct];
-    return {...x,opts:no,correct:ct!==undefined?no.findIndex(o=>eq(o,ct)):-1};
-  });
-  inv=new Set();
-  qs.forEach((x,i)=>{if(x.correct===-1)inv.add(i)});
-  total=qs.length;ans=Array(total).fill(null);cur=0;time=total*60;
-  $('tt').textContent=invMode?'⚠️ Invalid Questions':(sJ.size?`${sJ.size} Job(s) MCQs`:'All Jobs MCQs');
-  $('cnt').textContent='0/'+total;
-  closeDr();clearInterval(tmr);startT();render();grid();endBtn();stats();
-  scrollTo({top:0,behavior:'smooth'});
 }
 
-function buildMenus(){
-  const jobs=[...new Set(all.map(x=>cl(x.job)).filter(Boolean))].sort((a,b)=>TC(a).localeCompare(TC(b)));
-  $('jm').innerHTML=`<div class="ddi" data-v=""><span class="ck">✓</span>All jobs</div>`+
-    jobs.map(j=>`<div class="ddi" data-v="${nk(j)}"><span class="ck"></span>${TC(j)}</div>`).join('');
-  $('jm').querySelectorAll('.ddi').forEach(el=>{
-    el.onclick=e=>{
-      e.stopPropagation();
-      const v=el.dataset.v;
-      if(!v)sJ.clear(); else sJ.has(v)?sJ.delete(v):sJ.add(v);
-      rJ();rS();
-    };
-  });
-  rJ();rS();
-}
-
-function rJ(){
-  $('jm').querySelectorAll('.ddi').forEach(el=>{
-    const v=el.dataset.v,on=v?sJ.has(v):sJ.size===0;
-    el.classList.toggle('sel',on);
-    el.querySelector('.ck').textContent=on?'✓':'';
-  });
-  $('jt').textContent=sJ.size===0?'All jobs':`${sJ.size} job(s) selected`;
-  chips('jc',sJ,v=>{sJ.delete(v);rJ();rS()});
-}
-
-function rS(){
-  const pool=sJ.size===0?all:all.filter(x=>sJ.has(nk(x.job)));
-  const map=new Map();
-  pool.forEach(x=>{
-    const r=cl(x.subject);if(!r)return;
-    const k=nk(r);if(!map.has(k))map.set(k,TC(r));
-  });
-  [...sS].forEach(s=>{if(!map.has(s))sS.delete(s)});
-  const list=[...map.entries()].sort((a,b)=>a[1].localeCompare(b[1]));
-  $('sm').innerHTML=list.length
-    ? `<div class="ddi" data-v=""><span class="ck">✓</span>All subjects</div>`+
-      list.map(([k,label])=>`<div class="ddi" data-v="${k}"><span class="ck"></span>${label}</div>`).join('')
-    : `<div class="dde">${sJ.size?'No subjects for selected jobs':'No subjects available'}</div>`;
-  $('sm').querySelectorAll('.ddi').forEach(el=>{
-    el.onclick=e=>{
-      e.stopPropagation();
-      const v=el.dataset.v;
-      if(!v)sS.clear(); else sS.has(v)?sS.delete(v):sS.add(v);
-      rS();
-    };
-  });
-  $('sm').querySelectorAll('.ddi').forEach(el=>{
-    const v=el.dataset.v,on=v?sS.has(v):sS.size===0;
-    el.classList.toggle('sel',on);
-    el.querySelector('.ck').textContent=on?'✓':'';
-  });
-  $('stt').textContent=sS.size===0?'All subjects':`${sS.size} subject(s) selected`;
-  chips('sc',sS,v=>{sS.delete(v);rS()});
-}
-
-function chips(id,set,onRm){
-  const box=$(id);
-  box.innerHTML=[...set].map(v=>{
-    const f=all.find(x=>nk(x.job)===v||nk(x.subject)===v);
-    const label=f?(nk(f.job)===v?TC(f.job):TC(f.subject)):v;
-    return `<span class="cc">${label} <button data-v="${v}">×</button></span>`;
-  }).join('');
-  box.querySelectorAll('button').forEach(b=>{b.onclick=e=>{e.stopPropagation();onRm(b.dataset.v)}});
-}
-
-const ov=$('ov'),dr=$('dr');
-const openDr=()=>{ov.classList.add('on');dr.classList.add('on')};
-const closeDr=()=>{ov.classList.remove('on');dr.classList.remove('on')};
-$('dotsBtn').onclick=openDr;
-$('dc').onclick=closeDr;
-ov.onclick=closeDr;
-$('jb').onclick=e=>{e.stopPropagation();$('jd').classList.toggle('on');$('sd').classList.remove('on')};
-$('sb').onclick=e=>{e.stopPropagation();$('sd').classList.toggle('on');$('jd').classList.remove('on')};
-document.addEventListener('click',()=>{$('jd').classList.remove('on');$('sd').classList.remove('on')});
-$('jm').onclick=e=>e.stopPropagation();
-$('sm').onclick=e=>e.stopPropagation();
-$('sq').addEventListener('input',()=>searchQ=$('sq').value.trim());
-$('cr').querySelectorAll('.cb').forEach(b=>{
-  b.onclick=()=>{
-    $('cr').querySelectorAll('.cb').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on');
-    const n=+b.dataset.n;
-    if(n===-1){invMode=true;pick=0} else {invMode=false;pick=n}
-  };
-});
-$('lb').onclick=applyLoad;
-$('rb').onclick=()=>{
-  sJ.clear();sS.clear();searchQ='';invMode=false;pick=20;
-  $('sq').value='';
-  $('cr').querySelectorAll('.cb').forEach(x=>x.classList.remove('on'));
-  $('cr').querySelector('[data-n="20"]').classList.add('on');
-  rJ();rS();
-};
-
-function startT(){
-  clearInterval(tmr);
-  tmr=setInterval(()=>{
+function startTimer(){
+  clearInterval(timer);
+  timer=setInterval(()=>{
     time--;const m=Math.floor(time/60),s=time%60;
-    $('tmr').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-    if(time<=0){clearInterval(tmr);end()}
+    $('timer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    if(time<=0){clearInterval(timer);end()}
   },1000);
 }
 
-function stats(){
-  let ok=0,bad=0,pd=0,iv=0;
-  for(let i=0;i<total;i++){
-    if(inv.has(i)){iv++;continue}
-    if(ans[i]===null){pd++;continue}
-    ans[i]===qs[i].correct?ok++:bad++;
-  }
-  let h=`<span class="stat ok">🎯 Correct <span class="n">${ok}</span></span>`;
-  h+=`<span class="stat bad">❌ Wrong <span class="n">${bad}</span></span>`;
-  h+=`<span class="stat pend">⏳ Pending <span class="n">${pd}</span></span>`;
-  if(iv>0)h+=`<span class="stat inv">⚠️ Invalid <span class="n">${iv}</span></span>`;
-  $('st').innerHTML=h;
-}
-
 function render(){
-  const x=qs[cur];if(!x){$('bd').innerHTML='<div class="load">No questions match filters</div>';return}
-  const isI=inv.has(cur),done=ans[cur]!==null||isI;
-  const L=['A','B','C','D'];
+  const x=qs[cur];if(!x)return;
+  const done=ans[cur]!==null;
+  const isLast=cur===total-1;
+  const letters=['A','B','C','D'];
   let h=`<div class="q">${cur+1}. ${x.q}</div>`;
   x.opts.forEach((o,i)=>{
-    let c='opt';
-    if(done&&!isI){if(i===x.correct)c+=' ok';else if(i===ans[cur])c+=' bad'}
-    h+=`<button class="${c}" data-i="${i}" ${done?'disabled':''}><span class="k">${L[i]}</span><span>${o||'(Empty)'}</span></button>`;
+    let cls='opt';
+    if(done){
+      if(i===x.correct)cls+=' ok';
+      else if(i===ans[cur])cls+=' bad';
+    }
+    h+=`<button class="${cls}" data-i="${i}" ${done?'disabled':''}>
+      <span class="k">${letters[i]}</span><span>${o||'(Empty)'}</span></button>`;
   });
-  if(done&&(x.subject||x.topic||x.job)){
-    h+='<div class="chips">';
-    if(x.subject)h+=`<span class="chip subject">📚 ${TC(x.subject)}</span>`;
-    if(x.topic)h+=`<span class="chip topic">🏷️ ${TC(x.topic)}</span>`;
-    if(x.job)h+=`<span class="chip job">💼 ${TC(x.job)}</span>`;
-    h+='</div>';
-  }
-  if(isI)h+=`<div class="inv-msg">⚠️ Invalid question — correct answer not found in options</div>`;
-  h+=`<div class="bar">
-    <button class="btn btn-o" id="pv" ${cur===0?'disabled':''}>◀ Back</button>
-    <button class="btn" id="nx" ${cur===total-1?'disabled':''}>Next ▶</button>
-  </div>`;
-  $('bd').innerHTML=h;
-  if(!isI)$('bd').querySelectorAll('.opt:not([disabled])').forEach(b=>{
-    b.onclick=()=>{ans[cur]=+b.dataset.i;$('cnt').textContent=ans.filter(a=>a!==null).length+'/'+total;render();grid();stats()};
-  });
-  $('pv')&&($('pv').onclick=()=>{cur--;render();grid();stats()});
-  $('nx')&&($('nx').onclick=()=>{cur++;render();grid();stats()});
-}
 
-function endBtn(){
-  $('endW').innerHTML=`<button class="btn btn-g" id="eb">🏁 End Quiz</button>`;
-  $('eb').onclick=end;
+  // Back button
+  h+=`<div class="bar">
+    <button class="btn btn-outline" id="prev" ${cur===0?'disabled':''}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>`;
+
+  // Next OR Finish button
+  if(isLast){
+    h+=`<button class="btn btn-finish" id="finish">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Finish
+    </button>`;
+  }else{
+    h+=`<button class="btn" id="next">
+      Next
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>`;
+  }
+  h+=`</div>`;
+  $('body').innerHTML=h;
+
+  $('body').querySelectorAll('.opt:not([disabled])').forEach(b=>{
+    b.onclick=()=>{ans[cur]=+b.dataset.i;$('count').textContent=(ans.filter(a=>a!==null).length)+'/'+total;render();grid()};
+  });
+  $('prev')&&($('prev').onclick=()=>{cur--;render();grid()});
+  $('next')&&($('next').onclick=()=>{cur++;render();grid()});
+  $('finish')&&($('finish').onclick=end);
 }
 
 function grid(){
-  $('gd').innerHTML=qs.map((x,i)=>{
+  let h='';
+  qs.forEach((x,i)=>{
     let c='dot';
-    if(inv.has(i))c+=' inv';
-    else if(ans[i]!==null)c+=ans[i]===x.correct?' ok':' bad';
+    if(ans[i]!==null)c+=(ans[i]===x.correct?' ok':' bad');
     if(i===cur)c+=' cur';
-    return `<button class="${c}" data-i="${i}">${i+1}</button>`;
-  }).join('');
-  $('gd').querySelectorAll('.dot').forEach(d=>{
-    d.onclick=()=>{cur=+d.dataset.i;render();grid();stats();scrollTo({top:0,behavior:'smooth'})};
+    h+=`<button class="${c}" data-i="${i}">${i+1}</button>`;
+  });
+  $('grid').innerHTML=h;
+  $('grid').querySelectorAll('.dot').forEach(d=>{
+    d.onclick=()=>{cur=+d.dataset.i;render();grid();scrollTo({top:0,behavior:'smooth'})};
   });
 }
 
 function end(){
-  clearInterval(tmr);
-  const r=qs.filter((x,i)=>ans[i]===x.correct).length;
-  const pct=Math.round((r/total)*100);
-  const icon=r===total?'🌟':pct>=70?'👏':'💪';
-  const msg=r===total?'Perfect score!':pct>=70?'Great job!':'Keep practicing!';
-  $('bd').innerHTML=`<div style="text-align:center;padding:20px">
-    <div class="ric">${icon}</div>
-    <div style="font-size:2.6rem;font-weight:900;color:#0284c7">${r} / ${total}</div>
-    <div style="color:#475569;margin:10px 0 20px;font-weight:600">${msg} — ${pct}% correct</div>
-    <button class="btn" onclick="location.reload()">⟳ Try again</button>
-  </div>`;
-  $('gd').innerHTML='';$('endW').innerHTML='';$('st').innerHTML='';
+  clearInterval(timer);
+  const right=qs.filter((x,i)=>ans[i]===x.correct).length;
+  const pct=Math.round((right/total)*100);
+  let icon,msg;
+  if(right===total){icon='🌟';msg='Perfect score!';}
+  else if(pct>=70){icon='👏';msg='Great job!';}
+  else{icon='💪';msg='Keep practicing!';}
+  $('body').innerHTML=`
+    <div style="text-align:center;padding:20px">
+      <div class="result-icon">${icon}</div>
+      <div style="font-size:2.6rem;font-weight:900;color:#0284c7">${right} / ${total}</div>
+      <div style="color:#475569;margin:10px 0 20px;font-weight:600">
+        ${msg} — ${pct}% correct
+      </div>
+      <button class="btn" onclick="location.reload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Try again
+      </button>
+    </div>`;
+  $('grid').innerHTML='';
 }
 
 load();
