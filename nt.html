@@ -2,27 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notes · Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>My Notes · Home</title>
   <style>
-    /* minimal reset + design tokens – just enough for a clean notes home */
+    /* ----- GLOBAL RESET & DESIGN TOKENS ----- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    :root {
+      --bg: #f4f7fc;
+      --card: #ffffff;
+      --border: #e2eaf3;
+      --border-light: #edf2f9;
+      --text: #0b1e2f;
+      --text-secondary: #4f6279;
+      --text-muted: #7a8b9f;
+      --primary: #0a7cff;
+      --primary-soft: #eef4ff;
+      --primary-border: #c7dcff;
+      --green: #16a34a;
+      --green-soft: #e6f7ec;
+      --green-border: #b1e3c7;
+      --red: #dc2626;
+      --red-soft: #fee9e7;
+      --red-border: #fbc9c4;
+      --amber: #d97706;
+      --amber-soft: #fef4e6;
+      --amber-border: #fde0b6;
+      --blue-soft: #e4f0fe;
+      --blue-border: #b8d6fe;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.02);
+      --shadow-md: 0 4px 14px rgba(0,20,40,0.04);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
     }
 
     body {
-      background: #f4f7fc;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 1.5rem 1rem 2rem;
+      padding: 1.2rem 0.8rem 3rem;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      line-height: 1.45;
     }
 
-    /* home container – no header, no top bar */
+    /* ----- HOME LAYOUT (no header) ----- */
     .home {
       width: 100%;
       max-width: 720px;
@@ -31,184 +61,446 @@
       gap: 1rem;
     }
 
-    /* search bar – only interactive element */
+    /* ----- SEARCH + FILTER CONTROLS (inline, minimal) ----- */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
     .search-box {
-      width: 100%;
-      background: white;
-      border: 1px solid #d9e2ef;
-      border-radius: 18px;
-      padding: 0.75rem 1.2rem;
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 60px;
+      padding: 0.65rem 1.2rem;
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+      box-shadow: var(--shadow-sm);
       transition: border 0.15s, box-shadow 0.15s;
     }
     .search-box:focus-within {
-      border-color: #0a7cff;
-      box-shadow: 0 6px 16px rgba(10, 124, 255, 0.08);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(10,124,255,0.08);
     }
     .search-box span {
-      font-size: 1.2rem;
-      color: #7c8b9c;
+      font-size: 1.1rem;
+      color: var(--text-muted);
       line-height: 1;
+      user-select: none;
     }
     .search-box input {
       flex: 1;
       border: none;
       outline: none;
-      font-size: 1rem;
+      font-size: 0.95rem;
       background: transparent;
-      color: #0b1a2b;
+      color: var(--text);
+      font-weight: 400;
+      min-width: 0;
     }
     .search-box input::placeholder {
-      color: #9aabbe;
-      font-weight: 400;
+      color: var(--text-muted);
     }
 
-    /* notes list – simple, clean cards */
+    /* filter toggle button (compact) */
+    .filter-toggle {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.12s;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      user-select: none;
+    }
+    .filter-toggle:hover {
+      border-color: var(--primary-border);
+      color: var(--primary);
+    }
+    .filter-toggle.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    /* ----- FILTER PANEL (collapsible, minimal) ----- */
+    .filter-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.8rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .filter-panel.open {
+      display: flex;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .filter-group label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* multi-select simulation – simple chips */
+    .chip-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      min-height: 2rem;
+    }
+    .chip {
+      background: var(--primary-soft);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      padding: 0.25rem 0.7rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.1s, border 0.1s;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .chip:hover {
+      background: #d9e8ff;
+    }
+    .chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    .chip .remove {
+      font-size: 0.8rem;
+      opacity: 0.6;
+      margin-left: 2px;
+    }
+    .chip.active .remove {
+      opacity: 0.9;
+    }
+
+    /* simple select for sort */
+    .sort-select {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.8rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      outline: none;
+      width: 100%;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a8b9f' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+    }
+
+    .reset-filters {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .reset-filters:hover {
+      background: #f8fafd;
+      border-color: #cbdae9;
+    }
+
+    /* ----- CARD LIST (clean, identical view) ----- */
     .notes-list {
       display: flex;
       flex-direction: column;
-      gap: 0.8rem;
+      gap: 0.85rem;
     }
 
     .note-card {
-      background: white;
-      border-radius: 18px;
-      padding: 1.1rem 1.3rem;
-      border: 1px solid #e2eaf3;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-      transition: border 0.1s, box-shadow 0.1s;
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem 1.2rem 1rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: border 0.12s, box-shadow 0.12s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
       cursor: default;
     }
     .note-card:hover {
       border-color: #cbdae9;
-      box-shadow: 0 6px 16px rgba(0, 20, 40, 0.04);
+      box-shadow: var(--shadow-md);
     }
 
-    /* meta row: reference + category */
+    /* status stripe (left) */
+    .note-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+      background: var(--border);
+    }
+    .note-card.vimp::before { background: var(--red); }
+    .note-card.imp::before { background: var(--amber); }
+    .note-card.note::before { background: var(--primary); }
+
+    /* meta row */
     .note-meta {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 0.5rem 0.8rem;
-      margin-bottom: 0.5rem;
+      padding-right: 0.5rem;
     }
 
     .ref {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 0.7rem;
+      font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
       font-weight: 600;
-      background: #eef3fe;
+      background: var(--primary-soft);
       color: #0a5cbf;
-      padding: 0.2rem 0.6rem;
-      border-radius: 20px;
+      padding: 0.2rem 0.65rem;
+      border-radius: 40px;
       letter-spacing: 0.01em;
+      white-space: nowrap;
+      border: 1px solid var(--primary-border);
     }
 
     .cat {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       font-weight: 600;
-      color: #5e6e82;
+      color: var(--text-secondary);
       background: #f0f4fa;
-      padding: 0.2rem 0.6rem;
-      border-radius: 20px;
+      padding: 0.2rem 0.65rem;
+      border-radius: 40px;
+      white-space: nowrap;
     }
 
-    /* the actual memory / note text */
-    .memory {
-      font-size: 0.98rem;
-      line-height: 1.5;
-      color: #0b1e2f;
-      font-weight: 450;
-      word-break: break-word;
-      margin: 0.2rem 0 0.1rem;
-    }
-
-    /* priority badge (small indicator on the right) */
-    .priority {
-      float: right;
-      margin-left: 0.6rem;
+    .priority-badge {
+      margin-left: auto;
       font-size: 0.6rem;
       font-weight: 700;
       letter-spacing: 0.03em;
-      padding: 0.15rem 0.6rem;
+      padding: 0.2rem 0.7rem;
       border-radius: 40px;
       background: #eef2f7;
       color: #3f5468;
       text-transform: uppercase;
+      white-space: nowrap;
     }
-    .priority.vimp { background: #fee9e7; color: #b91c1c; }
-    .priority.imp  { background: #fef4e6; color: #b45309; }
-    .priority.note { background: #e4f0fe; color: #0369a1; }
+    .priority-badge.vimp { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-border); }
+    .priority-badge.imp  { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-border); }
+    .priority-badge.note { background: var(--blue-soft); color: #0369a1; border: 1px solid var(--blue-border); }
 
-    /* no-results state – minimal */
-    .empty {
-      background: white;
-      border-radius: 18px;
-      padding: 2.5rem 1.5rem;
+    /* memory text */
+    .memory {
+      font-size: 0.96rem;
+      line-height: 1.5;
+      color: var(--text);
+      font-weight: 450;
+      word-break: break-word;
+      padding: 0.1rem 0 0.2rem;
+    }
+
+    /* read / reaction strip (optional, but keep subtle) */
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding-top: 0.3rem;
+      border-top: 1px dashed var(--border-light);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+    .card-actions span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      cursor: default;
+    }
+    .card-actions .read-count {
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .card-actions .liked {
+      color: var(--green);
+      font-weight: 600;
+    }
+    .card-actions .disliked {
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    /* empty state */
+    .empty-state {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 3rem 1.5rem;
       text-align: center;
-      color: #617388;
+      color: var(--text-muted);
       font-size: 0.95rem;
       border: 1px dashed #c9d8e9;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .empty-state b {
+      color: var(--text-secondary);
+      font-weight: 600;
+      display: block;
+      font-size: 1rem;
     }
 
-    /* tiny footer hint (optional, very light) */
+    /* loader */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* tiny footer */
     .footnote {
       text-align: center;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: #a0b2c6;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       letter-spacing: 0.01em;
     }
+
+    /* utilities */
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="home">
-    <!-- search input – only interactive filter, no header, no buttons -->
-    <div class="search-box">
-      <span>🔍</span>
-      <input type="search" id="searchInput" placeholder="Search notes, categories, references…" autocomplete="off" autofocus>
+    <!-- TOOLBAR (search + filter toggle) -->
+    <div class="toolbar">
+      <div class="search-row">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="search" id="searchInput" placeholder="Search notes, categories, references…" autocomplete="off" autofocus>
+        </div>
+        <div class="filter-toggle" id="filterToggle" title="Show filters" aria-label="Toggle filters">
+          <span>⚙️</span>
+        </div>
+      </div>
+
+      <!-- FILTER PANEL (collapsible) -->
+      <div class="filter-panel" id="filterPanel">
+        <!-- category chips -->
+        <div class="filter-group">
+          <label>Category</label>
+          <div class="chip-container" id="categoryChips"></div>
+        </div>
+
+        <!-- status/priority chips -->
+        <div class="filter-group">
+          <label>Priority</label>
+          <div class="chip-container" id="statusChips"></div>
+        </div>
+
+        <!-- reference chips (limited) -->
+        <div class="filter-group">
+          <label>Reference</label>
+          <div class="chip-container" id="referenceChips"></div>
+        </div>
+
+        <!-- sort -->
+        <div class="filter-group">
+          <label>Sort</label>
+          <select class="sort-select" id="sortSelect">
+            <option value="default">Default order</option>
+            <option value="priority">Priority first</option>
+            <option value="unread">Unread first</option>
+            <option value="most">Most read first</option>
+          </select>
+        </div>
+
+        <!-- reset button -->
+        <button class="reset-filters" id="resetFilters">
+          <span>↻</span> Reset all filters
+        </button>
+      </div>
     </div>
 
-    <!-- notes list will be rendered by JavaScript -->
-    <div class="notes-list" id="notesList"></div>
-    <div class="footnote">— your notes, simplified —</div>
+    <!-- NOTES LIST -->
+    <div class="notes-list" id="notesList">
+      <div class="loading">Loading notes…</div>
+    </div>
+    <div class="footnote">— data from Google Sheets —</div>
   </div>
 
   <script>
     (function() {
-      // ----- sample notes data (exactly what you'd see on a home screen) -----
-      const notes = [
-        { reference: 'R-101', category: 'General', memory: 'Always double-check the invoice number before sending.', status: 'V.Imp' },
-        { reference: 'R-205', category: 'Billing', memory: 'Client prefers PDF invoices, not links.', status: 'Imp' },
-        { reference: 'R-309', category: 'Support', memory: 'Reset password link expires in 30 minutes.', status: 'Note' },
-        { reference: 'R-412', category: 'General', memory: 'Use “reply all” only when necessary.', status: 'Imp' },
-        { reference: 'R-555', category: 'Onboarding', memory: 'Send welcome packet within 2 hours of sign-up.', status: 'V.Imp' },
-        { reference: 'R-678', category: 'Billing', memory: 'Refund requests must be approved by manager.', status: 'Note' },
-        { reference: 'R-722', category: 'Technical', memory: 'API rate limit: 100 requests per minute.', status: 'V.Imp' },
-        { reference: 'R-810', category: 'Support', memory: 'Always ask for the ticket ID first.', status: 'Imp' },
-        { reference: 'R-923', category: 'General', memory: 'Meeting notes should be shared within 24h.', status: 'Note' },
-        { reference: 'R-1050', category: 'Onboarding', memory: 'Schedule a 30-min intro call with new team members.', status: 'Imp' }
-      ];
+      // ---------- CONFIG ----------
+      const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTR3op0RZuTMJ-HegiLJYV18VR97DAnZpcUPRWwMYRfr5pVVf_x6ZOYMfiS8aXIJQcTh2hHpsgqJ8ks/pub?output=csv';
 
-      // ----- render notes -----
-      const listEl = document.getElementById('notesList');
+      // ---------- STATE ----------
+      let allNotes = [];              // { row, category, reference, memory, status }
+      let filteredNotes = [];
+      let activeFilters = {
+        category: new Set(),
+        status: new Set(),
+        reference: new Set()
+      };
+      let sortOrder = 'default';
+      let searchTerm = '';
+
+      // ---------- DOM refs ----------
+      const notesListEl = document.getElementById('notesList');
       const searchInput = document.getElementById('searchInput');
+      const filterToggle = document.getElementById('filterToggle');
+      const filterPanel = document.getElementById('filterPanel');
+      const categoryChips = document.getElementById('categoryChips');
+      const statusChips = document.getElementById('statusChips');
+      const referenceChips = document.getElementById('referenceChips');
+      const sortSelect = document.getElementById('sortSelect');
+      const resetFiltersBtn = document.getElementById('resetFilters');
 
-      // helper: priority class
-      function getPriorityClass(status) {
-        const s = (status || '').toLowerCase();
-        if (s.includes('v.imp') || s.includes('vimp')) return 'vimp';
-        if (s.includes('imp')) return 'imp';
-        if (s.includes('note')) return 'note';
-        return '';
-      }
-
-      // escape html (very basic)
+      // ---------- UTILS ----------
       function escapeHtml(text) {
         if (!text) return '';
         return String(text)
@@ -219,47 +511,302 @@
           .replace(/'/g, '&#39;');
       }
 
-      // render notes based on search term
-      function renderNotes(searchTerm = '') {
-        const term = searchTerm.trim().toLowerCase();
-        const filtered = notes.filter(n => {
-          if (!term) return true;
-          return (
-            (n.reference && n.reference.toLowerCase().includes(term)) ||
-            (n.category && n.category.toLowerCase().includes(term)) ||
-            (n.memory && n.memory.toLowerCase().includes(term)) ||
-            (n.status && n.status.toLowerCase().includes(term))
-          );
-        });
+      function getPriorityClass(status) {
+        const s = (status || '').toLowerCase().replace(/[^a-z.]/g, '');
+        if (s.includes('v.imp') || s.includes('vimp') || s.includes('veryimportant')) return 'vimp';
+        if (s.includes('imp') || s.includes('important')) return 'imp';
+        if (s.includes('note') || s.includes('notes')) return 'note';
+        return '';
+      }
 
-        if (filtered.length === 0) {
-          listEl.innerHTML = `<div class="empty">No notes match “${escapeHtml(searchTerm)}”</div>`;
+      function getPriorityLabel(status) {
+        const s = (status || '').trim();
+        if (!s) return '—';
+        const cls = getPriorityClass(s);
+        if (cls === 'vimp') return 'V.Imp';
+        if (cls === 'imp') return 'Imp';
+        if (cls === 'note') return 'Note';
+        return s;
+      }
+
+      // ---------- PARSING CSV ----------
+      function parseCSV(text) {
+        const lines = [];
+        let row = [];
+        let field = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < text.length; i++) {
+          const ch = text[i];
+          const next = text[i + 1];
+
+          if (inQuotes) {
+            if (ch === '"' && next === '"') { field += '"'; i++; }
+            else if (ch === '"') { inQuotes = false; }
+            else { field += ch; }
+          } else {
+            if (ch === '"') { inQuotes = true; }
+            else if (ch === ',') { row.push(field); field = ''; }
+            else if (ch === '\n' || ch === '\r') {
+              if (ch === '\r' && next === '\n') i++;
+              row.push(field);
+              if (row.some(c => c.trim() !== '')) lines.push(row);
+              row = [];
+              field = '';
+            } else {
+              field += ch;
+            }
+          }
+        }
+        if (field || row.length) {
+          row.push(field);
+          if (row.some(c => c.trim() !== '')) lines.push(row);
+        }
+        return lines;
+      }
+
+      // ---------- MAP HEADERS TO INTERNAL FIELDS ----------
+      function mapHeader(header) {
+        const h = String(header).trim().toLowerCase().replace(/\s+/g, ' ');
+        const map = {
+          'row': 'row', 's no': 'row', 'sr no': 'row', 'sno': 'row', '#': 'row',
+          'category': 'category', 'cat': 'category',
+          'reference': 'reference', 'ref': 'reference',
+          'one-line memory': 'memory', 'one line memory': 'memory', 'memory': 'memory',
+          'one-liner': 'memory', 'oneliner': 'memory',
+          'mcq status': 'status', 'status': 'status', 'mcqstatus': 'status'
+        };
+        return map[h] || h;
+      }
+
+      // ---------- EXTRACT NOTES FROM CSV ROWS ----------
+      function extractNotes(rows) {
+        if (rows.length < 2) return [];
+        const headers = rows[0].map(mapHeader);
+        const idx = (name) => headers.indexOf(name);
+
+        const idxRow = idx('row');
+        const idxCat = idx('category');
+        const idxRef = idx('reference');
+        const idxMem = idx('memory');
+        const idxStatus = idx('status');
+
+        const result = [];
+        for (let i = 1; i < rows.length; i++) {
+          const r = rows[i];
+          if (!r || r.length === 0) continue;
+          const memory = idxMem >= 0 ? (r[idxMem] || '').trim() : '';
+          const reference = idxRef >= 0 ? (r[idxRef] || '').trim() : '';
+          if (!memory && !reference) continue; // skip empty rows
+
+          result.push({
+            row: idxRow >= 0 ? (r[idxRow] || '').trim() : '',
+            category: idxCat >= 0 ? (r[idxCat] || '').trim() : '',
+            reference: reference,
+            memory: memory,
+            status: idxStatus >= 0 ? (r[idxStatus] || '').trim() : ''
+          });
+        }
+        return result;
+      }
+
+      // ---------- RENDER CARDS ----------
+      function renderCards() {
+        if (filteredNotes.length === 0) {
+          notesListEl.innerHTML = `<div class="empty-state"><b>No notes found</b>Try changing the search or filters.</div>`;
           return;
         }
 
-        listEl.innerHTML = filtered.map(note => {
+        const cardsHtml = filteredNotes.map(note => {
           const priorityClass = getPriorityClass(note.status);
-          const statusLabel = note.status ? escapeHtml(note.status) : '—';
+          const priorityLabel = getPriorityLabel(note.status);
+          const catDisplay = note.category || 'Uncategorized';
+          const refDisplay = note.reference || '—';
+
           return `
-            <div class="note-card">
+            <div class="note-card ${priorityClass}">
               <div class="note-meta">
-                <span class="ref">${escapeHtml(note.reference || '—')}</span>
-                <span class="cat">${escapeHtml(note.category || 'Uncategorized')}</span>
-                <span class="priority ${priorityClass}">${statusLabel}</span>
+                <span class="ref">${escapeHtml(refDisplay)}</span>
+                <span class="cat">${escapeHtml(catDisplay)}</span>
+                <span class="priority-badge ${priorityClass}">${escapeHtml(priorityLabel)}</span>
               </div>
               <div class="memory">${escapeHtml(note.memory || '')}</div>
+              <div class="card-actions">
+                <span class="read-count">📖 0×</span>
+                <span>👍</span>
+                <span>👎</span>
+              </div>
             </div>
           `;
         }).join('');
+
+        notesListEl.innerHTML = cardsHtml;
       }
 
-      // initial render
-      renderNotes('');
+      // ---------- APPLY FILTERS + SORT ----------
+      function applyFiltersAndRender() {
+        let result = [...allNotes];
 
-      // live search (no debounce needed for small list, but keep it smooth)
+        // search filter
+        if (searchTerm.trim()) {
+          const term = searchTerm.trim().toLowerCase();
+          result = result.filter(n =>
+            (n.memory || '').toLowerCase().includes(term) ||
+            (n.reference || '').toLowerCase().includes(term) ||
+            (n.category || '').toLowerCase().includes(term) ||
+            (n.status || '').toLowerCase().includes(term)
+          );
+        }
+
+        // category filters
+        if (activeFilters.category.size > 0) {
+          result = result.filter(n => activeFilters.category.has((n.category || '').trim()));
+        }
+
+        // status filters
+        if (activeFilters.status.size > 0) {
+          result = result.filter(n => activeFilters.status.has((n.status || '').trim()));
+        }
+
+        // reference filters
+        if (activeFilters.reference.size > 0) {
+          result = result.filter(n => activeFilters.reference.has((n.reference || '').trim()));
+        }
+
+        // sorting
+        if (sortOrder === 'priority') {
+          const order = { 'vimp': 0, 'imp': 1, 'note': 2, 'other': 3 };
+          result.sort((a, b) => {
+            const pa = order[getPriorityClass(a.status)] ?? 3;
+            const pb = order[getPriorityClass(b.status)] ?? 3;
+            return pa - pb;
+          });
+        } else if (sortOrder === 'unread') {
+          // all treated as unread for now (no read data)
+          // keep stable
+        } else if (sortOrder === 'most') {
+          // keep default
+        }
+
+        filteredNotes = result;
+        renderCards();
+      }
+
+      // ---------- BUILD FILTER CHIPS (DYNAMIC) ----------
+      function buildFilterChips() {
+        // unique categories, statuses, references (limit references to 30)
+        const categories = [...new Set(allNotes.map(n => (n.category || '').trim() || 'Uncategorized'))].sort();
+        const statuses = [...new Set(allNotes.map(n => (n.status || '').trim()).filter(Boolean))].sort((a, b) => {
+          const order = { 'vimp': 0, 'imp': 1, 'note': 2 };
+          const ca = getPriorityClass(a);
+          const cb = getPriorityClass(b);
+          return (order[ca] ?? 9) - (order[cb] ?? 9);
+        });
+        const references = [...new Set(allNotes.map(n => (n.reference || '').trim()).filter(Boolean))].sort();
+
+        // render category chips
+        categoryChips.innerHTML = categories.map(cat => {
+          const active = activeFilters.category.has(cat) ? 'active' : '';
+          return `<span class="chip ${active}" data-type="category" data-value="${escapeHtml(cat)}">${escapeHtml(cat)}<span class="remove">✕</span></span>`;
+        }).join('');
+
+        // render status chips
+        statusChips.innerHTML = statuses.map(st => {
+          const label = getPriorityLabel(st);
+          const active = activeFilters.status.has(st) ? 'active' : '';
+          return `<span class="chip ${active}" data-type="status" data-value="${escapeHtml(st)}">${escapeHtml(label)}<span class="remove">✕</span></span>`;
+        }).join('');
+
+        // render reference chips (limit to 30 for brevity)
+        const refsToShow = references.slice(0, 30);
+        referenceChips.innerHTML = refsToShow.map(ref => {
+          const active = activeFilters.reference.has(ref) ? 'active' : '';
+          return `<span class="chip ${active}" data-type="reference" data-value="${escapeHtml(ref)}">${escapeHtml(ref)}<span class="remove">✕</span></span>`;
+        }).join('') + (references.length > 30 ? `<span class="chip" style="opacity:0.6;cursor:default;">+${references.length - 30} more</span>` : '');
+
+        // attach click listeners
+        document.querySelectorAll('.chip[data-type]').forEach(chip => {
+          chip.addEventListener('click', (e) => {
+            const type = chip.dataset.type;
+            const value = chip.dataset.value;
+            if (!type || !value) return;
+            // if clicking the remove ✕, remove filter
+            if (e.target.classList.contains('remove')) {
+              activeFilters[type].delete(value);
+            } else {
+              // toggle
+              if (activeFilters[type].has(value)) {
+                activeFilters[type].delete(value);
+              } else {
+                activeFilters[type].add(value);
+              }
+            }
+            buildFilterChips(); // re-render chips to update active state
+            applyFiltersAndRender();
+          });
+        });
+      }
+
+      // ---------- RESET FILTERS ----------
+      function resetAllFilters() {
+        activeFilters.category.clear();
+        activeFilters.status.clear();
+        activeFilters.reference.clear();
+        sortOrder = 'default';
+        sortSelect.value = 'default';
+        searchInput.value = '';
+        searchTerm = '';
+        buildFilterChips();
+        applyFiltersAndRender();
+      }
+
+      // ---------- LOAD DATA FROM SHEET ----------
+      async function loadNotes() {
+        try {
+          notesListEl.innerHTML = `<div class="loading">Fetching notes from Google Sheets…</div>`;
+          const response = await fetch(SHEET_CSV_URL + '&_=' + Date.now(), { cache: 'no-store' });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const csvText = await response.text();
+          const rows = parseCSV(csvText);
+          allNotes = extractNotes(rows);
+
+          if (allNotes.length === 0) {
+            notesListEl.innerHTML = `<div class="empty-state"><b>No notes found</b>The sheet appears to be empty or missing columns.</div>`;
+            return;
+          }
+
+          // build filter chips and render
+          buildFilterChips();
+          applyFiltersAndRender();
+        } catch (err) {
+          notesListEl.innerHTML = `<div class="empty-state"><b>Could not load notes</b>${escapeHtml(err.message)}<br><br>Check your internet connection or the sheet link.</div>`;
+        }
+      }
+
+      // ---------- EVENT LISTENERS ----------
+      // search
       searchInput.addEventListener('input', (e) => {
-        renderNotes(e.target.value);
+        searchTerm = e.target.value;
+        applyFiltersAndRender();
       });
+
+      // filter toggle
+      filterToggle.addEventListener('click', () => {
+        filterPanel.classList.toggle('open');
+        filterToggle.classList.toggle('active');
+      });
+
+      // sort
+      sortSelect.addEventListener('change', (e) => {
+        sortOrder = e.target.value;
+        applyFiltersAndRender();
+      });
+
+      // reset filters
+      resetFiltersBtn.addEventListener('click', resetAllFilters);
+
+      // ---------- INIT ----------
+      loadNotes();
     })();
   </script>
 </body>
