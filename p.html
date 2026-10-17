@@ -11,7 +11,7 @@
 <style>
   :root {
     --primary: #3b4df0;
-    --primary-light: #6a7bf5;
+    --primary-light: #e8ecfc;
     --bg: #f4f6f9;
     --text: #222;
     --pink: #d4528b;
@@ -26,49 +26,49 @@
     height: 100dvh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden; /* Prevents page scroll on mobile */
     padding: 10px;
   }
 
   /* --- TOP HEADER --- */
   .header-card {
-    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-    border-radius: 20px;
+    background: linear-gradient(135deg, #6a7bf5 0%, var(--primary) 100%);
+    border-radius: 16px;
     padding: 15px;
     color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    box-shadow: 0 8px 20px rgba(59, 77, 240, 0.25);
+    box-shadow: 0 6px 20px rgba(59, 77, 240, 0.2);
     position: relative;
     flex-shrink: 0;
-    height: 32%;
+    height: 30%;
   }
 
   .live-clock {
     position: absolute;
     top: 12px;
     right: 15px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.25);
     padding: 3px 10px;
     border-radius: 12px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.5px;
   }
 
   .main-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     text-align: center;
     margin-bottom: 2px;
-    margin-top: 15px;
+    margin-top: 10px;
   }
   
   .duration-text { 
-    font-size: 13px; 
+    font-size: 12px; 
     text-align: center; 
-    margin-bottom: 15px; 
+    margin-bottom: 12px; 
     color: #e0e0e0;
   }
   
@@ -76,20 +76,19 @@
     display: flex; 
     width: 100%; 
     justify-content: space-between; 
-    padding: 0 5px;
+    gap: 8px;
   }
   
   .stat-box { 
     text-align: center; 
     flex: 1;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
     padding: 8px 2px;
-    margin: 0 4px;
     backdrop-filter: blur(5px);
   }
   
-  .stat-label { font-size: 9px; font-weight: 500; text-transform: uppercase; opacity: 0.8; }
+  .stat-label { font-size: 9px; font-weight: 600; text-transform: uppercase; opacity: 0.9; }
   .stat-value { font-size: 16px; font-weight: 700; color: white; margin-top: 2px; }
   .stat-value.small { font-size: 11px; }
 
@@ -100,70 +99,67 @@
     gap: 10px;
     flex: 1;
     margin-top: 10px;
-    height: 66%;
+    height: 68%;
   }
 
-  /* Chart Container */
-  .chart-wrapper {
-    flex: 1.2;
+  .card {
     background: white;
     border-radius: 16px;
-    padding: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-    position: relative;
-    min-height: 160px;
-  }
-
-  .chart-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 8px;
-    text-align: center;
-  }
-
-  /* Table Container */
-  .table-container {
-    flex: 1;
-    background: white;
-    border-radius: 16px;
-    overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.04);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
+
+  /* Chart Container */
+  .chart-wrapper { flex: 1.1; padding: 12px; position: relative; }
+  .chart-title { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; text-align: center; }
+
+  /* Table Container */
+  .table-container { flex: 1; }
   
   .scroll-area { 
     overflow-y: auto; 
     flex: 1; 
     -webkit-overflow-scrolling: touch;
+    height: 100%;
   }
 
-  /* Custom Scrollbar */
   .scroll-area::-webkit-scrollbar { width: 4px; }
   .scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
   table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
-  th, td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
   th { background: #f9f9f9; font-weight: 600; position: sticky; top: 0; color: #444; z-index: 1; }
   td { color: #333; }
-  .highlight-row td { color: var(--pink); font-weight: 600; }
+  .highlight-row td { color: var(--pink); font-weight: 600; background: #fff8fb; }
 
-  /* Desktop adjustments */
+  /* --- DESKTOP LAYOUT --- */
   @media (min-width: 768px) {
-    body { padding: 20px; }
-    .header-card { height: 250px; }
-    .main-title { font-size: 32px; margin-top: 20px; }
+    body { padding: 30px; }
+    
+    .header-card { height: auto; padding: 25px 40px; border-radius: 24px; }
+    .main-title { font-size: 32px; margin-top: 10px; margin-bottom: 5px; }
     .duration-text { font-size: 18px; margin-bottom: 25px; }
+    .stat-box { padding: 15px; border-radius: 16px; }
     .stat-label { font-size: 12px; }
-    .stat-value { font-size: 24px; }
+    .stat-value { font-size: 28px; }
     .stat-value.small { font-size: 18px; }
     
-    .bottom-section { flex-direction: row; }
-    .chart-wrapper, .table-container { flex: 1; }
+    .bottom-section { 
+      flex-direction: row; 
+      height: 100%;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    /* Chart takes 40%, Table takes 60% */
+    .chart-wrapper { flex: 4; padding: 20px; border-radius: 24px; }
+    .table-container { flex: 6; border-radius: 24px; }
+    
+    .chart-title { font-size: 18px; text-align: left; margin-bottom: 15px; }
     table { font-size: 14px; }
-    th, td { padding: 12px 15px; }
-    .chart-title { font-size: 16px; text-align: left; }
+    th, td { padding: 12px 16px; }
   }
 </style>
 </head>
@@ -190,7 +186,7 @@
         <div class="stat-value" id="statMonths">-</div>
       </div>
       <div class="stat-box">
-        <div class="stat-label">Total Duration</div>
+        <div class="stat-label">Duration</div>
         <div class="stat-value small" id="statDuration">-</div>
       </div>
     </div>
@@ -200,13 +196,13 @@
   <div class="bottom-section">
     
     <!-- BAR CHART -->
-    <div class="chart-wrapper">
+    <div class="card chart-wrapper">
       <div class="chart-title">Recent Periods Duration (Days)</div>
       <canvas id="barChart"></canvas>
     </div>
 
     <!-- TABLE -->
-    <div class="table-container">
+    <div class="card table-container">
       <div class="scroll-area">
         <table>
           <thead>
@@ -215,6 +211,7 @@
               <th>Days</th>
               <th>Weeks</th>
               <th>Months</th>
+              <th>Duration</th>
             </tr>
           </thead>
           <tbody id="tableBody">
@@ -240,8 +237,7 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // --- 2. YOUR CSV DATA ---
-  // Parsed from the exact CSV you provided (Skipping empty rows and headers)
+  // --- 2. YOUR EXACT CSV DATA ---
   const csvData = [
     { date: "Oct 9, 2026", days: 9, weeks: 1, months: 0, duration: "0 Months 9 Days" },
     { date: "Sep 8, 2026", days: 31, weeks: 4, months: 1, duration: "1 Month 1 Day" },
@@ -252,7 +248,18 @@
     { date: "Mar 16, 2026", days: 36, weeks: 5, months: 1, duration: "1 Month 6 Days" },
     { date: "Feb 11, 2026", days: 33, weeks: 4, months: 1, duration: "1 Month 3 Days" },
     { date: "Jan 9, 2026", days: 33, weeks: 4, months: 1, duration: "1 Month 3 Days" },
-    { date: "Dec 9, 2025", days: 31, weeks: 4, months: 1, duration: "1 Month 1 Day" }
+    { date: "Dec 9, 2025", days: 31, weeks: 4, months: 1, duration: "1 Month 1 Day" },
+    { date: "Oct 31, 2025", days: 39, weeks: 5, months: 1, duration: "1 Month 9 Days" },
+    { date: "Sep 28, 2025", days: 33, weeks: 4, months: 1, duration: "1 Month 3 Days" },
+    { date: "Aug 27, 2025", days: 32, weeks: 4, months: 1, duration: "1 Month 2 Days" },
+    { date: "Jul 11, 2025", days: 47, weeks: 6, months: 1, duration: "1 Month 17 Days" },
+    { date: "Apr 22, 2025", days: 80, weeks: 11, months: 2, duration: "2 Months 20 Days" },
+    { date: "Jul 16, 2024", days: 280, weeks: 40, months: 9, duration: "9 Months 10 Days" },
+    { date: "Mar 22, 2024", days: 116, weeks: 16, months: 3, duration: "3 Months 26 Days" },
+    { date: "Jul 8, 2023", days: 258, weeks: 36, months: 8, duration: "8 Months 18 Days" },
+    { date: "May 6, 2023", days: 63, weeks: 9, months: 2, duration: "2 Months 3 Days" },
+    { date: "Apr 1, 2023", days: 35, weeks: 5, months: 1, duration: "1 Month 5 Days" },
+    { date: "Feb 19, 2023", days: 41, weeks: 5, months: 1, duration: "1 Month 11 Days" }
   ];
 
   // --- 3. UPDATE UI & TABLE ---
@@ -272,18 +279,18 @@
     
     csvData.forEach((row, index) => {
       const tr = document.createElement('tr');
-      if (index === 0) tr.classList.add('highlight-row'); // Highlight the latest
+      if (index === 0) tr.classList.add('highlight-row'); 
       
       tr.innerHTML = `
         <td>${row.date}</td>
         <td>${row.days}</td>
         <td>${row.weeks}</td>
         <td>${row.months}</td>
+        <td>${row.duration}</td>
       `;
       tbody.appendChild(tr);
     });
 
-    // Draw Chart
     renderBarChart();
   }
 
@@ -291,16 +298,17 @@
   function renderBarChart() {
     const ctx = document.getElementById('barChart').getContext('2d');
     
-    // Take the 7 most recent records for the chart to keep it clean
-    const chartData = csvData.slice(0, 7).reverse();
+    // Show the 8 most recent entries in the chart to keep it clean
+    const chartData = csvData.slice(0, 8).reverse();
 
     new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: chartData.map(d => d.date.split(',')[0]), // Just show "Oct 9" to save space
+        labels: chartData.map(d => d.date.split(',')[0]), 
         datasets: [{
           data: chartData.map(d => d.days),
-          backgroundColor: chartData.map((d, i) => i === chartData.length - 1 ? '#d4528b' : '#a8b8e6'), // Highlight recent in pink
+          // Highlight the latest date in pink, rest in blue
+          backgroundColor: chartData.map((d, i) => i === chartData.length - 1 ? '#d4528b' : '#a8b8e6'), 
           borderRadius: 6,
           barThickness: 14
         }]
@@ -309,7 +317,7 @@
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { right: 25 } }, // Space for numbers at the end
+        layout: { padding: { right: 30 } },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -319,15 +327,12 @@
           }
         },
         scales: {
-          x: { 
-            beginAtZero: true, 
-            display: false // Hide X axis grid for clean mobile look
-          },
+          x: { beginAtZero: true, display: false },
           y: { 
             grid: { display: false },
             ticks: { 
-              font: { size: 10, family: 'Poppins', weight: '500' }, 
-              color: '#666' 
+              font: { size: 11, family: 'Poppins', weight: '500' }, 
+              color: '#555' 
             }
           }
         },
@@ -335,7 +340,7 @@
           onComplete: function() {
             const chartInstance = this;
             const ctx = chartInstance.ctx;
-            ctx.font = '10px Poppins';
+            ctx.font = '11px Poppins';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = '#333';
@@ -344,7 +349,7 @@
               const meta = chartInstance.getDatasetMeta(i);
               meta.data.forEach(function(bar, index) {
                 const data = dataset.data[index];
-                ctx.fillText(data + 'd', bar.x + 5, bar.y); // Draw "31d" next to the bar
+                ctx.fillText(data + 'd', bar.x + 6, bar.y);
               });
             });
           }
@@ -353,7 +358,6 @@
     });
   }
 
-  // Initialize on load
   initDashboard();
 
 </script>
