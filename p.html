@@ -1,232 +1,492 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Periods & Love — Graph Viewer</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pirah Periods Date Dashboard</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  :root { --pink:#e91e63; --pink-soft:#f8bbd0; --ink:#222; }
-  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-         margin: 0; padding: 24px; background:#fff7fa; color:var(--ink); }
-  h1 { font-size:1.4rem; margin:0 0 16px; }
-  .card { background:#fff; border-radius:14px; padding:18px;
-          box-shadow:0 4px 18px rgba(0,0,0,.06); margin-bottom:18px; }
-  .controls { display:flex; flex-wrap:wrap; gap:12px; align-items:end; }
-  label { display:flex; flex-direction:column; font-size:.85rem; gap:4px; }
-  input, select, button { font:inherit; padding:8px 10px; border-radius:8px;
-          border:1px solid #ddd; }
-  button { background:var(--pink); color:#fff; border:none; cursor:pointer; }
-  button.secondary { background:#eee; color:#333; }
-  textarea { width:100%; min-height:110px; font-family:ui-monospace, monospace;
-             font-size:.8rem; border-radius:8px; border:1px solid #ddd; padding:10px; }
-  canvas { max-height:420px; }
-  .hint { font-size:.8rem; color:#777; }
+  :root {
+    --primary-blue: #3b4df0;
+    --light-blue: #e8ecfc;
+    --dark-text: #1a1a1a;
+    --grey-text: #666;
+    --pink: #d4528b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f6f9;
+    color: var(--dark-text);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dashboard {
+    max-width: 1100px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* --- HEADER SECTION --- */
+  .header-card {
+    background: linear-gradient(135deg, #a8b8e6 0%, #3b4df0 100%);
+    border-radius: 30px;
+    padding: 30px 40px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(59, 77, 240, 0.2);
+    min-height: 250px;
+  }
+
+  .gauge-container, .donut-container {
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .gauge-label, .donut-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #000;
+    background: rgba(255,255,255,0.7);
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+
+  /* Gauge custom styling */
+  .gauge-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    background: white;
+    border-radius: 50%;
+    border: 8px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+  }
+  .gauge-ticks { position: absolute; width: 100%; height: 100%; border-radius: 50%; }
+  .gauge-arc { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 4px solid transparent; border-top-color: #ff7f50; border-right-color: #ff7f50; transform: rotate(-45deg); }
+  .gauge-center { text-align: center; z-index: 10; }
+  .gauge-center .title { color: #3b4df0; font-size: 12px; font-weight: 600; }
+  .gauge-center .value { color: #000; font-size: 32px; font-weight: 700; line-height: 1; }
+  .gauge-needle {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    width: 4px;
+    height: 60px;
+    background: #e67e22;
+    transform-origin: bottom center;
+    transform: translateX(-50%) rotate(45deg); /* Dynamic rotation in JS */
+    border-radius: 4px;
+  }
+  .gauge-pin {
+    position: absolute;
+    width: 16px; height: 16px;
+    background: #1a529c;
+    border-radius: 50%;
+    border: 3px solid white;
+  }
+
+  /* Center Content */
+  .center-content {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+  }
+  .urdu-text {
+    background: rgba(0,0,0,0.5);
+    padding: 2px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    direction: rtl;
+  }
+  .main-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #000;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+  }
+  .sub-date {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: #111;
+  }
+  .duration-text {
+    font-size: 26px;
+    font-weight: 500;
+    margin-bottom: 25px;
+    letter-spacing: 0.5px;
+  }
+  .stats-row {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    max-width: 600px;
+  }
+  .stat-box {
+    text-align: center;
+    color: #000;
+  }
+  .stat-label { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+  .stat-value { font-size: 42px; font-weight: 500; color: white; }
+  .stat-value.small { font-size: 28px; }
+  .stat-value span { font-size: 16px; color: #ffeb3b; display: block; font-weight: 600; margin-top: -5px;}
+
+  /* Donut Chart */
+  .donut-wrapper {
+    position: relative;
+    width: 160px;
+    height: 160px;
+  }
+  .donut-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px; height: 50px;
+    background: #ccc;
+    border-radius: 50%;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  /* --- BOTTOM SECTION --- */
+  .bottom-section {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .left-panel { flex: 2; }
+  .right-panel { flex: 1; }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: #222;
+  }
+  .btn-dark {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  /* Table */
+  .table-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+  }
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  th {
+    font-weight: 600;
+    color: #000;
+    background-color: #f9f9f9;
+  }
+  th::after {
+    content: ' ▾';
+    color: #888;
+  }
+  td { color: #333; }
+  tr:last-child td { border-bottom: none; }
+
+  /* Bar Chart Area */
+  .chart-controls {
+    text-align: right;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #000;
+  }
+  .chart-controls span { margin-left: 15px; cursor: pointer; }
+  .chart-controls .active { color: #d4528b; font-weight: bold; }
+  .chart-controls .dot { color: #d4528b; font-size: 20px; vertical-align: middle; margin-right: 5px; }
+  
+  .chart-wrapper {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    height: 280px;
+    position: relative;
+  }
+
+  .legend-box {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  .legend-box::before {
+    content: '';
+    display: inline-block;
+    width: 15px; height: 10px;
+    background: var(--pink);
+    margin-right: 5px;
+    border-radius: 2px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .bottom-section { flex-direction: column; }
+    .left-panel, .right-panel { width: 100%; flex: none; }
+  }
+  @media (max-width: 768px) {
+    .header-card { flex-direction: column; align-items: center; gap: 30px; }
+    .stats-row { flex-direction: column; gap: 15px; }
+  }
 </style>
 </head>
 <body>
 
-<h1>🌸 Periods & Love — Graph Viewer</h1>
+<div class="dashboard">
+  
+  <!-- TOP HEADER -->
+  <div class="header-card">
+    <div class="gauge-container">
+      <div class="gauge-label">Weeks counter</div>
+      <div class="gauge-wrapper">
+        <div class="gauge-arc"></div>
+        <div class="gauge-needle" id="gaugeNeedle"></div>
+        <div class="gauge-pin"></div>
+        <div class="gauge-center">
+          <div class="title">Total Weeks</div>
+          <div class="value">1</div>
+        </div>
+      </div>
+    </div>
 
-<div class="card">
-  <p class="hint">Paste your CSV below (first row = headers), or upload a file.
-     Expected columns (case-insensitive, fuzzy match): a <b>date</b> column and one or more
-     numeric columns like <b>period</b>, <b>love</b>, <b>score</b>, etc.</p>
-  <textarea id="csvInput" placeholder="date,period,love
-2024-01-01,5,8
-2024-01-02,4,7
-2024-01-03,6,9"></textarea>
-  <div class="controls" style="margin-top:10px;">
-    <label>Upload CSV <input type="file" id="fileInput" accept=".csv,text/csv"></label>
-    <label>Chart type
-      <select id="chartType">
-        <option value="line">Line</option>
-        <option value="bar">Bar</option>
-        <option value="scatter">Scatter</option>
-      </select>
-    </label>
-    <label>From <input type="date" id="fromDate"></label>
-    <label>To <input type="date" id="toDate"></label>
-    <button id="renderBtn">Render</button>
-    <button class="secondary" id="clearBtn">Clear</button>
+    <div class="center-content">
+      <div class="urdu-text">پیراہ فرائم کرتی ہیں۔</div>
+      <div class="main-title">Pirah Periods Date</div>
+      <div class="sub-date">Fri, 09 Oct, 2026</div>
+      <div class="duration-text">Total Periods Duration : 0 Months 9 Days</div>
+      
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-label">Periods Date</div>
+          <div class="stat-value small">Fri, 09 Oct, 2026</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Total Days</div>
+          <div class="stat-value">9</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Total Weeks</div>
+          <div class="stat-value">1 <span>2 days</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="donut-container">
+      <div class="donut-label">Periods Days</div>
+      <div class="donut-wrapper">
+        <canvas id="donutChart"></canvas>
+        <div class="donut-center"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM SECTION -->
+  <div class="bottom-section">
+    
+    <!-- LEFT: TABLE -->
+    <div class="left-panel">
+      <div class="section-header">
+        <div class="section-title">Pirah All Periods Monthly Days Table :</div>
+        <button class="btn-dark">Open Periods Table</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Periods Date</th>
+              <th>Total Days</th>
+              <th>Total Weeks</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1. Oct 9, 2026</td><td>9</td><td>1</td><td>null</td></tr>
+            <tr><td>2. Sep 8, 2026</td><td>31</td><td>4</td><td>null</td></tr>
+            <tr><td>3. Aug 6, 2026</td><td>33</td><td>4</td><td>null</td></tr>
+            <tr><td>4. Jul 2, 2026</td><td>35</td><td>5</td><td>null</td></tr>
+            <tr><td>5. May 25, 2026</td><td>38</td><td>5</td><td>null</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RIGHT: BAR CHART -->
+    <div class="right-panel">
+      <div class="section-header" style="justify-content: flex-end;">
+        <div class="section-title" style="font-size: 16px; margin-right: 15px;">Click to select periods report :</div>
+        <div class="chart-controls">
+          <span>D</span>
+          <span class="active"><span class="dot">●</span>W</span>
+          <span>M</span>
+        </div>
+      </div>
+      
+      <div class="chart-wrapper">
+        <div class="legend-box">Periods Duration</div>
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<div class="card">
-  <canvas id="chart"></canvas>
-</div>
-
 <script>
-let chart = null;
+  // 1. Setup the Gauge Needle rotation
+  // The needle rotates from -90 (left) to +90 (right). 
+  // Here we just set a hardcoded rotation that looks good based on "1 Week".
+  document.getElementById('gaugeNeedle').style.transform = 'translateX(-50%) rotate(10deg)';
 
-/* ---------- tiny CSV parser (handles quotes & commas) ---------- */
-function parseCSV(text) {
-  const rows = [];
-  let row = [], field = '', inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"' && text[i+1] === '"') { field += '"'; i++; }
-      else if (c === '"') inQuotes = false;
-      else field += c;
-    } else {
-      if (c === '"') inQuotes = true;
-      else if (c === ',') { row.push(field); field = ''; }
-      else if (c === '\n' || c === '\r') {
-        if (field || row.length) { row.push(field); rows.push(row); row=[]; field=''; }
-        if (c === '\r' && text[i+1] === '\n') i++;
-      } else field += c;
-    }
-  }
-  if (field || row.length) { row.push(field); rows.push(row); }
-  return rows;
-}
-
-/* ---------- find which header is the date, which are numeric ---------- */
-function findColumns(headers, rows) {
-  const lower = headers.map(h => h.trim().toLowerCase());
-  let dateIdx = lower.findIndex(h => /date|day|time/.test(h));
-  if (dateIdx === -1) dateIdx = 0; // fallback
-
-  const numericIdx = [];
-  headers.forEach((h, i) => {
-    if (i === dateIdx) return;
-    const sample = rows.slice(1, 20).map(r => r[i]).filter(v => v !== '' && v != null);
-    if (sample.length && sample.every(v => !isNaN(parseFloat(v)))) numericIdx.push(i);
-  });
-  return { dateIdx, numericIdx };
-}
-
-/* ---------- parse a date string loosely ---------- */
-function parseDate(s) {
-  s = (s || '').trim();
-  if (!s) return null;
-  // try ISO / yyyy-mm-dd / yyyy/mm/dd
-  let d = new Date(s);
-  if (!isNaN(d)) return d;
-  // try dd/mm/yyyy or dd-mm-yyyy
-  const m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
-  if (m) {
-    let [, a, b, c] = m;
-    if (c.length === 2) c = '20' + c;
-    // assume dd/mm/yyyy
-    d = new Date(+c, +b - 1, +a);
-    if (!isNaN(d)) return d;
-  }
-  return null;
-}
-
-/* ---------- main render ---------- */
-function render() {
-  const raw = document.getElementById('csvInput').value.trim();
-  if (!raw) { alert('Paste some CSV first.'); return; }
-
-  const rows = parseCSV(raw).filter(r => r.some(c => c !== ''));
-  if (rows.length < 2) { alert('Need a header row + at least one data row.'); return; }
-
-  const headers = rows[0];
-  const dataRows = rows.slice(1);
-  const { dateIdx, numericIdx } = findColumns(headers, rows);
-
-  if (!numericIdx.length) { alert('No numeric columns found (period/love/etc).'); return; }
-
-  // build points
-  let points = dataRows.map(r => {
-    const d = parseDate(r[dateIdx]);
-    const vals = numericIdx.map(i => parseFloat(r[i]));
-    return { d, vals };
-  }).filter(p => p.d && p.vals.every(v => !isNaN(v)));
-
-  // date filter
-  const fromEl = document.getElementById('fromDate');
-  const toEl   = document.getElementById('toDate');
-  if (fromEl.value) { const f = new Date(fromEl.value); points = points.filter(p => p.d >= f); }
-  if (toEl.value)   { const t = new Date(toEl.value);   t.setHours(23,59,59); points = points.filter(p => p.d <= t); }
-
-  points.sort((a,b) => a.d - b.d);
-
-  if (!points.length) { alert('No valid points in that range.'); return; }
-
-  // set defaults for date pickers from data
-  if (!fromEl.value && points.length) fromEl.value = points[0].d.toISOString().slice(0,10);
-  if (!toEl.value && points.length)   toEl.value   = points[points.length-1].d.toISOString().slice(0,10);
-
-  const labels = points.map(p => p.d.toISOString().slice(0,10));
-  const type = document.getElementById('chartType').value;
-
-  const palette = ['#e91e63','#9c27b0','#3f51b5','#00bcd4','#4caf50','#ff9800'];
-
-  const datasets = numericIdx.map((colIdx, k) => {
-    const name = headers[colIdx].trim();
-    return {
-      label: name,
-      data: points.map(p => p.vals[k]),
-      borderColor: palette[k % palette.length],
-      backgroundColor: palette[k % palette.length] + '33',
-      borderWidth: 2,
-      pointRadius: 3,
-      tension: 0.3,
-      fill: false,
-      // for scatter we need {x,y}; handled below
-    };
-  });
-
-  let chartData;
-  if (type === 'scatter') {
-    chartData = {
-      datasets: numericIdx.map((colIdx, k) => ({
-        label: headers[colIdx].trim(),
-        data: points.map(p => ({ x: p.d.toISOString().slice(0,10), y: p.vals[k] })),
-        backgroundColor: palette[k % palette.length],
-        pointRadius: 4,
-      }))
-    };
-  } else {
-    chartData = { labels, datasets };
-  }
-
-  if (chart) chart.destroy();
-  const ctx = document.getElementById('chart').getContext('2d');
-  chart = new Chart(ctx, {
-    type: type === 'scatter' ? 'scatter' : type,
-    data: chartData,
+  // 2. Setup the Donut Chart
+  const donutCtx = document.getElementById('donutChart').getContext('2d');
+  new Chart(donutCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Days'],
+      datasets: [{
+        data: [9, 20, 15, 10, 25, 30, 12, 8], // Mock segments for the colorful wheel look
+        backgroundColor: [
+          '#e67e22', '#d4528b', '#00bcd4', '#8bc34a', 
+          '#9c27b0', '#f44336', '#3f51b5', '#ff9800'
+        ],
+        borderWidth: 0,
+        cutout: '60%' // Creates the hollow center
+      }]
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    }
+  });
+
+  // 3. Setup the Horizontal Bar Chart
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  
+  // Create custom labels and data mimicking the image
+  const labels = [
+    'Oct 9, 2026', 'Sep 8, 2026', 'Aug 6, 2026', 
+    'Jul 2, 2026', 'May 25, 2026', 'Apr 21, 2026', 
+    'Mar 16, 2026', 'Feb 11, 2026', 'Jan 9, 2026', 'Dec 9, 2025'
+  ];
+  const data = [9, 31, 33, 35, 38, 34, 36, 33, 33, 31];
+
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Days',
+        data: data,
+        backgroundColor: '#d4528b', // Pink color from image
+        borderRadius: 2,
+        barThickness: 8 // Thin bars
+      }]
+    },
+    options: {
+      indexAxis: 'y', // Makes the bar chart horizontal
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { right: 20 } }, // space for data labels
       plugins: {
-        legend: { position: 'top' },
-        title: { display: true, text: 'Periods & Love over Time' },
-        tooltip: { callbacks: { title: items => items[0]?.label ?? items[0]?.parsed?.x ?? '' } }
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) { return context.raw + ' Days'; }
+          }
+        }
       },
       scales: {
         x: {
-          type: type === 'scatter' ? 'category' : 'category',
-          title: { display: true, text: 'Date' },
-          ticks: { maxRotation: 45, autoSkip: true, maxTicksLimit: 20 }
+          beginAtZero: true,
+          max: 40,
+          grid: { color: '#eee', drawBorder: false },
+          ticks: { font: {size: 10}, color: '#666' }
         },
-        y: { beginAtZero: true, title: { display: true, text: 'Value' } }
+        y: {
+          grid: { display: false },
+          ticks: { 
+            font: { size: 10, family: 'Poppins' },
+            color: '#333'
+          }
+        }
+      },
+      animation: {
+        onComplete: function() {
+          const chartInstance = this;
+          const ctx = chartInstance.ctx;
+          ctx.font = Chart.helpers?.fontString ? Chart.helpers.fontString(10, 'normal', 'Poppins') : '10px Poppins';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#333';
+
+          // Draw the data labels at the end of each bar
+          this.data.datasets.forEach(function(dataset, i) {
+            const meta = chartInstance.getDatasetMeta(i);
+            meta.data.forEach(function(bar, index) {
+              const data = dataset.data[index];
+              // Draw text right after the bar
+              ctx.fillText(data, bar.x + 12, bar.y);
+            });
+          });
+        }
       }
     }
   });
-}
-
-/* ---------- events ---------- */
-document.getElementById('renderBtn').addEventListener('click', render);
-document.getElementById('chartType').addEventListener('change', render);
-document.getElementById('fileInput').addEventListener('change', e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const reader = new FileReader();
-  reader.onload = ev => { document.getElementById('csvInput').value = ev.target.result; render(); };
-  reader.readAsText(f);
-});
-document.getElementById('clearBtn').addEventListener('click', () => {
-  document.getElementById('csvInput').value = '';
-  document.getElementById('fromDate').value = '';
-  document.getElementById('toDate').value = '';
-  if (chart) { chart.destroy(); chart = null; }
-});
 </script>
+
 </body>
 </html>
