@@ -2,110 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pirah Periods Date Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pirah Dashboard</title>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
-    --primary-blue: #3b4df0;
-    --light-blue: #e8ecfc;
-    --dark-text: #1a1a1a;
-    --grey-text: #666;
+    --primary: #3b4df0;
+    --bg: #f0f2f5;
     --pink: #d4528b;
+    --text: #222;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f4f6f9;
-    color: var(--dark-text);
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .dashboard {
-    max-width: 1100px;
-    width: 100%;
+    background-color: var(--bg);
+    color: var(--text);
+    height: 100dvh; /* Dynamic viewport height for mobile */
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    overflow: hidden; /* Prevent scrolling */
+    padding: 8px;
   }
 
-  /* --- HEADER SECTION --- */
+  /* --- TOP HEADER --- */
   .header-card {
-    background: linear-gradient(135deg, #a8b8e6 0%, #3b4df0 100%);
-    border-radius: 30px;
-    padding: 30px 40px;
+    background: linear-gradient(135deg, #a8b8e6 0%, var(--primary) 100%);
+    border-radius: 20px;
+    padding: 12px;
     color: white;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(59, 77, 240, 0.2);
     position: relative;
-    box-shadow: 0 10px 30px rgba(59, 77, 240, 0.2);
-    min-height: 250px;
+    flex-shrink: 0;
+    height: 38%; /* Takes 38% of screen */
+  }
+
+  /* Live Clock Badge */
+  .live-clock {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    background: rgba(0,0,0,0.4);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
 
   .gauge-container, .donut-container {
-    width: 180px;
+    width: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
+    z-index: 2;
   }
 
-  .gauge-label, .donut-label {
-    font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 10px;
-    color: #000;
-    background: rgba(255,255,255,0.7);
-    padding: 2px 10px;
-    border-radius: 10px;
-  }
-
-  /* Gauge custom styling */
+  /* Gauge */
   .gauge-wrapper {
     position: relative;
-    width: 140px;
-    height: 140px;
+    width: 70px;
+    height: 70px;
     background: white;
     border-radius: 50%;
-    border: 8px solid #ccc;
+    border: 4px solid #ccc;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
   }
-  .gauge-ticks { position: absolute; width: 100%; height: 100%; border-radius: 50%; }
-  .gauge-arc { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 4px solid transparent; border-top-color: #ff7f50; border-right-color: #ff7f50; transform: rotate(-45deg); }
-  .gauge-center { text-align: center; z-index: 10; }
-  .gauge-center .title { color: #3b4df0; font-size: 12px; font-weight: 600; }
-  .gauge-center .value { color: #000; font-size: 32px; font-weight: 700; line-height: 1; }
+  .gauge-arc { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px solid transparent; border-top-color: #ff7f50; border-right-color: #ff7f50; transform: rotate(-45deg); }
+  .gauge-center .title { color: var(--primary); font-size: 7px; font-weight: 700; }
+  .gauge-center .value { color: #000; font-size: 16px; font-weight: 700; line-height: 1; }
   .gauge-needle {
-    position: absolute;
-    bottom: 50%;
-    left: 50%;
-    width: 4px;
-    height: 60px;
-    background: #e67e22;
-    transform-origin: bottom center;
-    transform: translateX(-50%) rotate(45deg); /* Dynamic rotation in JS */
-    border-radius: 4px;
+    position: absolute; bottom: 50%; left: 50%; width: 2px; height: 25px;
+    background: #e67e22; transform-origin: bottom center;
+    transform: translateX(-50%) rotate(10deg); border-radius: 2px;
   }
-  .gauge-pin {
-    position: absolute;
-    width: 16px; height: 16px;
-    background: #1a529c;
-    border-radius: 50%;
-    border: 3px solid white;
-  }
+  .gauge-pin { position: absolute; width: 8px; height: 8px; background: #1a529c; border-radius: 50%; border: 2px solid white; }
 
-  /* Center Content */
+  /* Center Text */
   .center-content {
     text-align: center;
     flex: 1;
@@ -113,220 +96,139 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 5px;
   }
-  .urdu-text {
-    background: rgba(0,0,0,0.5);
-    padding: 2px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    margin-bottom: 15px;
-    letter-spacing: 1px;
-    direction: rtl;
-  }
-  .main-title {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 5px;
-    color: #000;
-    text-shadow: 0 1px 2px rgba(255,255,255,0.3);
-  }
-  .sub-date {
-    font-size: 20px;
-    font-weight: 500;
-    margin-bottom: 15px;
-    color: #111;
-  }
-  .duration-text {
-    font-size: 26px;
-    font-weight: 500;
-    margin-bottom: 25px;
-    letter-spacing: 0.5px;
-  }
-  .stats-row {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    max-width: 600px;
-  }
-  .stat-box {
-    text-align: center;
-    color: #000;
-  }
-  .stat-label { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
-  .stat-value { font-size: 42px; font-weight: 500; color: white; }
-  .stat-value.small { font-size: 28px; }
-  .stat-value span { font-size: 16px; color: #ffeb3b; display: block; font-weight: 600; margin-top: -5px;}
+  .urdu-text { font-size: 9px; margin-bottom: 2px; opacity: 0.9; }
+  .main-title { font-size: 16px; font-weight: 700; color: #000; text-shadow: 0 1px 2px rgba(255,255,255,0.4); }
+  .duration-text { font-size: 10px; font-weight: 500; margin-bottom: 10px; }
+  
+  .stats-row { display: flex; width: 100%; justify-content: space-around; }
+  .stat-box { text-align: center; color: #000; }
+  .stat-label { font-size: 9px; font-weight: 600; }
+  .stat-value { font-size: 18px; font-weight: 600; color: white; line-height: 1; margin-top: 2px; }
+  .stat-value.small { font-size: 12px; }
+  .stat-value span { font-size: 8px; color: #ffeb3b; display: block; }
 
-  /* Donut Chart */
-  .donut-wrapper {
-    position: relative;
-    width: 160px;
-    height: 160px;
-  }
+  /* Donut */
+  .donut-wrapper { position: relative; width: 70px; height: 70px; }
   .donut-center {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50px; height: 50px;
-    background: #ccc;
-    border-radius: 50%;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 25px; height: 25px; background: #ccc; border-radius: 50%;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
   }
 
   /* --- BOTTOM SECTION --- */
   .bottom-section {
     display: flex;
-    gap: 20px;
-    align-items: flex-start;
-  }
-
-  .left-panel { flex: 2; }
-  .right-panel { flex: 1; }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-  }
-  .section-title {
-    font-size: 20px;
-    font-weight: 500;
-    color: #222;
-  }
-  .btn-dark {
-    background: #000;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    margin-top: 8px;
+    height: 60%;
   }
 
   /* Table */
   .table-container {
+    flex: 1;
     background: white;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
   }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
-  }
-  th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-  }
-  th {
-    font-weight: 600;
-    color: #000;
-    background-color: #f9f9f9;
-  }
-  th::after {
-    content: ' ▾';
-    color: #888;
-  }
-  td { color: #333; }
-  tr:last-child td { border-bottom: none; }
-
-  /* Bar Chart Area */
-  .chart-controls {
-    text-align: right;
-    font-size: 14px;
-    margin-bottom: 10px;
-    color: #000;
-  }
-  .chart-controls span { margin-left: 15px; cursor: pointer; }
-  .chart-controls .active { color: #d4528b; font-weight: bold; }
-  .chart-controls .dot { color: #d4528b; font-size: 20px; vertical-align: middle; margin-right: 5px; }
+  .table-header { display: flex; justify-content: space-between; padding: 6px 10px; align-items: center; border-bottom: 1px solid #eee; }
+  .table-title { font-size: 10px; font-weight: 600; }
+  .btn-sim { background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 9px; cursor: pointer; font-weight: 600; }
   
+  .scroll-area { overflow-y: auto; flex: 1; }
+  table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
+  th, td { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; }
+  th { background: #f9f9f9; font-weight: 600; position: sticky; top: 0; }
+
+  /* Chart */
   .chart-wrapper {
+    flex: 1;
     background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    height: 280px;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: relative;
+    min-height: 150px;
   }
+  
+  /* Animations */
+  .fade-update { animation: flash 0.5s ease-out; }
+  @keyframes flash { 0% { background-color: #ffeb3b; } 100% { background-color: transparent; } }
 
-  .legend-box {
-    display: inline-block;
-    padding: 4px 12px;
-    background: #f0f0f0;
-    border-radius: 4px;
-    font-size: 12px;
-    margin-bottom: 10px;
-  }
-  .legend-box::before {
-    content: '';
-    display: inline-block;
-    width: 15px; height: 10px;
-    background: var(--pink);
-    margin-right: 5px;
-    border-radius: 2px;
-  }
-
-  /* Responsive */
-  @media (max-width: 900px) {
-    .bottom-section { flex-direction: column; }
-    .left-panel, .right-panel { width: 100%; flex: none; }
-  }
-  @media (max-width: 768px) {
-    .header-card { flex-direction: column; align-items: center; gap: 30px; }
-    .stats-row { flex-direction: column; gap: 15px; }
+  /* Desktop adjustments */
+  @media (min-width: 768px) {
+    body { padding: 20px; height: auto; min-height: 100dvh; overflow: auto; }
+    .header-card { height: 250px; padding: 20px; }
+    .gauge-container, .donut-container { width: 140px; }
+    .gauge-wrapper, .donut-wrapper { width: 130px; height: 130px; }
+    .gauge-center .title { font-size: 12px; }
+    .gauge-center .value { font-size: 32px; }
+    .gauge-needle { height: 50px; width: 3px; }
+    .gauge-pin { width: 16px; height: 16px; border-width: 3px; }
+    .donut-center { width: 40px; height: 40px; }
+    
+    .main-title { font-size: 32px; }
+    .duration-text { font-size: 20px; margin-bottom: 20px; }
+    .stat-label { font-size: 16px; }
+    .stat-value { font-size: 38px; margin-top: 5px; }
+    .stat-value.small { font-size: 22px; }
+    .stat-value span { font-size: 14px; }
+    
+    .bottom-section { flex-direction: row; height: 400px; }
+    .table-container, .chart-wrapper { flex: 1; }
+    .btn-sim { font-size: 12px; padding: 6px 12px; }
+    table { font-size: 14px; }
+    th, td { padding: 10px 15px; }
+    .table-title { font-size: 16px; }
   }
 </style>
 </head>
 <body>
 
-<div class="dashboard">
-  
-  <!-- TOP HEADER -->
+  <!-- HEADER -->
   <div class="header-card">
+    <div class="live-clock" id="liveClock">Loading time...</div>
+
     <div class="gauge-container">
-      <div class="gauge-label">Weeks counter</div>
       <div class="gauge-wrapper">
         <div class="gauge-arc"></div>
         <div class="gauge-needle" id="gaugeNeedle"></div>
         <div class="gauge-pin"></div>
         <div class="gauge-center">
-          <div class="title">Total Weeks</div>
-          <div class="value">1</div>
+          <div class="title">Weeks</div>
+          <div class="value" id="gaugeValue">1</div>
         </div>
       </div>
     </div>
 
     <div class="center-content">
       <div class="urdu-text">پیراہ فرائم کرتی ہیں۔</div>
-      <div class="main-title">Pirah Periods Date</div>
-      <div class="sub-date">Fri, 09 Oct, 2026</div>
-      <div class="duration-text">Total Periods Duration : 0 Months 9 Days</div>
+      <div class="main-title">Pirah Date</div>
+      <div class="duration-text" id="durationText">Total: 0 Months 9 Days</div>
       
       <div class="stats-row">
         <div class="stat-box">
-          <div class="stat-label">Periods Date</div>
-          <div class="stat-value small">Fri, 09 Oct, 2026</div>
+          <div class="stat-label">Date</div>
+          <div class="stat-value small" id="statDate">09 Oct, 26</div>
         </div>
         <div class="stat-box">
-          <div class="stat-label">Total Days</div>
-          <div class="stat-value">9</div>
+          <div class="stat-label">Days</div>
+          <div class="stat-value" id="statDays">9</div>
         </div>
         <div class="stat-box">
-          <div class="stat-label">Total Weeks</div>
-          <div class="stat-value">1 <span>2 days</span></div>
+          <div class="stat-label">Weeks</div>
+          <div class="stat-value" id="statWeeks">1 <span>2d</span></div>
         </div>
       </div>
     </div>
 
     <div class="donut-container">
-      <div class="donut-label">Periods Days</div>
       <div class="donut-wrapper">
         <canvas id="donutChart"></canvas>
         <div class="donut-center"></div>
@@ -334,158 +236,186 @@
     </div>
   </div>
 
-  <!-- BOTTOM SECTION -->
+  <!-- BOTTOM -->
   <div class="bottom-section">
     
-    <!-- LEFT: TABLE -->
-    <div class="left-panel">
-      <div class="section-header">
-        <div class="section-title">Pirah All Periods Monthly Days Table :</div>
-        <button class="btn-dark">Open Periods Table</button>
+    <div class="table-container">
+      <div class="table-header">
+        <div class="table-title">Recent Periods</div>
+        <button class="btn-sim" onclick="simulateNewData()">Simulate New</button>
       </div>
-      <div class="table-container">
+      <div class="scroll-area">
         <table>
           <thead>
             <tr>
-              <th>Periods Date</th>
-              <th>Total Days</th>
-              <th>Total Weeks</th>
-              <th>Description</th>
+              <th>Date</th>
+              <th>Days</th>
+              <th>Wks</th>
             </tr>
           </thead>
-          <tbody>
-            <tr><td>1. Oct 9, 2026</td><td>9</td><td>1</td><td>null</td></tr>
-            <tr><td>2. Sep 8, 2026</td><td>31</td><td>4</td><td>null</td></tr>
-            <tr><td>3. Aug 6, 2026</td><td>33</td><td>4</td><td>null</td></tr>
-            <tr><td>4. Jul 2, 2026</td><td>35</td><td>5</td><td>null</td></tr>
-            <tr><td>5. May 25, 2026</td><td>38</td><td>5</td><td>null</td></tr>
+          <tbody id="tableBody">
+            <!-- Populated by JS -->
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- RIGHT: BAR CHART -->
-    <div class="right-panel">
-      <div class="section-header" style="justify-content: flex-end;">
-        <div class="section-title" style="font-size: 16px; margin-right: 15px;">Click to select periods report :</div>
-        <div class="chart-controls">
-          <span>D</span>
-          <span class="active"><span class="dot">●</span>W</span>
-          <span>M</span>
-        </div>
-      </div>
-      
-      <div class="chart-wrapper">
-        <div class="legend-box">Periods Duration</div>
-        <canvas id="barChart"></canvas>
-      </div>
+    <div class="chart-wrapper">
+      <canvas id="barChart"></canvas>
     </div>
 
   </div>
-</div>
 
 <script>
-  // 1. Setup the Gauge Needle rotation
-  // The needle rotates from -90 (left) to +90 (right). 
-  // Here we just set a hardcoded rotation that looks good based on "1 Week".
-  document.getElementById('gaugeNeedle').style.transform = 'translateX(-50%) rotate(10deg)';
+  // --- 1. LIVE PKT CLOCK ---
+  function updateClock() {
+    const options = { 
+      timeZone: 'Asia/Karachi', 
+      weekday: 'short', month: 'short', day: 'numeric', 
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+    };
+    const now = new Date().toLocaleString('en-US', options);
+    document.getElementById('liveClock').innerText = "PKT: " + now;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
 
-  // 2. Setup the Donut Chart
+  // --- 2. DATA & CHARTS ---
+  let barChartInstance = null;
+  
+  // Initial Data mimicking the screenshot
+  let currentData = [
+    { date: "Oct 9, 2026", days: 9, weeks: 1 },
+    { date: "Sep 8, 2026", days: 31, weeks: 4 },
+    { date: "Aug 6, 2026", days: 33, weeks: 4 },
+    { date: "Jul 2, 2026", days: 35, weeks: 5 },
+    { date: "May 25, 2026", days: 38, weeks: 5 }
+  ];
+
+  // Setup Donut
   const donutCtx = document.getElementById('donutChart').getContext('2d');
   new Chart(donutCtx, {
     type: 'doughnut',
     data: {
-      labels: ['Days'],
       datasets: [{
-        data: [9, 20, 15, 10, 25, 30, 12, 8], // Mock segments for the colorful wheel look
-        backgroundColor: [
-          '#e67e22', '#d4528b', '#00bcd4', '#8bc34a', 
-          '#9c27b0', '#f44336', '#3f51b5', '#ff9800'
-        ],
+        data: [9, 15, 20, 12, 18, 25, 10, 8],
+        backgroundColor: ['#e67e22', '#d4528b', '#00bcd4', '#8bc34a', '#9c27b0', '#f44336', '#3f51b5', '#ff9800'],
         borderWidth: 0,
-        cutout: '60%' // Creates the hollow center
+        cutout: '65%'
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: false } }
-    }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
   });
 
-  // 3. Setup the Horizontal Bar Chart
+  // Setup Bar Chart
   const barCtx = document.getElementById('barChart').getContext('2d');
   
-  // Create custom labels and data mimicking the image
-  const labels = [
-    'Oct 9, 2026', 'Sep 8, 2026', 'Aug 6, 2026', 
-    'Jul 2, 2026', 'May 25, 2026', 'Apr 21, 2026', 
-    'Mar 16, 2026', 'Feb 11, 2026', 'Jan 9, 2026', 'Dec 9, 2025'
-  ];
-  const data = [9, 31, 33, 35, 38, 34, 36, 33, 33, 31];
+  function renderBarChart() {
+    if (barChartInstance) barChartInstance.destroy();
 
-  new Chart(barCtx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Days',
-        data: data,
-        backgroundColor: '#d4528b', // Pink color from image
-        borderRadius: 2,
-        barThickness: 8 // Thin bars
-      }]
-    },
-    options: {
-      indexAxis: 'y', // Makes the bar chart horizontal
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: { padding: { right: 20 } }, // space for data labels
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(context) { return context.raw + ' Days'; }
-          }
-        }
+    const labels = currentData.map(d => d.date).reverse();
+    const data = currentData.map(d => d.days).reverse();
+
+    barChartInstance = new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: '#d4528b',
+          borderRadius: 4,
+          barThickness: 12
+        }]
       },
-      scales: {
-        x: {
-          beginAtZero: true,
-          max: 40,
-          grid: { color: '#eee', drawBorder: false },
-          ticks: { font: {size: 10}, color: '#666' }
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { right: 20 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
         },
-        y: {
-          grid: { display: false },
-          ticks: { 
-            font: { size: 10, family: 'Poppins' },
-            color: '#333'
+        scales: {
+          x: { beginAtZero: true, max: 45, display: false }, // Hide X axis for cleaner mobile view
+          y: { 
+            grid: { display: false },
+            ticks: { font: { size: 10, family: 'Poppins' }, color: '#555' }
           }
-        }
-      },
-      animation: {
-        onComplete: function() {
-          const chartInstance = this;
-          const ctx = chartInstance.ctx;
-          ctx.font = Chart.helpers?.fontString ? Chart.helpers.fontString(10, 'normal', 'Poppins') : '10px Poppins';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = '#333';
-
-          // Draw the data labels at the end of each bar
-          this.data.datasets.forEach(function(dataset, i) {
-            const meta = chartInstance.getDatasetMeta(i);
-            meta.data.forEach(function(bar, index) {
-              const data = dataset.data[index];
-              // Draw text right after the bar
-              ctx.fillText(data, bar.x + 12, bar.y);
+        },
+        animation: {
+          onComplete: function() {
+            const ctx = this.ctx;
+            ctx.font = '10px Poppins';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#333';
+            
+            this.data.datasets.forEach((dataset, i) => {
+              const meta = this.getDatasetMeta(i);
+              meta.data.forEach((bar, index) => {
+                ctx.fillText(dataset.data[index] + 'd', bar.x + 5, bar.y);
+              });
             });
-          });
+          }
         }
       }
-    }
-  });
+    });
+  }
+
+  // Update UI text and table
+  function updateUI() {
+    const latest = currentData[0];
+    
+    // Animate update (flash effect)
+    document.querySelector('.header-card').classList.add('fade-update');
+    setTimeout(() => document.querySelector('.header-card').classList.remove('fade-update'), 500);
+
+    // Header text
+    document.getElementById('statDate').innerText = latest.date;
+    document.getElementById('statDays').innerText = latest.days;
+    document.getElementById('statWeeks').innerHTML = latest.weeks + ' <span>' + (latest.days % 7) + 'd</span>';
+    
+    // Gauge
+    document.getElementById('gaugeValue').innerText = latest.weeks;
+    const rotation = (latest.weeks / 10) * 180 - 90; // Scale 1-10 weeks to -90 to +90 deg
+    document.getElementById('gaugeNeedle').style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+
+    // Table
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    currentData.forEach((row, index) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${index + 1}. ${row.date}</td>
+          <td>${row.days}</td>
+          <td>${row.weeks}</td>
+        </tr>
+      `;
+    });
+
+    renderBarChart();
+  }
+
+  // Dynamic Simulation Function
+  function simulateNewData() {
+    const today = new Date();
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const newDate = today.toLocaleDateString('en-US', options);
+    
+    const newDays = Math.floor(Math.random() * 15) + 25; // Random days 25-40
+    const newWeeks = Math.round(newDays / 7);
+
+    // Add to top, remove last to keep it 5 rows
+    currentData.unshift({ date: newDate, days: newDays, weeks: newWeeks });
+    currentData.pop();
+
+    updateUI();
+  }
+
+  // Initial Render
+  updateUI();
+
 </script>
 
 </body>
