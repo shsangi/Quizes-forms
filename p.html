@@ -189,8 +189,8 @@
       margin-top: 20px;
     }
     
-    .chart-wrapper { flex: 4; padding: 20px; border-radius: 24px; }
-    .table-container { flex: 6; border-radius: 24px; }
+    .chart-wrapper { flex: 5; padding: 20px; border-radius: 24px; }
+    .table-container { flex: 5; border-radius: 24px; }
     
     .chart-title { font-size: 18px; text-align: left; margin-bottom: 15px; }
     table { font-size: 14px; }
@@ -339,41 +339,54 @@
   function renderBarChart() {
     const ctx = document.getElementById('barChart').getContext('2d');
     
-    // Show the 8 most recent entries in the chart
+    // Take the 8 most recent entries and reverse them so the NEWEST is at the top
     const chartData = csvData.slice(0, 8).reverse();
 
     new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: chartData.map(d => d.date.split(',')[0]), 
+        // Showing Complete Date + Year
+        labels: chartData.map(d => d.date), 
         datasets: [{
           data: chartData.map(d => d.days),
-          // Latest is dark pink, older ones are soft pink
+          // Most recent is Dark Pink, older are Soft Pastel Pink
           backgroundColor: chartData.map((d, i) => i === chartData.length - 1 ? '#d81b60' : '#f8bbd0'), 
-          borderRadius: 6,
-          barThickness: 14
+          borderRadius: 6, // Modern rounded edges
+          borderSkipped: false, // Rounds all 4 corners
+          barThickness: 16, // Slightly thicker for better look
+          hoverBackgroundColor: '#ad1457'
         }]
       },
       options: {
-        indexAxis: 'y',
+        indexAxis: 'y', // Horizontal layout
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { right: 30 } },
+        layout: { padding: { right: 35 } }, // Space for data labels
         plugins: {
           legend: { display: false },
           tooltip: {
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            titleColor: '#d81b60',
+            bodyColor: '#333',
+            borderColor: '#f8bbd0',
+            borderWidth: 1,
+            padding: 10,
+            displayColors: false,
             callbacks: {
               label: function(context) { return context.raw + ' Days'; }
             }
           }
         },
         scales: {
-          x: { beginAtZero: true, display: false },
+          x: { 
+            beginAtZero: true, 
+            display: false // Hide X axis for ultra clean modern look
+          },
           y: { 
             grid: { display: false },
             ticks: { 
-              font: { size: 11, family: 'Poppins', weight: '500' }, 
-              color: '#777' 
+              font: { size: 11, family: 'Poppins', weight: '600' }, 
+              color: '#666' 
             }
           }
         },
@@ -381,16 +394,17 @@
           onComplete: function() {
             const chartInstance = this;
             const ctx = chartInstance.ctx;
-            ctx.font = '11px Poppins';
+            ctx.font = 'bold 11px Poppins';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#777';
 
             this.data.datasets.forEach(function(dataset, i) {
               const meta = chartInstance.getDatasetMeta(i);
               meta.data.forEach(function(bar, index) {
                 const data = dataset.data[index];
-                ctx.fillText(data + 'd', bar.x + 6, bar.y);
+                // Color the label text the same as the bar (Dark pink for recent, grey for old)
+                ctx.fillStyle = index === chartData.length - 1 ? '#d81b60' : '#888';
+                ctx.fillText(data + ' d', bar.x + 8, bar.y);
               });
             });
           }
