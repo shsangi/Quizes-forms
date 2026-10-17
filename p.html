@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- REMOVED maximum-scale and user-scalable to ALLOW pinch-to-zoom -->
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pirah Periods Dashboard</title>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,6 +33,8 @@
     flex-direction: column;
     overflow: hidden;
     padding: 12px;
+    /* Allow pinch to zoom natively */
+    touch-action: pan-x pan-y pinch-zoom; 
   }
 
   /* --- TOP HEADER --- */
@@ -49,15 +52,15 @@
     height: 32%;
   }
 
-  /* Small Transparent Date (No PKT Time) */
+  /* Small Transparent Date (No Time) */
   .date-badge {
     position: absolute;
     top: 12px;
     right: 15px;
-    background: rgba(255, 255, 255, 0.25); /* Highly transparent */
+    background: rgba(255, 255, 255, 0.25); 
     padding: 3px 10px;
     border-radius: 12px;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 600;
     color: rgba(0, 0, 0, 0.5);
     letter-spacing: 0.5px;
@@ -141,7 +144,7 @@
   }
 
   /* Chart Container */
-  .chart-wrapper { flex: 1.1; padding: 12px; position: relative; }
+  .chart-wrapper { flex: 1.2; padding: 12px; position: relative; }
   .chart-title { font-size: 12px; font-weight: 600; color: var(--soft-purple); margin-bottom: 8px; text-align: center; }
 
   /* Table Container */
@@ -171,7 +174,7 @@
 
   /* --- DESKTOP LAYOUT --- */
   @media (min-width: 768px) {
-    body { padding: 30px; }
+    body { padding: 30px; overflow: auto; }
     
     .header-card { height: auto; padding: 30px 40px; border-radius: 28px; }
     .main-title { font-size: 32px; margin-top: 10px; }
@@ -300,18 +303,15 @@
   function initDashboard() {
     const latest = csvData[0];
 
-    // Update Distinguish Cards
     document.getElementById('latestDate').innerText = latest.date;
     document.getElementById('statDays').innerText = latest.days;
     document.getElementById('statWeeks').innerText = latest.weeks;
     document.getElementById('statMonths').innerText = latest.months;
     
-    // Subtext for the cards
     document.getElementById('subDays').innerText = "Days Total";
     document.getElementById('subWeeks').innerText = "Weeks Total";
     document.getElementById('subMonths').innerText = "Months Total";
 
-    // Populate Table
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
     
@@ -332,33 +332,32 @@
     renderBarChart();
   }
 
-  // --- 4. RENDER BAR CHART ---
+  // --- 4. RENDER BAR CHART (DESCENDING WITH YEAR) ---
   function renderBarChart() {
     const ctx = document.getElementById('barChart').getContext('2d');
     
-    // Take the 8 most recent entries and REVERSE them so the NEWEST is at the TOP (descending visually)
+    // Take the 8 most recent entries and reverse them so the NEWEST is at the TOP
     const chartData = csvData.slice(0, 8).reverse();
 
     new Chart(ctx, {
       type: 'bar',
       data: {
-        // Showing Complete Date + Year explicitly
+        // Complete Date + Year
         labels: chartData.map(d => d.date), 
         datasets: [{
           data: chartData.map(d => d.days),
-          // Most recent is Dark Pink, older are Soft Pastel Pink
           backgroundColor: chartData.map((d, i) => i === chartData.length - 1 ? '#d81b60' : '#f8bbd0'), 
           borderRadius: 6, 
-          borderSkipped: false, // Rounds all 4 corners of the bar
+          borderSkipped: false,
           barThickness: 16, 
           hoverBackgroundColor: '#ad1457'
         }]
       },
       options: {
-        indexAxis: 'y', // Horizontal layout
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { right: 35 } }, // Space for data labels
+        layout: { padding: { right: 35 } },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -375,14 +374,10 @@
           }
         },
         scales: {
-          x: { 
-            beginAtZero: true, 
-            display: false // Hide X axis for ultra clean modern look
-          },
+          x: { beginAtZero: true, display: false },
           y: { 
             grid: { display: false },
             ticks: { 
-              // Complete date with year showing on the axis
               font: { size: 11, family: 'Poppins', weight: '600' }, 
               color: '#666' 
             }
@@ -400,7 +395,6 @@
               const meta = chartInstance.getDatasetMeta(i);
               meta.data.forEach(function(bar, index) {
                 const data = dataset.data[index];
-                // Color the label text the same as the bar
                 ctx.fillStyle = index === chartData.length - 1 ? '#d81b60' : '#888';
                 ctx.fillText(data + ' d', bar.x + 8, bar.y);
               });
@@ -411,6 +405,7 @@
     });
   }
 
+  // Initialize
   initDashboard();
 
 </script>
