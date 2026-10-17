@@ -49,18 +49,19 @@
     height: 32%;
   }
 
-  .live-clock {
+  /* Small Transparent Date (No PKT Time) */
+  .date-badge {
     position: absolute;
     top: 12px;
     right: 15px;
-    background: rgba(255,255,255,0.6);
-    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.25); /* Highly transparent */
+    padding: 3px 10px;
     border-radius: 12px;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
-    color: var(--dark-pink);
+    color: rgba(0, 0, 0, 0.5);
     letter-spacing: 0.5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    backdrop-filter: blur(4px);
   }
 
   .main-title {
@@ -141,7 +142,7 @@
 
   /* Chart Container */
   .chart-wrapper { flex: 1.1; padding: 12px; position: relative; }
-  .chart-title { font-size: 12px; font-weight: 600; color: var(--soft-purple); margin-bottom: 5px; text-align: center; }
+  .chart-title { font-size: 12px; font-weight: 600; color: var(--soft-purple); margin-bottom: 8px; text-align: center; }
 
   /* Table Container */
   .table-container { flex: 1; }
@@ -202,7 +203,8 @@
 
   <!-- HEADER -->
   <div class="header-card">
-    <div class="live-clock" id="liveClock">PKT: Loading...</div>
+    <!-- Small Transparent Date (No Time) -->
+    <div class="date-badge" id="currentDateBadge">Loading...</div>
     
     <div class="main-title">Pirah Periods Dashboard 🌸</div>
     <div class="latest-date-badge">Latest Record: <span id="latestDate">...</span></div>
@@ -234,7 +236,7 @@
     
     <!-- BAR CHART -->
     <div class="card chart-wrapper">
-      <div class="chart-title">Recent Cycle Durations (Days)</div>
+      <div class="chart-title">Recent Cycle Durations</div>
       <canvas id="barChart"></canvas>
     </div>
 
@@ -261,18 +263,13 @@
   </div>
 
 <script>
-  // --- 1. LIVE PKT CLOCK ---
-  function updateClock() {
-    const options = { 
-      timeZone: 'Asia/Karachi', 
-      weekday: 'short', month: 'short', day: 'numeric', 
-      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
-    };
-    const now = new Date().toLocaleString('en-US', options);
-    document.getElementById('liveClock').innerText = "PKT: " + now;
+  // --- 1. CURRENT DATE (NO TIME) ---
+  function setCurrentDate() {
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const today = new Date().toLocaleDateString('en-US', options);
+    document.getElementById('currentDateBadge').innerText = today;
   }
-  setInterval(updateClock, 1000);
-  updateClock();
+  setCurrentDate();
 
   // --- 2. YOUR EXACT CSV DATA ---
   const csvData = [
@@ -339,21 +336,21 @@
   function renderBarChart() {
     const ctx = document.getElementById('barChart').getContext('2d');
     
-    // Take the 8 most recent entries and reverse them so the NEWEST is at the top
+    // Take the 8 most recent entries and REVERSE them so the NEWEST is at the TOP (descending visually)
     const chartData = csvData.slice(0, 8).reverse();
 
     new Chart(ctx, {
       type: 'bar',
       data: {
-        // Showing Complete Date + Year
+        // Showing Complete Date + Year explicitly
         labels: chartData.map(d => d.date), 
         datasets: [{
           data: chartData.map(d => d.days),
           // Most recent is Dark Pink, older are Soft Pastel Pink
           backgroundColor: chartData.map((d, i) => i === chartData.length - 1 ? '#d81b60' : '#f8bbd0'), 
-          borderRadius: 6, // Modern rounded edges
-          borderSkipped: false, // Rounds all 4 corners
-          barThickness: 16, // Slightly thicker for better look
+          borderRadius: 6, 
+          borderSkipped: false, // Rounds all 4 corners of the bar
+          barThickness: 16, 
           hoverBackgroundColor: '#ad1457'
         }]
       },
@@ -385,6 +382,7 @@
           y: { 
             grid: { display: false },
             ticks: { 
+              // Complete date with year showing on the axis
               font: { size: 11, family: 'Poppins', weight: '600' }, 
               color: '#666' 
             }
@@ -402,7 +400,7 @@
               const meta = chartInstance.getDatasetMeta(i);
               meta.data.forEach(function(bar, index) {
                 const data = dataset.data[index];
-                // Color the label text the same as the bar (Dark pink for recent, grey for old)
+                // Color the label text the same as the bar
                 ctx.fillStyle = index === chartData.length - 1 ? '#d81b60' : '#888';
                 ctx.fillText(data + ' d', bar.x + 8, bar.y);
               });
