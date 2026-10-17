@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pirah Dashboard</title>
+<title>Pirah Periods Dashboard</title>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Chart.js -->
@@ -11,9 +11,10 @@
 <style>
   :root {
     --primary: #3b4df0;
-    --bg: #f0f2f5;
-    --pink: #d4528b;
+    --primary-light: #6a7bf5;
+    --bg: #f4f6f9;
     --text: #222;
+    --pink: #d4528b;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,170 +23,147 @@
     font-family: 'Poppins', sans-serif;
     background-color: var(--bg);
     color: var(--text);
-    height: 100dvh; /* Dynamic viewport height for mobile */
+    height: 100dvh;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Prevent scrolling */
-    padding: 8px;
+    overflow: hidden;
+    padding: 10px;
   }
 
   /* --- TOP HEADER --- */
   .header-card {
-    background: linear-gradient(135deg, #a8b8e6 0%, var(--primary) 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
     border-radius: 20px;
-    padding: 12px;
+    padding: 15px;
     color: white;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 15px rgba(59, 77, 240, 0.2);
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(59, 77, 240, 0.25);
     position: relative;
     flex-shrink: 0;
-    height: 38%; /* Takes 38% of screen */
+    height: 32%;
   }
 
-  /* Live Clock Badge */
   .live-clock {
     position: absolute;
-    top: 10px;
-    left: 15px;
-    background: rgba(0,0,0,0.4);
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 10px;
+    top: 12px;
+    right: 15px;
+    background: rgba(0,0,0,0.3);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.5px;
   }
 
-  .gauge-container, .donut-container {
-    width: 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    z-index: 2;
-  }
-
-  /* Gauge */
-  .gauge-wrapper {
-    position: relative;
-    width: 70px;
-    height: 70px;
-    background: white;
-    border-radius: 50%;
-    border: 4px solid #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .gauge-arc { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px solid transparent; border-top-color: #ff7f50; border-right-color: #ff7f50; transform: rotate(-45deg); }
-  .gauge-center .title { color: var(--primary); font-size: 7px; font-weight: 700; }
-  .gauge-center .value { color: #000; font-size: 16px; font-weight: 700; line-height: 1; }
-  .gauge-needle {
-    position: absolute; bottom: 50%; left: 50%; width: 2px; height: 25px;
-    background: #e67e22; transform-origin: bottom center;
-    transform: translateX(-50%) rotate(10deg); border-radius: 2px;
-  }
-  .gauge-pin { position: absolute; width: 8px; height: 8px; background: #1a529c; border-radius: 50%; border: 2px solid white; }
-
-  /* Center Text */
-  .center-content {
+  .main-title {
+    font-size: 20px;
+    font-weight: 700;
     text-align: center;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    margin-bottom: 2px;
+    margin-top: 15px;
+  }
+  
+  .duration-text { 
+    font-size: 13px; 
+    text-align: center; 
+    margin-bottom: 15px; 
+    color: #e0e0e0;
+  }
+  
+  .stats-row { 
+    display: flex; 
+    width: 100%; 
+    justify-content: space-between; 
     padding: 0 5px;
   }
-  .urdu-text { font-size: 9px; margin-bottom: 2px; opacity: 0.9; }
-  .main-title { font-size: 16px; font-weight: 700; color: #000; text-shadow: 0 1px 2px rgba(255,255,255,0.4); }
-  .duration-text { font-size: 10px; font-weight: 500; margin-bottom: 10px; }
   
-  .stats-row { display: flex; width: 100%; justify-content: space-around; }
-  .stat-box { text-align: center; color: #000; }
-  .stat-label { font-size: 9px; font-weight: 600; }
-  .stat-value { font-size: 18px; font-weight: 600; color: white; line-height: 1; margin-top: 2px; }
-  .stat-value.small { font-size: 12px; }
-  .stat-value span { font-size: 8px; color: #ffeb3b; display: block; }
-
-  /* Donut */
-  .donut-wrapper { position: relative; width: 70px; height: 70px; }
-  .donut-center {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 25px; height: 25px; background: #ccc; border-radius: 50%;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  .stat-box { 
+    text-align: center; 
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px 2px;
+    margin: 0 4px;
+    backdrop-filter: blur(5px);
   }
+  
+  .stat-label { font-size: 9px; font-weight: 500; text-transform: uppercase; opacity: 0.8; }
+  .stat-value { font-size: 16px; font-weight: 700; color: white; margin-top: 2px; }
+  .stat-value.small { font-size: 11px; }
 
   /* --- BOTTOM SECTION --- */
   .bottom-section {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     flex: 1;
-    margin-top: 8px;
-    height: 60%;
+    margin-top: 10px;
+    height: 66%;
   }
 
-  /* Table */
+  /* Chart Container */
+  .chart-wrapper {
+    flex: 1.2;
+    background: white;
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    position: relative;
+    min-height: 160px;
+  }
+
+  .chart-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  /* Table Container */
   .table-container {
     flex: 1;
     background: white;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
     display: flex;
     flex-direction: column;
   }
-  .table-header { display: flex; justify-content: space-between; padding: 6px 10px; align-items: center; border-bottom: 1px solid #eee; }
-  .table-title { font-size: 10px; font-weight: 600; }
-  .btn-sim { background: var(--primary); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 9px; cursor: pointer; font-weight: 600; }
   
-  .scroll-area { overflow-y: auto; flex: 1; }
-  table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
-  th, td { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; }
-  th { background: #f9f9f9; font-weight: 600; position: sticky; top: 0; }
-
-  /* Chart */
-  .chart-wrapper {
-    flex: 1;
-    background: white;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    position: relative;
-    min-height: 150px;
+  .scroll-area { 
+    overflow-y: auto; 
+    flex: 1; 
+    -webkit-overflow-scrolling: touch;
   }
-  
-  /* Animations */
-  .fade-update { animation: flash 0.5s ease-out; }
-  @keyframes flash { 0% { background-color: #ffeb3b; } 100% { background-color: transparent; } }
+
+  /* Custom Scrollbar */
+  .scroll-area::-webkit-scrollbar { width: 4px; }
+  .scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; }
+  th { background: #f9f9f9; font-weight: 600; position: sticky; top: 0; color: #444; z-index: 1; }
+  td { color: #333; }
+  .highlight-row td { color: var(--pink); font-weight: 600; }
 
   /* Desktop adjustments */
   @media (min-width: 768px) {
-    body { padding: 20px; height: auto; min-height: 100dvh; overflow: auto; }
-    .header-card { height: 250px; padding: 20px; }
-    .gauge-container, .donut-container { width: 140px; }
-    .gauge-wrapper, .donut-wrapper { width: 130px; height: 130px; }
-    .gauge-center .title { font-size: 12px; }
-    .gauge-center .value { font-size: 32px; }
-    .gauge-needle { height: 50px; width: 3px; }
-    .gauge-pin { width: 16px; height: 16px; border-width: 3px; }
-    .donut-center { width: 40px; height: 40px; }
+    body { padding: 20px; }
+    .header-card { height: 250px; }
+    .main-title { font-size: 32px; margin-top: 20px; }
+    .duration-text { font-size: 18px; margin-bottom: 25px; }
+    .stat-label { font-size: 12px; }
+    .stat-value { font-size: 24px; }
+    .stat-value.small { font-size: 18px; }
     
-    .main-title { font-size: 32px; }
-    .duration-text { font-size: 20px; margin-bottom: 20px; }
-    .stat-label { font-size: 16px; }
-    .stat-value { font-size: 38px; margin-top: 5px; }
-    .stat-value.small { font-size: 22px; }
-    .stat-value span { font-size: 14px; }
-    
-    .bottom-section { flex-direction: row; height: 400px; }
-    .table-container, .chart-wrapper { flex: 1; }
-    .btn-sim { font-size: 12px; padding: 6px 12px; }
+    .bottom-section { flex-direction: row; }
+    .chart-wrapper, .table-container { flex: 1; }
     table { font-size: 14px; }
-    th, td { padding: 10px 15px; }
-    .table-title { font-size: 16px; }
+    th, td { padding: 12px 15px; }
+    .chart-title { font-size: 16px; text-align: left; }
   }
 </style>
 </head>
@@ -193,45 +171,27 @@
 
   <!-- HEADER -->
   <div class="header-card">
-    <div class="live-clock" id="liveClock">Loading time...</div>
-
-    <div class="gauge-container">
-      <div class="gauge-wrapper">
-        <div class="gauge-arc"></div>
-        <div class="gauge-needle" id="gaugeNeedle"></div>
-        <div class="gauge-pin"></div>
-        <div class="gauge-center">
-          <div class="title">Weeks</div>
-          <div class="value" id="gaugeValue">1</div>
-        </div>
+    <div class="live-clock" id="liveClock">PKT: Loading...</div>
+    
+    <div class="main-title">Pirah Periods Dashboard</div>
+    <div class="duration-text">Latest Period: <span id="latestDate">...</span></div>
+    
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-label">Days</div>
+        <div class="stat-value" id="statDays">-</div>
       </div>
-    </div>
-
-    <div class="center-content">
-      <div class="urdu-text">پیراہ فرائم کرتی ہیں۔</div>
-      <div class="main-title">Pirah Date</div>
-      <div class="duration-text" id="durationText">Total: 0 Months 9 Days</div>
-      
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-label">Date</div>
-          <div class="stat-value small" id="statDate">09 Oct, 26</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Days</div>
-          <div class="stat-value" id="statDays">9</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Weeks</div>
-          <div class="stat-value" id="statWeeks">1 <span>2d</span></div>
-        </div>
+      <div class="stat-box">
+        <div class="stat-label">Weeks</div>
+        <div class="stat-value" id="statWeeks">-</div>
       </div>
-    </div>
-
-    <div class="donut-container">
-      <div class="donut-wrapper">
-        <canvas id="donutChart"></canvas>
-        <div class="donut-center"></div>
+      <div class="stat-box">
+        <div class="stat-label">Months</div>
+        <div class="stat-value" id="statMonths">-</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Total Duration</div>
+        <div class="stat-value small" id="statDuration">-</div>
       </div>
     </div>
   </div>
@@ -239,18 +199,22 @@
   <!-- BOTTOM -->
   <div class="bottom-section">
     
+    <!-- BAR CHART -->
+    <div class="chart-wrapper">
+      <div class="chart-title">Recent Periods Duration (Days)</div>
+      <canvas id="barChart"></canvas>
+    </div>
+
+    <!-- TABLE -->
     <div class="table-container">
-      <div class="table-header">
-        <div class="table-title">Recent Periods</div>
-        <button class="btn-sim" onclick="simulateNewData()">Simulate New</button>
-      </div>
       <div class="scroll-area">
         <table>
           <thead>
             <tr>
               <th>Date</th>
               <th>Days</th>
-              <th>Wks</th>
+              <th>Weeks</th>
+              <th>Months</th>
             </tr>
           </thead>
           <tbody id="tableBody">
@@ -258,10 +222,6 @@
           </tbody>
         </table>
       </div>
-    </div>
-
-    <div class="chart-wrapper">
-      <canvas id="barChart"></canvas>
     </div>
 
   </div>
@@ -280,81 +240,111 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // --- 2. DATA & CHARTS ---
-  let barChartInstance = null;
-  
-  // Initial Data mimicking the screenshot
-  let currentData = [
-    { date: "Oct 9, 2026", days: 9, weeks: 1 },
-    { date: "Sep 8, 2026", days: 31, weeks: 4 },
-    { date: "Aug 6, 2026", days: 33, weeks: 4 },
-    { date: "Jul 2, 2026", days: 35, weeks: 5 },
-    { date: "May 25, 2026", days: 38, weeks: 5 }
+  // --- 2. YOUR CSV DATA ---
+  // Parsed from the exact CSV you provided (Skipping empty rows and headers)
+  const csvData = [
+    { date: "Oct 9, 2026", days: 9, weeks: 1, months: 0, duration: "0 Months 9 Days" },
+    { date: "Sep 8, 2026", days: 31, weeks: 4, months: 1, duration: "1 Month 1 Day" },
+    { date: "Aug 6, 2026", days: 33, weeks: 4, months: 1, duration: "1 Month 3 Days" },
+    { date: "Jul 2, 2026", days: 35, weeks: 5, months: 1, duration: "1 Month 5 Days" },
+    { date: "May 25, 2026", days: 38, weeks: 5, months: 1, duration: "1 Month 8 Days" },
+    { date: "Apr 21, 2026", days: 34, weeks: 4, months: 1, duration: "1 Month 4 Days" },
+    { date: "Mar 16, 2026", days: 36, weeks: 5, months: 1, duration: "1 Month 6 Days" },
+    { date: "Feb 11, 2026", days: 33, weeks: 4, months: 1, duration: "1 Month 3 Days" },
+    { date: "Jan 9, 2026", days: 33, weeks: 4, months: 1, duration: "1 Month 3 Days" },
+    { date: "Dec 9, 2025", days: 31, weeks: 4, months: 1, duration: "1 Month 1 Day" }
   ];
 
-  // Setup Donut
-  const donutCtx = document.getElementById('donutChart').getContext('2d');
-  new Chart(donutCtx, {
-    type: 'doughnut',
-    data: {
-      datasets: [{
-        data: [9, 15, 20, 12, 18, 25, 10, 8],
-        backgroundColor: ['#e67e22', '#d4528b', '#00bcd4', '#8bc34a', '#9c27b0', '#f44336', '#3f51b5', '#ff9800'],
-        borderWidth: 0,
-        cutout: '65%'
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
-  });
+  // --- 3. UPDATE UI & TABLE ---
+  function initDashboard() {
+    const latest = csvData[0];
 
-  // Setup Bar Chart
-  const barCtx = document.getElementById('barChart').getContext('2d');
-  
+    // Update Top Stats
+    document.getElementById('latestDate').innerText = latest.date;
+    document.getElementById('statDays').innerText = latest.days;
+    document.getElementById('statWeeks').innerText = latest.weeks;
+    document.getElementById('statMonths').innerText = latest.months;
+    document.getElementById('statDuration').innerText = latest.duration;
+
+    // Populate Table
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    
+    csvData.forEach((row, index) => {
+      const tr = document.createElement('tr');
+      if (index === 0) tr.classList.add('highlight-row'); // Highlight the latest
+      
+      tr.innerHTML = `
+        <td>${row.date}</td>
+        <td>${row.days}</td>
+        <td>${row.weeks}</td>
+        <td>${row.months}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Draw Chart
+    renderBarChart();
+  }
+
+  // --- 4. RENDER BAR CHART ---
   function renderBarChart() {
-    if (barChartInstance) barChartInstance.destroy();
+    const ctx = document.getElementById('barChart').getContext('2d');
+    
+    // Take the 7 most recent records for the chart to keep it clean
+    const chartData = csvData.slice(0, 7).reverse();
 
-    const labels = currentData.map(d => d.date).reverse();
-    const data = currentData.map(d => d.days).reverse();
-
-    barChartInstance = new Chart(barCtx, {
+    new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: chartData.map(d => d.date.split(',')[0]), // Just show "Oct 9" to save space
         datasets: [{
-          data: data,
-          backgroundColor: '#d4528b',
-          borderRadius: 4,
-          barThickness: 12
+          data: chartData.map(d => d.days),
+          backgroundColor: chartData.map((d, i) => i === chartData.length - 1 ? '#d4528b' : '#a8b8e6'), // Highlight recent in pink
+          borderRadius: 6,
+          barThickness: 14
         }]
       },
       options: {
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { right: 20 } },
+        layout: { padding: { right: 25 } }, // Space for numbers at the end
         plugins: {
           legend: { display: false },
-          tooltip: { enabled: false }
+          tooltip: {
+            callbacks: {
+              label: function(context) { return context.raw + ' Days'; }
+            }
+          }
         },
         scales: {
-          x: { beginAtZero: true, max: 45, display: false }, // Hide X axis for cleaner mobile view
+          x: { 
+            beginAtZero: true, 
+            display: false // Hide X axis grid for clean mobile look
+          },
           y: { 
             grid: { display: false },
-            ticks: { font: { size: 10, family: 'Poppins' }, color: '#555' }
+            ticks: { 
+              font: { size: 10, family: 'Poppins', weight: '500' }, 
+              color: '#666' 
+            }
           }
         },
         animation: {
           onComplete: function() {
-            const ctx = this.ctx;
+            const chartInstance = this;
+            const ctx = chartInstance.ctx;
             ctx.font = '10px Poppins';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = '#333';
-            
-            this.data.datasets.forEach((dataset, i) => {
-              const meta = this.getDatasetMeta(i);
-              meta.data.forEach((bar, index) => {
-                ctx.fillText(dataset.data[index] + 'd', bar.x + 5, bar.y);
+
+            this.data.datasets.forEach(function(dataset, i) {
+              const meta = chartInstance.getDatasetMeta(i);
+              meta.data.forEach(function(bar, index) {
+                const data = dataset.data[index];
+                ctx.fillText(data + 'd', bar.x + 5, bar.y); // Draw "31d" next to the bar
               });
             });
           }
@@ -363,60 +353,9 @@
     });
   }
 
-  // Update UI text and table
-  function updateUI() {
-    const latest = currentData[0];
-    
-    // Animate update (flash effect)
-    document.querySelector('.header-card').classList.add('fade-update');
-    setTimeout(() => document.querySelector('.header-card').classList.remove('fade-update'), 500);
-
-    // Header text
-    document.getElementById('statDate').innerText = latest.date;
-    document.getElementById('statDays').innerText = latest.days;
-    document.getElementById('statWeeks').innerHTML = latest.weeks + ' <span>' + (latest.days % 7) + 'd</span>';
-    
-    // Gauge
-    document.getElementById('gaugeValue').innerText = latest.weeks;
-    const rotation = (latest.weeks / 10) * 180 - 90; // Scale 1-10 weeks to -90 to +90 deg
-    document.getElementById('gaugeNeedle').style.transform = `translateX(-50%) rotate(${rotation}deg)`;
-
-    // Table
-    const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = '';
-    currentData.forEach((row, index) => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${index + 1}. ${row.date}</td>
-          <td>${row.days}</td>
-          <td>${row.weeks}</td>
-        </tr>
-      `;
-    });
-
-    renderBarChart();
-  }
-
-  // Dynamic Simulation Function
-  function simulateNewData() {
-    const today = new Date();
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
-    const newDate = today.toLocaleDateString('en-US', options);
-    
-    const newDays = Math.floor(Math.random() * 15) + 25; // Random days 25-40
-    const newWeeks = Math.round(newDays / 7);
-
-    // Add to top, remove last to keep it 5 rows
-    currentData.unshift({ date: newDate, days: newDays, weeks: newWeeks });
-    currentData.pop();
-
-    updateUI();
-  }
-
-  // Initial Render
-  updateUI();
+  // Initialize on load
+  initDashboard();
 
 </script>
-
 </body>
 </html>
