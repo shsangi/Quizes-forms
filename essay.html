@@ -101,7 +101,7 @@
             padding: 24px 16px 120px;
         }
 
-        /* ── Search bar (replaces duplicate heading) ── */
+        /* ── Search bar ── */
         .search-wrap {
             position: relative;
             max-width: 640px;
@@ -820,7 +820,6 @@
     </div>
 
     <div class="container">
-        <!-- Search bar replaces duplicate heading -->
         <div class="search-wrap">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
@@ -968,12 +967,10 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // Escape text but wrap matched substring in <mark>
         function highlightTitle(title, query) {
             const safeTitle = escapeHtml(title);
             if (!query) return safeTitle;
             const safeQuery = escapeHtml(query);
-            // Case-insensitive replacement of ALL occurrences
             const regex = new RegExp(escapeRegex(safeQuery), 'gi');
             return safeTitle.replace(regex, match => `<mark>${match}</mark>`);
         }
@@ -1239,7 +1236,6 @@
             });
         }
 
-        // ── RENDER (with filter + highlight) ──
         function renderCards() {
             container.innerHTML = ''; 
 
@@ -1248,7 +1244,6 @@
             let visibleCount = 0;
 
             essaysData.forEach((essay, index) => {
-                // Filter — case-insensitive, partial match on title
                 const matches = !lc || essay.title.toLowerCase().includes(lc);
                 if (!matches) return;
                 visibleCount++;
@@ -1304,7 +1299,6 @@
                 container.insertAdjacentHTML('beforeend', cardHTML);
             });
 
-            // Show/hide no-results message
             if (visibleCount === 0 && essaysData.length > 0) {
                 noResults.classList.add('visible');
             } else {
@@ -1312,13 +1306,11 @@
             }
         }
 
-        // ── SEARCH HANDLERS ──
         function handleSearch() {
             const val = searchInput.value;
             currentQuery = val;
             searchClear.classList.toggle('visible', val.length > 0);
 
-            // Update meta text
             if (val.trim()) {
                 const lc = val.trim().toLowerCase();
                 const matches = essaysData.filter(e => e.title.toLowerCase().includes(lc)).length;
@@ -1473,7 +1465,6 @@
                     clearSearch();
                 }
             }
-            // "/" focuses the search input
             if (event.key === '/' && document.activeElement !== searchInput) {
                 event.preventDefault();
                 searchInput.focus();
