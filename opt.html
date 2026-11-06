@@ -229,27 +229,36 @@
   .subject.selected.violating .marks { color: var(--danger); }
 
   /* ============================================================
-     FULL-SCREEN "FINAL CHOICE" OVERLAY
+     FULL-SCREEN "FINAL CHOICE" OVERLAY  (whole panel scrolls)
      ============================================================ */
   .final-overlay {
     position: fixed;
     inset: 0;
     z-index: 100;
     background: var(--bg);
-    display: flex;
-    flex-direction: column;
-    padding: calc(14px + env(safe-area-inset-top, 0px)) 16px
-             calc(16px + env(safe-area-inset-bottom, 0px));
     opacity: 0;
     transform: translateY(20px);
     pointer-events: none;
     transition: opacity 0.22s ease, transform 0.22s ease;
+    /* the overlay itself scrolls; children flow normally */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .final-overlay.open {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
   }
+
+  /* inner wrapper: everything scrolls together */
+  .final-inner {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 16px
+             calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
   .final-head {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 10px;
@@ -284,18 +293,22 @@
   .final-summary.valid .sum-count { color: var(--ok); }
   .final-summary.over .sum-total { color: var(--danger); }
 
-  /* full-screen chip list — SAME look as home row chips, just larger */
-  .final-list {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    -webkit-overflow-scrolling: touch;
+  /* full-screen chip list — grows naturally, no inner scroll */
+  .final-overlay .chosen-list {
+    flex: 0 0 auto;
+    margin-bottom: 8px;
   }
+  .final-overlay .chosen-list li {
+    padding: 14px 14px;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    border-left-width: 5px;
+  }
+  .final-overlay .chosen-list .rm { font-size: 1.4rem; }
 
   .final-status {
-    font-size: 0.88rem; margin-top: 8px; text-align: center;
+    font-size: 0.88rem; margin-top: 4px; text-align: center;
     flex: 0 0 auto; min-height: 18px;
   }
   .final-status.ok { color: var(--ok); }
@@ -306,6 +319,9 @@
     flex: 0 0 auto;
     margin-top: 12px;
     display: flex; gap: 10px;
+    /* pushes footer to bottom when few items, scrolls when many */
+    margin-top: auto;
+    padding-top: 12px;
   }
   .final-foot button {
     flex: 1;
@@ -325,16 +341,6 @@
     background: var(--panel-2); color: var(--muted); border-color: var(--border);
     cursor: not-allowed; opacity: 0.7;
   }
-
-  /* larger chips inside the full-screen overlay */
-  .final-overlay .chosen-list li {
-    padding: 14px 14px;
-    font-size: 1rem;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    border-left-width: 5px;
-  }
-  .final-overlay .chosen-list .rm { font-size: 1.4rem; }
 
   @media (min-width: 760px) {
     body { max-width: 760px; margin: 0 auto; font-size: 17px; }
@@ -356,7 +362,7 @@
   <div class="title-row">
     <h1>CSS Optional Subject Builder</h1>
     <div class="header-right">
-      <span class="version">v2.7</span>
+      <span class="version">v2.8</span>
       <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙 Dark</button>
     </div>
   </div>
@@ -383,32 +389,36 @@
 
 <div id="groups"></div>
 
-<!-- ============ FULL-SCREEN FINAL CHOICE OVERLAY ============ -->
+<!-- ============ FULL-SCREEN FINAL CHOICE OVERLAY (scrolls) ============ -->
 <div class="final-overlay" id="finalOverlay" aria-hidden="true">
-  <div class="final-head">
-    <h2>Final Choice — Review</h2>
-    <button class="final-close" id="finalCloseBtn">✕ Close</button>
-  </div>
+  <div class="final-inner">
 
-  <div class="final-summary" id="finalSummary">
-    <div class="sum-block">
-      <span class="sum-label">Total marks</span>
-      <span class="sum-total" id="finalTotal">0 / 600</span>
+    <div class="final-head">
+      <h2>Final Choice — Review</h2>
+      <button class="final-close" id="finalCloseBtn">✕ Close</button>
     </div>
-    <div class="sum-block right">
-      <span class="sum-label">Subjects</span>
-      <span class="sum-count" id="finalCount">0</span>
+
+    <div class="final-summary" id="finalSummary">
+      <div class="sum-block">
+        <span class="sum-label">Total marks</span>
+        <span class="sum-total" id="finalTotal">0 / 600</span>
+      </div>
+      <div class="sum-block right">
+        <span class="sum-label">Subjects</span>
+        <span class="sum-count" id="finalCount">0</span>
+      </div>
     </div>
-  </div>
 
-  <!-- SAME row-chip layout as home, just bigger -->
-  <ul class="chosen-list" id="finalList"></ul>
+    <!-- SAME row-chip layout as home, just bigger -->
+    <ul class="chosen-list" id="finalList"></ul>
 
-  <div class="final-status" id="finalStatus"></div>
+    <div class="final-status" id="finalStatus"></div>
 
-  <div class="final-foot">
-    <button id="finalBackBtn">← Back to builder</button>
-    <button class="confirm" id="finalConfirmBtn" disabled>✓ Confirm 600</button>
+    <div class="final-foot">
+      <button id="finalBackBtn">← Back to builder</button>
+      <button class="confirm" id="finalConfirmBtn" disabled>✓ Confirm 600</button>
+    </div>
+
   </div>
 </div>
 
@@ -768,6 +778,8 @@ function openFinal() {
   renderFinal();
   finalOverlay.classList.add("open");
   finalOverlay.setAttribute("aria-hidden", "false");
+  /* start at top each time it opens */
+  finalOverlay.scrollTop = 0;
 }
 function closeFinal() {
   finalOverlay.classList.remove("open");
