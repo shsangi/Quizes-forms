@@ -102,7 +102,6 @@
   .total-pill.over { background: rgba(239,68,68,0.2); color: var(--danger); }
   .total-pill.valid-grey { background: var(--panel-2); color: var(--grey); }
 
-  /* little "view full screen" hint */
   .expand-hint {
     font-size: 0.72rem; color: var(--accent); margin-top: 4px;
     display: flex; align-items: center; gap: 4px;
@@ -179,8 +178,8 @@
     overflow-y: auto;
     padding: 0 14px 0;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px));
-    scroll-padding-bottom: 150px;
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    scroll-padding-bottom: 120px;
   }
   .group {
     background: var(--panel);
@@ -188,7 +187,7 @@
     border-radius: 10px;
     margin-bottom: 8px;
     overflow: hidden;
-    scroll-margin-bottom: 130px;
+    scroll-margin-bottom: 100px;
   }
   .group.violation { border-color: var(--danger); }
   .group-header {
@@ -227,26 +226,6 @@
   .marks { font-size: 0.82rem; color: var(--muted); }
   .subject.selected .marks { color: var(--accent); }
   .subject.selected.violating .marks { color: var(--danger); }
-
-  /* ---------- floating jump-to-Group-VII button ---------- */
-  .jump-btn {
-    position: fixed;
-    right: 14px;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    z-index: 40;
-    background: #f97316;
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 12px 18px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-    display: flex; align-items: center; gap: 6px;
-  }
-  .jump-btn:active { transform: scale(0.96); }
-  .jump-btn.hidden { display: none; }
 
   /* ============================================================
      FULL-SCREEN "FINAL CHOICE" OVERLAY
@@ -393,12 +372,11 @@
   <div class="title-row">
     <h1>CSS Optional Subject Builder</h1>
     <div class="header-right">
-      <span class="version">v2.5</span>
+      <span class="version">v2.6</span>
       <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙 Dark</button>
     </div>
   </div>
 
-  <!-- Clickable selected strip → opens full-screen review -->
   <div class="selected-strip" id="selectedStrip" title="Tap to view full screen">
     <div class="strip-head">
       <span class="lbl">Selected · target 600</span>
@@ -420,8 +398,6 @@
 </div>
 
 <div id="groups"></div>
-
-<button class="jump-btn" id="jumpBtn">⤓ Group VII</button>
 
 <!-- ============ FULL-SCREEN FINAL CHOICE OVERLAY ============ -->
 <div class="final-overlay" id="finalOverlay" aria-hidden="true">
@@ -556,7 +532,6 @@ const statusEl      = document.getElementById("status");
 const hintBox       = document.getElementById("hintBox");
 const chosenListEl  = document.getElementById("chosenList");
 const selectedStrip = document.getElementById("selectedStrip");
-const jumpBtn       = document.getElementById("jumpBtn");
 
 /* full-screen elements */
 const finalOverlay    = document.getElementById("finalOverlay");
@@ -733,7 +708,6 @@ function updateUI() {
   });
   if (!any) chosenListEl.innerHTML = `<li class="empty">No subjects selected yet.</li>`;
 
-  updateJumpVisibility();
   // keep overlay in sync if it's open
   if (finalOverlay.classList.contains("open")) renderFinal();
 }
@@ -813,39 +787,20 @@ document.getElementById("finalBackBtn").addEventListener("click", closeFinal);
 finalConfirmBtn.addEventListener("click", () => {
   if (totalMarks() !== TARGET) return;
   closeFinal();
-  // brief success flash on the strip
   selectedStrip.style.transition = "box-shadow 0.15s";
   selectedStrip.style.boxShadow = "0 0 0 3px rgba(34,197,94,0.5)";
   setTimeout(() => { selectedStrip.style.boxShadow = ""; }, 600);
 });
-// Esc closes overlay
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && finalOverlay.classList.contains("open")) closeFinal();
 });
 
-/* ================= JUMP TO GROUP VII ================= */
-function updateJumpVisibility() {
-  const nearBottom =
-    groupsEl.scrollTop + groupsEl.clientHeight >= groupsEl.scrollHeight - 80;
-  jumpBtn.classList.toggle("hidden", nearBottom);
-}
-jumpBtn.addEventListener("click", () => {
-  const g7 = document.querySelector('.group[data-group="VII"]');
-  if (!g7) return;
-  g7.classList.add("open");
-  g7.scrollIntoView({ behavior: "smooth", block: "end" });
-  setTimeout(() => { groupsEl.scrollTop = groupsEl.scrollHeight; }, 350);
-});
-groupsEl.addEventListener("scroll", updateJumpVisibility, { passive: true });
-
 /* ================= TOOLBAR ================= */
 document.getElementById("expandAllBtn").addEventListener("click", () => {
   document.querySelectorAll(".group").forEach(g => g.classList.add("open"));
-  updateJumpVisibility();
 });
 document.getElementById("collapseAllBtn").addEventListener("click", () => {
   document.querySelectorAll(".group").forEach(g => g.classList.remove("open"));
-  updateJumpVisibility();
 });
 document.getElementById("resetBtn").addEventListener("click", () => {
   GROUPS.forEach(g => state[g.groupNumber] = []);
