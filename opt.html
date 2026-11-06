@@ -240,7 +240,6 @@
     transform: translateY(20px);
     pointer-events: none;
     transition: opacity 0.22s ease, transform 0.22s ease;
-    /* the overlay itself scrolls; children flow normally */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -250,7 +249,6 @@
     pointer-events: auto;
   }
 
-  /* inner wrapper: everything scrolls together */
   .final-inner {
     min-height: 100%;
     display: flex;
@@ -317,11 +315,9 @@
 
   .final-foot {
     flex: 0 0 auto;
-    margin-top: 12px;
-    display: flex; gap: 10px;
-    /* pushes footer to bottom when few items, scrolls when many */
     margin-top: auto;
     padding-top: 12px;
+    display: flex; gap: 10px;
   }
   .final-foot button {
     flex: 1;
@@ -340,6 +336,30 @@
   .final-foot .confirm:disabled {
     background: var(--panel-2); color: var(--muted); border-color: var(--border);
     cursor: not-allowed; opacity: 0.7;
+  }
+
+  /* copy row */
+  .copy-row {
+    display: flex; gap: 10px;
+    margin-top: 10px;
+    flex: 0 0 auto;
+  }
+  .copy-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--accent);
+    background: rgba(56,189,248,0.12);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .copy-btn:active { background: rgba(56,189,248,0.25); }
+  .copy-btn.copied {
+    border-color: var(--ok); color: var(--ok);
+    background: rgba(34,197,94,0.15);
   }
 
   @media (min-width: 760px) {
@@ -362,7 +382,7 @@
   <div class="title-row">
     <h1>CSS Optional Subject Builder</h1>
     <div class="header-right">
-      <span class="version">v2.8</span>
+      <span class="version">v2.9</span>
       <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙 Dark</button>
     </div>
   </div>
@@ -411,6 +431,11 @@
 
     <!-- SAME row-chip layout as home, just bigger -->
     <ul class="chosen-list" id="finalList"></ul>
+
+    <!-- Copy all selected -->
+    <div class="copy-row">
+      <button class="copy-btn" id="copyBtn">📋 Copy all selected</button>
+    </div>
 
     <div class="final-status" id="finalStatus"></div>
 
@@ -522,8 +547,33 @@ const GROUPS = [
 ];
 
 const TARGET = 600;
+const STORAGE_KEY = "css-builder-selection";
+
+/* ================= STATE (with persistence) ================= */
 const state = {};
 GROUPS.forEach(g => state[g.groupNumber] = []);
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    GROUPS.forEach(g => {
+      const saved = parsed[g.groupNumber];
+      if (Array.isArray(saved)) {
+        // only keep names that actually exist in this group
+        state[g.groupNumber] = saved.filter(n =>
+          g.subjects.some(s => s.name === n)
+        );
+      }
+    });
+  } catch(e) {}
+}
 
 const chipClass = { "I":"g1","II":"g2","III":"g3","IV":"g4","V":"g5","VI":"g6","VII":"g7" };
 
@@ -542,6 +592,7 @@ const finalCount      = document.getElementById("finalCount");
 const finalSummary    = document.getElementById("finalSummary");
 const finalStatus     = document.getElementById("finalStatus");
 const finalConfirmBtn = document.getElementById("finalConfirmBtn");
+const copyBtn         = document.getElementById("copyBtn");
 
 /* ================= HELPERS ================= */
 const subj = (g, n) => GROUPS.find(x => x.groupNumber === g).subjects.find(s => s.name === n);
@@ -659,6 +710,7 @@ function toggle(g, n) {
   const i = sel.indexOf(n);
   if (i === -1) sel.push(n); else sel.splice(i, 1);
   updateUI();
+  saveState();
 }
 
 /* ================= UPDATE ================= */
@@ -723,6 +775,7 @@ function updateUI() {
   const anyHome = buildChips(chosenListEl, flagged, (g, n) => {
     state[g] = state[g].filter(x => x !== n);
     updateUI();
+    saveState();
   });
   if (!anyHome) chosenListEl.innerHTML = `<li class="empty">No subjects selected yet.</li>`;
 
@@ -749,6 +802,7 @@ function renderFinal() {
   const any = buildChips(finalList, flagged, (g, n) => {
     state[g] = state[g].filter(x => x !== n);
     updateUI();
+    saveState();
   });
   if (!any) {
     finalList.innerHTML = `<li class="empty">No subjects selected yet. Go back and pick some.</li>`;
@@ -772,13 +826,74 @@ function renderFinal() {
   }
 
   finalConfirmBtn.disabled = !isValid;
+
+  /* copy button disabled when nothing selected */
+  copyBtn.disabled = totalCount() === 0;
+  copyBtn.style.opacity = totalCount() === 0 ? 0.5 : 1;
+  copyBtn.style.cursor = totalCount() === 0 ? "not-allowed" : "pointer";
 }
 
+/* ================= COPY ALL SELECTED ================= */
+function buildCopyText() {
+  const lines = [];
+  lines.push("CSS Optional Subjects — Final Choice");
+  lines.push("====================================");
+  GROUPS.forEach(g => {
+    state[g.groupNumber].forEach(n => {
+      const s = subj(g.groupNumber, n);
+      lines.push(`Group ${g.groupNumber} — ${s.name} (${s.marks} marks)`);
+    });
+  });
+  lines.push("------------------------------------");
+  lines.push(`Total subjects: ${totalCount()}`);
+  lines.push(`Total marks: ${totalMarks()} / ${TARGET}`);
+  return lines.join("\n");
+}
+
+copyBtn.addEventListener("click", async () => {
+  const text = buildCopyText();
+  let ok = false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    }
+  } catch(e) { ok = false; }
+
+  if (!ok) {
+    // fallback for older browsers
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      ok = true;
+    } catch(e) { ok = false; }
+  }
+
+  if (ok) {
+    const original = copyBtn.textContent;
+    copyBtn.classList.add("copied");
+    copyBtn.textContent = "✓ Copied!";
+    setTimeout(() => {
+      copyBtn.classList.remove("copied");
+      copyBtn.textContent = original;
+    }, 1500);
+  } else {
+    // show the text so user can copy manually
+    alert(text);
+  }
+});
+
+/* ================= OPEN / CLOSE OVERLAY ================= */
 function openFinal() {
   renderFinal();
   finalOverlay.classList.add("open");
   finalOverlay.setAttribute("aria-hidden", "false");
-  /* start at top each time it opens */
   finalOverlay.scrollTop = 0;
 }
 function closeFinal() {
@@ -810,9 +925,11 @@ document.getElementById("collapseAllBtn").addEventListener("click", () => {
 document.getElementById("resetBtn").addEventListener("click", () => {
   GROUPS.forEach(g => state[g.groupNumber] = []);
   updateUI();
+  saveState();
 });
 
 /* ================= INIT ================= */
+loadState();
 renderGroups();
 updateUI();
 document.querySelector('.group[data-group="I"]').classList.add("open");
