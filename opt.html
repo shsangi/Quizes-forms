@@ -51,24 +51,24 @@
     transition: background 0.2s, color 0.2s;
   }
 
-  /* ---------- header ---------- */
+  /* ---------- header (compact fonts restored) ---------- */
   header {
-    padding: 10px 14px 8px;
+    padding: 8px 12px 6px;
     border-bottom: 1px solid var(--border);
     flex: 0 0 auto;
   }
   .title-row {
     display: flex; justify-content: space-between; align-items: center; gap: 8px;
   }
-  h1 { font-size: 1.15rem; margin: 0; font-weight: 700; }
+  h1 { font-size: 0.95rem; margin: 0; font-weight: 700; }
   .header-right { display: flex; align-items: center; gap: 8px; }
-  .version { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+  .version { font-size: 0.62rem; color: var(--muted); white-space: nowrap; }
 
   .theme-btn {
     background: var(--panel-2); color: var(--text);
     border: 1px solid var(--border); border-radius: 999px;
-    padding: 5px 12px; font-size: 0.85rem; cursor: pointer;
-    display: flex; align-items: center; gap: 4px;
+    padding: 3px 9px; font-size: 0.68rem; cursor: pointer;
+    display: flex; align-items: center; gap: 3px;
   }
   .theme-btn:active { background: var(--hover); }
 
@@ -241,7 +241,9 @@
 
   @media (min-width: 760px) {
     body { max-width: 760px; margin: 0 auto; font-size: 17px; }
-    h1 { font-size: 1.3rem; }
+    h1 { font-size: 1.1rem; }
+    .version { font-size: 0.7rem; }
+    .theme-btn { font-size: 0.75rem; padding: 4px 10px; }
     .selected-strip { max-height: 24vh; }
     .subject { padding: 12px 14px; font-size: 1rem; }
     .group-header { padding: 13px 16px; font-size: 1rem; }
@@ -255,7 +257,7 @@
   <div class="title-row">
     <h1>CSS Optional Subject Builder</h1>
     <div class="header-right">
-      <span class="version">v2.4</span>
+      <span class="version">v2.4.1</span>
       <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙 Dark</button>
     </div>
   </div>
