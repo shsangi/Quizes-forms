@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>CSS Optional Builder</title>
+<title>CSS Optional Subject Builder</title>
 <style>
   :root {
     --bg: #0f172a;
@@ -31,45 +31,92 @@
     overflow: hidden;
   }
 
+  /* ---------- header ---------- */
   header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 12px 4px;
-  }
-  header h1 { font-size: 0.95rem; margin: 0; font-weight: 600; }
-  .ver { font-size: 0.6rem; color: var(--muted); margin-left: 6px; }
-
-  /* Top summary bar */
-  .summary {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 12px;
-    background: var(--panel);
-    border-top: 1px solid var(--border);
+    padding: 8px 12px 6px;
     border-bottom: 1px solid var(--border);
+    flex: 0 0 auto;
   }
-  .total-num { font-size: 1.3rem; font-weight: 700; line-height: 1; }
-  .total-num.ok { color: var(--ok); }
-  .total-num.over { color: var(--danger); }
-  .total-denom { color: var(--muted); font-size: 0.7rem; }
-  .status {
-    flex: 1; font-size: 0.68rem; line-height: 1.25;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  .title-row {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
   }
+  h1 { font-size: 0.95rem; margin: 0; font-weight: 700; }
+  .version { font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
+
+  /* ---------- selected strip (TOP) ---------- */
+  .selected-strip {
+    margin-top: 6px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 6px 8px;
+    max-height: 30vh;
+    overflow-y: auto;
+    flex: 0 0 auto;
+  }
+  .strip-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 4px;
+  }
+  .strip-head .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .total-pill {
+    font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+    background: var(--panel-2); color: var(--text);
+  }
+  .total-pill.ok { background: rgba(34,197,94,0.2); color: var(--ok); }
+  .total-pill.over { background: rgba(239,68,68,0.2); color: var(--danger); }
+
+  .chosen-list { list-style: none; padding: 0; margin: 0; }
+  .chosen-list li {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 6px; padding: 4px 8px; border-radius: 6px;
+    background: var(--panel-2); margin-bottom: 3px; font-size: 0.75rem;
+    border-left: 3px solid transparent;
+  }
+  .chosen-list li.violating {
+    border-left-color: var(--danger); background: rgba(239,68,68,0.12);
+  }
+  .chosen-list .rm {
+    color: var(--danger); background: none; border: none;
+    font-size: 1rem; line-height: 1; cursor: pointer; padding: 0 2px;
+  }
+  .empty { color: var(--muted); font-size: 0.75rem; font-style: italic; padding: 2px 4px; }
+
+  .status { font-size: 0.7rem; margin-top: 4px; min-height: 14px; }
   .status.ok { color: var(--ok); }
   .status.err { color: var(--danger); }
   .status.warn { color: var(--warn); }
 
-  /* Scrollable groups area */
-  .scroll {
-    flex: 1;
+  .hint {
+    font-size: 0.68rem; padding: 5px 8px; border-radius: 6px;
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.4);
+    color: #fca5a5; margin-top: 4px; display: none;
+  }
+  .hint.show { display: block; }
+
+  /* ---------- toolbar ---------- */
+  .toolbar {
+    display: flex; gap: 6px; padding: 6px 12px;
+    flex: 0 0 auto;
+  }
+  .toolbar button {
+    flex: 1; padding: 5px 8px; border-radius: 7px; cursor: pointer;
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); font-size: 0.72rem;
+  }
+  .toolbar button:active { background: #2e3d56; }
+
+  /* ---------- groups (scrollable) ---------- */
+  #groups {
+    flex: 1 1 auto;
     overflow-y: auto;
-    padding: 8px;
+    padding: 0 12px 12px;
     -webkit-overflow-scrolling: touch;
   }
-
   .group {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 6px;
     overflow: hidden;
   }
@@ -77,186 +124,150 @@
   .group-header {
     display: flex; justify-content: space-between; align-items: center;
     padding: 8px 10px; cursor: pointer; user-select: none;
-    background: var(--panel-2);
+    background: var(--panel-2); font-size: 0.78rem;
   }
   .group-header:active { background: #2e3d56; }
-  .group-title { font-weight: 600; font-size: 0.8rem; }
-  .group-title small { color: var(--muted); font-weight: 400; font-size: 0.62rem; margin-left: 6px; }
+  .group-title { font-weight: 600; }
+  .group-title small { color: var(--muted); font-weight: 400; margin-left: 4px; font-size: 0.65rem; }
   .chev { transition: transform 0.2s; color: var(--muted); font-size: 0.7rem; }
   .group.open .chev { transform: rotate(90deg); }
-  .group-body { display: none; padding: 4px; }
+  .group-body { display: none; padding: 6px; }
   .group.open .group-body { display: block; }
-  .rule { font-size: 0.62rem; color: var(--accent); padding: 2px 6px 4px; }
-  .rule-flag {
-    font-size: 0.62rem; color: var(--danger); padding: 0 6px 4px;
-    font-weight: 600; line-height: 1.3;
-  }
+  .rule { font-size: 0.65rem; color: var(--accent); padding: 2px 6px 4px; }
+  .rule-flag { font-size: 0.65rem; color: var(--danger); padding: 0 6px 4px; font-weight: 600; }
 
   .subject {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 7px 9px; border-radius: 6px; cursor: pointer;
-    border: 1px solid transparent; margin-bottom: 3px;
-    font-size: 0.75rem;
+    padding: 6px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid transparent; margin-bottom: 3px; font-size: 0.75rem;
   }
   .subject:active { background: #2e3d56; }
   .subject.selected {
-    background: rgba(56, 189, 248, 0.15);
-    border-color: var(--accent);
+    background: rgba(56,189,248,0.15); border-color: var(--accent);
   }
   .subject.selected.violating {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: var(--danger);
+    background: rgba(239,68,68,0.15); border-color: var(--danger);
   }
-  .marks { font-size: 0.65rem; color: var(--muted); }
+  .marks { font-size: 0.68rem; color: var(--muted); }
   .subject.selected .marks { color: var(--accent); }
   .subject.selected.violating .marks { color: var(--danger); }
 
-  /* Bottom chosen list drawer */
-  .drawer {
-    background: var(--panel);
-    border-top: 1px solid var(--border);
-    max-height: 30vh;
-    display: flex; flex-direction: column;
+  /* desktop widen a bit */
+  @media (min-width: 760px) {
+    body { font-size: 14px; max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 1.1rem; }
+    .selected-strip { max-height: 26vh; }
+    .subject { padding: 8px 12px; font-size: 0.82rem; }
+    .group-header { padding: 10px 14px; font-size: 0.85rem; }
   }
-  .drawer-head {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 6px 12px; font-size: 0.72rem; color: var(--muted);
-  }
-  .drawer-head button {
-    background: none; border: 1px solid var(--border); color: var(--muted);
-    border-radius: 6px; padding: 3px 8px; font-size: 0.65rem; cursor: pointer;
-  }
-  .drawer-head button:active { color: var(--text); }
-  .chosen-list {
-    list-style: none; padding: 0 8px 8px; margin: 0;
-    overflow-y: auto; flex: 1;
-  }
-  .chosen-list li {
-    display: flex; justify-content: space-between; gap: 6px;
-    padding: 5px 8px; border-radius: 6px; background: var(--panel-2);
-    margin-bottom: 3px; font-size: 0.7rem;
-    border-left: 3px solid transparent;
-  }
-  .chosen-list li.violating {
-    border-left-color: var(--danger);
-    background: rgba(239, 68, 68, 0.12);
-  }
-  .chosen-list .rm {
-    color: var(--danger); cursor: pointer; font-weight: 700;
-    background: none; border: none; font-size: 0.85rem; line-height: 1;
-    padding: 0 2px;
-  }
-  .empty { color: var(--muted); font-size: 0.7rem; font-style: italic; padding: 4px; }
-
-  .hint {
-    display: none;
-    margin: 0 8px 6px;
-    padding: 6px 8px;
-    border-radius: 6px;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.4);
-    color: #fca5a5;
-    font-size: 0.65rem;
-    line-height: 1.35;
-    max-height: 22vh;
-    overflow-y: auto;
-  }
-  .hint.show { display: block; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>CSS Optional Builder <span class="ver">v1.2</span></h1>
+  <div class="title-row">
+    <h1>CSS Optional Subject Builder</h1>
+    <span class="version">v2.0</span>
+  </div>
+
+  <!-- Selected subjects at TOP -->
+  <div class="selected-strip">
+    <div class="strip-head">
+      <span class="lbl">Selected · target 600</span>
+      <span class="total-pill" id="totalPill">0 / 600</span>
+    </div>
+    <ul class="chosen-list" id="chosenList">
+      <li class="empty">No subjects selected yet.</li>
+    </ul>
+    <div class="status" id="status">Select subjects to begin.</div>
+    <div class="hint" id="hintBox"></div>
+  </div>
 </header>
 
-<div class="summary">
-  <span class="total-num" id="totalNum">0</span>
-  <span class="total-denom">/600</span>
-  <span class="status" id="status">Select subjects to begin.</span>
+<!-- Expand / Collapse / Reset -->
+<div class="toolbar">
+  <button id="expandAllBtn">Expand All</button>
+  <button id="collapseAllBtn">Collapse All</button>
+  <button id="resetBtn">Reset</button>
 </div>
 
-<div class="scroll" id="groups"></div>
-
-<div class="hint" id="hintBox"></div>
-
-<div class="drawer">
-  <div class="drawer-head">
-    <span id="drawerLabel">No subjects selected</span>
-    <button id="resetBtn">Reset</button>
-  </div>
-  <ul class="chosen-list" id="chosenList">
-    <li class="empty">Tap a group above to select subjects.</li>
-  </ul>
-</div>
+<!-- Scrollable group list -->
+<div id="groups"></div>
 
 <script>
 const GROUPS = [
-  { groupNumber: "I", name: "Commerce & Social Sci.", rule: "One subject (200).",
-    maxSubjects: 1, maxMarks: 200, subjects: [
-      { name: "Accountancy & Auditing", marks: 200 },
-      { name: "Economics", marks: 200 },
-      { name: "Computer Science", marks: 200 },
-      { name: "Political Science", marks: 200 },
-      { name: "International Relations", marks: 200 }
+  { groupNumber:"I", name:"Commerce & Social Sciences",
+    rule:"Select ONE (200 marks).", maxSubjects:1, maxMarks:200,
+    subjects:[
+      {name:"Accountancy & Auditing",marks:200},
+      {name:"Economics",marks:200},
+      {name:"Computer Science",marks:200},
+      {name:"Political Science",marks:200},
+      {name:"International Relations",marks:200}
     ]},
-  { groupNumber: "II", name: "Sciences & Math", rule: "One 200 OR two 100s.",
-    maxSubjects: 2, maxMarks: 200, subjects: [
-      { name: "Physics", marks: 200 },
-      { name: "Chemistry", marks: 200 },
-      { name: "Applied Mathematics", marks: 100 },
-      { name: "Pure Mathematics", marks: 100 },
-      { name: "Statistics", marks: 100 },
-      { name: "Geology", marks: 100 }
+  { groupNumber:"II", name:"Sciences & Mathematics",
+    rule:"ONE 200-mark OR up to TWO 100-mark (max 200).", maxSubjects:2, maxMarks:200,
+    subjects:[
+      {name:"Physics",marks:200},
+      {name:"Chemistry",marks:200},
+      {name:"Applied Mathematics",marks:100},
+      {name:"Pure Mathematics",marks:100},
+      {name:"Statistics",marks:100},
+      {name:"Geology",marks:100}
     ]},
-  { groupNumber: "III", name: "Admin & Governance", rule: "One subject (100).",
-    maxSubjects: 1, maxMarks: 100, subjects: [
-      { name: "Business Administration", marks: 100 },
-      { name: "Public Administration", marks: 100 },
-      { name: "Governance & Public Policies", marks: 100 },
-      { name: "Town Planning & Urban Mgmt", marks: 100 }
+  { groupNumber:"III", name:"Administration & Governance",
+    rule:"Select ONE (100 marks).", maxSubjects:1, maxMarks:100,
+    subjects:[
+      {name:"Business Administration",marks:100},
+      {name:"Public Administration",marks:100},
+      {name:"Governance & Public Policies",marks:100},
+      {name:"Town Planning & Urban Management",marks:100}
     ]},
-  { groupNumber: "IV", name: "History", rule: "One subject (100).",
-    maxSubjects: 1, maxMarks: 100, subjects: [
-      { name: "History of Pakistan & India", marks: 100 },
-      { name: "Islamic History & Culture", marks: 100 },
-      { name: "British History", marks: 100 },
-      { name: "European History", marks: 100 },
-      { name: "History of USA", marks: 100 }
+  { groupNumber:"IV", name:"History",
+    rule:"Select ONE (100 marks).", maxSubjects:1, maxMarks:100,
+    subjects:[
+      {name:"History of Pakistan & India",marks:100},
+      {name:"Islamic History & Culture",marks:100},
+      {name:"British History",marks:100},
+      {name:"European History",marks:100},
+      {name:"History of USA",marks:100}
     ]},
-  { groupNumber: "V", name: "Natural Sci. & Lit.", rule: "One subject (100).",
-    maxSubjects: 1, maxMarks: 100, subjects: [
-      { name: "Gender Studies", marks: 100 },
-      { name: "Environmental Sciences", marks: 100 },
-      { name: "Agriculture & Forestry", marks: 100 },
-      { name: "Botany", marks: 100 },
-      { name: "Zoology", marks: 100 },
-      { name: "English Literature", marks: 100 },
-      { name: "Urdu Literature", marks: 100 }
+  { groupNumber:"V", name:"Natural Sciences & Literature",
+    rule:"Select ONE (100 marks).", maxSubjects:1, maxMarks:100,
+    subjects:[
+      {name:"Gender Studies",marks:100},
+      {name:"Environmental Sciences",marks:100},
+      {name:"Agriculture & Forestry",marks:100},
+      {name:"Botany",marks:100},
+      {name:"Zoology",marks:100},
+      {name:"English Literature",marks:100},
+      {name:"Urdu Literature",marks:100}
     ]},
-  { groupNumber: "VI", name: "Law & Philosophy", rule: "One subject (100).",
-    maxSubjects: 1, maxMarks: 100, subjects: [
-      { name: "Law", marks: 100 },
-      { name: "Constitutional Law", marks: 100 },
-      { name: "International Law", marks: 100 },
-      { name: "Muslim Law & Jurisprudence", marks: 100 },
-      { name: "Mercantile Law", marks: 100 },
-      { name: "Criminology", marks: 100 },
-      { name: "Philosophy", marks: 100 }
+  { groupNumber:"VI", name:"Law & Philosophy",
+    rule:"Select ONE (100 marks).", maxSubjects:1, maxMarks:100,
+    subjects:[
+      {name:"Law",marks:100},
+      {name:"Constitutional Law",marks:100},
+      {name:"International Law",marks:100},
+      {name:"Muslim Law & Jurisprudence",marks:100},
+      {name:"Mercantile Law",marks:100},
+      {name:"Criminology",marks:100},
+      {name:"Philosophy",marks:100}
     ]},
-  { groupNumber: "VII", name: "Social Sci. & Lang.", rule: "One subject (100).",
-    maxSubjects: 1, maxMarks: 100, subjects: [
-      { name: "Journalism & Mass Comm.", marks: 100 },
-      { name: "Psychology", marks: 100 },
-      { name: "Geography", marks: 100 },
-      { name: "Sociology", marks: 100 },
-      { name: "Anthropology", marks: 100 },
-      { name: "Punjabi", marks: 100 },
-      { name: "Sindhi", marks: 100 },
-      { name: "Pashto", marks: 100 },
-      { name: "Balochi", marks: 100 },
-      { name: "Persian", marks: 100 },
-      { name: "Arabic", marks: 100 }
+  { groupNumber:"VII", name:"Social Sciences & Languages",
+    rule:"Select ONE (100 marks).", maxSubjects:1, maxMarks:100,
+    subjects:[
+      {name:"Journalism & Mass Communication",marks:100},
+      {name:"Psychology",marks:100},
+      {name:"Geography",marks:100},
+      {name:"Sociology",marks:100},
+      {name:"Anthropology",marks:100},
+      {name:"Punjabi",marks:100},
+      {name:"Sindhi",marks:100},
+      {name:"Pashto",marks:100},
+      {name:"Balochi",marks:100},
+      {name:"Persian",marks:100},
+      {name:"Arabic",marks:100}
     ]}
 ];
 
@@ -264,17 +275,16 @@ const TARGET = 600;
 const state = {};
 GROUPS.forEach(g => state[g.groupNumber] = []);
 
-const groupsEl    = document.getElementById("groups");
-const totalNumEl  = document.getElementById("totalNum");
-const statusEl    = document.getElementById("status");
-const hintBox     = document.getElementById("hintBox");
-const chosenListEl= document.getElementById("chosenList");
-const drawerLabel = document.getElementById("drawerLabel");
-const resetBtn    = document.getElementById("resetBtn");
+const groupsEl     = document.getElementById("groups");
+const totalPill    = document.getElementById("totalPill");
+const statusEl     = document.getElementById("status");
+const hintBox      = document.getElementById("hintBox");
+const chosenListEl = document.getElementById("chosenList");
 
-function subjectOf(g, n) { return GROUPS.find(x => x.groupNumber === g).subjects.find(s => s.name === n); }
-function groupMarks(g) { return state[g].reduce((s, n) => s + subjectOf(g, n).marks, 0); }
-function totalMarks() { return GROUPS.reduce((s, g) => s + groupMarks(g.groupNumber), 0); }
+/* ---------- helpers ---------- */
+const subj = (g, n) => GROUPS.find(x => x.groupNumber === g).subjects.find(s => s.name === n);
+const groupMarks = g => state[g].reduce((s, n) => s + subj(g, n).marks, 0);
+const totalMarks = () => GROUPS.reduce((s, g) => s + groupMarks(g.groupNumber), 0);
 
 function getViolations() {
   const v = [];
@@ -283,19 +293,22 @@ function getViolations() {
     if (!sel.length) return;
     const m = groupMarks(g.groupNumber);
     if (sel.length > g.maxSubjects)
-      v.push({ group: g.groupNumber, type: "count", msg: `G${g.groupNumber}: remove ${sel.length - g.maxSubjects} subject(s).` });
+      v.push({group:g.groupNumber, type:"count",
+        message:`Group ${g.groupNumber}: ${sel.length} picked — FPSC allows ${g.maxSubjects}. Remove ${sel.length-g.maxSubjects}.`});
     if (m > g.maxMarks)
-      v.push({ group: g.groupNumber, type: "marks", msg: `G${g.groupNumber}: remove ${m - g.maxMarks} marks.` });
-    if (g.groupNumber === "II" && sel.length > 1) {
-      const has200 = sel.some(n => subjectOf("II", n).marks === 200);
-      if (has200) v.push({ group: "II", type: "mix", msg: `GII: 200-mark cannot mix — remove others.` });
-    }
+      v.push({group:g.groupNumber, type:"marks",
+        message:`Group ${g.groupNumber}: ${m} marks — cap is ${g.maxMarks}. Remove ${m-g.maxMarks}.`});
+    if (g.groupNumber === "II" && sel.length > 1 &&
+        sel.some(n => subj("II", n).marks === 200))
+      v.push({group:"II", type:"mix",
+        message:`Group II: a 200-mark subject can't be combined with another. Remove the extra subject(s).`});
   });
   const t = totalMarks();
-  if (t !== TARGET) v.push({
-    group: null, type: "total",
-    msg: t > TARGET ? `Remove ${t - TARGET} marks to reach 600.` : `Add ${TARGET - t} marks to reach 600.`
-  });
+  if (t !== TARGET)
+    v.push({group:null, type:"total",
+      message: t > TARGET
+        ? `Total ${t} — over by ${t-TARGET}. Remove ${t-TARGET} marks.`
+        : `Total ${t} — need ${TARGET-t} more marks.`});
   return v;
 }
 
@@ -305,52 +318,47 @@ function violatingKeys() {
     const sel = state[g.groupNumber];
     if (!sel.length) return;
     const m = groupMarks(g.groupNumber);
-    if (sel.length > g.maxSubjects || m > g.maxMarks) sel.forEach(n => keys.add(`${g.groupNumber}|${n}`));
-    if (g.groupNumber === "II" && sel.length > 1 &&
-        sel.some(n => subjectOf("II", n).marks === 200))
-      sel.forEach(n => keys.add(`II|${n}`));
+    const overCount = sel.length > g.maxSubjects;
+    const overMarks = m > g.maxMarks;
+    const mixII = g.groupNumber === "II" && sel.length > 1 &&
+                  sel.some(n => subj("II", n).marks === 200);
+    if (overCount || overMarks || mixII)
+      sel.forEach(n => keys.add(`${g.groupNumber}|${n}`));
   });
   return keys;
 }
 
+/* ---------- render ---------- */
 function renderGroups() {
   groupsEl.innerHTML = "";
-  GROUPS.forEach(group => {
-    const div = document.createElement("div");
-    div.className = "group";
-    div.dataset.group = group.groupNumber;
-
-    const head = document.createElement("div");
-    head.className = "group-header";
-    head.innerHTML = `<span class="group-title">G${group.groupNumber} · ${group.name}<small>${group.rule}</small></span><span class="chev">▶</span>`;
-    head.addEventListener("click", () => div.classList.toggle("open"));
-
-    const body = document.createElement("div");
-    body.className = "group-body";
-
-    const rule = document.createElement("div");
-    rule.className = "rule";
-    rule.textContent = group.rule;
-    body.appendChild(rule);
-
-    const flag = document.createElement("div");
-    flag.className = "rule-flag";
-    flag.dataset.flag = group.groupNumber;
-    body.appendChild(flag);
-
-    group.subjects.forEach(s => {
+  GROUPS.forEach(g => {
+    const d = document.createElement("div");
+    d.className = "group";
+    d.dataset.group = g.groupNumber;
+    d.innerHTML = `
+      <div class="group-header">
+        <span class="group-title">Group ${g.groupNumber} — ${g.name}
+          <small>${g.rule}</small>
+        </span>
+        <span class="chev">▶</span>
+      </div>
+      <div class="group-body">
+        <div class="rule">${g.rule}</div>
+        <div class="rule-flag" data-flag="${g.groupNumber}"></div>
+      </div>`;
+    d.querySelector(".group-header")
+      .addEventListener("click", () => d.classList.toggle("open"));
+    const body = d.querySelector(".group-body");
+    g.subjects.forEach(s => {
       const row = document.createElement("div");
       row.className = "subject";
-      row.dataset.group = group.groupNumber;
+      row.dataset.group = g.groupNumber;
       row.dataset.subject = s.name;
       row.innerHTML = `<span>${s.name}</span><span class="marks">${s.marks}</span>`;
-      row.addEventListener("click", () => toggle(group.groupNumber, s.name));
+      row.addEventListener("click", () => toggle(g.groupNumber, s.name));
       body.appendChild(row);
     });
-
-    div.appendChild(head);
-    div.appendChild(body);
-    groupsEl.appendChild(div);
+    groupsEl.appendChild(d);
   });
 }
 
@@ -361,6 +369,7 @@ function toggle(g, n) {
   updateUI();
 }
 
+/* ---------- update ---------- */
 function updateUI() {
   const violations = getViolations();
   const flagged = violatingKeys();
@@ -373,72 +382,75 @@ function updateUI() {
   });
 
   GROUPS.forEach(g => {
-    const div = document.querySelector(`.group[data-group="${g.groupNumber}"]`);
-    const flagEl = div.querySelector(`.rule-flag[data-flag="${g.groupNumber}"]`);
+    const gd = document.querySelector(`.group[data-group="${g.groupNumber}"]`);
+    const flagEl = gd.querySelector(`.rule-flag[data-flag="${g.groupNumber}"]`);
     const gv = violations.filter(v => v.group === g.groupNumber);
-    if (gv.length) {
-      div.classList.add("violation");
-      flagEl.textContent = "⚠ " + gv.map(v => v.msg).join(" ");
-    } else {
-      div.classList.remove("violation");
-      flagEl.textContent = "";
-    }
+    gd.classList.toggle("violation", gv.length > 0);
+    flagEl.textContent = gv.length ? "⚠ " + gv.map(v => v.message).join(" ") : "";
   });
 
   const total = totalMarks();
-  totalNumEl.textContent = total;
-  totalNumEl.className = "total-num" + (total === TARGET ? " ok" : total > TARGET ? " over" : "");
+  totalPill.textContent = `${total} / ${TARGET}`;
+  totalPill.className = "total-pill";
+  if (total === TARGET) totalPill.classList.add("ok");
+  else if (total > TARGET) totalPill.classList.add("over");
 
+  statusEl.className = "status";
   const tv = violations.find(v => v.type === "total");
   const rv = violations.filter(v => v.type !== "total");
-  statusEl.className = "status";
-  if (tv && tv.msg.startsWith("Remove")) {
-    statusEl.classList.add("err");
-    statusEl.textContent = "❌ " + tv.msg;
+  if (tv && tv.message.includes("over")) {
+    statusEl.classList.add("err"); statusEl.textContent = "❌ " + tv.message;
   } else if (rv.length) {
-    statusEl.classList.add("err");
-    statusEl.textContent = "❌ FPSC rule — see red groups.";
+    statusEl.classList.add("err"); statusEl.textContent = "❌ FPSC rule violation — see highlighted groups.";
   } else if (total === TARGET) {
-    statusEl.classList.add("ok");
-    statusEl.textContent = "✅ Valid — exactly 600!";
+    statusEl.classList.add("ok"); statusEl.textContent = "✅ Valid FPSC combination — exactly 600 marks!";
   } else {
-    statusEl.classList.add("warn");
-    statusEl.textContent = "⚠ " + (tv ? tv.msg : "");
+    statusEl.classList.add("warn"); statusEl.textContent = "⚠ " + tv.message;
   }
 
   if (violations.length) {
     hintBox.classList.add("show");
-    hintBox.innerHTML = "<strong>To fix:</strong> " + violations.map(v => "• " + v.msg).join(" ");
+    hintBox.innerHTML = "<strong>To fix:</strong><br>• " +
+      violations.map(v => v.message).join("<br>• ");
   } else {
-    hintBox.classList.remove("show");
-    hintBox.innerHTML = "";
+    hintBox.classList.remove("show"); hintBox.innerHTML = "";
   }
 
+  // chosen list (top)
   chosenListEl.innerHTML = "";
-  let count = 0, any = false;
+  let any = false;
   GROUPS.forEach(g => {
-    state[g.groupNumber].forEach(name => {
-      any = true; count++;
-      const s = subjectOf(g.groupNumber, name);
+    state[g.groupNumber].forEach(n => {
+      any = true;
+      const s = subj(g.groupNumber, n);
       const li = document.createElement("li");
-      li.className = flagged.has(`${g.groupNumber}|${name}`) ? "violating" : "";
-      li.innerHTML = `<span>G${g.groupNumber}: ${s.name} <span class="marks">(${s.marks})</span></span><button class="rm">×</button>`;
+      li.className = flagged.has(`${g.groupNumber}|${n}`) ? "violating" : "";
+      li.innerHTML = `
+        <span>G${g.groupNumber}: ${s.name} <span class="marks">(${s.marks})</span></span>
+        <button class="rm" title="Remove">×</button>`;
       li.querySelector(".rm").addEventListener("click", () => {
-        state[g.groupNumber] = state[g.groupNumber].filter(n => n !== name);
+        state[g.groupNumber] = state[g.groupNumber].filter(x => x !== n);
         updateUI();
       });
       chosenListEl.appendChild(li);
     });
   });
-  if (!any) chosenListEl.innerHTML = `<li class="empty">Tap a group above to select subjects.</li>`;
-  drawerLabel.textContent = any ? `${count} selected · ${total}/600` : "No subjects selected";
+  if (!any) chosenListEl.innerHTML = `<li class="empty">No subjects selected yet.</li>`;
 }
 
-resetBtn.addEventListener("click", () => {
+/* ---------- toolbar actions ---------- */
+document.getElementById("expandAllBtn").addEventListener("click", () => {
+  document.querySelectorAll(".group").forEach(g => g.classList.add("open"));
+});
+document.getElementById("collapseAllBtn").addEventListener("click", () => {
+  document.querySelectorAll(".group").forEach(g => g.classList.remove("open"));
+});
+document.getElementById("resetBtn").addEventListener("click", () => {
   GROUPS.forEach(g => state[g.groupNumber] = []);
   updateUI();
 });
 
+/* ---------- init ---------- */
 renderGroups();
 updateUI();
 document.querySelector('.group[data-group="I"]').classList.add("open");
