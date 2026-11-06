@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CSS Optional Subject Combination Builder (600 Marks)</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --accent: #38bdf8;
+    --accent-2: #22c55e;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+  .layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  .group {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .group-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; cursor: pointer; user-select: none;
+    background: var(--panel-2);
+  }
+  .group-header:hover { background: #2e3d56; }
+  .group-title { font-weight: 600; }
+  .group-title small { color: var(--muted); font-weight: 400; margin-left: 8px; }
+  .chev { transition: transform 0.2s; color: var(--muted); }
+  .group.open .chev { transform: rotate(90deg); }
+  .group-body { display: none; padding: 8px; }
+  .group.open .group-body { display: block; }
+  .rule { font-size: 0.78rem; color: var(--accent); padding: 4px 8px 8px; }
+
+  .subject {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 12px; border-radius: 8px; cursor: pointer;
+    border: 1px solid transparent; margin-bottom: 4px;
+  }
+  .subject:hover { background: #2e3d56; }
+  .subject.selected {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent);
+  }
+  .subject.disabled { opacity: 0.4; cursor: not-allowed; }
+  .marks { font-size: 0.8rem; color: var(--muted); }
+  .subject.selected .marks { color: var(--accent); }
+
+  .sidebar {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    position: sticky; top: 24px; height: fit-content;
+  }
+  .sidebar h2 { font-size: 1rem; margin: 0 0 12px; }
+  .total-box {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 12px; border-radius: 10px; background: var(--panel-2);
+    margin-bottom: 12px;
+  }
+  .total-num { font-size: 1.6rem; font-weight: 700; }
+  .total-num.ok { color: var(--accent-2); }
+  .total-num.over { color: var(--danger); }
+  .total-denom { color: var(--muted); font-size: 0.85rem; }
+  .status { font-size: 0.85rem; margin-bottom: 12px; min-height: 20px; }
+  .status.ok { color: var(--accent-2); }
+  .status.err { color: var(--danger); }
+  .status.warn { color: #f59e0b; }
+
+  .chosen-list { list-style: none; padding: 0; margin: 0 0 12px; }
+  .chosen-list li {
+    display: flex; justify-content: space-between; gap: 8px;
+    padding: 8px 10px; border-radius: 8px; background: var(--panel-2);
+    margin-bottom: 6px; font-size: 0.85rem;
+  }
+  .chosen-list .rm {
+    color: var(--danger); cursor: pointer; font-weight: 700;
+    background: none; border: none; font-size: 1rem;
+  }
+  .empty { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+  button.reset {
+    width: 100%; padding: 10px; border-radius: 8px; cursor: pointer;
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--border); font-size: 0.85rem;
+  }
+  button.reset:hover { color: var(--text); border-color: var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>CSS Optional Subject Combination Builder</h1>
+<div class="subtitle">Select subjects group by group until the total equals exactly <strong>600 marks</strong>.</div>
+
+<div class="layout">
+  <div id="groups"></div>
+
+  <aside class="sidebar">
+    <h2>Your Combination</h2>
+    <div class="total-box">
+      <span class="total-num" id="totalNum">0</span>
+      <span class="total-denom">/ 600 marks</span>
+    </div>
+    <div class="status" id="status">Start by selecting a subject from Group I.</div>
+    <ul class="chosen-list" id="chosenList">
+      <li class="empty">No subjects selected yet.</li>
+    </ul>
+    <button class="reset" id="resetBtn">Reset Selection</button>
+  </aside>
+</div>
+
+<script>
+const GROUPS = [
+  {
+    groupNumber: "I",
+    name: "Commerce & Social Sciences",
+    rule: "Select exactly ONE subject (200 marks).",
+    type: "single",
+    allowedMarks: [200],
+    subjects: [
+      { name: "Accountancy & Auditing", marks: 200 },
+      { name: "Economics", marks: 200 },
+      { name: "Computer Science", marks: 200 },
+      { name: "Political Science", marks: 200 },
+      { name: "International Relations", marks: 200 }
+    ]
+  },
+  {
+    groupNumber: "II",
+    name: "Sciences & Mathematics",
+    rule: "Select ONE 200-mark subject OR TWO 100-mark subjects.",
+    type: "flex",
+    allowedMarks: [100, 200],
+    subjects: [
+      { name: "Physics", marks: 200 },
+      { name: "Chemistry", marks: 200 },
+      { name: "Applied Mathematics", marks: 100 },
+      { name: "Pure Mathematics", marks: 100 },
+      { name: "Statistics", marks: 100 },
+      { name: "Geology", marks: 100 }
+    ]
+  },
+  {
+    groupNumber: "III",
+    name: "Administration & Governance",
+    rule: "Select exactly ONE subject (100 marks).",
+    type: "single",
+    allowedMarks: [100],
+    subjects: [
+      { name: "Business Administration", marks: 100 },
+      { name: "Public Administration", marks: 100 },
+      { name: "Governance & Public Policies", marks: 100 },
+      { name: "Town Planning & Urban Management", marks: 100 }
+    ]
+  },
+  {
+    groupNumber: "IV",
+    name: "History",
+    rule: "Select exactly ONE subject (100 marks).",
+    type: "single",
+    allowedMarks: [100],
+    subjects: [
+      { name: "History of Pakistan & India", marks: 100 },
+      { name: "Islamic History & Culture", marks: 100 },
+      { name: "British History", marks: 100 },
+      { name: "European History", marks: 100 },
+      { name: "History of USA", marks: 100 }
+    ]
+  },
+  {
+    groupNumber: "V",
+    name: "Natural Sciences & Literature",
+    rule: "Select exactly ONE subject (100 marks).",
+    type: "single",
+    allowedMarks: [100],
+    subjects: [
+      { name: "Gender Studies", marks: 100 },
+      { name: "Environmental Sciences", marks: 100 },
+      { name: "Agriculture & Forestry", marks: 100 },
+      { name: "Botany", marks: 100 },
+      { name: "Zoology", marks: 100 },
+      { name: "English Literature", marks: 100 },
+      { name: "Urdu Literature", marks: 100 }
+    ]
+  },
+  {
+    groupNumber: "VI",
+    name: "Law & Philosophy",
+    rule: "Select exactly ONE subject (100 marks).",
+    type: "single",
+    allowedMarks: [100],
+    subjects: [
+      { name: "Law", marks: 100 },
+      { name: "Constitutional Law", marks: 100 },
+      { name: "International Law", marks: 100 },
+      { name: "Muslim Law & Jurisprudence", marks: 100 },
+      { name: "Mercantile Law", marks: 100 },
+      { name: "Criminology", marks: 100 },
+      { name: "Philosophy", marks: 100 }
+    ]
+  },
+  {
+    groupNumber: "VII",
+    name: "Social Sciences & Languages",
+    rule: "Select exactly ONE subject (100 marks).",
+    type: "single",
+    allowedMarks: [100],
+    subjects: [
+      { name: "Journalism & Mass Communication", marks: 100 },
+      { name: "Psychology", marks: 100 },
+      { name: "Geography", marks: 100 },
+      { name: "Sociology", marks: 100 },
+      { name: "Anthropology", marks: 100 },
+      { name: "Punjabi", marks: 100 },
+      { name: "Sindhi", marks: 100 },
+      { name: "Pashto", marks: 100 },
+      { name: "Balochi", marks: 100 },
+      { name: "Persian", marks: 100 },
+      { name: "Arabic", marks: 100 }
+    ]
+  }
+];
+
+const TARGET = 600;
+
+// selection state: { "I": ["Computer Science"], "II": ["Statistics"], ... }
+const state = {};
+GROUPS.forEach(g => state[g.groupNumber] = []);
+
+const groupsEl = document.getElementById("groups");
+const totalNumEl = document.getElementById("totalNum");
+const statusEl = document.getElementById("status");
+const chosenListEl = document.getElementById("chosenList");
+const resetBtn = document.getElementById("resetBtn");
+
+// ---------- render group panels ----------
+function renderGroups() {
+  groupsEl.innerHTML = "";
+  GROUPS.forEach(group => {
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "group";
+    groupDiv.dataset.group = group.groupNumber;
+
+    const header = document.createElement("div");
+    header.className = "group-header";
+    header.innerHTML = `
+      <span class="group-title">Group ${group.groupNumber} — ${group.name}
+        <small>${group.rule}</small>
+      </span>
+      <span class="chev">▶</span>
+    `;
+    header.addEventListener("click", () => groupDiv.classList.toggle("open"));
+
+    const body = document.createElement("div");
+    body.className = "group-body";
+
+    const rule = document.createElement("div");
+    rule.className = "rule";
+    rule.textContent = group.rule;
+    body.appendChild(rule);
+
+    group.subjects.forEach(subject => {
+      const row = document.createElement("div");
+      row.className = "subject";
+      row.dataset.group = group.groupNumber;
+      row.dataset.subject = subject.name;
+      row.innerHTML = `<span>${subject.name}</span><span class="marks">${subject.marks} marks</span>`;
+      row.addEventListener("click", () => toggleSubject(group, subject));
+      body.appendChild(row);
+    });
+
+    groupDiv.appendChild(header);
+    groupDiv.appendChild(body);
+    groupsEl.appendChild(groupDiv);
+  });
+}
+
+// ---------- selection logic ----------
+function toggleSubject(group, subject) {
+  const selected = state[group.groupNumber];
+  const idx = selected.indexOf(subject.name);
+
+  if (idx !== -1) {
+    // deselect
+    selected.splice(idx, 1);
+  } else {
+    if (group.type === "single") {
+      // only one allowed
+      state[group.groupNumber] = [subject.name];
+    } else if (group.type === "flex") {
+      const currentMarks = selected.reduce((sum, n) => {
+        const s = group.subjects.find(x => x.name === n);
+        return sum + s.marks;
+      }, 0);
+
+      // Rule: either one 200-mark subject OR up to two 100-mark subjects
+      if (currentMarks + subject.marks > 200) {
+        // replace whole selection with this subject (reset then apply)
+        state[group.groupNumber] = [subject.name];
+      } else {
+        // prevent mixing a 200-mark with anything else
+        const has200 = selected.some(n => group.subjects.find(x => x.name === n).marks === 200);
+        if (has200) {
+          state[group.groupNumber] = [subject.name];
+        } else if (subject.marks === 200) {
+          // picking a 200 resets any 100s
+          state[group.groupNumber] = [subject.name];
+        } else {
+          selected.push(subject.name);
+        }
+      }
+    }
+  }
+
+  updateUI();
+}
+
+function getTotalMarks() {
+  let total = 0;
+  GROUPS.forEach(group => {
+    state[group.groupNumber].forEach(name => {
+      const s = group.subjects.find(x => x.name === name);
+      if (s) total += s.marks;
+    });
+  });
+  return total;
+}
+
+// ---------- update UI ----------
+function updateUI() {
+  // highlight selected subjects
+  document.querySelectorAll(".subject").forEach(row => {
+    const g = row.dataset.group;
+    const s = row.dataset.subject;
+    row.classList.toggle("selected", state[g].includes(s));
+  });
+
+  // total
+  const total = getTotalMarks();
+  totalNumEl.textContent = total;
+  totalNumEl.className = "total-num";
+  if (total === TARGET) totalNumEl.classList.add("ok");
+  else if (total > TARGET) totalNumEl.classList.add("over");
+
+  // status message
+  statusEl.className = "status";
+  if (total === TARGET) {
+    statusEl.classList.add("ok");
+    statusEl.textContent = "✅ Valid combination — exactly 600 marks!";
+  } else if (total > TARGET) {
+    statusEl.classList.add("err");
+    statusEl.textContent = `❌ Over by ${total - TARGET} marks. Remove a subject.`;
+  } else {
+    const remaining = TARGET - total;
+    statusEl.classList.add("warn");
+    statusEl.textContent = `Need ${remaining} more marks to reach 600.`;
+  }
+
+  // chosen list
+  chosenListEl.innerHTML = "";
+  let any = false;
+  GROUPS.forEach(group => {
+    state[group.groupNumber].forEach(name => {
+      any = true;
+      const s = group.subjects.find(x => x.name === name);
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <span>G${group.groupNumber}: ${s.name} <span class="marks">(${s.marks})</span></span>
+        <button class="rm" title="Remove">×</button>
+      `;
+      li.querySelector(".rm").addEventListener("click", () => {
+        state[group.groupNumber] = state[group.groupNumber].filter(n => n !== name);
+        updateUI();
+      });
+      chosenListEl.appendChild(li);
+    });
+  });
+  if (!any) {
+    chosenListEl.innerHTML = `<li class="empty">No subjects selected yet.</li>`;
+  }
+}
+
+// ---------- reset ----------
+resetBtn.addEventListener("click", () => {
+  GROUPS.forEach(g => state[g.groupNumber] = []);
+  updateUI();
+});
+
+// ---------- init ----------
+renderGroups();
+updateUI();
+
+// open Group I by default
+document.querySelector('.group[data-group="I"]').classList.add("open");
+</script>
+</body>
+</html>
