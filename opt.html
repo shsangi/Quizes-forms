@@ -18,6 +18,7 @@
     --muted: #94a3b8;
     --border: #334155;
     --hover: #2e3d56;
+    --grey: #64748b;
   }
   [data-theme="light"] {
     --bg: #f1f5f9;
@@ -31,6 +32,7 @@
     --muted: #64748b;
     --border: #cbd5e1;
     --hover: #f1f5f9;
+    --grey: #94a3b8;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -79,7 +81,9 @@
     max-height: 30vh;
     overflow-y: auto;
     flex: 0 0 auto;
+    transition: border-color 0.2s;
   }
+  .selected-strip.valid { border-color: var(--ok); }
   .strip-head {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 4px;
@@ -88,9 +92,12 @@
   .total-pill {
     font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
     background: var(--panel-2); color: var(--text);
+    transition: background 0.2s, color 0.2s;
   }
   .total-pill.ok { background: rgba(34,197,94,0.2); color: var(--ok); }
   .total-pill.over { background: rgba(239,68,68,0.2); color: var(--danger); }
+  /* when valid → grey everything so it recedes */
+  .total-pill.valid-grey { background: var(--panel-2); color: var(--grey); }
 
   .chosen-list { list-style: none; padding: 0; margin: 0; }
   .chosen-list li {
@@ -98,14 +105,53 @@
     gap: 6px; padding: 4px 8px; border-radius: 6px;
     background: var(--panel-2); margin-bottom: 3px; font-size: 0.74rem;
     border-left: 3px solid transparent;
+    transition: background 0.15s, opacity 0.2s;
   }
   .chosen-list li.violating {
-    border-left-color: var(--danger); background: rgba(239,68,68,0.12);
+    background: rgba(239,68,68,0.12);
   }
+  /* group colors on the left border + a big dot */
+  .chosen-list li.g1  { border-left-color: #3b82f6; }
+  .chosen-list li.g2  { border-left-color: #22c55e; }
+  .chosen-list li.g3  { border-left-color: #a855f7; }
+  .chosen-list li.g4  { border-left-color: #f59e0b; }
+  .chosen-list li.g5  { border-left-color: #ec4899; }
+  .chosen-list li.g6  { border-left-color: #06b6d4; }
+  .chosen-list li.g7  { border-left-color: #f97316; }
+
+  .chosen-list li.violating.g1, .chosen-list li.violating.g2,
+  .chosen-list li.violating.g3, .chosen-list li.violating.g4,
+  .chosen-list li.violating.g5, .chosen-list li.violating.g6,
+  .chosen-list li.violating.g7 { border-left-color: var(--danger); }
+
+  .chip-left { display: flex; align-items: center; gap: 6px; }
+  .group-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    flex: 0 0 auto; display: inline-block;
+  }
+  .g1 .group-dot { background: #3b82f6; }
+  .g2 .group-dot { background: #22c55e; }
+  .g3 .group-dot { background: #a855f7; }
+  .g4 .group-dot { background: #f59e0b; }
+  .g5 .group-dot { background: #ec4899; }
+  .g6 .group-dot { background: #06b6d4; }
+  .g7 .group-dot { background: #f97316; }
+
+  /* when valid, all chips fade to grey */
+  .chosen-list.valid li {
+    border-left-color: var(--grey) !important;
+    background: var(--panel-2);
+  }
+  .chosen-list.valid .group-dot {
+    background: var(--grey) !important;
+  }
+
   .chosen-list .rm {
     color: var(--danger); background: none; border: none;
     font-size: 1rem; line-height: 1; cursor: pointer; padding: 0 2px;
   }
+  .chosen-list.valid .rm { color: var(--grey); }
+
   .empty { color: var(--muted); font-size: 0.74rem; font-style: italic; padding: 2px 4px; }
 
   .status { font-size: 0.69rem; margin-top: 4px; min-height: 14px; }
@@ -153,8 +199,21 @@
     background: var(--panel-2); font-size: 0.78rem;
   }
   .group-header:active { background: var(--hover); }
-  .group-title { font-weight: 600; }
-  .group-title small { color: var(--muted); font-weight: 400; margin-left: 4px; font-size: 0.64rem; }
+  .group-title { font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .group-title small { color: var(--muted); font-weight: 400; margin-left: 2px; font-size: 0.64rem; }
+
+  /* group color marker in header */
+  .group-badge {
+    width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto;
+  }
+  .group[data-group="I"]   .group-badge { background: #3b82f6; }
+  .group[data-group="II"]  .group-badge { background: #22c55e; }
+  .group[data-group="III"] .group-badge { background: #a855f7; }
+  .group[data-group="IV"]  .group-badge { background: #f59e0b; }
+  .group[data-group="V"]   .group-badge { background: #ec4899; }
+  .group[data-group="VI"]  .group-badge { background: #06b6d4; }
+  .group[data-group="VII"] .group-badge { background: #f97316; }
+
   .chev { transition: transform 0.2s; color: var(--muted); font-size: 0.7rem; }
   .group.open .chev { transform: rotate(90deg); }
   .group-body { display: none; padding: 6px; }
@@ -194,13 +253,13 @@
   <div class="title-row">
     <h1>CSS Optional Subject Builder</h1>
     <div class="header-right">
-      <span class="version">v2.1</span>
+      <span class="version">v2.2</span>
       <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙 Dark</button>
     </div>
   </div>
 
   <!-- Selected subjects at TOP -->
-  <div class="selected-strip">
+  <div class="selected-strip" id="selectedStrip">
     <div class="strip-head">
       <span class="lbl">Selected · target 600</span>
       <span class="total-pill" id="totalPill">0 / 600</span>
@@ -328,11 +387,15 @@ const TARGET = 600;
 const state = {};
 GROUPS.forEach(g => state[g.groupNumber] = []);
 
-const groupsEl     = document.getElementById("groups");
-const totalPill    = document.getElementById("totalPill");
-const statusEl     = document.getElementById("status");
-const hintBox      = document.getElementById("hintBox");
-const chosenListEl = document.getElementById("chosenList");
+/* map group number → chip class g1..g7 */
+const chipClass = { "I":"g1","II":"g2","III":"g3","IV":"g4","V":"g5","VI":"g6","VII":"g7" };
+
+const groupsEl      = document.getElementById("groups");
+const totalPill     = document.getElementById("totalPill");
+const statusEl      = document.getElementById("status");
+const hintBox       = document.getElementById("hintBox");
+const chosenListEl  = document.getElementById("chosenList");
+const selectedStrip = document.getElementById("selectedStrip");
 
 /* ================= HELPERS ================= */
 const subj = (g, n) => GROUPS.find(x => x.groupNumber === g).subjects.find(s => s.name === n);
@@ -390,7 +453,9 @@ function renderGroups() {
     d.dataset.group = g.groupNumber;
     d.innerHTML = `
       <div class="group-header">
-        <span class="group-title">Group ${g.groupNumber} — ${g.name}
+        <span class="group-title">
+          <span class="group-badge"></span>
+          Group ${g.groupNumber} — ${g.name}
           <small>${g.rule}</small>
         </span>
         <span class="chev">▶</span>
@@ -426,7 +491,10 @@ function toggle(g, n) {
 function updateUI() {
   const violations = getViolations();
   const flagged = violatingKeys();
+  const total = totalMarks();
+  const isValid = total === TARGET;
 
+  /* subjects */
   document.querySelectorAll(".subject").forEach(row => {
     const g = row.dataset.group, s = row.dataset.subject;
     const isSel = state[g].includes(s);
@@ -434,6 +502,7 @@ function updateUI() {
     row.classList.toggle("violating", isSel && flagged.has(`${g}|${s}`));
   });
 
+  /* groups */
   GROUPS.forEach(g => {
     const gd = document.querySelector(`.group[data-group="${g.groupNumber}"]`);
     const flagEl = gd.querySelector(`.rule-flag[data-flag="${g.groupNumber}"]`);
@@ -442,12 +511,21 @@ function updateUI() {
     flagEl.textContent = gv.length ? "⚠ " + gv.map(v => v.message).join(" ") : "";
   });
 
-  const total = totalMarks();
+  /* target pill: colored while invalid, grey once valid */
   totalPill.textContent = `${total} / ${TARGET}`;
   totalPill.className = "total-pill";
-  if (total === TARGET) totalPill.classList.add("ok");
-  else if (total > TARGET) totalPill.classList.add("over");
+  if (isValid) {
+    totalPill.classList.add("valid-grey");
+  } else if (total > TARGET) {
+    totalPill.classList.add("over");
+  } else {
+    totalPill.classList.add("ok");
+  }
 
+  /* whole strip border: green when valid */
+  selectedStrip.classList.toggle("valid", isValid);
+
+  /* status */
   statusEl.className = "status";
   const tv = violations.find(v => v.type === "total");
   const rv = violations.filter(v => v.type !== "total");
@@ -455,12 +533,13 @@ function updateUI() {
     statusEl.classList.add("err"); statusEl.textContent = "❌ " + tv.message;
   } else if (rv.length) {
     statusEl.classList.add("err"); statusEl.textContent = "❌ FPSC rule violation — see highlighted groups.";
-  } else if (total === TARGET) {
+  } else if (isValid) {
     statusEl.classList.add("ok"); statusEl.textContent = "✅ Valid FPSC combination — exactly 600 marks!";
   } else {
     statusEl.classList.add("warn"); statusEl.textContent = "⚠ " + tv.message;
   }
 
+  /* hint */
   if (violations.length) {
     hintBox.classList.add("show");
     hintBox.innerHTML = "<strong>To fix:</strong><br>• " +
@@ -469,6 +548,8 @@ function updateUI() {
     hintBox.classList.remove("show"); hintBox.innerHTML = "";
   }
 
+  /* chosen list — group-colored until valid, then grey */
+  chosenListEl.classList.toggle("valid", isValid);
   chosenListEl.innerHTML = "";
   let any = false;
   GROUPS.forEach(g => {
@@ -476,9 +557,13 @@ function updateUI() {
       any = true;
       const s = subj(g.groupNumber, n);
       const li = document.createElement("li");
-      li.className = flagged.has(`${g.groupNumber}|${n}`) ? "violating" : "";
+      li.className = chipClass[g.groupNumber];
+      if (flagged.has(`${g.groupNumber}|${n}`)) li.classList.add("violating");
       li.innerHTML = `
-        <span>G${g.groupNumber}: ${s.name} <span class="marks">(${s.marks})</span></span>
+        <span class="chip-left">
+          <span class="group-dot"></span>
+          <span>G${g.groupNumber}: ${s.name} <span class="marks">(${s.marks})</span></span>
+        </span>
         <button class="rm" title="Remove">×</button>`;
       li.querySelector(".rm").addEventListener("click", () => {
         state[g.groupNumber] = state[g.groupNumber].filter(x => x !== n);
