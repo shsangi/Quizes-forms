@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>CSS Optional Subject Builder</title>
 <style>
-  :root {
+  /* ---------- THEME TOKENS ---------- */
+  :root, [data-theme="dark"] {
     --bg: #0f172a;
     --panel: #1e293b;
     --panel-2: #273449;
@@ -16,7 +17,22 @@
     --text: #e2e8f0;
     --muted: #94a3b8;
     --border: #334155;
+    --hover: #2e3d56;
   }
+  [data-theme="light"] {
+    --bg: #f1f5f9;
+    --panel: #ffffff;
+    --panel-2: #e2e8f0;
+    --accent: #0284c7;
+    --ok: #16a34a;
+    --danger: #dc2626;
+    --warn: #d97706;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #cbd5e1;
+    --hover: #f1f5f9;
+  }
+
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
@@ -29,6 +45,7 @@
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
+    transition: background 0.2s, color 0.2s;
   }
 
   /* ---------- header ---------- */
@@ -38,10 +55,19 @@
     flex: 0 0 auto;
   }
   .title-row {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
   }
   h1 { font-size: 0.95rem; margin: 0; font-weight: 700; }
-  .version { font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .version { font-size: 0.62rem; color: var(--muted); white-space: nowrap; }
+
+  .theme-btn {
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 3px 9px; font-size: 0.68rem; cursor: pointer;
+    display: flex; align-items: center; gap: 3px;
+  }
+  .theme-btn:active { background: var(--hover); }
 
   /* ---------- selected strip (TOP) ---------- */
   .selected-strip {
@@ -58,7 +84,7 @@
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 4px;
   }
-  .strip-head .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .strip-head .lbl { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
   .total-pill {
     font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
     background: var(--panel-2); color: var(--text);
@@ -70,7 +96,7 @@
   .chosen-list li {
     display: flex; justify-content: space-between; align-items: center;
     gap: 6px; padding: 4px 8px; border-radius: 6px;
-    background: var(--panel-2); margin-bottom: 3px; font-size: 0.75rem;
+    background: var(--panel-2); margin-bottom: 3px; font-size: 0.74rem;
     border-left: 3px solid transparent;
   }
   .chosen-list li.violating {
@@ -80,17 +106,17 @@
     color: var(--danger); background: none; border: none;
     font-size: 1rem; line-height: 1; cursor: pointer; padding: 0 2px;
   }
-  .empty { color: var(--muted); font-size: 0.75rem; font-style: italic; padding: 2px 4px; }
+  .empty { color: var(--muted); font-size: 0.74rem; font-style: italic; padding: 2px 4px; }
 
-  .status { font-size: 0.7rem; margin-top: 4px; min-height: 14px; }
+  .status { font-size: 0.69rem; margin-top: 4px; min-height: 14px; }
   .status.ok { color: var(--ok); }
   .status.err { color: var(--danger); }
   .status.warn { color: var(--warn); }
 
   .hint {
-    font-size: 0.68rem; padding: 5px 8px; border-radius: 6px;
+    font-size: 0.67rem; padding: 5px 8px; border-radius: 6px;
     background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.4);
-    color: #fca5a5; margin-top: 4px; display: none;
+    color: var(--danger); margin-top: 4px; display: none;
   }
   .hint.show { display: block; }
 
@@ -104,7 +130,7 @@
     background: var(--panel-2); color: var(--text);
     border: 1px solid var(--border); font-size: 0.72rem;
   }
-  .toolbar button:active { background: #2e3d56; }
+  .toolbar button:active { background: var(--hover); }
 
   /* ---------- groups (scrollable) ---------- */
   #groups {
@@ -126,33 +152,33 @@
     padding: 8px 10px; cursor: pointer; user-select: none;
     background: var(--panel-2); font-size: 0.78rem;
   }
-  .group-header:active { background: #2e3d56; }
+  .group-header:active { background: var(--hover); }
   .group-title { font-weight: 600; }
-  .group-title small { color: var(--muted); font-weight: 400; margin-left: 4px; font-size: 0.65rem; }
+  .group-title small { color: var(--muted); font-weight: 400; margin-left: 4px; font-size: 0.64rem; }
   .chev { transition: transform 0.2s; color: var(--muted); font-size: 0.7rem; }
   .group.open .chev { transform: rotate(90deg); }
   .group-body { display: none; padding: 6px; }
   .group.open .group-body { display: block; }
-  .rule { font-size: 0.65rem; color: var(--accent); padding: 2px 6px 4px; }
-  .rule-flag { font-size: 0.65rem; color: var(--danger); padding: 0 6px 4px; font-weight: 600; }
+  .rule { font-size: 0.64rem; color: var(--accent); padding: 2px 6px 4px; }
+  .rule-flag { font-size: 0.64rem; color: var(--danger); padding: 0 6px 4px; font-weight: 600; }
 
   .subject {
     display: flex; justify-content: space-between; align-items: center;
     padding: 6px 10px; border-radius: 6px; cursor: pointer;
     border: 1px solid transparent; margin-bottom: 3px; font-size: 0.75rem;
   }
-  .subject:active { background: #2e3d56; }
+  .subject:active { background: var(--hover); }
   .subject.selected {
     background: rgba(56,189,248,0.15); border-color: var(--accent);
   }
   .subject.selected.violating {
     background: rgba(239,68,68,0.15); border-color: var(--danger);
   }
-  .marks { font-size: 0.68rem; color: var(--muted); }
+  .marks { font-size: 0.67rem; color: var(--muted); }
   .subject.selected .marks { color: var(--accent); }
   .subject.selected.violating .marks { color: var(--danger); }
 
-  /* desktop widen a bit */
+  /* desktop */
   @media (min-width: 760px) {
     body { font-size: 14px; max-width: 720px; margin: 0 auto; }
     h1 { font-size: 1.1rem; }
@@ -167,7 +193,10 @@
 <header>
   <div class="title-row">
     <h1>CSS Optional Subject Builder</h1>
-    <span class="version">v2.0</span>
+    <div class="header-right">
+      <span class="version">v2.1</span>
+      <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙 Dark</button>
+    </div>
   </div>
 
   <!-- Selected subjects at TOP -->
@@ -195,6 +224,30 @@
 <div id="groups"></div>
 
 <script>
+/* ================= THEME ================= */
+const themeBtn = document.getElementById("themeBtn");
+const root = document.documentElement;
+
+function applyTheme(theme) {
+  root.setAttribute("data-theme", theme);
+  themeBtn.textContent = theme === "dark" ? "🌙 Dark" : "☀️ Light";
+  try { localStorage.setItem("css-builder-theme", theme); } catch(e) {}
+}
+
+(function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem("css-builder-theme"); } catch(e) {}
+  const prefersLight = window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: light)").matches;
+  applyTheme(saved || (prefersLight ? "light" : "dark"));
+})();
+
+themeBtn.addEventListener("click", () => {
+  const current = root.getAttribute("data-theme") || "dark";
+  applyTheme(current === "dark" ? "light" : "dark");
+});
+
+/* ================= DATA ================= */
 const GROUPS = [
   { groupNumber:"I", name:"Commerce & Social Sciences",
     rule:"Select ONE (200 marks).", maxSubjects:1, maxMarks:200,
@@ -281,7 +334,7 @@ const statusEl     = document.getElementById("status");
 const hintBox      = document.getElementById("hintBox");
 const chosenListEl = document.getElementById("chosenList");
 
-/* ---------- helpers ---------- */
+/* ================= HELPERS ================= */
 const subj = (g, n) => GROUPS.find(x => x.groupNumber === g).subjects.find(s => s.name === n);
 const groupMarks = g => state[g].reduce((s, n) => s + subj(g, n).marks, 0);
 const totalMarks = () => GROUPS.reduce((s, g) => s + groupMarks(g.groupNumber), 0);
@@ -328,7 +381,7 @@ function violatingKeys() {
   return keys;
 }
 
-/* ---------- render ---------- */
+/* ================= RENDER ================= */
 function renderGroups() {
   groupsEl.innerHTML = "";
   GROUPS.forEach(g => {
@@ -369,7 +422,7 @@ function toggle(g, n) {
   updateUI();
 }
 
-/* ---------- update ---------- */
+/* ================= UPDATE ================= */
 function updateUI() {
   const violations = getViolations();
   const flagged = violatingKeys();
@@ -416,7 +469,6 @@ function updateUI() {
     hintBox.classList.remove("show"); hintBox.innerHTML = "";
   }
 
-  // chosen list (top)
   chosenListEl.innerHTML = "";
   let any = false;
   GROUPS.forEach(g => {
@@ -438,7 +490,7 @@ function updateUI() {
   if (!any) chosenListEl.innerHTML = `<li class="empty">No subjects selected yet.</li>`;
 }
 
-/* ---------- toolbar actions ---------- */
+/* ================= TOOLBAR ================= */
 document.getElementById("expandAllBtn").addEventListener("click", () => {
   document.querySelectorAll(".group").forEach(g => g.classList.add("open"));
 });
@@ -450,7 +502,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   updateUI();
 });
 
-/* ---------- init ---------- */
+/* ================= INIT ================= */
 renderGroups();
 updateUI();
 document.querySelector('.group[data-group="I"]').classList.add("open");
