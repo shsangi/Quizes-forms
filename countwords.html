@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Word & Letter Counter (paste‑ready)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            width: 100%;
+            max-width: 720px;
+            padding: 28px 30px 30px;
+            border-radius: 40px;
+            box-shadow: 0 20px 35px -10px rgba(0, 20, 40, 0.25), 
+                        0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            transition: 0.2s;
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.1rem 0;
+            color: #0b2b3b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 span {
+            background: #1e5a7a;
+            color: white;
+            font-size: 1rem;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+        .subhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            color: #2a5770;
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .subhead button {
+            background: transparent;
+            border: 1.5px solid #b6d0e0;
+            color: #1f4e66;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .subhead button:hover {
+            background: #d9e9f2;
+            border-color: #7faec9;
+        }
+        .subhead button:active {
+            transform: scale(0.96);
+        }
+        textarea {
+            width: 100%;
+            border: 2px solid #cbdce8;
+            border-radius: 24px;
+            padding: 18px 20px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            resize: vertical;
+            background: #ffffffd9;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+            transition: 0.2s;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 200px;
+            color: #103746;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3e8db0;
+            box-shadow: 0 0 0 4px rgba(62, 141, 176, 0.15), inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+        textarea::placeholder {
+            color: #8daec2;
+            font-weight: 400;
+            font-style: italic;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin: 24px 0 8px;
+        }
+        .stat-item {
+            background: #e1eff8;
+            border-radius: 20px;
+            padding: 16px 12px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 20, 30, 0.04);
+            border: 1px solid #ffffffb3;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-weight: 600;
+            color: #21607e;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #07384e;
+            line-height: 1.2;
+            word-break: break-word;
+            transition: 0.1s;
+        }
+        .stat-desc {
+            font-size: 0.72rem;
+            color: #3d6e89;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+        .footer-note {
+            text-align: right;
+            font-size: 0.75rem;
+            color: #54809b;
+            margin-top: 12px;
+            border-top: 1px dashed #c2d8e8;
+            padding-top: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-note span {
+            background: #d5e6f1;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        @media (max-width: 550px) {
+            .card { padding: 20px; }
+            .stats-grid { gap: 8px; }
+            .stat-value { font-size: 1.8rem; }
+            h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>
+        📊 Text Counter
+        <span>live</span>
+    </h1>
+    <div class="subhead">
+        <div>🔹 Paste or type — counts update instantly</div>
+        <button id="clearBtn" title="Clear textarea">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            Clear
+        </button>
+    </div>
+
+    <textarea id="textInput" placeholder="Paste anything here… ✨&#10;&#10;Try a sentence, a paragraph, or just a few words." autofocus></textarea>
+
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-label">Words</div>
+            <div class="stat-value" id="wordCount">0</div>
+            <div class="stat-desc">space‑separated</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Letters (no spaces)</div>
+            <div class="stat-value" id="letterNoSpace">0</div>
+            <div class="stat-desc">all chars except spaces</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Letters + spaces</div>
+            <div class="stat-value" id="letterWithSpace">0</div>
+            <div class="stat-desc">total characters</div>
+        </div>
+    </div>
+    <div class="footer-note">
+        <span>⚡ updates on paste & type</span>
+        <span id="charIndicator">0 chars</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const textarea = document.getElementById('textInput');
+        const wordCountEl = document.getElementById('wordCount');
+        const letterNoSpaceEl = document.getElementById('letterNoSpace');
+        const letterWithSpaceEl = document.getElementById('letterWithSpace');
+        const charIndicator = document.getElementById('charIndicator');
+        const clearBtn = document.getElementById('clearBtn');
+
+        // ----- core counting functions -----
+
+        /**
+         * Count words: split by whitespace (spaces, tabs, newlines, etc.)
+         * Treat any sequence of non-whitespace as a word.
+         * Handles multiple spaces / line breaks correctly.
+         */
+        function countWords(text) {
+            if (!text) return 0;
+            // Trim and split by one or more whitespace characters, filter out empty tokens
+            const words = text.trim().split(/\s+/);
+            // If the trimmed text is empty string, split returns [''], so we need to handle that
+            if (words.length === 1 && words[0] === '') return 0;
+            return words.length;
+        }
+
+        /**
+         * Letters without spaces: count all characters except any whitespace
+         * (space, tab, newline, carriage return, etc.)
+         */
+        function countLettersWithoutSpaces(text) {
+            if (!text) return 0;
+            // Remove all whitespace characters (spaces, tabs, newlines, etc.) then count length
+            return text.replace(/\s/g, '').length;
+        }
+
+        /**
+         * Letters with spaces: simply the total length of the string
+         */
+        function countLettersWithSpaces(text) {
+            return text.length;
+        }
+
+        // ----- update all counters -----
+        function updateCounts() {
+            const text = textarea.value;
+
+            const words = countWords(text);
+            const noSpaces = countLettersWithoutSpaces(text);
+            const withSpaces = countLettersWithSpaces(text);
+
+            // update DOM
+            wordCountEl.textContent = words;
+            letterNoSpaceEl.textContent = noSpaces;
+            letterWithSpaceEl.textContent = withSpaces;
+
+            // optional extra indicator (total length)
+            charIndicator.textContent = `${withSpaces} char${withSpaces !== 1 ? 's' : ''}`;
+        }
+
+        // ----- event listeners -----
+
+        // "input" event fires for typing, pasting, cutting, undo, etc.
+        textarea.addEventListener('input', updateCounts);
+
+        // Also explicitly handle "paste" just to be extra responsive in all browsers,
+        // though 'input' already covers it. This ensures immediate update even if
+        // some browser lags with input on paste.
+        textarea.addEventListener('paste', function(e) {
+            // The paste event fires before the value is updated,
+            // so we use a tiny microtask / setTimeout to update after the paste is processed.
+            // This is a safety net — 'input' will also fire. But we keep it for instant feel.
+            setTimeout(() => {
+                updateCounts();
+            }, 0);
+        });
+
+        // Clear button
+        clearBtn.addEventListener('click', function() {
+            textarea.value = '';
+            updateCounts();
+            textarea.focus();
+        });
+
+        // Initialize counters (in case textarea has default value or autofill)
+        updateCounts();
+
+        // Handle edge case: programmatic value changes (e.g., via scripts)
+        // We can also observe if needed, but not necessary.
+        // For robustness, we could add a MutationObserver, but not required.
+
+        // Also update if the textarea is cleared via keyboard (e.g., Ctrl+A Delete)
+        // 'input' already covers that.
+
+        // OPTIONAL: If the textarea gets reset by form reset (none here), ignore.
+
+        // For maximum paste responsiveness, also listen to "change" but that's less needed.
+        // We are good.
+    })();
+</script>
+</body>
+</html>
